@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+}
+skinparam classAttributeIconSize 0
+hide circle
+top to bottom direction
+skinparam nodesep 35
+skinparam ranksep 45
+class "职员" as S <<entity>> {
+ 姓名
+ --
+ 判断岗位资格()
+}
+class "接诊时段" as T <<entity>> {
+ 适用星期
+ 起始时间
+ 结束时间
+ 确认依据
+ 发布时间
+ --
+ 校验时段()
+ 判断可接诊()
+ 核对预约支持()
+ 发布安排()
+}
+class "预约" as A <<entity>> {
+ 起始时间
+ 结束时间
+ 候诊安排
+ --
+ 提供有效占用()
+ 检查时段冲突()
+}
+S "1" -down- "0..*" T : 接诊牙医
+S "1" -right- "0..*" A : 预约牙医
+class "接诊时段变更" as H <<entity>> {
+ 发生时间
+ 原起止时间
+ 变更原因
+ --
+ 保留原安排()
+}
+T "1" *-down- "0..*" H : 变更经历
+T "1..*" -- "0..*" A : 覆盖接诊时间
+
+@enduml

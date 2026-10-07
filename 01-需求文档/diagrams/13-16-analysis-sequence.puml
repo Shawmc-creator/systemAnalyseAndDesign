@@ -1,0 +1,65 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 16
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 16
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ ParticipantFontSize 16
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "前台" as A
+boundary "<u>:前台接口</u>" as B #white
+control "<u>:查询可用接诊安排控制</u>" as K #white
+participant "<u>:接诊时段</u>" as E
+participant "<u>:预约</u>" as E2
+A -> B : 提交查询条件（步骤1）
+activate B
+B -> B : 检查基本格式()
+B -> K : 查询可用接诊安排(条件、操作者)
+activate K
+K -> E : 提供已确认人员时段()
+activate E
+E --> K : 指定期间有效时段
+deactivate E
+alt 日期、人员及权限有效
+ K -> E2 : 提供有效占用并判定冲突()
+ activate E2
+ E2 --> K : 占用与可用安排
+ deactivate E2
+ K --> B : 查询结果与业务口径（步骤2-3）
+ B --> A : 反馈可核对明细
+else 条件无效或范围无权
+ K --> B : 拒绝原因，不返回越权内容
+ B --> A : 反馈问题
+end
+deactivate K
+deactivate B
+opt 选择获准明细（步骤4）
+ A -> B : 提交选定业务对象
+ activate B
+ B -> K : 取得当前明细()
+ activate K
+ K -> E : 提供当前获准详情()
+ activate E
+ E --> K : 当前详情或不可访问原因
+ deactivate E
+ K --> B : 当前结果
+ deactivate K
+ B --> A : 反馈结果
+ deactivate B
+end
+note over K,E2 : 无安排明确反馈；确认预约仍须重新校验；查询不写入业务。
+
+@enduml

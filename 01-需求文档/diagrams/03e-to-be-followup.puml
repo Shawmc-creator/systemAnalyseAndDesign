@@ -1,0 +1,58 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+actor "患者" as P
+participant "<img:business-worker.png>\n前台" as F
+participant "<img:business-worker.png>\n牙医" as D
+participant "<img:business-entity.png>\n牙科诊所管理系统" as S
+group 本次诊疗已结束且牙医提出诊后联系要求
+ D -> S : 登记随访／复诊事项及时间要求
+ S -> S : 关联病历并生成前台诊后待办
+end
+... 到达牙医提出的联系时间 ...
+group 按待办事项开展随访
+ F -> S : 查询到期诊后待办
+ S --> F : 返回联系事项与患者资料
+ F -> P : 联系患者，了解诊后情况
+ alt 已联系到患者
+  P --> F : 反馈诊后情况与复诊意向
+  F -> S : 保存联系结果及患者反馈
+  D -> S : 查阅需评估的反馈及前次病历
+  S --> D : 返回联系记录与诊疗历史
+  D -> D : 评估反馈，形成处理意见
+  D -> S : 登记处理意见及复诊要求
+  F -> S : 查阅牙医处理意见
+  S --> F : 返回处理意见及复诊要求
+  F -> P : 传达牙医意见
+ else 未联系到患者
+  F -> S : 记录未联系成功及后续联系事项
+ end
+end
+opt 牙医提出复诊要求且患者确认安排
+ F -> S : 查询可约时段并登记复诊预约
+ S --> F : 返回预约确认信息
+ F -> P : 回告复诊时间及接诊牙医
+ ... 患者按约到诊并完成接待 ...
+ D -> S : 查询前次病历及诊后联系记录
+ S --> D : 返回关联病历与联系记录
+ D -> D : 结合检查评估复诊情况
+ D -> S : 保存复诊记录与后续意见
+ D -> P : 说明复诊结果与后续意见
+end
+@enduml

@@ -1,0 +1,44 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+participant "<img:business-worker.png>\n收费人员" as C
+participant "<img:business-worker.png>\n诊所负责人" as M
+C -> C : 整理需要新增或调整的价目
+activate C
+C -> M : 提交项目、单位、价格及适用区间
+activate M
+M -> M : 核实项目和价格调整内容
+M --> C : 确认价格及适用起止时点
+deactivate M
+C -> C : 查阅纸质价目表和历史版本
+C -> C : 检查原、新价目的适用区间
+C -> M : 核实原价目结束与新价目衔接
+activate M
+M --> C : 确认区间衔接安排
+deactivate M
+C -> C : 编制新价目，标明确认人和时间
+C -> C : 保留原价目及历史适用区间
+C -> M : 提交完成后的价目表核对
+activate M
+M -> M : 核对价格、单位和生效时间
+M --> C : 确认该版价目可供使用
+deactivate M
+C -> C : 按确认区间查价，保留原结算依据
+deactivate C
+@enduml

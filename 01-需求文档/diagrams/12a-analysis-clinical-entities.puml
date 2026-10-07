@@ -1,0 +1,74 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+}
+skinparam classAttributeIconSize 0
+hide circle
+top to bottom direction
+skinparam nodesep 35
+skinparam ranksep 45
+class "患者" as P <<entity>> {
+ 姓名
+ 联系电话
+ 出生日期
+ --
+ 核对身份()
+ 维护资料()
+ 提供诊疗历史()
+}
+class "患者资料变更" as H <<entity>> {
+ 发生时间
+ 原值
+ 原因
+ --
+ 保留原资料()
+}
+class "就诊" as V <<entity>> {
+ 到诊时间
+ --
+ 核对接诊归属()
+ 提供病历()
+}
+class "病历" as R <<entity>> {
+ 主诉
+ 相关病史
+ 过敏说明
+ 诊断
+ 治疗经过
+ 诊后指导
+ 签署时间
+ --
+ 判断可编辑()
+ 保存临床内容()
+ 校验签署()
+ 签署()
+ 提供正文()
+}
+class "检查所见" as F <<entity>> {
+ 牙位
+ 检查描述
+ --
+ 校验牙位()
+}
+class "病历补充" as A <<entity>> {
+ 发生时间
+ 内容
+ 原因
+ --
+ 追加补充()
+}
+P "1" *-right- "0..*" H : 资料变更经历
+P "1" -down- "0..*" V : 就诊者
+V "1" *-down- "1" R : 本次病历
+R "1" *-right- "0..*" F : 检查所见
+R "1" *-down- "0..*" A : 补充经历
+
+@enduml

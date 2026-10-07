@@ -1,0 +1,106 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 110
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "收费人员" as A #white
+boundary "<u>:收费人员接口</u>" as B #white
+control "<u>:查询待结算</u>\n<u>费用控制</u>" as K #white
+participant "<u>:就诊</u>" as V
+participant "<u>:诊疗确认</u>" as D
+participant "<u>:诊疗明细</u>" as I
+participant "<u>:价目</u>" as P
+A -> B : 查询就诊(患者条件或就诊编号)
+activate B
+B -> B : 检查查询条件()
+B -> K : 查询待结算就诊(条件)
+activate K
+K -> V : 查询匹配就诊(条件)
+activate V
+V --> K : {患者、就诊及结算情况}
+deactivate V
+K --> B : 候选记录或无结果
+deactivate K
+B --> A : 展示候选记录（步骤1-2）
+deactivate B
+opt 核对并选定就诊
+A -> B : 选择本次就诊（步骤3）
+activate B
+B -> K : 查询待结算费用(就诊)
+activate K
+K -> V : 判断已结清并取得当前确认()
+activate V
+V --> K : 当前确认、已结清或尚未确认
+deactivate V
+alt 有待计费确认
+K -> D : 判断可计费()
+activate D
+loop 每条确认明细
+D -> I : 检查数量及价目()
+activate I
+opt 已关联价目
+I -> P : 核对已关联价目(原确认时点)
+activate P
+deactivate P
+end
+deactivate I
+end
+D --> K : 可计费或具体缺失项
+deactivate D
+newpage
+opt 依据完整
+K -> D : 合计费用()
+activate D
+loop 每条确认明细
+D -> I : 计算金额()
+activate I
+I -> P : 提供已关联单价()
+activate P
+P --> I : 原计价单价
+deactivate P
+I -> I : 计算数量乘单价()
+I --> D : 明细金额及依据
+deactivate I
+end
+D -> D : 汇总明细金额()
+D --> K : 明细、应收及费用核对依据
+deactivate D
+end
+else 已结清（4b）
+K -> V : 提供既有收款结果()
+activate V
+V --> K : 原结算结果
+deactivate V
+else 尚未确认（4a）
+note over K,V : 停止计费，提示牙医确认后重新查询。
+end
+K --> B : 核对费用、既有结算或具体问题
+deactivate K
+B --> A : 展示核对结果（步骤4-5）
+deactivate B
+A -> B : 完成核对或另行发起UC-07（步骤6）
+end
+note over B,D
+缺价不视为零元（4a）；
+项目更正后重新核对（5a）。
+end note
+@enduml

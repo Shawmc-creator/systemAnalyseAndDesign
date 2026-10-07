@@ -1,0 +1,66 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+participant "<img:business-worker.png>\n诊疗助理" as A
+participant "<img:business-worker.png>\n诊所负责人" as M
+participant "<img:business-entity.png>\n牙科诊所管理系统" as S
+activate A
+alt 材料入库
+ A -> A : 核对实际到货材料、单位及数量
+ A -> S : 提交材料入库数量及经办信息
+else 材料领用
+ A -> S : 查询该材料可用库存
+ activate S
+ S --> A : 返回可用数量
+deactivate S
+ A -> A : 核对本次领用数量及用途
+ A -> S : 提交本次领用数量及用途
+else 材料盘点
+ A -> A : 清点实际库存
+ A -> S : 查询该材料账面库存
+ activate S
+ S --> A : 返回账面数量
+deactivate S
+ A -> M : 报告盘点差异及核实情况
+ activate M
+ M -> M : 核实差异原因及处理方式
+ M --> A : 确认库存调整及原因
+deactivate M
+ A -> S : 提交已确认的盘点调整
+end
+activate S
+S -> S : 校验材料、单位、数量及变动依据\n领用数量不得超过可用库存
+alt 变动内容有效
+ S -> S : 保存库存变动并更新余额
+ S --> A : 返回变动结果及当前库存
+else 变动内容无效
+ S --> A : 返回具体问题，保留原有效库存
+end
+deactivate S
+opt 登记成功且为材料领用
+ A -> A : 发放材料并核实实际领用数量
+end
+opt 库存不足以满足后续使用
+ A -> M : 报告需要补充的材料及数量
+ activate M
+ M --> A : 确认补充数量及时间安排
+deactivate M
+end
+deactivate A
+@enduml

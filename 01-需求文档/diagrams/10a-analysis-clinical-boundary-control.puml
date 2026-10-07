@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+skinparam nodesep 24
+skinparam ranksep 65
+skinparam actor {
+ BorderColor black
+ BackgroundColor white
+}
+skinparam usecase {
+ BorderColor black
+ BackgroundColor white
+}
+skinparam rectangle {
+ BorderColor black
+ BackgroundColor white
+}
+skinparam defaultFontSize 17
+skinparam ranksep 55
+left to right direction
+actor "前台" as A0
+boundary "前台接口" as B0 #white
+A0 -- B0
+control "维护患者资料控制\nUC-08" as K8 #white
+B0 ..> K8
+control "办理复诊随访联系控制\nUC-13" as K13 #white
+B0 ..> K13
+actor "牙医" as A1
+boundary "牙医接口" as B1 #white
+A1 -- B1
+control "查询患者诊疗资料控制\nUC-09" as K9 #white
+B1 ..> K9
+control "记录检查诊断及方案控制\nUC-10" as K10 #white
+B1 ..> K10
+control "签署及补充病历控制\nUC-11" as K11 #white
+B1 ..> K11
+control "提出复诊随访要求控制\nUC-12" as K12 #white
+B1 ..> K12
+control "记录复诊随访评估控制\nUC-14" as K14 #white
+B1 ..> K14
+
+K8 -[hidden]right-> K9
+K9 -[hidden]right-> K10
+K10 -[hidden]right-> K11
+K11 -[hidden]right-> K12
+K12 -[hidden]right-> K13
+K13 -[hidden]right-> K14
+A0 -[hidden]right-> A1
+@enduml

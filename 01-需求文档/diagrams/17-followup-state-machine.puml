@@ -1,0 +1,45 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+ StartColor black
+ EndColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+state "待处理" as Open {
+ state "待联系" as Pending
+ state "已联系待评估" as Contacted
+ state "已约复诊" as Scheduled
+ [*] --> Pending
+ Pending : 未联系成功 [下次日期有效]\n/ 追加联系及后续日期
+ Pending -down-> Contacted : 登记联系 [实际反馈有效]\n/ 保留联系经历
+ Contacted -down-> Scheduled : 关联复诊 [同患者有效预约]\n/ 保留预约与联系经历
+ Pending -left-> Scheduled : 关联复诊\n[同患者有效预约]\n/ 保留关联结果
+ Scheduled : 登记新的复诊关联 [同患者]\n/ 追加联系，保留原经历
+}
+state "评估完成" as Completed
+state "已取消" as Cancelled
+[*] --> Open : 提出要求 [来源已签署]\n/ 关联来源并生成待办
+Open -down-> Completed : 确认临床评估 [评估有效]\n/ 保存评估人与时间
+Open -down-> Cancelled : 取消安排 [原因有效]\n/ 保留要求及联系经历
+Completed : 查询或重复确认 / 返回原评估
+Cancelled : 查询 / 返回原取消结果
+note bottom of Completed
+ 评估有效：有来源或复诊的接诊权限，
+ 恢复情况、结论及处理意见完整；
+ 已约复诊时，其病历须已签署。
+end note
+note bottom of Cancelled
+ 预约改期、取消由UC-01办理，
+ 预约取消不自动取消诊后要求。
+end note
+@enduml
+

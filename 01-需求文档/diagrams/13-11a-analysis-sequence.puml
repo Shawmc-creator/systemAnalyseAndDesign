@@ -1,0 +1,63 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 16
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 16
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ ParticipantFontSize 16
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "牙医" as A
+boundary "<u>:牙医接口</u>" as B #white
+control "<u>:签署及补充病历控制</u>" as K #white
+participant "<u>:病历</u>" as R
+participant "<u>:病历补充</u>" as H
+A -> B : 请求补充已签署病历（1a）
+activate B
+B -> K : 取得原签署病历()
+activate K
+K -> R : 提供原文及补充经历()
+activate R
+R --> K : 已签署正文及原补充
+ deactivate R
+K --> B : 原病历及经历
+ deactivate K
+B --> A : 反馈原文供核对
+ deactivate B
+A -> B : 提交补充内容及原因
+activate B
+B -> K : 追加病历补充(内容、原因、牙医)
+activate K
+critical 归属校验与补充同时完成
+ K -> R : 核对本人签署病历()
+ activate R
+ R --> K : 已签署且操作者有权限
+ alt 补充内容及原因有效
+  K -> R : 追加补充()
+  R -> H : 保存本次补充(内容、原因、经办及时间)
+  activate H
+  H --> R : 已保留独立补充
+  deactivate H
+  R --> K : 补充结果
+ else 无权限或内容无效
+  R --> K : 拒绝原因，原文及补充不变
+ end
+ deactivate R
+end
+K --> B : 追加结果或问题
+ deactivate K
+B --> A : 反馈原文与新增补充
+ deactivate B
+@enduml

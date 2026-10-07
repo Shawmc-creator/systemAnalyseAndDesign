@@ -1,0 +1,48 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+}
+skinparam classAttributeIconSize 0
+hide circle
+top to bottom direction
+skinparam nodesep 35
+skinparam ranksep 45
+class "现金收款" as P <<entity>> {
+ 收款时间
+ 应收金额
+ 实际收到金额
+ --
+ 计算找零()
+ 计算净收()
+ 提供原收据()
+}
+class "收款核对" as R <<entity>> {
+ 营业日期
+ 系统净收快照
+ 盘点净收
+ 差异原因
+ 处理意见
+ 确认依据
+ 核对时间
+ --
+ 核验收款依据()
+ 计算差额()
+ 保留核对经历()
+}
+class "职员" as S <<entity>> {
+ 姓名
+ --
+ 判断岗位资格()
+}
+R "0..*" -- "0..*" P : 核对依据
+S "1" -down- "0..*" R : 经办收费人员
+
+@enduml

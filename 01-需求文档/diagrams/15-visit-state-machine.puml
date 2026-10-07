@@ -1,0 +1,39 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+skinparam ArrowFontSize 17
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+ StartColor black
+ EndColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+state "未结清" as Open {
+ state "未确认项目" as Unconfirmed
+ state "已确认缺价" as Missing
+ state "可结算" as Ready
+ state PriceCheck <<choice>>
+ [*] --> Unconfirmed
+ Unconfirmed : 查询费用 / 提示项目未确认
+ Missing : 查询费用 / 提示缺价，停止核对
+ Ready : 查询费用 / 返回费用与核对依据
+ Unconfirmed -down-> PriceCheck : 确认诊疗项目 [确认有效]\n/ 建立当前确认及明细
+ PriceCheck -left-> Missing : [存在缺价明细]
+ PriceCheck -down-> Ready : [全部明细价目齐全]
+ Missing -down-> Ready : 计价依据补齐\n[全部明细价目齐全]\n/ 核验原确认时点价目
+}
+state "已结清" as Settled
+Settled : 查询费用 / 提供原费用及收款
+Settled : 登记现金结算 / 返回原收款
+Settled : 取得收据 / 形成原收款收据
+[*] -down-> Open : 登记到诊 [预约可到诊]\n/ 保存到诊并关联预约
+Open -left-> PriceCheck : 更正确认\n[有当前确认且更正有效]\n/ 保留原确认，建立新版本
+Ready -down-> Settled : 登记现金结算 [结算有效]\n/ 保存现金收款，关联结清
+@enduml

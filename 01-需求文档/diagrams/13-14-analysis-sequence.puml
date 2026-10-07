@@ -1,0 +1,92 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 16
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 16
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ ParticipantFontSize 16
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "牙医" as A
+boundary "<u>:牙医接口</u>" as B #white
+control "<u>:记录复诊随访评估控制</u>" as K #white
+participant "<u>:诊后要求</u>" as E
+participant "<u>:病历</u>" as E2
+participant "<u>:临床评估</u>" as E3
+A -> B : 请求评估诊后要求（步骤1）
+activate B
+B -> K : 取得办理依据()
+activate K
+K -> E : 提供来源及关联复诊()
+activate E
+E --> K : 来源、联系与复诊病历
+deactivate E
+K --> B : 当前办理依据
+deactivate K
+B --> A : 反馈内容（步骤2）
+deactivate B
+A -> B : 提交恢复情况、临床结论及处理意见（步骤3）
+activate B
+B -> K : 校验办理内容()
+activate K
+K -> E : 判断要求可评估()
+activate E
+E --> K : 业务条件判断
+deactivate E
+K -> E2 : 核对来源牙医；已约时核对复诊签署()
+activate E2
+E2 --> K : 关联依据及校验结果
+deactivate E2
+alt 有评估权限且临床依据完整
+ K --> B : 可确认内容
+ deactivate K
+ B --> A : 反馈核对内容（步骤4）
+ deactivate B
+newpage
+ A -> B : 确认提交（步骤5）
+ activate B
+ B -> K : 确认办理()
+ activate K
+ critical 最后核验与保存同时完成
+  K -> E : 再次核对当前有效依据()
+  activate E
+  E --> K : 有效或已变化
+  deactivate E
+  alt 当前依据有效
+   K -> E : 完成并关联临床评估()
+   activate E
+   E -> E3 : 确认临床结果()
+   activate E3
+   E3 --> E : 已关联业务经历
+   deactivate E3
+   E --> K : 已保存业务结果
+   deactivate E
+  else 当前依据已变化
+   note over K,E : 拒绝过期提交，保留原有效内容。
+  end
+ end
+ K --> B : 保存结果或具体原因
+ deactivate K
+ B --> A : 反馈结果（步骤6）
+ deactivate B
+else 校验不通过
+ K --> B : 拒绝原因
+ deactivate K
+ B --> A : 具体问题，修正后再提交
+ deactivate B
+end
+note over K,E2 : 已约复诊但未有已签署病历：\n拒绝完成评估，保留原要求。
+
+@enduml

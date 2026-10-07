@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#124e59">
+  <title>青禾牙科工作台</title>
+  <script>
+    if (location.protocol === 'file:') location.replace('http://127.0.0.1:3000/');
+  </script>
+  <link rel="stylesheet" href="/styles.css?v=4">
+</head>
+<body>
+  <section id="login-screen" class="login-screen">
+    <div class="login-mark" aria-hidden="true">
+      <svg viewBox="0 0 64 64"><path d="M18 8c7-4 11 2 14 2s7-6 14-2c9 5 7 18 3 29-4 12-6 19-11 19-4 0-3-15-6-15s-2 15-6 15c-5 0-7-7-11-19C11 26 9 13 18 8Z"/></svg>
+    </div>
+    <div class="login-panel">
+      <p class="brand-name">青禾牙科</p>
+      <h1>今天的诊疗，从清楚的交接开始。</h1>
+      <p class="login-copy">预约、诊疗、现金结算和复诊使用同一份患者记录。</p>
+      <form id="login-form">
+        <label>账号<input name="username" autocomplete="username" value="frontdesk" required></label>
+        <label>密码<input name="password" type="password" autocomplete="current-password" value="Clinic123!" required></label>
+        <button class="primary wide" type="submit">进入工作台</button>
+        <p id="login-error" class="form-error" role="alert"></p>
+      </form>
+      <details><summary>演示账号</summary><p>manager（负责人兼牙医）、dentist（牙医）<br>frontdesk（前台）、cashier（收费人员）<br>assistant、assistant2（诊疗助理）<br>密码均为 Clinic123!</p></details>
+    </div>
+  </section>
+
+  <div id="app-shell" class="app-shell" hidden>
+    <aside class="sidebar">
+      <div class="sidebar-brand"><span class="tooth-dot">牙</span><span>青禾牙科</span></div>
+      <nav id="main-nav" aria-label="主导航">
+        <button data-view="today" data-role="frontdesk,dentist,assistant,manager" class="active"><span>今日</span><small>接待队列</small></button>
+        <button data-view="patients"><span>患者</span><small>档案与风险</small></button>
+        <button data-view="appointments" data-role="frontdesk,dentist,manager"><span>预约</span><small>接诊与时段</small></button>
+        <button data-view="clinical" data-role="dentist"><span>诊疗</span><small>病历与方案</small></button>
+        <button data-view="billing" data-role="cashier,manager"><span>收费</span><small>现金与收据</small></button>
+        <button data-view="followups" data-role="frontdesk,dentist,manager"><span>复诊</span><small>联系与评估</small></button>
+        <button data-view="prices" data-role="cashier,manager"><span>价目</span><small>确认与版本</small></button>
+        <button data-view="materials" data-role="assistant,manager"><span>材料</span><small>入库领用盘点</small></button>
+        <button data-view="reconciliations" data-role="cashier,manager"><span>核对</span><small>每日现金核对</small></button>
+        <button data-view="reports" data-role="manager,cashier"><span>经营</span><small>业务与收款</small></button>
+        <button data-view="settings" data-role="manager"><span>设置</span><small>人员与基础资料</small></button>
+      </nav>
+      <div class="user-box"><strong id="user-name"></strong><span id="user-roles"></span><button id="logout-btn" class="text-button">退出登录</button></div>
+    </aside>
+    <main>
+      <div class="mobile-session"><span id="mobile-user"></span><button id="mobile-logout-btn" class="ghost" type="button">退出登录</button></div>
+      <header class="topbar"><div><p id="view-kicker"></p><h1 id="view-title">今日接待</h1></div><div id="view-actions" class="top-actions"></div></header>
+      <section id="flash" class="flash" role="status" hidden></section>
+      <section id="content" class="content" aria-live="polite"></section>
+    </main>
+  </div>
+
+  <dialog id="modal"><div class="modal-frame"><header><h2 id="modal-title"></h2><button class="icon-button" type="button" onclick="app.closeModal()" aria-label="关闭">×</button></header><div id="modal-content"></div></div></dialog>
+  <script src="/app.js?v=19"></script>
+</body>
+</html>

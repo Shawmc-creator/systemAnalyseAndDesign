@@ -1,0 +1,43 @@
+@startuml
+' Business symbols extracted from course PPT PDF pages 86-87. System uses the business entity symbol.
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+actor "患者" as P
+participant "<img:business-worker.png>\n收费人员" as C
+participant "<img:business-entity.png>\n牙科诊所管理系统" as S
+P -> C : 请求结算本次诊疗费用
+activate C
+C -> P : 核实患者与本次就诊（c）
+P --> C : 提供姓名及本次就诊信息
+C -> S : 查询本次待结算费用
+activate S
+S -> S : 读取已确认项目及数量\n按适用单价计算应收
+S --> C : 返回项目明细及应收金额
+deactivate S
+C -> P : 核对收费项目及应付金额
+P --> C : 确认费用并交付现金
+C -> C : 清点实际收到的款项
+C -> S : 登记本次现金收款及实收金额
+activate S
+S -> S : 保存本次收款\n计算找零并标记结清
+S --> C : 返回结算结果、找零金额及收据
+deactivate S
+C -> P : 交付收据及找零，确认结清（d）
+deactivate C
+@enduml

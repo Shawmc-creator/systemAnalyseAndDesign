@@ -1,0 +1,45 @@
+@startuml
+left to right direction
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam ArrowColor black
+skinparam nodesep 23
+skinparam ranksep 65
+skinparam rectangle { 
+ BackgroundColor white
+ BorderColor black
+}
+actor "前台" as F
+actor "牙医" as D
+actor "收费人员" as C
+boundary "前台接口" as BF #white
+boundary "牙医接口" as BD #white
+boundary "收费人员接口" as BC #white
+control "维护预约及接诊安排控制\nUC-01" as C1 #white
+control "查询预约及接诊安排控制\nUC-02" as C2 #white
+control "登记到诊控制\nUC-03" as C3 #white
+control "确认诊疗项目控制\nUC-04" as C4 #white
+control "维护收费价目控制\nUC-05" as C5 #white
+control "查询待结算费用控制\nUC-06" as C6 #white
+control "登记现金收款控制\nUC-07" as C7 #white
+F -- BF
+D -- BD
+C -- BC
+BF ..> C1
+BF ..> C2
+BF ..> C3
+BD ..> C4
+BC ..> C5
+BC ..> C6
+BC ..> C7
+' Invisible constraints keep roles and use cases in their required vertical order.
+C1 -[hidden]right-> C2
+C2 -[hidden]right-> C3
+C3 -[hidden]right-> C4
+C4 -[hidden]right-> C5
+C5 -[hidden]right-> C6
+C6 -[hidden]right-> C7
+@enduml

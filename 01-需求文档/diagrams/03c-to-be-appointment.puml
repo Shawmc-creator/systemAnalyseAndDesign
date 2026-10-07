@@ -1,0 +1,54 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+actor "患者" as P
+participant "<img:business-worker.png>\n前台" as F
+participant "<img:business-worker.png>\n牙医" as D
+participant "<img:business-entity.png>\n牙科诊所管理系统" as S
+P -> F : 提出预约就诊需求
+activate F
+F -> P : 询问姓名、联系电话及就诊需求
+P --> F : 提供联系信息与期望时间
+F -> S : 查询经负责人确认的可约时段
+activate S
+S -> S : 对照接诊排班与有效预约
+S --> F : 返回可约时段及接诊牙医
+deactivate S
+opt 接诊安排需要进一步核实时
+ F -> D : 核实接诊安排
+ activate D
+ D --> F : 确认接诊安排
+ deactivate D
+end
+F -> P : 提供可约时段及接诊牙医
+P --> F : 选择并确认预约安排
+F -> S : 提交患者信息与预约安排
+activate S
+S -> S : 检查最新排班与时段冲突
+alt 所选时段仍可预约
+ S -> S : 保存预约记录
+ S --> F : 返回预约确认信息
+ F -> P : 回告预约时间、牙医及到诊要求
+else 时段已被占用或不可接诊
+ S --> F : 返回冲突结果及可选时段
+ F -> P : 说明冲突并重新协商预约安排
+end
+deactivate S
+deactivate F
+@enduml

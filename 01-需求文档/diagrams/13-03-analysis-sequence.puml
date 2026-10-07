@@ -1,0 +1,75 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "前台" as A #white
+boundary "<u>:前台接口</u>" as B #white
+control "<u>:登记到诊控制</u>" as K #white
+participant "<u>:预约</u>" as R
+participant "<u>:就诊</u>" as V
+A -> B : 发起到诊登记(预约编号)
+activate B
+B -> K : 取得待登记预约(预约编号)
+activate K
+K -> R : 提供接待详情()
+activate R
+R --> K : 身份资料及预约安排
+deactivate R
+K --> B : 当前预约
+deactivate K
+B --> A : 展示资料供核对（步骤1-2）
+deactivate B
+opt 患者与预约一致（3a时停止登记）
+A -> B : 确认到诊（步骤3）
+activate B
+B -> K : 登记到诊(预约、经办前台)
+activate K
+critical 检查、就诊与预约更新同时完成（步骤4-5）
+K -> R : 判断可到诊(当日)
+activate R
+R --> K : 允许、拒绝或已有到诊
+deactivate R
+alt 允许登记
+K -> V : 登记到诊(预约、前台、当前时点)
+activate V
+V --> K : 新就诊及到诊时间
+deactivate V
+K -> R : 关联到诊(新就诊)
+activate R
+deactivate R
+else 已到诊或重复提交（4b）
+K -> V : 提供既有到诊结果()
+activate V
+V --> K : 原就诊编号及到诊时间
+deactivate V
+else 非当日或已取消（4a）
+note over K,R : 不生成就诊，保留原结果。
+end
+end
+K --> B : 登记结果或拒绝原因
+deactivate K
+B --> A : 编号及候诊安排，或具体原因（步骤6）
+deactivate B
+end
+note over K,V : 失败不留部分登记；未收到结果时先查询（5a）。
+@enduml

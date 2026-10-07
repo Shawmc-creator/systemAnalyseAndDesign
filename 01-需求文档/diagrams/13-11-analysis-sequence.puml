@@ -1,0 +1,88 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 16
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 16
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ ParticipantFontSize 16
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "牙医" as A
+boundary "<u>:牙医接口</u>" as B #white
+control "<u>:签署及补充病历控制</u>" as K #white
+participant "<u>:病历</u>" as E
+participant "<u>:就诊</u>" as E2
+A -> B : 请求签署本次病历（步骤1）
+activate B
+B -> K : 取得办理依据()
+activate K
+K -> E : 提供正文及签署经历()
+activate E
+E --> K : 完整病历及已有签署
+deactivate E
+K --> B : 当前办理依据
+deactivate K
+B --> A : 反馈内容（步骤2）
+deactivate B
+A -> B : 提交治疗经过、诊后指导及签署确认（步骤3）
+activate B
+B -> K : 校验办理内容()
+activate K
+K -> E : 校验签署()
+activate E
+E --> K : 业务条件判断
+deactivate E
+K -> E2 : 核对接诊归属()
+activate E2
+E2 --> K : 关联依据及校验结果
+deactivate E2
+alt 本人病历、内容完整且未变化
+ K --> B : 可确认内容
+ deactivate K
+ B --> A : 反馈核对内容（步骤4）
+ deactivate B
+newpage
+ A -> B : 确认提交（步骤5）
+ activate B
+ B -> K : 确认办理()
+ activate K
+ critical 最后核验与保存同时完成
+  K -> E : 再次核对当前有效依据()
+  activate E
+  E --> K : 有效或已变化
+  deactivate E
+  alt 当前依据有效
+   K -> E : 签署并保留原文()
+   activate E
+   E --> K : 已保存业务结果
+   deactivate E
+  else 当前依据已变化
+   note over K,E : 拒绝过期提交，保留原有效内容。
+  end
+ end
+ K --> B : 保存结果或具体原因
+ deactivate K
+ B --> A : 反馈结果（步骤6）
+ deactivate B
+else 校验不通过
+ K --> B : 拒绝原因
+ deactivate K
+ B --> A : 具体问题，修正后再提交
+ deactivate B
+end
+note over K,E2 : 已签署后需要补充：\n追加病历补充及原因；不覆盖原文。
+note over E,E2 : 已签署补充分配给病历补充；重复签署返回原结果。
+
+@enduml

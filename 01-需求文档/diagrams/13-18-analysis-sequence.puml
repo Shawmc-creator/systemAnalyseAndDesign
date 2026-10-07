@@ -1,0 +1,92 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 16
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 16
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ ParticipantFontSize 16
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "诊疗助理" as A
+boundary "<u>:诊疗助理接口</u>" as B #white
+control "<u>:登记材料变动控制</u>" as K #white
+participant "<u>:材料</u>" as E
+participant "<u>:材料变动</u>" as E2
+A -> B : 请求材料入库、领用或盘点（步骤1）
+activate B
+B -> K : 取得办理依据()
+activate K
+K -> E : 提供计量单位及库存()
+activate E
+E --> K : 材料单位与账面数量
+deactivate E
+K --> B : 当前办理依据
+deactivate K
+B --> A : 反馈内容（步骤2）
+deactivate B
+A -> B : 提交实际数量、用途及盘点确认依据（步骤3）
+activate B
+B -> K : 校验办理内容()
+activate K
+K -> E : 校验数量及可领用库存()
+activate E
+E --> K : 业务条件判断
+deactivate E
+K -> E2 : 核对变动类型及盘点确认依据()
+activate E2
+E2 --> K : 关联依据及校验结果
+deactivate E2
+alt 数量合法、库存足够、盘点有确认依据
+ K --> B : 可确认内容
+ deactivate K
+ B --> A : 反馈核对内容（步骤4）
+ deactivate B
+newpage
+ A -> B : 确认提交（步骤5）
+ activate B
+ B -> K : 确认办理()
+ activate K
+ critical 最后核验与保存同时完成
+  K -> E : 再次核对当前有效依据()
+  activate E
+  E --> K : 有效或已变化
+  deactivate E
+  alt 当前依据有效
+   K -> E : 登记变动并更新余额()
+   activate E
+   E -> E2 : 保存原始收发盘点()
+   activate E2
+   E2 --> E : 已关联业务经历
+   deactivate E2
+   E --> K : 已保存业务结果
+   deactivate E
+  else 当前依据已变化
+   note over K,E : 拒绝过期提交，保留原有效内容。
+  end
+ end
+ K --> B : 保存结果或具体原因
+ deactivate K
+ B --> A : 反馈结果（步骤6）
+ deactivate B
+else 校验不通过
+ K --> B : 拒绝原因
+ deactivate K
+ B --> A : 具体问题，修正后再提交
+ deactivate B
+end
+note over K,E2 : 超库存或盘点确认缺失：\n拒绝变动，余额与原始流水保持不变。
+note over E,E2 : 材料组织材料变动；入库加库存、领用减库存、盘点用实盘数。
+
+@enduml

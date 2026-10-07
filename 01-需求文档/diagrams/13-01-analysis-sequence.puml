@@ -1,0 +1,71 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "前台" as A #white
+boundary "<u>:前台接口</u>" as B #white
+control "<u>:维护预约及</u>\n<u>接诊安排控制</u>" as K #white
+participant "<u>:患者</u>" as P
+participant "<u>:职员</u>" as S
+participant "<u>:预约</u>" as R
+A -> B : 新增预约()
+B --> A : 提示输入预约内容（步骤1-2）
+A -> B : 提交预约(预约内容)
+activate B
+B -> B : 检查输入格式()
+B -> K : 检查预约安排(预约内容)
+activate K
+K -> P : 核对预约患者(姓名、电话)
+activate P
+P --> K : 预约患者
+deactivate P
+K -> S : 确认接诊资格(牙医、确认人)
+activate S
+S --> K : 人员及确认信息是否合法
+deactivate S
+K -> R : 检查时段冲突(患者、牙医、时段)
+activate R
+R --> K : 安排是否合法及冲突时段
+deactivate R
+K --> B : 待保存安排或校验问题
+deactivate K
+B --> A : 展示待保存内容或具体问题（步骤3-4）
+deactivate B
+opt 校验通过，前台核对后确认
+A -> B : 确认预约()
+activate B
+B -> K : 维护预约及接诊安排(预约内容)
+activate K
+critical 冲突复查与保存同时完成
+K -> R : 新增预约(预约内容、经办前台)
+activate R
+R -> R : 检查时段冲突()
+R --> K : 新预约或冲突拒绝结果
+deactivate R
+end
+K --> B : 本次保存结果
+deactivate K
+B --> A : 预约编号及安排，或具体问题（步骤5-6）
+deactivate B
+end
+@enduml

@@ -1,0 +1,55 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+actor "患者" as P
+participant "<img:business-worker.png>\n牙医" as D
+participant "<img:business-worker.png>\n诊疗助理" as A
+participant "<img:business-entity.png>\n牙科诊所管理系统" as S
+group 患者已完成到诊接待
+ D -> S : 查询患者本次就诊及既往病历
+ activate S
+ S --> D : 返回患者资料及诊疗历史
+ deactivate S
+ activate D
+ D -> P : 询问主诉、病史及相关情况
+ P --> D : 陈述症状并补充病史
+ D -> D : 结合既往记录完成检查与诊断
+ D -> P : 说明治疗方案及预计费用
+ P --> D : 表达治疗选择与方案确认情况
+ D -> S : 登记检查、诊断、方案及确认情况
+end
+opt 患者确认方案并接受本次治疗
+ D -> A : 交代本次治疗的准备及协助要求
+ activate A
+ A -> A : 准备所需器械、材料及诊疗环境
+ A --> D : 告知准备完成
+ D -> P : 实施已确认的治疗
+ A -> D : 配合诊疗操作
+ A -> S : 登记本次材料领用
+ A -> A : 移交使用后的器械
+ deactivate A
+end
+D -> S : 保存实际诊疗记录、收费项目\n及后续随访／复诊要求
+activate S
+S -> S : 关联本次就诊，保存共享记录\n生成待结算明细\n有诊后要求时生成待办
+S --> D : 返回保存结果
+deactivate S
+D -> P : 说明诊后注意事项及后续诊疗要求
+deactivate D
+@enduml

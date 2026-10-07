@@ -1,0 +1,34 @@
+# Local databases and session data
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+**/data/backups/
+**/uploads/
+03-数据/运行备份/
+03-数据/示例导出/
+04-测试与验收/测试结果/
+
+# Runtime, credentials and local tooling
+02-系统实现/runtime/
+node_modules/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+LOCAL_APPDATA_FONTCONFIG_CACHE/
+**/LOCAL_APPDATA_FONTCONFIG_CACHE/
+
+# Generated TeX files (keep deliverable PDFs and diagram PNGs)
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.xdv
+*.fls
+*.fdb_latexmk
+*.bak
+.DS_Store
+Thumbs.db

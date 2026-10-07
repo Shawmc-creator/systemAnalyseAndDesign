@@ -1,0 +1,71 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "前台" as A #white
+boundary "<u>:前台接口</u>" as B #white
+control "<u>:维护预约及</u>\n<u>接诊安排控制</u>" as K #white
+participant "<u>:预约</u>" as R
+participant "<u>:预约变更</u>" as H
+A -> B : 选择已有预约(预约编号)
+activate B
+B -> K : 取得当前预约(预约编号)
+activate K
+K -> R : 提供接待详情()
+activate R
+R --> K : 当前安排及修改依据
+deactivate R
+K --> B : 当前预约
+deactivate K
+B --> A : 展示原安排
+deactivate B
+A -> B : 提交变更(内容、原因、原依据)
+activate B
+B -> B : 检查输入格式()
+B -> K : 维护预约及接诊安排(变更内容)
+activate K
+critical 可修改判断、变更及追溯同时完成
+activate R
+alt 修改（1a）
+K -> R : 调整安排(新安排、原因、原依据)
+R -> R : 判断可修改并检查时段冲突()
+else 取消（1b）
+K -> R : 取消(原因、原依据)
+R -> R : 判断可取消()
+end
+alt 校验通过
+R -> H : 保留变更(原安排、原因、经办前台)
+activate H
+H --> R : 变更已保留
+deactivate H
+R --> K : 新安排或已取消（取消后释放时段）
+else 已到诊、原依据过期或安排冲突（4a、6a）
+R --> K : 拒绝变更及最新安排
+end
+deactivate R
+end
+K --> B : 本次变更结果
+deactivate K
+B --> A : 展示结果；失败时重新核对
+deactivate B
+@enduml

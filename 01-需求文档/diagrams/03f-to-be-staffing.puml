@@ -1,0 +1,59 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+participant "<img:business-worker.png>\n诊所负责人" as M
+participant "<img:business-worker.png>\n牙医" as D
+participant "<img:business-worker.png>\n前台" as F
+participant "<img:business-entity.png>\n牙科诊所管理系统" as S
+M -> D : 收集拟安排期间的可接诊时段
+activate D
+D --> M : 提供可接诊时段
+deactivate D
+activate M
+M -> S : 查询该期间已确认安排及预约
+activate S
+S --> M : 返回已有接诊时段及预约
+deactivate S
+M -> M : 编制接诊时段草案
+M -> D : 核实接诊时段草案
+activate D
+D --> M : 确认可按草案接诊
+deactivate D
+M -> S : 保存并发布已确认的接诊安排
+activate S
+S -> S : 校验时段及人员有效性\n核对与已有预约是否一致
+alt 安排有效且无冲突
+ S -> S : 保存已确认接诊时段
+ S --> M : 返回发布结果
+else 安排无效或存在冲突
+ S --> M : 返回具体问题，不保存新安排
+end
+deactivate S
+opt 接诊安排发布成功
+ M -> F : 告知接诊安排已发布
+ activate F
+ F -> S : 查询已发布的接诊时段
+ activate S
+ S --> F : 返回可办理预约的接诊安排
+deactivate S
+ F -> F : 依据安排办理后续预约
+deactivate F
+end
+deactivate M
+@enduml

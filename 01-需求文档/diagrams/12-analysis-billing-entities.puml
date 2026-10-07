@@ -1,0 +1,67 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+}
+skinparam classAttributeIconSize 0
+hide circle
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ --
+ 判断已结清()
+}
+class "诊疗确认" as Confirm <<entity>> {
+ 确认时间
+ 版本
+ 更正原因
+ --
+ 确认项目()
+ 判断可计费()
+ 合计费用()
+}
+class "诊疗明细" as Item <<entity>> {
+ 牙位
+ 数量
+ --
+ 计算金额()
+}
+class "收费项目" as Service <<entity>> {
+ 名称
+ 计价单位
+}
+class "价目" as Price <<entity>> {
+ 单价
+ 适用开始
+ 适用结束
+ 负责人确认时间
+ 调整原因
+ --
+ 判断适用时点()
+ 检查区间重叠()
+}
+class "现金收款" as Payment <<entity>> {
+ 实际收到金额
+ 应收金额
+ 收款时间
+ --
+ 计算找零()
+ 计算净收()
+}
+Visit "1" *-down- "0..*" Confirm : 确认经历
+Confirm "1" *-right- "1..*" Item : 已完成项目
+Item "0..*" -right- "1" Service : 项目
+Service "1" *-down- "0..*" Price : 价格版本
+Item "0..*" -down- "0..1" Price : 计价依据
+Visit "1" -right- "0..1" Payment : 有效结算
+Payment "0..1" -down- "1" Confirm : 结算依据
+@enduml

@@ -1,0 +1,49 @@
+@startuml
+' 青禾牙科诊所整体业务；PPT第85、86、93、95页。
+left to right direction
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 240
+skinparam nodesep 35
+skinparam ranksep 70
+skinparam ArrowColor black
+skinparam ArrowThickness 1
+skinparam actor {
+  BorderColor black
+  BackgroundColor white
+  FontColor black
+}
+skinparam usecase {
+  BorderColor black
+  BackgroundColor white
+  FontColor black
+}
+skinparam rectangle {
+  BorderColor black
+  BackgroundColor white
+  FontColor black
+  FontSize 20
+  FontStyle bold
+  RoundCorner 0
+}
+
+actor/ "患者" as Patient
+rectangle "青禾牙科诊所" as Clinic {
+  usecase/ "BUC-01\n预约就诊" as BUC01
+  usecase/ "BUC-02\n接受口腔检查与诊断" as BUC02
+  usecase/ "BUC-03\n接受口腔治疗" as BUC03
+  usecase/ "BUC-04\n接受复诊与随访" as BUC04
+  usecase/ "BUC-05\n结算诊疗费用" as BUC05
+}
+Patient --> BUC01
+Patient --> BUC02
+Patient --> BUC03
+Patient --> BUC04
+Patient --> BUC05
+BUC02 -[hidden]right-> BUC01
+BUC03 -[hidden]right-> BUC02
+BUC04 -[hidden]right-> BUC03
+BUC05 -[hidden]right-> BUC04
+@enduml

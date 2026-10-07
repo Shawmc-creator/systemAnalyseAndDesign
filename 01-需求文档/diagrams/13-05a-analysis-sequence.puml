@@ -1,0 +1,72 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 135
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "收费人员" as A #white
+boundary "<u>:收费人员接口</u>" as B #white
+control "<u>:维护收费</u>\n<u>价目控制</u>" as K #white
+participant "<u>:收费项目</u>" as S
+participant "<u>原价目:价目</u>" as O
+participant "<u>新价目:价目</u>" as N
+A -> B : 提交适用区间调整(方案、负责人确认)
+activate B
+B -> B : 检查输入与确认信息()
+B -> K : 维护收费价目(方案、原依据)
+activate K
+critical 完整区间方案的校验与保存同时完成
+activate S
+alt 停止适用（3a）
+K -> S : 停止适用(停止时点、原依据)
+S -> S : 核对最新价目及适用区间()
+opt 校验通过
+S -> O : 结束适用(停止时点)
+activate O
+deactivate O
+end
+else 解决区间重叠（4b）
+K -> S : 调整价目区间(原终点、新价目、原依据)
+S -> O : 检查区间重叠(完整衔接方案)
+activate O
+O --> S : 衔接是否合法
+deactivate O
+opt 区间合法且修改依据仍一致
+S -> O : 结束适用(已确认的原终点)
+activate O
+deactivate O
+S -> N : 新增版本(新价目、负责人确认)
+activate N
+deactivate N
+end
+end
+S --> K : 完整结果或拒绝原因（4a、6a）
+deactivate S
+end
+K --> B : 本次维护结果
+deactivate K
+B --> A : 最新适用区间，或具体问题
+deactivate B
+note over O,N
+开始包含、结束不包含；允许首尾衔接。
+历史明细已关联的单价依据保留。
+end note
+@enduml

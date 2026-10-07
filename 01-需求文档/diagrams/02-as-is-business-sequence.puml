@@ -1,0 +1,36 @@
+@startuml
+' Business symbols extracted from course PPT PDF pages 86-87.
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+actor "患者" as P
+participant "<img:business-worker.png>\n前台" as F
+participant "<img:business-worker.png>\n牙医" as D
+P -> F : 请求办理到诊接待
+activate F
+F -> P : 核实姓名及预约信息（a）
+P --> F : 提供姓名、联系电话及预约时间
+F -> F : 查阅纸质预约本，核对预约记录
+F -> D : 核实本次接诊安排
+activate D
+D --> F : 确认接诊牙医及候诊安排
+deactivate D
+F -> F : 抄录患者与预约信息，登记到诊
+F -> P : 告知接诊牙医及候诊安排（b）
+deactivate F
+@enduml

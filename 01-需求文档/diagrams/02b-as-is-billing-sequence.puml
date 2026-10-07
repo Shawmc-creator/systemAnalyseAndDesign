@@ -1,0 +1,37 @@
+@startuml
+' Business symbols extracted from course PPT PDF pages 86-87.
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+actor "患者" as P
+participant "<img:business-worker.png>\n收费人员" as C
+participant "<img:business-worker.png>\n牙医" as D
+P -> C : 提交诊疗单，请求结算
+activate C
+C -> C : 核对患者与本次诊疗单（c）
+C -> D : 核实诊疗项目及数量
+activate D
+D --> C : 确认已完成的项目及数量
+deactivate D
+C -> C : 查阅价目表，计算本次应收费用
+C -> P : 说明收费项目及应付金额
+P --> C : 确认费用并交付现金
+C -> C : 清点款项，登记实收与找零
+C -> P : 交付收据及找零，确认结清（d）
+deactivate C
+@enduml

@@ -1,0 +1,78 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+}
+skinparam classAttributeIconSize 0
+hide circle
+top to bottom direction
+skinparam nodesep 35
+skinparam ranksep 45
+class "就诊" as V <<entity>> {
+ 到诊时间
+ --
+ 核对接诊归属()
+}
+class "病历" as R <<entity>> {
+ 诊断
+ 治疗经过
+ --
+ 提供方案()
+}
+class "诊疗方案" as P <<entity>> {
+ 说明时间
+ 方案说明
+ 预计费用说明
+ --
+ 保存方案()
+ 记录患者决定()
+}
+class "方案项目" as I <<entity>> {
+ 牙位
+ 预计数量
+ 患者决定
+ 决定说明
+ --
+ 判断同意()
+ 计算剩余数量()
+}
+class "收费项目" as S <<entity>> {
+ 名称
+ 计价单位
+ --
+ 检查有效性()
+}
+class "诊疗确认" as C <<entity>> {
+ 确认时间
+ 版本
+ 更正原因
+ --
+ 确认项目()
+ 保留原确认()
+}
+class "诊疗明细" as T <<entity>> {
+ 牙位
+ 数量
+ 方案外原因
+ 患者确认事实
+ --
+ 核对方案归属()
+ 核对剩余数量()
+}
+V "1" *-down- "1" R : 病历
+R "1" *-down- "0..*" P : 沟通方案
+P "1" *-right- "1..*" I : 拟定项目
+I "0..*" -right- "1" S : 对应项目
+V "1" *-right- "0..*" C : 确认经历
+C "1" *-down- "1..*" T : 实际完成
+T "0..*" -down- "0..1" I : 方案依据
+T "0..*" -- "1" S : 收费项目
+
+@enduml

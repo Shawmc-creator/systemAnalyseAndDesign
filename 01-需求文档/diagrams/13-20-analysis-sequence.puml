@@ -1,0 +1,88 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 16
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 16
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ ParticipantFontSize 16
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "收费人员" as A
+boundary "<u>:收费人员接口</u>" as B #white
+control "<u>:登记收款核对控制</u>" as K #white
+participant "<u>:现金收款</u>" as E
+participant "<u>:收款核对</u>" as E2
+A -> B : 请求核对营业日现金（步骤1）
+activate B
+B -> K : 取得办理依据()
+activate K
+K -> E : 提供当日有效收款()
+activate E
+E --> K : 收据、净收及核对依据
+deactivate E
+K --> B : 当前办理依据
+deactivate K
+B --> A : 反馈内容（步骤2）
+deactivate B
+A -> B : 提交盘点净收、差异说明及处理依据（步骤3）
+activate B
+B -> K : 校验办理内容()
+activate K
+K -> E : 核验当日收款依据()
+activate E
+E --> K : 业务条件判断
+deactivate E
+K -> E2 : 计算差额并核验处理依据()
+activate E2
+E2 --> K : 关联依据及校验结果
+deactivate E2
+alt 现金盘点有效，差异已有处理依据
+ K --> B : 可确认内容
+ deactivate K
+ B --> A : 反馈核对内容（步骤4）
+ deactivate B
+newpage
+ A -> B : 确认提交（步骤5）
+ activate B
+ B -> K : 确认办理()
+ activate K
+ critical 最后核验与保存同时完成
+  K -> E : 再次核对当前有效依据()
+  activate E
+  E --> K : 有效或已变化
+  deactivate E
+  alt 当前依据有效
+   K -> E2 : 保留本次核对经历()
+   activate E2
+   E2 --> K : 已保存核对结果
+   deactivate E2
+  else 当前依据已变化
+   note over K,E : 拒绝过期提交，保留原有效内容。
+  end
+ end
+ K --> B : 保存结果或具体原因
+ deactivate K
+ B --> A : 反馈结果（步骤6）
+ deactivate B
+else 校验不通过
+ K --> B : 拒绝原因
+ deactivate K
+ B --> A : 具体问题，修正后再提交
+ deactivate B
+end
+note over K,E2 : 明细变化或差异依据不完整：\n拒绝使用旧依据，不改原收据；重新核对。
+note over E,E2 : 收款核对引用原现金收款，保存时不得调用原收款修改。
+
+@enduml

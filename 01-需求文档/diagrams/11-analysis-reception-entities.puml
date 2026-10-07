@@ -1,0 +1,54 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+}
+skinparam classAttributeIconSize 0
+hide circle
+top to bottom direction
+skinparam nodesep 50
+skinparam ranksep 65
+class "患者" as Patient <<entity>> {
+ 姓名
+ 联系电话
+}
+class "职员" as Staff <<entity>> {
+ 姓名
+}
+class "预约" as Appointment <<entity>> {
+ 起始时间
+ 结束时间
+ 候诊安排
+ --
+ 检查时段冲突()
+ 调整安排()
+ 取消()
+ 判断可到诊()
+}
+class "预约变更" as Change <<entity>> {
+ 发生时间
+ 原起始时间
+ 原结束时间
+ 原候诊安排
+ 变更原因
+ 变更类型
+}
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ --
+ 登记到诊()
+ 判断已结清()
+}
+Patient "1" -- "0..*" Appointment : 预约者
+Staff "1" -- "0..*" Appointment : 接诊牙医
+Appointment "1" *-right- "0..*" Change : 变更经历
+Appointment "1" -down- "0..1" Visit : 产生
+Staff "1" -- "0..*" Change : 经办前台
+@enduml

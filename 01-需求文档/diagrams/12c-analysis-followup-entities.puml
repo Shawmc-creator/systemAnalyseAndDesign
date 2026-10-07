@@ -1,0 +1,72 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+}
+skinparam classAttributeIconSize 0
+hide circle
+top to bottom direction
+skinparam nodesep 35
+skinparam ranksep 45
+class "就诊" as V <<entity>> {
+ 到诊时间
+ --
+ 提供来源病历()
+ 核对接诊归属()
+}
+class "病历" as R <<entity>> {
+ 诊断
+ 签署时间
+ --
+ 判断已签署()
+ 提供诊后指导()
+}
+class "诊后要求" as Q <<entity>> {
+ 类型
+ 目的
+ 目标日期
+ 提出时间
+ --
+ 判断可联系()
+ 关联复诊()
+ 取消()
+ 完成评估()
+}
+class "联系经历" as H <<entity>> {
+ 联系时间
+ 反馈
+ 原因
+ 下次联系日期
+ --
+ 追加联系()
+}
+class "预约" as P <<entity>> {
+ 起始时间
+ 结束时间
+ --
+ 核对同患者()
+ 判断有效()
+}
+class "临床评估" as E <<entity>> {
+ 恢复情况
+ 结论
+ 处理意见
+ 完成时间
+ --
+ 确认临床结果()
+}
+V "1" *-down- "1" R : 病历
+V "1" -right- "0..*" Q : 来源就诊
+Q "1" *-down- "0..*" H : 联系经历
+Q "0..*" -right- "0..1" P : 关联复诊预约
+P "1" -up- "0..1" V : 产生复诊就诊
+Q "1" *-right- "0..1" E : 完成评估
+
+@enduml

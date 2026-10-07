@@ -1,0 +1,68 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "收费人员" as A #white
+boundary "<u>:收费人员接口</u>" as B #white
+control "<u>:登记现金</u>\n<u>收款控制</u>" as K #white
+participant "<u>:就诊</u>" as V
+participant "<u>:现金收款</u>" as C
+A -> B : 重复提交或查询结果(本次就诊)
+activate B
+B -> K : 恢复收款结果(本次就诊)
+activate K
+K -> V : 提供本次结算结果()
+activate V
+V -> C : 查询有效收款(本次就诊)
+activate C
+C --> V : 已有收款或无有效收款
+deactivate C
+alt 已有有效收款（4b、5a、6a）
+V -> C : 形成收据()
+activate C
+C --> V : 原编号收据及原金额
+deactivate C
+V --> K : 原收款及结清结果
+else 已明确未结清且无有效收款（5a）
+V --> K : 未登记，须核实现金后决定重试
+else 查询失败、结果不能确定
+V --> K : 结果待确认；先恢复查询
+end
+deactivate V
+K --> B : 本次恢复结果
+deactivate K
+B --> A : 展示结果并核对实际现金
+deactivate B
+opt 明确无收款，收费人员核实现金与费用后重试
+A -> B : 重新提交已核对内容()
+activate B
+B -> K : 登记现金收款(重新核对内容)
+activate K
+ref over K,V,C : 转UC-07基本路径4-6；重新校验后保存或取原结果。
+K --> B : 新登记或既有结果
+deactivate K
+B --> A : 明确结算结果
+deactivate B
+end
+note over V,C : 重复不再收款；重取收据沿用原编号。
+@enduml

@@ -1,0 +1,74 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 135
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "前台" as A #white
+boundary "<u>:前台接口</u>" as B #white
+control "<u>:查询预约及</u>\n<u>接诊安排控制</u>" as K #white
+participant "<u>:患者</u>" as P
+participant "<u>:预约</u>" as R
+participant "<u>:职员</u>" as S
+A -> B : 查询预约(日期、姓名或电话)
+activate B
+B -> B : 检查查询条件()
+opt 条件完整（2a时提示补齐）
+B -> K : 查询预约及接诊安排(条件)
+activate K
+K -> P : 查询匹配患者(姓名或电话)
+activate P
+P --> K : {匹配患者}
+deactivate P
+K -> R : 查询预约(日期、{患者})
+activate R
+loop 每条匹配预约
+R -> P : 提供接待资料()
+activate P
+deactivate P
+R -> S : 提供接诊信息()
+activate S
+deactivate S
+end
+R --> K : {预约及接诊安排}
+deactivate R
+K --> B : 预约列表或无匹配结果
+deactivate K
+end
+B --> A : 展示列表、无结果或条件问题（步骤1-3）
+deactivate B
+opt 有匹配记录，前台核对后选定
+A -> B : 选择预约(预约编号)
+activate B
+B -> K : 取得所选预约详情(预约编号)
+activate K
+K -> R : 提供接待详情()
+activate R
+R --> K : 当前状态、安排及更新时间
+deactivate R
+K --> B : 当前预约详情
+deactivate K
+B --> A : 展示最新内容（步骤4-5）
+deactivate B
+A -> B : 完成核对或另行发起UC-03（步骤6）
+end
+note over A,B : 多条记录由前台核对选择（4a）；不使用过期安排（5a）。
+@enduml

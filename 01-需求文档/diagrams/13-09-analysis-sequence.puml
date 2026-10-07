@@ -1,0 +1,65 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 16
+skinparam dpi 200
+skinparam maxMessageSize 150
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 16
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ ParticipantFontSize 16
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "牙医" as A
+boundary "<u>:牙医接口</u>" as B #white
+control "<u>:查询患者诊疗资料控制</u>" as K #white
+participant "<u>:就诊</u>" as E
+participant "<u>:患者</u>" as E2
+A -> B : 提交查询条件（步骤1）
+activate B
+B -> B : 检查基本格式()
+B -> K : 查询患者诊疗资料(条件、操作者)
+activate K
+K -> E : 核对接诊归属并定位患者()
+activate E
+E --> K : 本次患者及权限
+deactivate E
+alt 本人接诊范围有效
+ K -> E2 : 提供该患者诊疗历史()
+ activate E2
+ E2 --> K : 病历及补充经历
+ deactivate E2
+ K --> B : 查询结果与业务口径（步骤2-3）
+ B --> A : 反馈可核对明细
+else 条件无效或范围无权
+ K --> B : 拒绝原因，不返回越权内容
+ B --> A : 反馈问题
+end
+deactivate K
+deactivate B
+opt 选择获准明细（步骤4）
+ A -> B : 提交选定业务对象
+ activate B
+ B -> K : 取得当前明细()
+ activate K
+ K -> E : 提供当前获准详情()
+ activate E
+ E --> K : 当前详情或不可访问原因
+ deactivate E
+ K --> B : 当前结果
+ deactivate K
+ B --> A : 反馈结果
+ deactivate B
+end
+note over K,E2 : 拒绝正文访问；无既往资料时明确说明；查询不写入业务。
+
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+ StartColor black
+ EndColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+state "草稿" as Draft
+state "已签署" as Signed
+state "已补充" as Amended
+[*] --> Draft : 登记到诊 / 建立本次病历
+Draft : 编辑临床内容 [本人接诊且内容有效]\n/ 保存当前草稿及方案
+Draft --> Signed : 确认签署 [本人接诊、内容完整且未变化]\n/ 保留原文与签署事实
+Signed --> Amended : 提交补充 [本人接诊且内容及原因有效]\n/ 追加病历补充，保留原文
+Amended : 提交补充 [本人接诊且内容及原因有效]\n/ 再次追加补充
+Signed : 重复签署 / 返回原签署结果
+Amended : 查询病历 / 返回原文及补充经历
+note right of Draft : 校验失败保持草稿。\n方案不自动生成实际项目。
+note right of Signed : 签署后不覆盖原文。\n实际项目更正按UC-04办理。
+
+@enduml

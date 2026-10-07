@@ -1,0 +1,30 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+ StartColor black
+ EndColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+state "待决定" as Pending
+state "已同意" as Agreed
+state "已拒绝" as Rejected
+state "已暂缓" as Deferred
+[*] --> Pending : 记录方案项目 [本次可编辑病历]\n/ 保存项目与预计数量
+Pending --> Agreed : 记录患者决定 [明确同意且方案有效]\n/ 保留说明时间及决定
+Pending --> Rejected : 记录患者决定 [明确拒绝]\n/ 保留拒绝说明
+Pending --> Deferred : 记录患者决定 [明确暂缓]\n/ 保留暂缓说明
+Deferred --> Agreed : 再次沟通 [本人可编辑且明确同意]\n/ 保留新的决定依据
+Rejected --> Agreed : 再次沟通 [本人可编辑且明确同意]\n/ 保留新的决定依据
+Agreed : 确认实际项目 [数量不超剩余且牙位一致]\n/ 关联实际明细，累计实际完成数量
+note bottom of Agreed : 已同意不等于实际完成。\n签署后不得改写原方案决定；\n后续新方案随本次复诊病历保存。
+
+@enduml

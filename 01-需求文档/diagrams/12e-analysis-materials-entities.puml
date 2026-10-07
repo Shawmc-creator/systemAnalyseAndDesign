@@ -1,0 +1,58 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+}
+skinparam classAttributeIconSize 0
+hide circle
+top to bottom direction
+skinparam nodesep 35
+skinparam ranksep 45
+class "材料" as M <<entity>> {
+ 名称
+ 计量单位
+ 账面数量
+ --
+ 提供库存()
+ 校验可领用()
+ 登记入库()
+ 登记领用()
+ 应用盘点()
+}
+class "材料变动" as H <<entity>> {
+ 类型
+ 变动数量
+ 发生时间
+ 前数量
+ 后数量
+ 用途或原因
+ --
+ 保留原始变动()
+ 校验变动依据()
+}
+class "职员" as S <<entity>> {
+ 姓名
+ --
+ 判断岗位资格()
+ 核对负责人()
+}
+class "盘点调整" as A <<entity>> {
+ 实盘数量
+ 负责人确认时间
+ 确认依据
+ --
+ 核对盘点依据()
+}
+H <|-- A
+M "1" *-down- "0..*" H : 收发盘点经历
+S "1" -right- "0..*" H : 经办助理
+S "1" -right- "0..*" A : 确认负责人
+
+@enduml

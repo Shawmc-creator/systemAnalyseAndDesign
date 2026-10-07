@@ -1,0 +1,46 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+participant "<img:business-worker.png>\n诊所负责人" as M
+participant "<img:business-worker.png>\n牙医" as D
+participant "<img:business-worker.png>\n前台" as F
+M -> D : 收集拟安排期间的可接诊时段
+activate D
+D -> D : 核对个人出勤及工作安排
+D --> M : 提供可接诊时段
+deactivate D
+activate M
+M -> F : 核实该期间已有预约
+activate F
+F -> F : 查阅纸质预约本
+F --> M : 提供已约定的牙医与时段
+deactivate F
+M -> M : 编制接诊时段草案\n避开已有预约冲突
+M -> D : 核实接诊时段草案
+activate D
+D --> M : 确认可按草案接诊
+deactivate D
+M -> M : 确认并保存纸质接诊安排
+M -> F : 发布已确认的接诊安排
+activate F
+F -> F : 抄录接诊时段，供后续预约使用
+F --> M : 确认收到安排
+deactivate F
+deactivate M
+@enduml

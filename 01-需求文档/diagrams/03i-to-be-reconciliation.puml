@@ -1,0 +1,59 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+participant "<img:business-worker.png>\n收费人员" as C
+participant "<img:business-worker.png>\n诊所负责人" as M
+participant "<img:business-entity.png>\n牙科诊所管理系统" as S
+activate C
+C -> S : 查询当日有效收款及明细
+activate S
+S -> S : 汇总有效收款和现金净收
+S --> C : 返回收款明细及汇总金额
+deactivate S
+C -> C : 清点现金，核对开班现金及收款明细
+alt 核对一致
+ C -> S : 提交日终核对结果
+ activate S
+ S -> S : 保存核对结果及经办时间
+ S --> C : 返回登记结果
+deactivate S
+else 存在差异
+ C -> M : 报告差异及对应收款明细
+ activate M
+ M -> C : 要求复核原始收据和实际现金
+ C -> C : 复查凭据及清点结果
+ C --> M : 反馈差异原因
+ M --> C : 确认处理意见
+deactivate M
+ C -> S : 保存差异说明及负责人处理意见
+ activate S
+ S --> C : 返回核对结果登记完成
+deactivate S
+end
+C -> M : 告知当日日终核对完成
+activate M
+M -> S : 查询同一期间的就诊与收款汇总
+activate S
+S -> S : 汇总就诊人次、有效收款及未结清情况
+S --> M : 返回汇总及可核对的业务明细
+deactivate S
+M -> M : 查看经营情况，核对差异及后续安排
+deactivate M
+deactivate C
+@enduml

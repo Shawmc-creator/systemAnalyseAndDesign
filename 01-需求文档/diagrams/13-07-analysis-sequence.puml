@@ -1,0 +1,98 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 120
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "收费人员" as A #white
+boundary "<u>:收费人员接口</u>" as B #white
+control "<u>:登记现金</u>\n<u>收款控制</u>" as K #white
+participant "<u>:就诊</u>" as V
+participant "<u>:诊疗确认</u>" as D
+participant "<u>:现金收款</u>" as C
+A -> B : 发起收款(就诊、费用核对依据)
+activate B
+B -> K : 核验现金结算依据(就诊、依据)
+activate K
+K -> V : 核验结算依据(费用依据)
+activate V
+V -> D : 核对费用依据(确认及价目依据)
+activate D
+ref over D
+计费判断及计算
+同UC-06基本图。
+end ref
+D --> V : 当前依据及应收
+deactivate D
+V --> K : 当前应收、已有收款或拒绝原因
+deactivate V
+K --> B : 当前结算信息
+deactivate K
+B --> A : 应收金额或停止原因（步骤1-2）
+deactivate B
+opt 未结清且依据一致
+A -> B : 确认实收(实际收到金额)（步骤3）
+activate B
+B -> B : 检查金额格式()
+B -> K : 登记现金收款(依据、实收)
+activate K
+K -> C : 检查现金金额(实收、应收)
+activate C
+C --> K : 足额或金额问题
+deactivate C
+opt 金额合法且足额
+newpage
+critical 核验及结算同时生效
+K -> V : 登记现金结算(依据、实收、人员、时点)
+activate V
+V -> V : 核对未结清及当前版本()
+V -> D : 核对费用依据(确认及价目依据)
+activate D
+deactivate D
+opt 当前仍可结算
+V -> C : 登记收款(确认、应收、实收、人员)
+activate C
+C -> C : 计算找零()
+C -> C : 计算净收()
+C --> V : 有效收款
+deactivate C
+V -> V : 关联有效收款()
+end
+V --> K : 新收款、既有结果或拒绝原因
+deactivate V
+end
+opt 有有效收款
+K -> C : 形成收据()
+activate C
+C --> K : 原收款编号收据
+deactivate C
+end
+end
+K --> B : 本次登记结果
+deactivate K
+B --> A : 编号、金额、找零及收据，或问题（步骤6）
+deactivate B
+end
+note over B,V
+依据变化经UC-06重新核对；
+重复及结果恢复见扩展图。
+end note
+@enduml

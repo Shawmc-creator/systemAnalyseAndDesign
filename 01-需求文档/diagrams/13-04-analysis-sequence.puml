@@ -1,0 +1,109 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 95
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+actor "牙医" as A #white
+boundary "<u>:牙医接口</u>" as B #white
+control "<u>:确认诊疗</u>\n<u>项目控制</u>" as K #white
+participant "<u>:就诊</u>" as V
+participant "<u>:诊疗确认</u>" as D
+participant "<u>:诊疗明细</u>" as I
+participant "<u>:收费项目</u>" as S
+participant "<u>:价目</u>" as P
+A -> B : 选择就诊(就诊编号)
+activate B
+B -> K : 取得本人接诊记录(就诊编号)
+activate K
+K -> V : 核对接诊归属(当前牙医)
+activate V
+V --> K : 就诊资料或拒绝原因
+deactivate V
+K --> B : 本次就诊结果
+deactivate K
+B --> A : 展示患者及已有项目（步骤1-2）
+deactivate B
+opt 就诊归属有效
+A -> B : 提交项目({项目、数量})
+activate B
+B -> B : 检查输入格式()
+B -> K : 检查诊疗项目(完整明细)
+activate K
+K -> V : 判断已结清()
+activate V
+V --> K : 当前结算情况
+deactivate V
+K -> D : 校验项目集合(完整明细)
+activate D
+loop 每项项目内容
+D -> I : 校验项目数量(项目、数量)
+activate I
+I -> S : 检查项目有效性()
+activate S
+deactivate S
+deactivate I
+end
+D -> D : 合并重复项目()
+D --> K : 明细校验结果
+deactivate D
+K --> B : 待确认明细或问题
+deactivate K
+B --> A : 核对明细（步骤3-4）
+deactivate B
+newpage
+opt 未结清且明细合法
+A -> B : 确认项目(原版本)
+activate B
+B -> K : 确认诊疗项目(完整明细、原版本)
+activate K
+critical 校验与确认同时生效
+K -> V : 确认诊疗(明细、牙医、原版本)
+activate V
+V -> V : 核对未结清及当前版本()
+opt 校验通过
+V -> D : 确认项目(明细、确认时点)
+activate D
+loop 每条确认明细
+D -> I : 确定计价依据(数量、确认时点)
+activate I
+I -> S : 提供适用价目(确认时点)
+activate S
+S -> P : 判断适用时点(确认时点)
+activate P
+deactivate P
+deactivate S
+deactivate I
+end
+D --> V : 新确认版本及价目依据
+deactivate D
+end
+V --> K : 确认结果或版本变化拒绝结果
+deactivate V
+end
+K --> B : 本次确认结果
+deactivate K
+B --> A : 确认版本及结果（步骤5-6）
+deactivate B
+end
+end
+note over K : 确认前还须核对方案属于本次就诊、患者同意及剩余数量；\n方案外项目须原因及患者确认，同项目不同牙位分别保留。
+@enduml

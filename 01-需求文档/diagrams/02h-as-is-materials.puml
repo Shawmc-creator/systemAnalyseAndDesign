@@ -1,0 +1,49 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 220
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+participant "<img:business-worker.png>\n诊疗助理" as A
+participant "<img:business-worker.png>\n诊所负责人" as M
+activate A
+alt 材料入库
+ A -> A : 核对实际到货材料、单位及数量
+ A -> A : 在纸质台账登记入库数量
+else 材料领用
+ A -> A : 核对可用材料及本次领用数量
+ A -> A : 发放材料，核实实际领用数量
+ A -> A : 在纸质台账登记领用用途及数量
+else 材料盘点
+ A -> A : 清点实际库存
+ A -> A : 对照台账，确定盘点差异
+ A -> M : 报告差异及核实情况
+ activate M
+ M -> M : 核实差异原因及处理方式
+ M --> A : 确认库存调整及原因
+deactivate M
+ A -> A : 登记盘点调整，保留原台账
+end
+A -> A : 汇总本次变动后的库存
+opt 库存不足以满足后续使用
+ A -> M : 报告需要补充的材料及数量
+ activate M
+ M -> M : 核实需求，确定补充安排
+ M --> A : 告知补充数量及时间安排
+deactivate M
+end
+deactivate A
+@enduml

@@ -1,0 +1,41 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+skinparam nodesep 24
+skinparam ranksep 65
+skinparam actor {
+ BorderColor black
+ BackgroundColor white
+}
+skinparam usecase {
+ BorderColor black
+ BackgroundColor white
+}
+skinparam rectangle {
+ BorderColor black
+ BackgroundColor white
+}
+left to right direction
+actor "收费人员" as A
+rectangle "牙科诊所管理系统" {
+ usecase "UC-05\n维护收费价目" as U5
+ usecase "UC-06\n查询待结算费用" as U6
+ usecase "UC-07\n登记现金收款" as U7
+ usecase "UC-19\n查询日常业务与收款" as U19
+ usecase "UC-20\n登记收款核对" as U20
+}
+A -- U5
+A -- U6
+A -- U7
+A -- U19
+A -- U20
+U5 -[hidden]left-> U6
+U6 -[hidden]left-> U7
+U7 -[hidden]left-> U19
+U19 -[hidden]left-> U20
+
+@enduml

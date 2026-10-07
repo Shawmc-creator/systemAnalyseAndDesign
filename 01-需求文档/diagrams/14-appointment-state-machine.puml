@@ -1,0 +1,29 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+skinparam ArrowFontSize 17
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ FontColor black
+ StartColor black
+ EndColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+state "已预约" as Booked
+state "已取消" as Cancelled
+state "已到诊" as Arrived
+Booked : 调整安排 [安排有效且无冲突]
+Booked : / 保留变更，保存新安排
+Booked : 查询预约 / 提供当前安排
+Cancelled : 查询预约 / 提供取消结果
+Arrived : 查询预约 / 提供预约及就诊
+[*] --> Booked : 新增预约 [安排有效且无冲突]\n/ 保存预约
+Booked -down-> Cancelled : 取消 [尚无关联就诊]\n/ 保留取消经历，释放时段
+Booked -down-> Arrived : 关联到诊\n[当日且尚无关联就诊]\n/ 关联本预约的唯一就诊
+@enduml
