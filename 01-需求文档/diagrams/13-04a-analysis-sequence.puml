@@ -5,7 +5,7 @@ skinparam shadowing false
 skinparam defaultFontName SimSun
 skinparam defaultFontSize 17
 skinparam dpi 200
-skinparam maxMessageSize 135
+skinparam maxMessageSize 125
 skinparam sequence {
  ArrowColor black
  ArrowFontSize 17
@@ -28,47 +28,48 @@ control "<u>:确认诊疗</u>\n<u>项目控制</u>" as K #white
 participant "<u>:就诊</u>" as V
 participant "<u>原确认:诊疗确认</u>" as O
 participant "<u>新确认:诊疗确认</u>" as N
-A -> B : 提交更正(原版本、原因、完整项目)
+A -> B : 提交更正(原版本、原明细关联、原因及完整集合)
 activate B
-B -> B : 检查输入与必填原因()
-B -> K : 更正诊疗确认(更正内容)
+B -> B : 检查字段及更正原因()
+B -> K : 更正诊疗确认()
 activate K
-critical 更正与收款使用同一次就诊的当前依据
-K -> V : 更正确认(原版本、原因、明细、牙医)
-activate V
-V -> V : 核对归属、未结清及当前版本()
-alt 校验通过
-V -> N : 校验项目集合(完整项目)
-activate N
-ref over N
-项目、数量检查
-同UC-04步骤3-4。
-end ref
-opt 项目及数量合法
-V -> O : 保留历史确认()
-activate O
-deactivate O
-V -> N : 确认项目(更正原因、当前时点)
-ref over N
-明细及价目匹配
-同UC-04步骤5-6。
-end ref
-N --> V : 新确认版本
-V -> V : 采用新确认版本()
-end
-deactivate N
-else 已结清、依据过期或内容不合法（4b、6a）
-note over V,N : 拒绝更正，原确认保持有效。
-end
-V --> K : 新版本或拒绝原因
-deactivate V
+critical 更正与收款复核同一当前版本
+ K -> V : 更正确认(完整集合、原版本、牙医)
+ activate V
+ V -> V : 核对本人、未结清及最新版本()
+ alt 基础条件有效
+  V -> N : 校验拟生效完整明细集合()
+  activate N
+  ref over N
+   同基本图：检查实际完成时间、方案归属、
+   患者决定及拟生效数量，排除被替换版本。
+  end ref
+  alt 明细及方案校验全部通过
+   V -> O : 提供原明细及计价依据()
+   activate O
+   O --> V : 原明细对象、原时点及价目
+   deactivate O
+   V -> N : 确定计价依据(原明细、本次时点)
+   ref over N
+    同辅助计价图：同项目继承原计价依据；
+    新增或换项目按本次时点匹配。
+   end ref
+   N --> V : 待生效完整明细及价目依据
+   V -> O : 保留原确认及历史明细()
+   V -> N : 保存更正原因及新确认()
+   V -> V : 替换当前版本，重算方案有效数量()
+  else 明细或方案无效
+   V -> V : 拒绝更正，原确认仍有效()
+  end
+  deactivate N
+ else 已结清或原版本已变化
+  V -> V : 拒绝过期更正()
+ end
+ V --> K : 新版本或拒绝原因
+ deactivate V
 end
 K --> B : 本次更正结果
 deactivate K
-B --> A : 展示结果；成功时旧核对依据失效
+B --> A : 成功后重新核对费用，失败保留原内容
 deactivate B
-note over O,N
-历史明细保留；收费人员
-通过UC-06核对新版本。
-end note
 @enduml

@@ -23,7 +23,8 @@ state "待处理" as Open {
  Pending -down-> Contacted : 登记联系 [实际反馈有效]\n/ 保留联系经历
  Contacted -down-> Scheduled : 关联复诊 [同患者有效预约]\n/ 保留预约与联系经历
  Pending -left-> Scheduled : 关联复诊\n[同患者有效预约]\n/ 保留关联结果
- Scheduled : 登记新的复诊关联 [同患者]\n/ 追加联系，保留原经历
+ Scheduled -left-> Pending : 关联预约取消 [要求未终结]\n/ 保留原预约，返回待联系
+ Scheduled : 登记新的复诊关联 [同患者且预约有效]\n/ 追加联系，保留原经历
 }
 state "评估完成" as Completed
 state "已取消" as Cancelled
@@ -39,7 +40,8 @@ note bottom of Completed
 end note
 note bottom of Cancelled
  预约改期、取消由UC-01办理，
- 预约取消不自动取消诊后要求。
+ 预约取消使未终结要求回到待联系，
+ 原预约及取消依据保留。
 end note
 @enduml
 

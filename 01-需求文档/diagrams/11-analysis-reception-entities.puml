@@ -44,6 +44,7 @@ class "就诊" as Visit <<entity>> {
  到诊时间
  --
  登记到诊()
+ 建立本次病历草稿()
  判断已结清()
 }
 Patient "1" -- "0..*" Appointment : 预约者

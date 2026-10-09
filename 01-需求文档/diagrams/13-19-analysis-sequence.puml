@@ -39,7 +39,7 @@ alt 日期及获准查询范围有效
  activate E2
  E2 --> K : 有效收据及现金净收
  deactivate E2
- K -> E3 : 按实际完成日期汇总当前有效明细()
+ K -> E3 : 按明细实际完成时间汇总当前有效版本()
  activate E3
  E3 --> K : 已完成项目及数量
  deactivate E3

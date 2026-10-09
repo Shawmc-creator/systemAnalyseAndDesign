@@ -42,12 +42,8 @@ else 价目方案无效
 end
 deactivate S
 opt 价目维护成功
- C -> M : 告知价目维护已完成
+ C -> M : 提供保存结果及价目版本明细
  activate M
- M -> S : 查询已维护的价目方案
- activate S
- S --> M : 返回当前及历史价格版本
-deactivate S
  M -> M : 核对确认内容与生效安排
 deactivate M
 end

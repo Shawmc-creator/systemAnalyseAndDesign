@@ -27,6 +27,7 @@ boundary "<u>:前台接口</u>" as B #white
 control "<u>:登记到诊控制</u>" as K #white
 participant "<u>:预约</u>" as R
 participant "<u>:就诊</u>" as V
+participant "<u>:病历</u>" as C
 A -> B : 发起到诊登记(预约编号)
 activate B
 B -> K : 取得待登记预约(预约编号)
@@ -44,7 +45,7 @@ A -> B : 确认到诊（步骤3）
 activate B
 B -> K : 登记到诊(预约、经办前台)
 activate K
-critical 检查、就诊与预约更新同时完成（步骤4-5）
+critical 预约、就诊及病历同时完成（步骤4-5）
 K -> R : 判断可到诊(当日)
 activate R
 R --> K : 允许、拒绝或已有到诊
@@ -52,7 +53,11 @@ deactivate R
 alt 允许登记
 K -> V : 登记到诊(预约、前台、当前时点)
 activate V
-V --> K : 新就诊及到诊时间
+V -> C : 建立本次草稿(就诊、患者)
+activate C
+C --> V : 已关联本次病历草稿
+deactivate C
+V --> K : 新就诊、病历及到诊时间
 deactivate V
 K -> R : 关联到诊(新就诊)
 activate R
@@ -60,7 +65,7 @@ deactivate R
 else 已到诊或重复提交（4b）
 K -> V : 提供既有到诊结果()
 activate V
-V --> K : 原就诊编号及到诊时间
+V --> K : 原就诊、病历编号及到诊时间
 deactivate V
 else 非当日或已取消（4a）
 note over K,R : 不生成就诊，保留原结果。

@@ -58,7 +58,7 @@ loop 每条确认明细
 D -> I : 检查数量及价目()
 activate I
 opt 已关联价目
-I -> P : 核对已关联价目(原确认时点)
+I -> P : 核对已关联价目(明细计价时点)
 activate P
 deactivate P
 end

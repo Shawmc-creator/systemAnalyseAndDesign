@@ -27,13 +27,13 @@ state "未结清" as Open {
  Unconfirmed -down-> PriceCheck : 确认诊疗项目 [确认有效]\n/ 建立当前确认及明细
  PriceCheck -left-> Missing : [存在缺价明细]
  PriceCheck -down-> Ready : [全部明细价目齐全]
- Missing -down-> Ready : 计价依据补齐\n[全部明细价目齐全]\n/ 核验原确认时点价目
+ Missing -down-> Ready : 计价依据补齐\n[全部明细价目齐全]\n/ 核验各明细计价时点价目
 }
 state "已结清" as Settled
 Settled : 查询费用 / 提供原费用及收款
 Settled : 登记现金结算 / 返回原收款
 Settled : 取得收据 / 形成原收款收据
 [*] -down-> Open : 登记到诊 [预约可到诊]\n/ 保存到诊并关联预约
-Open -left-> PriceCheck : 更正确认\n[有当前确认且更正有效]\n/ 保留原确认，建立新版本
+Open -left-> PriceCheck : 更正确认\n[有当前确认且更正有效]\n/ 保留原确认，继承既有行价格并建立新版本
 Ready -down-> Settled : 登记现金结算 [结算有效]\n/ 保存现金收款，关联结清
 @enduml

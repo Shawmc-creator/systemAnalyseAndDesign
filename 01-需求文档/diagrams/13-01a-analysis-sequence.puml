@@ -27,6 +27,7 @@ boundary "<u>:前台接口</u>" as B #white
 control "<u>:维护预约及</u>\n<u>接诊安排控制</u>" as K #white
 participant "<u>:预约</u>" as R
 participant "<u>:预约变更</u>" as H
+participant "<u>:诊后要求</u>" as Q
 A -> B : 选择已有预约(预约编号)
 activate B
 B -> K : 取得当前预约(预约编号)
@@ -58,6 +59,15 @@ R -> H : 保留变更(原安排、原因、经办前台)
 activate H
 H --> R : 变更已保留
 deactivate H
+opt 本次为取消
+ loop 引用本预约的未终结诊后要求
+  R -> Q : 预约取消转待联系(原预约、取消依据)
+  activate Q
+  Q -> Q : 保留历史关联，当前安排失效
+  Q --> R : 要求已返回待联系
+  deactivate Q
+ end
+end
 R --> K : 新安排或已取消（取消后释放时段）
 else 已到诊、原依据过期或安排冲突（4a、6a）
 R --> K : 拒绝变更及最新安排

@@ -41,7 +41,7 @@ A -> B : 提交每周时段、确认依据及变更原因（步骤3）
 activate B
 B -> K : 校验办理内容()
 activate K
-K -> E : 校验人员和时段()
+K -> E : 校验人员、时段及牙医确认人时间()
 activate E
 E --> K : 业务条件判断
 deactivate E

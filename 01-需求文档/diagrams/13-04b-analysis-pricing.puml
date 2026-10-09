@@ -1,0 +1,71 @@
+@startuml
+hide footbox
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam maxMessageSize 125
+skinparam sequence {
+ ArrowColor black
+ ArrowFontSize 17
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ParticipantBorderColor black
+ ParticipantBackgroundColor white
+ GroupBorderColor black
+ GroupBackgroundColor white
+ GroupHeaderFontSize 16
+ ParticipantFontSize 16
+ ReferenceBackgroundColor white
+ ReferenceBorderColor black
+}
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+control "<u>:确认诊疗</u>\n<u>项目控制</u>" as K #white
+participant "<u>:诊疗确认</u>" as C
+participant "<u>新明细:诊疗明细</u>" as I
+participant "<u>原明细:诊疗明细</u>" as O
+participant "<u>:收费项目</u>" as S
+participant "<u>:价目</u>" as P
+K -> C : 确定完整明细计价依据(本次确认时点)
+activate C
+loop 每条拟生效明细
+ C -> I : 确定计价依据(原明细关联、本次时点)
+ activate I
+ I -> S : 检查收费项目有效性()
+ activate S
+ S --> I : 有效或拒绝原因
+ deactivate S
+ I -> I : 核对原明细与当前版本归属()
+ alt 收费项目有效且原明细关联合法
+ alt 已有明细且收费项目未变更
+  I -> O : 核对当前版本归属并提供原计价依据()
+  activate O
+  O --> I : 原时点及已保留价目或缺价标记
+  deactivate O
+  I -> I : 继承计价时点及已有价目()
+ else 新增明细或更换收费项目
+  I -> I : 计价时点取本次确认时点()
+ end
+ alt 已有可继承价目
+  I -> I : 保留原单价依据，按当前数量计费()
+ else 尚无价目依据
+  I -> S : 提供适用价目(明细计价时点)
+  activate S
+  S -> P : 判断适用时点(明细计价时点)
+  activate P
+  P --> S : 适用价目或缺价
+  deactivate P
+  S --> I : 匹配结果
+  deactivate S
+ end
+ I --> C : 计价时点、价目关联或缺价标记
+ else 收费项目无效或原明细归属错误
+  I --> C : 拒绝，原确认仍有效
+ end
+ deactivate I
+end
+C --> K : 可保留的计价依据及完整性
+deactivate C
+@enduml

@@ -31,6 +31,9 @@ B -> K : 取得办理依据()
 activate K
 K -> E : 提供来源及联系经历()
 activate E
+opt 原复诊预约已取消（2a）
+ E -> E : 判断已回到待联系，保留原预约依据
+end
 E --> K : 要求、患者及已有办理结果
 deactivate E
 K --> B : 当前办理依据
