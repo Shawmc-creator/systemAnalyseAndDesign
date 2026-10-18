@@ -1,0 +1,37 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "待检" as Pending
+state "可用" as Available
+state "隔离" as Isolated
+state "停用" as Disabled
+state "过期" as Expired
+[*] --> Pending : 形成批次来源\n[已知材料和到货来源]\n/ 保留效期与批号
+Pending --> Available : 确认合格范围\n[验收已认可且未过期]\n/ 允许合格量计可用
+Available --> Isolated : 立即隔离批次\n[发现异常]\n/ 立即禁止正常领用
+Isolated --> Disabled : 审核恢复或停用\n[负责人决定停用]\n/ 保留原因
+Isolated --> Available : 审核恢复或停用\n[依据充分且未过期]\n/ 保留恢复确认
+Disabled --> Available : 审核恢复或停用\n[异常解决且未过期]\n/ 保留恢复依据
+Available --> Expired : 判断效期\n[已过有效期]\n/ 停止正常领用
+Isolated --> Expired : 判断效期\n[已过有效期]\n/ 保持不可用
+Pending --> Expired : 判断效期\n[已过有效期]\n/ 不得转可用
+
+@enduml

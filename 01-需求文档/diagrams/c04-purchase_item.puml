@@ -1,0 +1,39 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "待交付" as Pending
+state "履行中" as Active
+state "待差异处理" as Issue
+state "履行已完成" as Done
+state "剩余已取消" as Cancelled
+[*] --> Pending : 组织约定明细\n[采购已确认]\n/ 保留约定数量
+Pending --> Active : 核对交付及差异\n[已部分到货且未完成]\n/ 累计交付与验收
+Pending --> Done : 核对交付及差异\n[一次交付完成且全部合格]\n/ 保留履行结果
+Active : 核对交付及差异 [继续分批且未完成]\n/ 分别累计各数量
+Pending --> Issue : 核对交付及差异\n[拒收或交付差异未解决]\n/ 保留待处理量
+Active --> Issue : 核对交付及差异\n[拒收或交付差异未解决]\n/ 保留待处理量
+Issue -right-> Active : 确认差异安排\n[仍有未交付]\n/ 保留补换或调整依据
+Active --> Done : 核对交付及差异\n[交付完成且差异已解决]\n/ 保留履行结果
+Issue --> Done : 确认差异安排\n[剩余及拒收均已处理]\n/ 保留处理依据
+Pending --> Cancelled : 取消未履行部分\n[负责人确认]\n/ 保留取消原因
+Active --> Cancelled : 取消未履行部分\n[只取消剩余且已发生事实保留]\n/ 保留验收与付款
+
+@enduml

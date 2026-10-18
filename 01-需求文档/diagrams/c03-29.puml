@@ -1,0 +1,120 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "收费人员" as A0
+boundary "<u>:收费人员接口</u>" as B0
+actor "诊所负责人" as A1
+boundary "<u>:诊所负责人接口</u>" as B1
+control "<u>:登记供应商付款</u>\n<u>与结算控制</u>" as K
+participant "<u>:采购</u>" as Purchase
+participant "<u>:验收</u>" as Receipt
+participant "<u>:供应商资金</u>" as SupplierFunds
+participant "<u>:供货付款</u>" as SupplyPayment
+participant "<u>:供货分配</u>" as SupplyAllocation
+A0 -> B0 : 提交UC-29办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-29办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+opt 本次付款含采购预付
+K -> Purchase : 提供预付依据(确认采购或空)
+activate Purchase
+Purchase --> K : 处理结果或拒绝原因
+deactivate Purchase
+end
+opt 本次付款含验收结算
+K -> Receipt : 提供合格结算依据(验收范围或空)
+activate Receipt
+Receipt --> K : 处理结果或拒绝原因
+deactivate Receipt
+end
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A1 -> B1 : 确认供货结算范围
+activate B1
+B1 -> B1 : 检查输入格式()
+B1 -> K : 协调UC-29办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> SupplierFunds : 确认付款范围(负责人意见及结算依据)
+activate SupplierFunds
+SupplierFunds --> K : 处理结果或拒绝原因
+deactivate SupplierFunds
+end
+K --> B1 : 本阶段结果及下一步依据
+deactivate K
+B1 --> A1 : 展示结果、状态和原因
+deactivate B1
+A0 -> B0 : 申请本次付款办理
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-29办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> SupplierFunds : 开始供货付款(负责人确认范围及拟付额)
+activate SupplierFunds
+SupplierFunds -> SupplyPayment : 建立付款占用(唯一办理依据)
+activate SupplyPayment
+SupplyPayment --> SupplierFunds : 处理结果或拒绝原因
+deactivate SupplyPayment
+SupplierFunds --> K : 处理结果或拒绝原因
+deactivate SupplierFunds
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A0 -> B0 : 提交线下实际付款结果
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-29办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> SupplierFunds : 核实实际付款(渠道、实际结果及凭据)
+activate SupplierFunds
+SupplierFunds -> SupplyPayment : 确认实际支出(已核实结果)
+activate SupplyPayment
+SupplyPayment -> SupplyAllocation : 形成供货分配(采购预付或验收结算)
+activate SupplyAllocation
+SupplyAllocation --> SupplyPayment : 处理结果或拒绝原因
+deactivate SupplyAllocation
+SupplyPayment --> SupplierFunds : 处理结果或拒绝原因
+deactivate SupplyPayment
+SupplierFunds --> K : 处理结果或拒绝原因
+deactivate SupplierFunds
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,SupplyAllocation
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

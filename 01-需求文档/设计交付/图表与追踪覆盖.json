@@ -1,0 +1,1050 @@
+{
+  "version": "2026-10-18-final-design",
+  "usecases": 32,
+  "entity_classes": 67,
+  "target_tables": 85,
+  "legacy_tables": 41,
+  "new_diagrams": [
+    {
+      "stem": "d2-final-architecture",
+      "kind": "architecture",
+      "title": "业务层职责与数据访问",
+      "svg_width": 1249.0,
+      "svg_height": 671.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 10.3
+    },
+    {
+      "stem": "d2-final-command",
+      "kind": "architecture",
+      "title": "公共写入、幂等短路与失败回滚",
+      "svg_width": 899.0,
+      "svg_height": 888.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.6
+    },
+    {
+      "stem": "d2-final-class-identity",
+      "kind": "classes",
+      "title": "患者身份与接诊权限",
+      "group": "identity",
+      "svg_width": 891.0,
+      "svg_height": 747.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.7
+    },
+    {
+      "stem": "d2-final-class-reception",
+      "kind": "classes",
+      "title": "预约到诊与日期资源",
+      "group": "reception",
+      "svg_width": 1978.0,
+      "svg_height": 1189.0,
+      "paper_mm": [
+        420,
+        297
+      ],
+      "minimum_font_pt": 9.1
+    },
+    {
+      "stem": "d2-final-class-clinical",
+      "kind": "classes",
+      "title": "健康复核与病历",
+      "group": "clinical",
+      "svg_width": 1961.0,
+      "svg_height": 848.0,
+      "paper_mm": [
+        420,
+        297
+      ],
+      "minimum_font_pt": 9.6
+    },
+    {
+      "stem": "d2-final-class-plan",
+      "kind": "classes",
+      "title": "跨次方案与实际执行",
+      "group": "plan",
+      "svg_width": 3047.0,
+      "svg_height": 837.0,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 8.9
+    },
+    {
+      "stem": "d2-final-class-documents",
+      "kind": "classes",
+      "title": "影像文书与患者决定",
+      "group": "documents",
+      "svg_width": 3778.0,
+      "svg_height": 858.0,
+      "paper_mm": [
+        841,
+        594
+      ],
+      "minimum_font_pt": 10.3
+    },
+    {
+      "stem": "d2-final-class-billing",
+      "kind": "classes",
+      "title": "实际项目与应收费用",
+      "group": "billing",
+      "svg_width": 2470.0,
+      "svg_height": 1117.0,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 11.0
+    },
+    {
+      "stem": "d2-final-class-funds",
+      "kind": "classes",
+      "title": "患者付款与用途分配",
+      "group": "funds",
+      "svg_width": 2012.0,
+      "svg_height": 720.0,
+      "paper_mm": [
+        420,
+        297
+      ],
+      "minimum_font_pt": 9.3
+    },
+    {
+      "stem": "d2-final-class-refunds",
+      "kind": "classes",
+      "title": "费用申请调整与退款",
+      "group": "refunds",
+      "svg_width": 2063.0,
+      "svg_height": 904.0,
+      "paper_mm": [
+        420,
+        297
+      ],
+      "minimum_font_pt": 9.1
+    },
+    {
+      "stem": "d2-final-class-followup",
+      "kind": "classes",
+      "title": "复诊随访与评估",
+      "group": "followup",
+      "svg_width": 3013.0,
+      "svg_height": 875.0,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 9.0
+    },
+    {
+      "stem": "d2-final-class-materials",
+      "kind": "classes",
+      "title": "批次库存与实际用料",
+      "group": "materials",
+      "svg_width": 3047.0,
+      "svg_height": 1068.0,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 8.9
+    },
+    {
+      "stem": "d2-final-class-purchase",
+      "kind": "classes",
+      "title": "采购与分批验收",
+      "group": "purchase",
+      "svg_width": 2470.0,
+      "svg_height": 909.0,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 11.0
+    },
+    {
+      "stem": "d2-final-class-supplier_funds",
+      "kind": "classes",
+      "title": "供货付款与分配",
+      "group": "supplier_funds",
+      "svg_width": 1944.0,
+      "svg_height": 899.0,
+      "paper_mm": [
+        420,
+        297
+      ],
+      "minimum_font_pt": 9.7
+    },
+    {
+      "stem": "d2-final-class-instruments",
+      "kind": "classes",
+      "title": "器械处理放行与使用",
+      "group": "instruments",
+      "svg_width": 2012.0,
+      "svg_height": 1388.0,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 12.1
+    },
+    {
+      "stem": "d2-final-class-reconciliation",
+      "kind": "classes",
+      "title": "收支核对与异常跟进",
+      "group": "reconciliation",
+      "svg_width": 1434.0,
+      "svg_height": 1323.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.0
+    },
+    {
+      "stem": "d2-final-seq-01",
+      "kind": "sequence",
+      "title": "UC-01：维护预约及接诊安排",
+      "uc": 1,
+      "extra": "",
+      "source_sequence": "c03-01",
+      "svg_width": 3095.833,
+      "svg_height": 3681.25,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 8.7
+    },
+    {
+      "stem": "d2-final-seq-01-change",
+      "kind": "sequence",
+      "title": "UC-01：改约、取消及资源冲突",
+      "uc": 1,
+      "extra": "change",
+      "source_sequence": "c03-01-change",
+      "svg_width": 2927.083,
+      "svg_height": 3860.417,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.1
+    },
+    {
+      "stem": "d2-final-seq-02",
+      "kind": "sequence",
+      "title": "UC-02：查询预约及接诊安排",
+      "uc": 2,
+      "extra": "",
+      "source_sequence": "c03-02",
+      "svg_width": 2075.0,
+      "svg_height": 2250.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 8.7
+    },
+    {
+      "stem": "d2-final-seq-03",
+      "kind": "sequence",
+      "title": "UC-03：登记到诊",
+      "uc": 3,
+      "extra": "",
+      "source_sequence": "c03-03",
+      "svg_width": 3145.833,
+      "svg_height": 4191.667,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 12.4
+    },
+    {
+      "stem": "d2-final-seq-04",
+      "kind": "sequence",
+      "title": "UC-04：确认诊疗项目与执行",
+      "uc": 4,
+      "extra": "",
+      "source_sequence": "c03-04",
+      "svg_width": 3650.0,
+      "svg_height": 4341.667,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 10.7
+    },
+    {
+      "stem": "d2-final-seq-05",
+      "kind": "sequence",
+      "title": "UC-05：维护收费价目",
+      "uc": 5,
+      "extra": "",
+      "source_sequence": "c03-05",
+      "svg_width": 2964.583,
+      "svg_height": 5629.167,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 9.3
+    },
+    {
+      "stem": "d2-final-seq-06",
+      "kind": "sequence",
+      "title": "UC-06：查询账单与待结算费用",
+      "uc": 6,
+      "extra": "",
+      "source_sequence": "c03-06",
+      "svg_width": 2939.583,
+      "svg_height": 2729.167,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.1
+    },
+    {
+      "stem": "d2-final-seq-07",
+      "kind": "sequence",
+      "title": "UC-07：登记患者付款与预付抵扣",
+      "uc": 7,
+      "extra": "",
+      "source_sequence": "c03-07",
+      "svg_width": 2787.5,
+      "svg_height": 3681.25,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.5
+    },
+    {
+      "stem": "d2-final-seq-07-offset",
+      "kind": "sequence",
+      "title": "UC-07：预付抵扣与重复付款恢复",
+      "uc": 7,
+      "extra": "offset",
+      "source_sequence": "c03-07-offset",
+      "svg_width": 2787.5,
+      "svg_height": 3829.167,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.1
+    },
+    {
+      "stem": "d2-final-seq-08",
+      "kind": "sequence",
+      "title": "UC-08：维护患者资料",
+      "uc": 8,
+      "extra": "",
+      "source_sequence": "c03-08",
+      "svg_width": 2579.167,
+      "svg_height": 3460.417,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 10.1
+    },
+    {
+      "stem": "d2-final-seq-09",
+      "kind": "sequence",
+      "title": "UC-09：查询患者诊疗资料",
+      "uc": 9,
+      "extra": "",
+      "source_sequence": "c03-09",
+      "svg_width": 3379.167,
+      "svg_height": 3241.667,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 10.8
+    },
+    {
+      "stem": "d2-final-seq-10",
+      "kind": "sequence",
+      "title": "UC-10：记录检查与诊断",
+      "uc": 10,
+      "extra": "",
+      "source_sequence": "c03-10",
+      "svg_width": 2868.75,
+      "svg_height": 3829.167,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.1
+    },
+    {
+      "stem": "d2-final-seq-11",
+      "kind": "sequence",
+      "title": "UC-11：签署及补充病历",
+      "uc": 11,
+      "extra": "",
+      "source_sequence": "c03-11",
+      "svg_width": 2297.917,
+      "svg_height": 3129.167,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 11.2
+    },
+    {
+      "stem": "d2-final-seq-11-addendum",
+      "kind": "sequence",
+      "title": "UC-11：签署后补充与无治疗结束",
+      "uc": 11,
+      "extra": "addendum",
+      "source_sequence": "c03-11-addendum",
+      "svg_width": 2695.833,
+      "svg_height": 3350.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.9
+    },
+    {
+      "stem": "d2-final-seq-12",
+      "kind": "sequence",
+      "title": "UC-12：提出复诊随访要求",
+      "uc": 12,
+      "extra": "",
+      "source_sequence": "c03-12",
+      "svg_width": 2945.833,
+      "svg_height": 3750.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.1
+    },
+    {
+      "stem": "d2-final-seq-13",
+      "kind": "sequence",
+      "title": "UC-13：办理复诊随访联系",
+      "uc": 13,
+      "extra": "",
+      "source_sequence": "c03-13",
+      "svg_width": 2472.917,
+      "svg_height": 3641.667,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.6
+    },
+    {
+      "stem": "d2-final-seq-14",
+      "kind": "sequence",
+      "title": "UC-14：记录复诊随访评估",
+      "uc": 14,
+      "extra": "",
+      "source_sequence": "c03-14",
+      "svg_width": 2487.5,
+      "svg_height": 3639.583,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.6
+    },
+    {
+      "stem": "d2-final-seq-15",
+      "kind": "sequence",
+      "title": "UC-15：维护日期排班与诊椅安排",
+      "uc": 15,
+      "extra": "",
+      "source_sequence": "c03-15",
+      "svg_width": 2700.0,
+      "svg_height": 3529.167,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.9
+    },
+    {
+      "stem": "d2-final-seq-15-closure",
+      "kind": "sequence",
+      "title": "UC-15：临时停诊与已有预约",
+      "uc": 15,
+      "extra": "closure",
+      "source_sequence": "c03-15-closure",
+      "svg_width": 2735.417,
+      "svg_height": 3641.667,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.6
+    },
+    {
+      "stem": "d2-final-seq-16",
+      "kind": "sequence",
+      "title": "UC-16：查询可用接诊安排",
+      "uc": 16,
+      "extra": "",
+      "source_sequence": "c03-16",
+      "svg_width": 2508.333,
+      "svg_height": 2606.25,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 10.7
+    },
+    {
+      "stem": "d2-final-seq-17",
+      "kind": "sequence",
+      "title": "UC-17：查询材料与批次库存",
+      "uc": 17,
+      "extra": "",
+      "source_sequence": "c03-17",
+      "svg_width": 3114.583,
+      "svg_height": 2950.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 8.6
+    },
+    {
+      "stem": "d2-final-seq-18",
+      "kind": "sequence",
+      "title": "UC-18：登记批次库存变动",
+      "uc": 18,
+      "extra": "",
+      "source_sequence": "c03-18",
+      "svg_width": 3102.083,
+      "svg_height": 3706.25,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 8.6
+    },
+    {
+      "stem": "d2-final-seq-18-count",
+      "kind": "sequence",
+      "title": "UC-18：盘点审批、并发与停用校验",
+      "uc": 18,
+      "extra": "count",
+      "source_sequence": "c03-18-count",
+      "svg_width": 3210.417,
+      "svg_height": 5589.583,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 9.4
+    },
+    {
+      "stem": "d2-final-seq-19",
+      "kind": "sequence",
+      "title": "UC-19：查询经营与资金明细",
+      "uc": 19,
+      "extra": "",
+      "source_sequence": "c03-19",
+      "svg_width": 2635.417,
+      "svg_height": 2689.583,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 10.2
+    },
+    {
+      "stem": "d2-final-seq-20",
+      "kind": "sequence",
+      "title": "UC-20：登记收支核对与差异处理",
+      "uc": 20,
+      "extra": "",
+      "source_sequence": "c03-20",
+      "svg_width": 3664.583,
+      "svg_height": 6041.667,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 8.7
+    },
+    {
+      "stem": "d2-final-seq-21",
+      "kind": "sequence",
+      "title": "UC-21：维护长期健康资料及复核",
+      "uc": 21,
+      "extra": "",
+      "source_sequence": "c03-21",
+      "svg_width": 3231.25,
+      "svg_height": 3941.667,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 8.9
+    },
+    {
+      "stem": "d2-final-seq-22",
+      "kind": "sequence",
+      "title": "UC-22：维护持续治疗方案及确认",
+      "uc": 22,
+      "extra": "",
+      "source_sequence": "c03-22",
+      "svg_width": 2904.167,
+      "svg_height": 4008.333,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 8.7
+    },
+    {
+      "stem": "d2-final-seq-22-revision",
+      "kind": "sequence",
+      "title": "UC-22：跨次治疗改版与撤回同意",
+      "uc": 22,
+      "extra": "revision",
+      "source_sequence": "c03-22-revision",
+      "svg_width": 3266.667,
+      "svg_height": 3747.917,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 9.3
+    },
+    {
+      "stem": "d2-final-seq-23",
+      "kind": "sequence",
+      "title": "UC-23：管理影像与诊疗文书",
+      "uc": 23,
+      "extra": "",
+      "source_sequence": "c03-23",
+      "svg_width": 3175.0,
+      "svg_height": 5831.25,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 9.0
+    },
+    {
+      "stem": "d2-final-seq-24",
+      "kind": "sequence",
+      "title": "UC-24：申请费用调整与退费",
+      "uc": 24,
+      "extra": "",
+      "source_sequence": "c03-24",
+      "svg_width": 2620.833,
+      "svg_height": 3458.333,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 10.1
+    },
+    {
+      "stem": "d2-final-seq-25",
+      "kind": "sequence",
+      "title": "UC-25：审核费用调整与退费",
+      "uc": 25,
+      "extra": "",
+      "source_sequence": "c03-25",
+      "svg_width": 3737.5,
+      "svg_height": 4520.833,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 10.5
+    },
+    {
+      "stem": "d2-final-seq-26",
+      "kind": "sequence",
+      "title": "UC-26：办理与登记退款",
+      "uc": 26,
+      "extra": "",
+      "source_sequence": "c03-26",
+      "svg_width": 2787.5,
+      "svg_height": 6108.333,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 8.6
+    },
+    {
+      "stem": "d2-final-seq-26-unknown",
+      "kind": "sequence",
+      "title": "UC-26：退款未知、失败与重复办理",
+      "uc": 26,
+      "extra": "unknown",
+      "source_sequence": "c03-26-unknown",
+      "svg_width": 2579.167,
+      "svg_height": 8131.25,
+      "paper_mm": [
+        594,
+        841
+      ],
+      "minimum_font_pt": 9.5
+    },
+    {
+      "stem": "d2-final-seq-27",
+      "kind": "sequence",
+      "title": "UC-27：维护供应商与采购安排",
+      "uc": 27,
+      "extra": "",
+      "source_sequence": "c03-27",
+      "svg_width": 3295.833,
+      "svg_height": 5752.083,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 9.1
+    },
+    {
+      "stem": "d2-final-seq-28",
+      "kind": "sequence",
+      "title": "UC-28：登记采购验收与退换",
+      "uc": 28,
+      "extra": "",
+      "source_sequence": "c03-28",
+      "svg_width": 3475.0,
+      "svg_height": 4008.333,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 8.7
+    },
+    {
+      "stem": "d2-final-seq-28-partial",
+      "kind": "sequence",
+      "title": "UC-28：分批验收及拒收处理",
+      "uc": 28,
+      "extra": "partial",
+      "source_sequence": "c03-28-partial",
+      "svg_width": 3760.417,
+      "svg_height": 8333.333,
+      "paper_mm": [
+        594,
+        841
+      ],
+      "minimum_font_pt": 9.3
+    },
+    {
+      "stem": "d2-final-seq-29-stage-1",
+      "kind": "sequence",
+      "title": "UC-29：登记供应商付款与结算（阶段1）",
+      "uc": 29,
+      "extra": "",
+      "source_sequence": "c03-29",
+      "svg_width": 3531.25,
+      "svg_height": 5252.083,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 10.0
+    },
+    {
+      "stem": "d2-final-seq-29-stage-2",
+      "kind": "sequence",
+      "title": "UC-29：登记供应商付款与结算（阶段2）",
+      "uc": 29,
+      "extra": "",
+      "source_sequence": "c03-29",
+      "svg_width": 3235.417,
+      "svg_height": 2787.5,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 12.5
+    },
+    {
+      "stem": "d2-final-seq-29-stage-3",
+      "kind": "sequence",
+      "title": "UC-29：登记供应商付款与结算（阶段3）",
+      "uc": 29,
+      "extra": "",
+      "source_sequence": "c03-29",
+      "svg_width": 3387.5,
+      "svg_height": 3129.167,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "minimum_font_pt": 11.2
+    },
+    {
+      "stem": "d2-final-seq-29-recovery",
+      "kind": "sequence",
+      "title": "UC-29：供货付款未知与退回款",
+      "uc": 29,
+      "extra": "recovery",
+      "source_sequence": "c03-29-recovery",
+      "svg_width": 2787.5,
+      "svg_height": 3706.25,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.4
+    },
+    {
+      "stem": "d2-final-seq-30-stage-1",
+      "kind": "sequence",
+      "title": "UC-30：登记器械处理与放行（阶段1）",
+      "uc": 30,
+      "extra": "",
+      "source_sequence": "c03-30",
+      "svg_width": 3131.25,
+      "svg_height": 3445.833,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 8.6
+    },
+    {
+      "stem": "d2-final-seq-30-stage-2",
+      "kind": "sequence",
+      "title": "UC-30：登记器械处理与放行（阶段2）",
+      "uc": 30,
+      "extra": "",
+      "source_sequence": "c03-30",
+      "svg_width": 2720.833,
+      "svg_height": 2608.333,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.9
+    },
+    {
+      "stem": "d2-final-seq-30-stage-3",
+      "kind": "sequence",
+      "title": "UC-30：登记器械处理与放行（阶段3）",
+      "uc": 30,
+      "extra": "",
+      "source_sequence": "c03-30",
+      "svg_width": 2927.083,
+      "svg_height": 3239.583,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.2
+    },
+    {
+      "stem": "d2-final-seq-31",
+      "kind": "sequence",
+      "title": "UC-31：登记器械包使用与追溯",
+      "uc": 31,
+      "extra": "",
+      "source_sequence": "c03-31",
+      "svg_width": 2904.167,
+      "svg_height": 4050.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 8.6
+    },
+    {
+      "stem": "d2-final-seq-31-incident",
+      "kind": "sequence",
+      "title": "UC-31：事后异常与使用追溯",
+      "uc": 31,
+      "extra": "incident",
+      "source_sequence": "c03-31-incident",
+      "svg_width": 3095.833,
+      "svg_height": 4050.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 8.6
+    },
+    {
+      "stem": "d2-final-seq-32",
+      "kind": "sequence",
+      "title": "UC-32：维护材料与批次状态",
+      "uc": 32,
+      "extra": "",
+      "source_sequence": "c03-32",
+      "svg_width": 3383.333,
+      "svg_height": 6012.5,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 8.7
+    },
+    {
+      "stem": "d3-final-navigation",
+      "kind": "ui",
+      "title": "岗位导航与业务衔接",
+      "svg_width": 1814.0,
+      "svg_height": 245.0,
+      "paper_mm": [
+        420,
+        297
+      ],
+      "minimum_font_pt": 10.4
+    },
+    {
+      "stem": "d3-final-screen-appointments",
+      "kind": "wireframe",
+      "title": "预约与到诊页面结构",
+      "svg_width": 352.0,
+      "svg_height": 158.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 17.4
+    },
+    {
+      "stem": "d3-final-screen-clinical",
+      "kind": "wireframe",
+      "title": "诊疗工作台页面结构",
+      "svg_width": 293.0,
+      "svg_height": 196.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 20.9
+    },
+    {
+      "stem": "d3-final-screen-plan",
+      "kind": "wireframe",
+      "title": "方案与文书页面结构",
+      "svg_width": 289.0,
+      "svg_height": 189.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 21.2
+    },
+    {
+      "stem": "d3-final-screen-fees",
+      "kind": "wireframe",
+      "title": "收费与退费页面结构",
+      "svg_width": 349.0,
+      "svg_height": 151.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 17.5
+    },
+    {
+      "stem": "d3-final-screen-followup",
+      "kind": "wireframe",
+      "title": "复诊随访页面结构",
+      "svg_width": 305.0,
+      "svg_height": 151.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 20.1
+    },
+    {
+      "stem": "d3-final-screen-stock",
+      "kind": "wireframe",
+      "title": "材料库存页面结构",
+      "svg_width": 293.0,
+      "svg_height": 151.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 20.9
+    },
+    {
+      "stem": "d3-final-screen-purchase",
+      "kind": "wireframe",
+      "title": "采购与供货页面结构",
+      "svg_width": 298.0,
+      "svg_height": 153.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 20.5
+    },
+    {
+      "stem": "d3-final-screen-instruments",
+      "kind": "wireframe",
+      "title": "器械处理页面结构",
+      "svg_width": 314.0,
+      "svg_height": 147.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 19.5
+    },
+    {
+      "stem": "d3-final-screen-management",
+      "kind": "wireframe",
+      "title": "排班与经营页面结构",
+      "svg_width": 305.0,
+      "svg_height": 162.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 20.1
+    },
+    {
+      "stem": "d3-final-screen-operations",
+      "kind": "wireframe",
+      "title": "运行管理页面结构",
+      "svg_width": 377.0,
+      "svg_height": 153.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 16.2
+    },
+    {
+      "stem": "d3-final-submit",
+      "kind": "ui",
+      "title": "页面提交与不确定响应处理",
+      "svg_width": 698.0,
+      "svg_height": 700.0,
+      "paper_mm": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 12.4
+    }
+  ],
+  "scope": "设计完整性核对；不是应用功能通过声明"
+}

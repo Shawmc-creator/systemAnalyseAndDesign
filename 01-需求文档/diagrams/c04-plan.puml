@@ -1,0 +1,38 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "草稿" as Draft
+state "待确认" as Pending
+state "已确认" as Agreed
+state "暂缓" as Deferred
+state "已拒绝" as Rejected
+state "停止后续执行" as Stopped
+state "本版执行完成" as Done
+[*] --> Draft : 形成待确认版本\n[来源与项目有据]\n/ 建立草稿明细
+Draft --> Pending : 提交方案说明\n[明细完整]\n/ 固定待确认内容
+Pending --> Agreed : 登记确认经历\n[患者同意具体范围]\n/ 保留决定及文书
+Pending --> Deferred : 登记确认经历\n[患者暂缓]\n/ 保留未执行安排
+Pending --> Rejected : 登记确认经历\n[患者拒绝]\n/ 保留拒绝依据
+Deferred --> Pending : 重新说明方案\n[内容未改变]\n/ 重新取得决定
+Agreed --> Stopped : 停止后续安排\n[撤回同意或新版本替代]\n/ 保留已执行关联
+Agreed --> Done : 核对本版完成\n[同意范围已完成]\n/ 保留每次执行来源
+
+@enduml

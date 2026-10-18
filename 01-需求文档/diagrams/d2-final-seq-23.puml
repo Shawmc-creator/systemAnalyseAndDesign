@@ -1,0 +1,117 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 150
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "诊疗助理" as A0
+boundary "<u>:诊疗助理接口</u>" as B0
+actor "牙医" as A1
+boundary "<u>:牙医接口</u>" as B1
+control "<u>:管理影像与诊疗</u>\n<u>文书控制</u>" as K
+participant "<u>:患者</u>" as Patient
+participant "<u>:诊疗文件</u>" as Document
+participant "<u>:文件版本</u>" as FileVersion
+participant "工作单元" as W
+participant "数据映射器" as DM
+participant "权限与会话服务" as AUTH
+A0 -> B0 : 提交UC-23办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 办理(ctx, UC23Command)
+activate K
+group 本阶段同一写事务
+K -> W : 开始写事务()
+W --> K : 同一连接
+K -> AUTH : 核对岗位及对象(ctx, 引用)
+AUTH --> K : 有效授权依据或拒绝
+K -> W : 核对提交(ctx, cmd)
+W --> K : 新命令分支（原结果短路见公共图）
+K -> DM : 装载(对象引用、连接)
+DM --> K : 实体与依据快照
+K -> Patient : 核对临床访问(牙医或获准助理、对象范围)
+activate Patient
+Patient --> K : 处理结果或拒绝原因
+deactivate Patient
+K -> Document : 接收原件版本(患者、来源、归属、文件)
+activate Document
+Document -> FileVersion : 核对原件完整性(格式、大小和校验依据)
+activate FileVersion
+FileVersion --> Document : 处理结果或拒绝原因
+deactivate FileVersion
+Document --> K : 处理结果或拒绝原因
+deactivate Document
+alt 本阶段全部校验通过
+K -> DM : 保存(变更集合、连接)
+DM --> K : 保存成功或版本冲突
+K -> W : 校验集合与来源()
+W --> K : 末校验结果
+K -> W : 保存结果与审计并提交()
+else 任一步骤拒绝或保存失败
+K -> W : 回滚()
+end
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A1 -> B1 : 确认上传文件及归属
+activate B1
+B1 -> B1 : 检查输入格式()
+B1 -> K : 协调UC-23办理(对象、依据)
+activate K
+group 本阶段同一写事务
+K -> W : 开始写事务()
+W --> K : 同一连接
+K -> AUTH : 核对岗位及对象(ctx, 引用)
+AUTH --> K : 有效授权依据或拒绝
+K -> W : 核对提交(ctx, cmd)
+W --> K : 新命令分支（原结果短路见公共图）
+K -> DM : 装载(对象引用、连接)
+DM --> K : 实体与依据快照
+K -> Document : 确认文件依据(牙医核实结果及关联对象)
+activate Document
+Document -> FileVersion : 保留确认原件(人员时间、版本及代理依据)
+activate FileVersion
+FileVersion --> Document : 处理结果或拒绝原因
+deactivate FileVersion
+Document --> K : 处理结果或拒绝原因
+deactivate Document
+alt 本阶段全部校验通过
+K -> DM : 保存(变更集合、连接)
+DM --> K : 保存成功或版本冲突
+K -> W : 校验集合与来源()
+W --> K : 末校验结果
+K -> W : 保存结果与审计并提交()
+else 任一步骤拒绝或保存失败
+K -> W : 回滚()
+end
+end
+K --> B1 : 本阶段结果及下一步依据
+deactivate K
+B1 --> A1 : 展示结果、状态和原因
+deactivate B1
+note over K,FileVersion
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

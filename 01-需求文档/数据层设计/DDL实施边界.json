@@ -1,0 +1,5698 @@
+{
+  "version": "2026-10-18-D1-state-collections",
+  "scope": "85表结构、16类状态转移与集合提交门禁样例；全用例服务与迁移验收待完成",
+  "source_sha256": "844f135d4f5f7c2390d6aa60e296002dccf92e93429ae23ae9e8b1a8e8783ea3",
+  "sql_sha256": "6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d",
+  "counts": {
+    "tables": 85,
+    "fields": 1048,
+    "foreign_key_groups": 281,
+    "check_expressions": 1981,
+    "indexes": 268,
+    "triggers": 389,
+    "seed_roles": 5,
+    "seed_permissions": 50
+  },
+  "indexes": [
+    {
+      "name": "ux_treatment_execution_p1",
+      "table": "treatment_execution",
+      "columns": [
+        "original_execution_id"
+      ],
+      "where": "original_execution_id IS NOT NULL",
+      "purpose": "每个原执行只允许一个直接更正后继；后续更正引用上一后继，不允许分叉。",
+      "kind": "partial_unique"
+    },
+    {
+      "name": "ux_reconciliation_item_p1",
+      "table": "reconciliation_item",
+      "columns": [
+        "cash_reconciliation_id",
+        "patient_payment_id"
+      ],
+      "where": "patient_payment_id IS NOT NULL",
+      "purpose": "同次核对同一来源原单只出现一次；不同核对允许重复引用。",
+      "kind": "partial_unique"
+    },
+    {
+      "name": "ux_reconciliation_item_p2",
+      "table": "reconciliation_item",
+      "columns": [
+        "cash_reconciliation_id",
+        "patient_refund_id"
+      ],
+      "where": "patient_refund_id IS NOT NULL",
+      "purpose": "同次核对同一来源原单只出现一次；不同核对允许重复引用。",
+      "kind": "partial_unique"
+    },
+    {
+      "name": "ux_reconciliation_item_p3",
+      "table": "reconciliation_item",
+      "columns": [
+        "cash_reconciliation_id",
+        "supplier_payment_id"
+      ],
+      "where": "supplier_payment_id IS NOT NULL",
+      "purpose": "同次核对同一来源原单只出现一次；不同核对允许重复引用。",
+      "kind": "partial_unique"
+    },
+    {
+      "name": "ux_reconciliation_item_p4",
+      "table": "reconciliation_item",
+      "columns": [
+        "cash_reconciliation_id",
+        "supplier_refund_id"
+      ],
+      "where": "supplier_refund_id IS NOT NULL",
+      "purpose": "同次核对同一来源原单只出现一次；不同核对允许重复引用。",
+      "kind": "partial_unique"
+    },
+    {
+      "name": "ux_instrument_use_p1",
+      "table": "instrument_use",
+      "columns": [
+        "instrument_pack_cycle_id"
+      ],
+      "where": "use_status IN ('已发放','已使用')",
+      "purpose": "一个包次最多一个正常占用/使用；未用退回保留历史且解除占用。异常补录由隔离及追溯规则处理。",
+      "kind": "partial_unique"
+    },
+    {
+      "name": "ux_backup_artifact_p1",
+      "table": "backup_artifact",
+      "columns": [
+        "backup_id"
+      ],
+      "where": "artifact_kind = 'database'",
+      "purpose": "每任务最多一份数据库清单；成功前另核对恰好一份。",
+      "kind": "partial_unique"
+    },
+    {
+      "name": "ux_backup_artifact_p2",
+      "table": "backup_artifact",
+      "columns": [
+        "backup_id",
+        "document_version_id"
+      ],
+      "where": "artifact_kind = 'attachment'",
+      "purpose": "同备份同文件版本只列一次；附件类型要求版本非空。",
+      "kind": "partial_unique"
+    },
+    {
+      "name": "ux_backup_run_p1",
+      "table": "backup_run",
+      "columns": [
+        "trigger_kind"
+      ],
+      "where": "status = '运行中'",
+      "purpose": "同触发类别最多一个运行中任务；共用目标路径的任务另由作业串行协调。",
+      "kind": "partial_unique"
+    },
+    {
+      "name": "ix_patient_q1",
+      "table": "patient",
+      "columns": [
+        "name"
+      ],
+      "usecases": [
+        2,
+        8
+      ],
+      "purpose": "同名候选；前缀或精确检索，不把姓名作为身份唯一键。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_patient_q2",
+      "table": "patient",
+      "columns": [
+        "phone"
+      ],
+      "usecases": [
+        2,
+        8
+      ],
+      "purpose": "电话候选与人工核对；同号可属于多个患者。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_patient_change_q1",
+      "table": "patient_change",
+      "columns": [
+        "patient_id",
+        "occurred_at"
+      ],
+      "usecases": [
+        8,
+        9
+      ],
+      "purpose": "资料变更时间线。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_appointment_q1",
+      "table": "appointment",
+      "columns": [
+        "planned_start",
+        "status"
+      ],
+      "usecases": [
+        1,
+        2,
+        3
+      ],
+      "purpose": "日期预约清单；时间区间先换算UTC。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_appointment_q2",
+      "table": "appointment",
+      "columns": [
+        "patient_id",
+        "status",
+        "planned_start"
+      ],
+      "usecases": [
+        1,
+        2
+      ],
+      "purpose": "患者有效预约与冲突候选。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_appointment_change_q1",
+      "table": "appointment_change",
+      "columns": [
+        "appointment_id",
+        "occurred_at"
+      ],
+      "usecases": [
+        1,
+        2
+      ],
+      "purpose": "改约取消历史。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_dated_schedule_q1",
+      "table": "dated_schedule",
+      "columns": [
+        "dentist_id",
+        "status",
+        "starts_at",
+        "ends_at"
+      ],
+      "usecases": [
+        1,
+        15,
+        16
+      ],
+      "purpose": "牙医日期安排及区间候选。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_dated_schedule_q2",
+      "table": "dated_schedule",
+      "columns": [
+        "dental_chair_id",
+        "status",
+        "starts_at",
+        "ends_at"
+      ],
+      "usecases": [
+        1,
+        15,
+        16
+      ],
+      "purpose": "诊椅日期安排及区间候选。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_resource_occupancy_q1",
+      "table": "resource_occupancy",
+      "columns": [
+        "dated_schedule_id",
+        "starts_at",
+        "ends_at"
+      ],
+      "usecases": [
+        1,
+        3,
+        15,
+        16
+      ],
+      "purpose": "未释放占用的区间核对。",
+      "where": "released_at IS NULL",
+      "kind": "query"
+    },
+    {
+      "name": "ix_resource_occupancy_q2",
+      "table": "resource_occupancy",
+      "columns": [
+        "appointment_id"
+      ],
+      "usecases": [
+        1,
+        3,
+        15
+      ],
+      "purpose": "查当前预约占用。",
+      "where": "released_at IS NULL",
+      "kind": "query"
+    },
+    {
+      "name": "ix_resource_occupancy_q3",
+      "table": "resource_occupancy",
+      "columns": [
+        "visit_id"
+      ],
+      "usecases": [
+        3,
+        4,
+        15
+      ],
+      "purpose": "查现场或预约到诊占用。",
+      "where": "released_at IS NULL",
+      "kind": "query"
+    },
+    {
+      "name": "ix_visit_q1",
+      "table": "visit",
+      "columns": [
+        "patient_id",
+        "arrived_at"
+      ],
+      "usecases": [
+        3,
+        9,
+        14
+      ],
+      "purpose": "诊疗历史与复诊来源。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_visit_q2",
+      "table": "visit",
+      "columns": [
+        "dentist_id",
+        "status",
+        "arrived_at"
+      ],
+      "usecases": [
+        3,
+        4,
+        9,
+        10,
+        11
+      ],
+      "purpose": "本人当日候诊、接诊清单。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_clinical_handover_q1",
+      "table": "clinical_handover",
+      "columns": [
+        "patient_id",
+        "receiving_dentist_id",
+        "valid_from"
+      ],
+      "usecases": [
+        9,
+        10,
+        11
+      ],
+      "purpose": "接诊交接范围及有效区间。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_record_addendum_q1",
+      "table": "record_addendum",
+      "columns": [
+        "clinical_record_id",
+        "added_at"
+      ],
+      "usecases": [
+        9,
+        11
+      ],
+      "purpose": "签署后补充时间线。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_health_version_q1",
+      "table": "health_version",
+      "columns": [
+        "patient_id",
+        "effective_at"
+      ],
+      "usecases": [
+        9,
+        21
+      ],
+      "purpose": "患者某时点有效健康版本。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_health_review_q1",
+      "table": "health_review",
+      "columns": [
+        "visit_id",
+        "reviewed_at"
+      ],
+      "usecases": [
+        10,
+        11,
+        21
+      ],
+      "purpose": "当前就诊实际复核版本。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_treatment_plan_q1",
+      "table": "treatment_plan",
+      "columns": [
+        "patient_id",
+        "status",
+        "established_at"
+      ],
+      "usecases": [
+        9,
+        22
+      ],
+      "purpose": "患者持续治疗方案。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_patient_decision_q1",
+      "table": "patient_decision",
+      "columns": [
+        "plan_version_id",
+        "decided_at",
+        "id"
+      ],
+      "usecases": [
+        4,
+        22
+      ],
+      "purpose": "版本及具体项目的决定时间线；相同时刻按id稳定排序。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_treatment_execution_q1",
+      "table": "treatment_execution",
+      "columns": [
+        "plan_item_id",
+        "completed_at"
+      ],
+      "usecases": [
+        4,
+        22
+      ],
+      "purpose": "项目已执行、更正链与剩余数量。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_treatment_execution_q2",
+      "table": "treatment_execution",
+      "columns": [
+        "visit_id",
+        "completed_at"
+      ],
+      "usecases": [
+        4,
+        6,
+        9
+      ],
+      "purpose": "本次实际执行与应收来源。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_clinical_document_q1",
+      "table": "clinical_document",
+      "columns": [
+        "patient_id",
+        "document_type",
+        "created_at"
+      ],
+      "usecases": [
+        9,
+        23
+      ],
+      "purpose": "患者原件分类检索。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_service_price_q1",
+      "table": "service_price",
+      "columns": [
+        "service_id",
+        "status",
+        "valid_from",
+        "valid_until"
+      ],
+      "usecases": [
+        4,
+        5,
+        6
+      ],
+      "purpose": "按项目和计价时点确定已确认价格。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_bill_q1",
+      "table": "bill",
+      "columns": [
+        "patient_id",
+        "formed_at"
+      ],
+      "usecases": [
+        6,
+        7,
+        19,
+        24
+      ],
+      "purpose": "患者账单与结算历史。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_bill_item_q1",
+      "table": "bill_item",
+      "columns": [
+        "bill_id",
+        "pricing_status"
+      ],
+      "usecases": [
+        6,
+        7,
+        24
+      ],
+      "purpose": "本账目缺价和有效应收项目。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_patient_payment_q1",
+      "table": "patient_payment",
+      "columns": [
+        "patient_funds_id",
+        "status",
+        "received_at"
+      ],
+      "usecases": [
+        7,
+        19,
+        24,
+        26
+      ],
+      "purpose": "已确认原款、预付与可退余额。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_payment_allocation_q1",
+      "table": "payment_allocation",
+      "columns": [
+        "bill_id",
+        "effective_at"
+      ],
+      "usecases": [
+        6,
+        7,
+        25
+      ],
+      "purpose": "账目用途及释放累计。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_prepayment_offset_q1",
+      "table": "prepayment_offset",
+      "columns": [
+        "bill_id",
+        "effective_at"
+      ],
+      "usecases": [
+        6,
+        7,
+        25
+      ],
+      "purpose": "预付抵扣及释放累计。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_fee_request_q1",
+      "table": "fee_request",
+      "columns": [
+        "status",
+        "submitted_at"
+      ],
+      "usecases": [
+        24,
+        25
+      ],
+      "purpose": "待审核和重提任务。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_patient_refund_q1",
+      "table": "patient_refund",
+      "columns": [
+        "fee_request_id",
+        "status"
+      ],
+      "usecases": [
+        25,
+        26
+      ],
+      "purpose": "批准额度下待办理、待核实和成功退款。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_patient_refund_q2",
+      "table": "patient_refund",
+      "columns": [
+        "patient_payment_id",
+        "status"
+      ],
+      "usecases": [
+        7,
+        26
+      ],
+      "purpose": "原款退款占用与实退累计。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_followup_requirement_q1",
+      "table": "followup_requirement",
+      "columns": [
+        "responsible_frontdesk_id",
+        "status",
+        "next_contact_date"
+      ],
+      "usecases": [
+        12,
+        13
+      ],
+      "purpose": "负责人的待联系清单。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_followup_requirement_q2",
+      "table": "followup_requirement",
+      "columns": [
+        "patient_id",
+        "status",
+        "target_start"
+      ],
+      "usecases": [
+        12,
+        13,
+        14
+      ],
+      "purpose": "患者复诊窗口及未完成要求。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_contact_history_q1",
+      "table": "contact_history",
+      "columns": [
+        "followup_requirement_id",
+        "contacted_at"
+      ],
+      "usecases": [
+        13,
+        14
+      ],
+      "purpose": "联系与复诊预约历史。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_clinical_assessment_q1",
+      "table": "clinical_assessment",
+      "columns": [
+        "followup_requirement_id",
+        "assessed_at"
+      ],
+      "usecases": [
+        14
+      ],
+      "purpose": "多次临床评估及后续处理。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_material_batch_q1",
+      "table": "material_batch",
+      "columns": [
+        "material_id",
+        "status",
+        "expiry_date"
+      ],
+      "usecases": [
+        17,
+        18,
+        32
+      ],
+      "purpose": "可用批次和临期筛选；仍逐次检查真实日期。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_inventory_movement_q1",
+      "table": "inventory_movement",
+      "columns": [
+        "batch_stock_id",
+        "occurred_at",
+        "id"
+      ],
+      "usecases": [
+        17,
+        18,
+        28
+      ],
+      "purpose": "批次位置流水及余额追溯。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_material_usage_q1",
+      "table": "material_usage",
+      "columns": [
+        "visit_id",
+        "used_at"
+      ],
+      "usecases": [
+        9,
+        18
+      ],
+      "purpose": "实际使用批次追溯。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_stock_count_q1",
+      "table": "stock_count",
+      "columns": [
+        "status",
+        "counted_at"
+      ],
+      "usecases": [
+        18
+      ],
+      "purpose": "待确认盘点差异。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_purchase_order_q1",
+      "table": "purchase_order",
+      "columns": [
+        "supplier_id",
+        "status",
+        "agreed_at"
+      ],
+      "usecases": [
+        27,
+        28,
+        29
+      ],
+      "purpose": "供应商采购履行与预付来源。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_purchase_receipt_q1",
+      "table": "purchase_receipt",
+      "columns": [
+        "purchase_order_id",
+        "arrived_at"
+      ],
+      "usecases": [
+        28,
+        29
+      ],
+      "purpose": "分批到货与验收累计。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_purchase_receipt_item_q1",
+      "table": "purchase_receipt_item",
+      "columns": [
+        "purchase_order_item_id"
+      ],
+      "usecases": [
+        28
+      ],
+      "purpose": "同采购明细的分批验收量。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_purchase_issue_q1",
+      "table": "purchase_issue",
+      "columns": [
+        "status",
+        "created_at"
+      ],
+      "usecases": [
+        28,
+        29
+      ],
+      "purpose": "待处理差异、退供及价款调整。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_supplier_payment_q1",
+      "table": "supplier_payment",
+      "columns": [
+        "supplier_funds_id",
+        "status",
+        "initiated_at"
+      ],
+      "usecases": [
+        19,
+        29
+      ],
+      "purpose": "供货付款预占、未知和成功事实。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_supplier_allocation_q1",
+      "table": "supplier_allocation",
+      "columns": [
+        "purchase_order_id",
+        "allocation_state"
+      ],
+      "usecases": [
+        27,
+        29
+      ],
+      "purpose": "采购预付款的待生效/生效/释放用途。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_supplier_allocation_q2",
+      "table": "supplier_allocation",
+      "columns": [
+        "purchase_receipt_id",
+        "allocation_state"
+      ],
+      "usecases": [
+        28,
+        29
+      ],
+      "purpose": "验收应付余额与已付款分配。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_supplier_refund_q1",
+      "table": "supplier_refund",
+      "columns": [
+        "supplier_payment_id",
+        "received_at"
+      ],
+      "usecases": [
+        19,
+        29
+      ],
+      "purpose": "原供货付款退款累计。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_instrument_processing_q1",
+      "table": "instrument_processing",
+      "columns": [
+        "status",
+        "started_at"
+      ],
+      "usecases": [
+        30
+      ],
+      "purpose": "待核对放行及隔离轮次。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_instrument_pack_cycle_q1",
+      "table": "instrument_pack_cycle",
+      "columns": [
+        "instrument_pack_id",
+        "status",
+        "expires_at"
+      ],
+      "usecases": [
+        30,
+        31
+      ],
+      "purpose": "器械包当前轮次、占用和有效期。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_instrument_use_q1",
+      "table": "instrument_use",
+      "columns": [
+        "visit_id",
+        "issued_at"
+      ],
+      "usecases": [
+        9,
+        31
+      ],
+      "purpose": "按患者就诊追溯包次；由既有visit患者索引定位。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_cash_reconciliation_q1",
+      "table": "cash_reconciliation",
+      "columns": [
+        "business_date",
+        "channel",
+        "cutoff_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "营业日各渠道多次核对快照。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_issue_followup_q1",
+      "table": "issue_followup",
+      "columns": [
+        "assigned_to",
+        "status",
+        "due_date"
+      ],
+      "usecases": [
+        20,
+        30
+      ],
+      "purpose": "负责人指派的未决问题。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_patient_payment_q2",
+      "table": "patient_payment",
+      "columns": [
+        "channel",
+        "received_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "按渠道和UTC起止区间取得原始资金事实；另按确认状态过滤。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_patient_refund_q3",
+      "table": "patient_refund",
+      "columns": [
+        "channel",
+        "verified_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "按渠道和UTC起止区间取得原始资金事实；另按确认状态过滤。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_supplier_payment_q2",
+      "table": "supplier_payment",
+      "columns": [
+        "channel",
+        "verified_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "按渠道和UTC起止区间取得原始资金事实；另按确认状态过滤。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_supplier_refund_q2",
+      "table": "supplier_refund",
+      "columns": [
+        "channel",
+        "received_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "按渠道和UTC起止区间取得原始资金事实；另按确认状态过滤。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_account_role_q1",
+      "table": "account_role",
+      "columns": [
+        "account_id",
+        "role_id",
+        "granted_at"
+      ],
+      "usecases": [],
+      "purpose": "请求权限核对；运行支撑。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_staff_role_qualification_q1",
+      "table": "staff_role_qualification",
+      "columns": [
+        "staff_id",
+        "role_id",
+        "valid_from"
+      ],
+      "usecases": [],
+      "purpose": "岗位有效区间与重叠核验；运行支撑。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_authentication_event_q1",
+      "table": "authentication_event",
+      "columns": [
+        "login_digest",
+        "source_digest",
+        "occurred_at"
+      ],
+      "usecases": [],
+      "purpose": "登录失败限流窗口；另分别限制单来源/单账号维度。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_authentication_event_q2",
+      "table": "authentication_event",
+      "columns": [
+        "source_digest",
+        "occurred_at"
+      ],
+      "usecases": [],
+      "purpose": "来源维度限流窗口。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_authentication_event_q3",
+      "table": "authentication_event",
+      "columns": [
+        "login_digest",
+        "occurred_at"
+      ],
+      "usecases": [],
+      "purpose": "账号维度限流窗口。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_operation_audit_q1",
+      "table": "operation_audit",
+      "columns": [
+        "object_kind",
+        "object_key",
+        "occurred_at"
+      ],
+      "usecases": [],
+      "purpose": "按受控对象追溯操作历史。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_operation_audit_q2",
+      "table": "operation_audit",
+      "columns": [
+        "submission_id"
+      ],
+      "usecases": [],
+      "purpose": "一项命令涉及多个对象的审计集合。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_backup_run_q1",
+      "table": "backup_run",
+      "columns": [
+        "status",
+        "created_at"
+      ],
+      "usecases": [],
+      "purpose": "备份任务恢复与保留策略。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_backup_copy_q1",
+      "table": "backup_copy",
+      "columns": [
+        "backup_id",
+        "status"
+      ],
+      "usecases": [],
+      "purpose": "核对本地及异机可用副本。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_restore_verification_q1",
+      "table": "restore_verification",
+      "columns": [
+        "backup_id",
+        "started_at"
+      ],
+      "usecases": [],
+      "purpose": "备份恢复演练历史。",
+      "kind": "query"
+    },
+    {
+      "name": "ix_fk_patient_created_by",
+      "table": "patient",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_staff_created_by",
+      "table": "staff",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_change_operator_id",
+      "table": "patient_change",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_proxy_patient_id",
+      "table": "patient_proxy",
+      "columns": [
+        "patient_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_proxy_verified_by",
+      "table": "patient_proxy",
+      "columns": [
+        "verified_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_handover_receiving_dentist_id",
+      "table": "clinical_handover",
+      "columns": [
+        "receiving_dentist_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_handover_handover_by",
+      "table": "clinical_handover",
+      "columns": [
+        "handover_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_dental_chair_created_by",
+      "table": "dental_chair",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_dated_schedule_created_by",
+      "table": "dated_schedule",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_dated_schedule_confirmed_by",
+      "table": "dated_schedule",
+      "columns": [
+        "confirmed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_schedule_change_dated_schedule_id",
+      "table": "schedule_change",
+      "columns": [
+        "dated_schedule_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_schedule_change_operator_id",
+      "table": "schedule_change",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_schedule_change_old_dentist_id",
+      "table": "schedule_change",
+      "columns": [
+        "old_dentist_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_schedule_change_new_dentist_id",
+      "table": "schedule_change",
+      "columns": [
+        "new_dentist_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_schedule_change_old_chair_id",
+      "table": "schedule_change",
+      "columns": [
+        "old_chair_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_schedule_change_new_chair_id",
+      "table": "schedule_change",
+      "columns": [
+        "new_chair_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_resource_occupancy_visit_id_appointment_id",
+      "table": "resource_occupancy",
+      "columns": [
+        "visit_id",
+        "appointment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_resource_occupancy_dated_schedule_id",
+      "table": "resource_occupancy",
+      "columns": [
+        "dated_schedule_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_resource_occupancy_appointment_id",
+      "table": "resource_occupancy",
+      "columns": [
+        "appointment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_resource_occupancy_created_by",
+      "table": "resource_occupancy",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_resource_occupancy_released_by",
+      "table": "resource_occupancy",
+      "columns": [
+        "released_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_appointment_created_by",
+      "table": "appointment",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_appointment_notified_by",
+      "table": "appointment",
+      "columns": [
+        "notified_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_appointment_change_operator_id",
+      "table": "appointment_change",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_appointment_change_old_schedule_id",
+      "table": "appointment_change",
+      "columns": [
+        "old_schedule_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_appointment_change_new_schedule_id",
+      "table": "appointment_change",
+      "columns": [
+        "new_schedule_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_visit_appointment_id_patient_id",
+      "table": "visit",
+      "columns": [
+        "appointment_id",
+        "patient_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_visit_registered_by",
+      "table": "visit",
+      "columns": [
+        "registered_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_health_version_previous_version_id_patient_id",
+      "table": "health_version",
+      "columns": [
+        "previous_version_id",
+        "patient_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_health_version_created_by",
+      "table": "health_version",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_health_item_health_version_id",
+      "table": "health_item",
+      "columns": [
+        "health_version_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_health_review_health_version_id",
+      "table": "health_review",
+      "columns": [
+        "health_version_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_health_review_reviewed_by",
+      "table": "health_review",
+      "columns": [
+        "reviewed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_record_signed_by",
+      "table": "clinical_record",
+      "columns": [
+        "signed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_finding_recorded_by",
+      "table": "clinical_finding",
+      "columns": [
+        "recorded_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_record_addendum_signed_by",
+      "table": "record_addendum",
+      "columns": [
+        "signed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_document_visit_id",
+      "table": "clinical_document",
+      "columns": [
+        "visit_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_document_plan_version_id",
+      "table": "clinical_document",
+      "columns": [
+        "plan_version_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_document_created_by",
+      "table": "clinical_document",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_document_version_previous_version_id_clinical_document_id",
+      "table": "document_version",
+      "columns": [
+        "previous_version_id",
+        "clinical_document_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_document_version_uploaded_by",
+      "table": "document_version",
+      "columns": [
+        "uploaded_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_document_version_confirmed_by",
+      "table": "document_version",
+      "columns": [
+        "confirmed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_treatment_plan_created_by",
+      "table": "treatment_plan",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_treatment_plan_closed_by",
+      "table": "treatment_plan",
+      "columns": [
+        "closed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_plan_version_previous_version_id_treatment_plan_id",
+      "table": "plan_version",
+      "columns": [
+        "previous_version_id",
+        "treatment_plan_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_plan_version_source_visit_id",
+      "table": "plan_version",
+      "columns": [
+        "source_visit_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_plan_version_created_by",
+      "table": "plan_version",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_plan_version_explained_by",
+      "table": "plan_version",
+      "columns": [
+        "explained_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_decision_patient_proxy_id",
+      "table": "patient_decision",
+      "columns": [
+        "patient_proxy_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_decision_explained_by",
+      "table": "patient_decision",
+      "columns": [
+        "explained_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_decision_recorded_by",
+      "table": "patient_decision",
+      "columns": [
+        "recorded_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_treatment_execution_service_id",
+      "table": "treatment_execution",
+      "columns": [
+        "service_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_treatment_execution_original_execution_id",
+      "table": "treatment_execution",
+      "columns": [
+        "original_execution_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_treatment_execution_performed_by",
+      "table": "treatment_execution",
+      "columns": [
+        "performed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_service_created_by",
+      "table": "service",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_service_price_created_by",
+      "table": "service_price",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_service_price_confirmed_by",
+      "table": "service_price",
+      "columns": [
+        "confirmed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_bill_patient_funds_id_patient_id",
+      "table": "bill",
+      "columns": [
+        "patient_funds_id",
+        "patient_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_bill_created_by",
+      "table": "bill",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_bill_item_service_price_id",
+      "table": "bill_item",
+      "columns": [
+        "service_price_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_bill_item_priced_by",
+      "table": "bill_item",
+      "columns": [
+        "priced_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_funds_opened_by",
+      "table": "patient_funds",
+      "columns": [
+        "opened_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_payment_operator_id",
+      "table": "patient_payment",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_payment_verified_by",
+      "table": "patient_payment",
+      "columns": [
+        "verified_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_payment_allocation_original_allocation_id_patient_payment_id_bill_id",
+      "table": "payment_allocation",
+      "columns": [
+        "original_allocation_id",
+        "patient_payment_id",
+        "bill_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_payment_allocation_patient_payment_id",
+      "table": "payment_allocation",
+      "columns": [
+        "patient_payment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_payment_allocation_operator_id",
+      "table": "payment_allocation",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_payment_allocation_fee_request_id",
+      "table": "payment_allocation",
+      "columns": [
+        "fee_request_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_prepayment_offset_original_offset_id_patient_payment_id_bill_id",
+      "table": "prepayment_offset",
+      "columns": [
+        "original_offset_id",
+        "patient_payment_id",
+        "bill_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_prepayment_offset_patient_payment_id",
+      "table": "prepayment_offset",
+      "columns": [
+        "patient_payment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_prepayment_offset_operator_id",
+      "table": "prepayment_offset",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_prepayment_offset_fee_request_id",
+      "table": "prepayment_offset",
+      "columns": [
+        "fee_request_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_fee_request_bill_id_patient_funds_id",
+      "table": "fee_request",
+      "columns": [
+        "bill_id",
+        "patient_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_fee_request_patient_payment_id_patient_funds_id",
+      "table": "fee_request",
+      "columns": [
+        "patient_payment_id",
+        "patient_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_fee_request_patient_funds_id",
+      "table": "fee_request",
+      "columns": [
+        "patient_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_fee_request_created_by",
+      "table": "fee_request",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_fee_request_reviewed_by",
+      "table": "fee_request",
+      "columns": [
+        "reviewed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_fee_adjustment_fee_request_id_bill_id",
+      "table": "fee_adjustment",
+      "columns": [
+        "fee_request_id",
+        "bill_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_fee_adjustment_bill_id",
+      "table": "fee_adjustment",
+      "columns": [
+        "bill_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_fee_adjustment_approved_by",
+      "table": "fee_adjustment",
+      "columns": [
+        "approved_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_fee_adjustment_item_bill_item_id",
+      "table": "fee_adjustment_item",
+      "columns": [
+        "bill_item_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_refund_fee_request_id_patient_funds_id",
+      "table": "patient_refund",
+      "columns": [
+        "fee_request_id",
+        "patient_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_refund_patient_payment_id_patient_funds_id",
+      "table": "patient_refund",
+      "columns": [
+        "patient_payment_id",
+        "patient_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_refund_previous_attempt_id_patient_funds_id",
+      "table": "patient_refund",
+      "columns": [
+        "previous_attempt_id",
+        "patient_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_refund_patient_funds_id",
+      "table": "patient_refund",
+      "columns": [
+        "patient_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_refund_operator_id",
+      "table": "patient_refund",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_patient_refund_verified_by",
+      "table": "patient_refund",
+      "columns": [
+        "verified_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_followup_requirement_source_visit_id",
+      "table": "followup_requirement",
+      "columns": [
+        "source_visit_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_followup_requirement_source_plan_version_id",
+      "table": "followup_requirement",
+      "columns": [
+        "source_plan_version_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_followup_requirement_created_by",
+      "table": "followup_requirement",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_followup_requirement_closed_by",
+      "table": "followup_requirement",
+      "columns": [
+        "closed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_contact_history_appointment_id",
+      "table": "contact_history",
+      "columns": [
+        "appointment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_contact_history_operator_id",
+      "table": "contact_history",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_assessment_visit_id",
+      "table": "clinical_assessment",
+      "columns": [
+        "visit_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_assessment_assessed_by",
+      "table": "clinical_assessment",
+      "columns": [
+        "assessed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_clinical_assessment_responsible_staff_id",
+      "table": "clinical_assessment",
+      "columns": [
+        "responsible_staff_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_material_created_by",
+      "table": "material",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_material_confirmed_by",
+      "table": "material",
+      "columns": [
+        "confirmed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_material_batch_created_by",
+      "table": "material_batch",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_batch_change_material_batch_id",
+      "table": "batch_change",
+      "columns": [
+        "material_batch_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_batch_change_operator_id",
+      "table": "batch_change",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_batch_change_confirmed_by",
+      "table": "batch_change",
+      "columns": [
+        "confirmed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_stock_location_created_by",
+      "table": "stock_location",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_batch_stock_stock_location_id",
+      "table": "batch_stock",
+      "columns": [
+        "stock_location_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_inventory_movement_original_movement_id_batch_stock_id",
+      "table": "inventory_movement",
+      "columns": [
+        "original_movement_id",
+        "batch_stock_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_inventory_movement_stock_count_id_batch_stock_id",
+      "table": "inventory_movement",
+      "columns": [
+        "stock_count_id",
+        "batch_stock_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_inventory_movement_purchase_receipt_item_id",
+      "table": "inventory_movement",
+      "columns": [
+        "purchase_receipt_item_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_inventory_movement_operator_id",
+      "table": "inventory_movement",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_inventory_movement_purchase_issue_id",
+      "table": "inventory_movement",
+      "columns": [
+        "purchase_issue_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_material_usage_inventory_movement_id",
+      "table": "material_usage",
+      "columns": [
+        "inventory_movement_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_material_usage_operator_id",
+      "table": "material_usage",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_stock_count_batch_stock_id",
+      "table": "stock_count",
+      "columns": [
+        "batch_stock_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_stock_count_operator_id",
+      "table": "stock_count",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_stock_count_confirmed_by",
+      "table": "stock_count",
+      "columns": [
+        "confirmed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_created_by",
+      "table": "supplier",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_verified_by",
+      "table": "supplier",
+      "columns": [
+        "verified_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_order_created_by",
+      "table": "purchase_order",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_order_confirmed_by",
+      "table": "purchase_order",
+      "columns": [
+        "confirmed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_order_item_material_id",
+      "table": "purchase_order_item",
+      "columns": [
+        "material_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_receipt_operator_id",
+      "table": "purchase_receipt",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_receipt_confirmed_by",
+      "table": "purchase_receipt",
+      "columns": [
+        "confirmed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_receipt_item_purchase_receipt_id",
+      "table": "purchase_receipt_item",
+      "columns": [
+        "purchase_receipt_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_receipt_item_material_batch_id",
+      "table": "purchase_receipt_item",
+      "columns": [
+        "material_batch_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_receipt_item_stock_location_id",
+      "table": "purchase_receipt_item",
+      "columns": [
+        "stock_location_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_issue_purchase_receipt_item_id_purchase_order_item_id",
+      "table": "purchase_issue",
+      "columns": [
+        "purchase_receipt_item_id",
+        "purchase_order_item_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_issue_purchase_order_item_id",
+      "table": "purchase_issue",
+      "columns": [
+        "purchase_order_item_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_issue_created_by",
+      "table": "purchase_issue",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_purchase_issue_confirmed_by",
+      "table": "purchase_issue",
+      "columns": [
+        "confirmed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_funds_opened_by",
+      "table": "supplier_funds",
+      "columns": [
+        "opened_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_payment_previous_attempt_id_supplier_funds_id",
+      "table": "supplier_payment",
+      "columns": [
+        "previous_attempt_id",
+        "supplier_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_payment_authorized_by",
+      "table": "supplier_payment",
+      "columns": [
+        "authorized_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_payment_operator_id",
+      "table": "supplier_payment",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_payment_verified_by",
+      "table": "supplier_payment",
+      "columns": [
+        "verified_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_allocation_original_allocation_id_supplier_payment_id",
+      "table": "supplier_allocation",
+      "columns": [
+        "original_allocation_id",
+        "supplier_payment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_allocation_supplier_payment_id",
+      "table": "supplier_allocation",
+      "columns": [
+        "supplier_payment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_allocation_operator_id",
+      "table": "supplier_allocation",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_allocation_purchase_issue_id",
+      "table": "supplier_allocation",
+      "columns": [
+        "purchase_issue_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_refund_supplier_payment_id_supplier_funds_id",
+      "table": "supplier_refund",
+      "columns": [
+        "supplier_payment_id",
+        "supplier_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_refund_purchase_issue_id",
+      "table": "supplier_refund",
+      "columns": [
+        "purchase_issue_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_refund_supplier_funds_id",
+      "table": "supplier_refund",
+      "columns": [
+        "supplier_funds_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_refund_operator_id",
+      "table": "supplier_refund",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_supplier_refund_verified_by",
+      "table": "supplier_refund",
+      "columns": [
+        "verified_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_pack_created_by",
+      "table": "instrument_pack",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_processing_equipment_created_by",
+      "table": "processing_equipment",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_processing_processing_equipment_id",
+      "table": "instrument_processing",
+      "columns": [
+        "processing_equipment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_processing_previous_processing_id",
+      "table": "instrument_processing",
+      "columns": [
+        "previous_processing_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_processing_operator_id",
+      "table": "instrument_processing",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_processing_released_by",
+      "table": "instrument_processing",
+      "columns": [
+        "released_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_processing_isolated_by",
+      "table": "instrument_processing",
+      "columns": [
+        "isolated_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_pack_cycle_checked_by",
+      "table": "instrument_pack_cycle",
+      "columns": [
+        "checked_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_processing_monitor_instrument_processing_id",
+      "table": "processing_monitor",
+      "columns": [
+        "instrument_processing_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_processing_monitor_recorded_by",
+      "table": "processing_monitor",
+      "columns": [
+        "recorded_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_use_instrument_pack_cycle_id",
+      "table": "instrument_use",
+      "columns": [
+        "instrument_pack_cycle_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_use_operator_id",
+      "table": "instrument_use",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_instrument_use_used_by",
+      "table": "instrument_use",
+      "columns": [
+        "used_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_cash_reconciliation_operator_id",
+      "table": "cash_reconciliation",
+      "columns": [
+        "operator_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_reconciliation_item_cash_reconciliation_id",
+      "table": "reconciliation_item",
+      "columns": [
+        "cash_reconciliation_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_reconciliation_item_patient_payment_id",
+      "table": "reconciliation_item",
+      "columns": [
+        "patient_payment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_reconciliation_item_patient_refund_id",
+      "table": "reconciliation_item",
+      "columns": [
+        "patient_refund_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_reconciliation_item_supplier_payment_id",
+      "table": "reconciliation_item",
+      "columns": [
+        "supplier_payment_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_reconciliation_item_supplier_refund_id",
+      "table": "reconciliation_item",
+      "columns": [
+        "supplier_refund_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_issue_followup_cash_reconciliation_id",
+      "table": "issue_followup",
+      "columns": [
+        "cash_reconciliation_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_issue_followup_instrument_processing_id",
+      "table": "issue_followup",
+      "columns": [
+        "instrument_processing_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_issue_followup_created_by",
+      "table": "issue_followup",
+      "columns": [
+        "created_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_issue_followup_completed_by",
+      "table": "issue_followup",
+      "columns": [
+        "completed_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_decision_plan_item_plan_item_id",
+      "table": "decision_plan_item",
+      "columns": [
+        "plan_item_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_decision_plan_item_linked_by",
+      "table": "decision_plan_item",
+      "columns": [
+        "linked_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_decision_file_version_document_version_id",
+      "table": "decision_file_version",
+      "columns": [
+        "document_version_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_decision_file_version_linked_by",
+      "table": "decision_file_version",
+      "columns": [
+        "linked_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_staff_role_qualification_role_id",
+      "table": "staff_role_qualification",
+      "columns": [
+        "role_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_staff_role_qualification_verified_by",
+      "table": "staff_role_qualification",
+      "columns": [
+        "verified_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_staff_role_qualification_revoked_by",
+      "table": "staff_role_qualification",
+      "columns": [
+        "revoked_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_account_role_qualification_id_role_id",
+      "table": "account_role",
+      "columns": [
+        "qualification_id",
+        "role_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_account_role_role_id",
+      "table": "account_role",
+      "columns": [
+        "role_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_account_role_granted_by",
+      "table": "account_role",
+      "columns": [
+        "granted_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_account_role_revoked_by",
+      "table": "account_role",
+      "columns": [
+        "revoked_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_role_permission_permission_id",
+      "table": "role_permission",
+      "columns": [
+        "permission_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_login_session_account_id",
+      "table": "login_session",
+      "columns": [
+        "account_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_authentication_event_session_id_account_id",
+      "table": "authentication_event",
+      "columns": [
+        "session_id",
+        "account_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_authentication_event_account_id",
+      "table": "authentication_event",
+      "columns": [
+        "account_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_request_submission_permission_id",
+      "table": "request_submission",
+      "columns": [
+        "permission_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_operation_audit_session_id_account_id",
+      "table": "operation_audit",
+      "columns": [
+        "session_id",
+        "account_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_operation_audit_submission_id_account_id",
+      "table": "operation_audit",
+      "columns": [
+        "submission_id",
+        "account_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_operation_audit_account_id_staff_id",
+      "table": "operation_audit",
+      "columns": [
+        "account_id",
+        "staff_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_operation_audit_submission_id_permission_id",
+      "table": "operation_audit",
+      "columns": [
+        "submission_id",
+        "permission_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_operation_audit_staff_id",
+      "table": "operation_audit",
+      "columns": [
+        "staff_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_operation_audit_permission_id",
+      "table": "operation_audit",
+      "columns": [
+        "permission_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_backup_run_requested_by",
+      "table": "backup_run",
+      "columns": [
+        "requested_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_backup_run_responsible_staff_id",
+      "table": "backup_run",
+      "columns": [
+        "responsible_staff_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_backup_artifact_document_version_id",
+      "table": "backup_artifact",
+      "columns": [
+        "document_version_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_backup_copy_verified_by",
+      "table": "backup_copy",
+      "columns": [
+        "verified_by"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_restore_verification_copy_id_backup_id",
+      "table": "restore_verification",
+      "columns": [
+        "copy_id",
+        "backup_id"
+      ],
+      "kind": "foreign_key"
+    },
+    {
+      "name": "ix_fk_restore_verification_verified_by",
+      "table": "restore_verification",
+      "columns": [
+        "verified_by"
+      ],
+      "kind": "foreign_key"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "tr_patient_delete_forbidden_delete",
+      "table": "patient",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_patient_stable_id_update",
+      "table": "patient",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_staff_delete_forbidden_delete",
+      "table": "staff",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_staff_stable_id_update",
+      "table": "staff",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_patient_change_delete_forbidden_delete",
+      "table": "patient_change",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_patient_change_stable_id_update",
+      "table": "patient_change",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_patient_proxy_delete_forbidden_delete",
+      "table": "patient_proxy",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_patient_proxy_stable_id_update",
+      "table": "patient_proxy",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_clinical_handover_delete_forbidden_delete",
+      "table": "clinical_handover",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_clinical_handover_stable_id_update",
+      "table": "clinical_handover",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_dental_chair_delete_forbidden_delete",
+      "table": "dental_chair",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_dental_chair_stable_id_update",
+      "table": "dental_chair",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_dated_schedule_delete_forbidden_delete",
+      "table": "dated_schedule",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_dated_schedule_stable_id_update",
+      "table": "dated_schedule",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_schedule_change_delete_forbidden_delete",
+      "table": "schedule_change",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_schedule_change_stable_id_update",
+      "table": "schedule_change",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_resource_occupancy_delete_forbidden_delete",
+      "table": "resource_occupancy",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_resource_occupancy_stable_id_update",
+      "table": "resource_occupancy",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_appointment_delete_forbidden_delete",
+      "table": "appointment",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_appointment_stable_id_update",
+      "table": "appointment",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_appointment_change_delete_forbidden_delete",
+      "table": "appointment_change",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_appointment_change_stable_id_update",
+      "table": "appointment_change",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_visit_delete_forbidden_delete",
+      "table": "visit",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_visit_stable_id_update",
+      "table": "visit",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_health_version_delete_forbidden_delete",
+      "table": "health_version",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_health_version_stable_id_update",
+      "table": "health_version",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_health_item_delete_forbidden_delete",
+      "table": "health_item",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_health_item_stable_id_update",
+      "table": "health_item",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_health_review_delete_forbidden_delete",
+      "table": "health_review",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_health_review_stable_id_update",
+      "table": "health_review",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_clinical_record_delete_forbidden_delete",
+      "table": "clinical_record",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_clinical_record_stable_id_update",
+      "table": "clinical_record",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_clinical_finding_delete_forbidden_delete",
+      "table": "clinical_finding",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_clinical_finding_stable_id_update",
+      "table": "clinical_finding",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_record_addendum_delete_forbidden_delete",
+      "table": "record_addendum",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_record_addendum_stable_id_update",
+      "table": "record_addendum",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_clinical_document_delete_forbidden_delete",
+      "table": "clinical_document",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_clinical_document_stable_id_update",
+      "table": "clinical_document",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_document_version_delete_forbidden_delete",
+      "table": "document_version",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_document_version_stable_id_update",
+      "table": "document_version",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_treatment_plan_delete_forbidden_delete",
+      "table": "treatment_plan",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_treatment_plan_stable_id_update",
+      "table": "treatment_plan",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_plan_version_delete_forbidden_delete",
+      "table": "plan_version",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_plan_version_stable_id_update",
+      "table": "plan_version",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_plan_item_delete_forbidden_delete",
+      "table": "plan_item",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_plan_item_stable_id_update",
+      "table": "plan_item",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_patient_decision_delete_forbidden_delete",
+      "table": "patient_decision",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_patient_decision_stable_id_update",
+      "table": "patient_decision",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_treatment_execution_delete_forbidden_delete",
+      "table": "treatment_execution",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_treatment_execution_stable_id_update",
+      "table": "treatment_execution",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_service_delete_forbidden_delete",
+      "table": "service",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_service_stable_id_update",
+      "table": "service",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_service_price_delete_forbidden_delete",
+      "table": "service_price",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_service_price_stable_id_update",
+      "table": "service_price",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_bill_delete_forbidden_delete",
+      "table": "bill",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_bill_stable_id_update",
+      "table": "bill",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_bill_item_delete_forbidden_delete",
+      "table": "bill_item",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_bill_item_stable_id_update",
+      "table": "bill_item",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_patient_funds_delete_forbidden_delete",
+      "table": "patient_funds",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_patient_funds_stable_id_update",
+      "table": "patient_funds",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_patient_payment_delete_forbidden_delete",
+      "table": "patient_payment",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_patient_payment_stable_id_update",
+      "table": "patient_payment",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_payment_allocation_delete_forbidden_delete",
+      "table": "payment_allocation",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_payment_allocation_stable_id_update",
+      "table": "payment_allocation",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_prepayment_offset_delete_forbidden_delete",
+      "table": "prepayment_offset",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_prepayment_offset_stable_id_update",
+      "table": "prepayment_offset",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_fee_request_delete_forbidden_delete",
+      "table": "fee_request",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_fee_request_stable_id_update",
+      "table": "fee_request",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_fee_adjustment_delete_forbidden_delete",
+      "table": "fee_adjustment",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_fee_adjustment_stable_id_update",
+      "table": "fee_adjustment",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_fee_adjustment_item_delete_forbidden_delete",
+      "table": "fee_adjustment_item",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_fee_adjustment_item_stable_id_update",
+      "table": "fee_adjustment_item",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_patient_refund_delete_forbidden_delete",
+      "table": "patient_refund",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_patient_refund_stable_id_update",
+      "table": "patient_refund",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_followup_requirement_delete_forbidden_delete",
+      "table": "followup_requirement",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_followup_requirement_stable_id_update",
+      "table": "followup_requirement",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_contact_history_delete_forbidden_delete",
+      "table": "contact_history",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_contact_history_stable_id_update",
+      "table": "contact_history",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_clinical_assessment_delete_forbidden_delete",
+      "table": "clinical_assessment",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_clinical_assessment_stable_id_update",
+      "table": "clinical_assessment",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_material_delete_forbidden_delete",
+      "table": "material",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_material_stable_id_update",
+      "table": "material",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_material_batch_delete_forbidden_delete",
+      "table": "material_batch",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_material_batch_stable_id_update",
+      "table": "material_batch",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_batch_change_delete_forbidden_delete",
+      "table": "batch_change",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_batch_change_stable_id_update",
+      "table": "batch_change",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_stock_location_delete_forbidden_delete",
+      "table": "stock_location",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_stock_location_stable_id_update",
+      "table": "stock_location",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_batch_stock_delete_forbidden_delete",
+      "table": "batch_stock",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_batch_stock_stable_id_update",
+      "table": "batch_stock",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_inventory_movement_delete_forbidden_delete",
+      "table": "inventory_movement",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_inventory_movement_stable_id_update",
+      "table": "inventory_movement",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_material_usage_delete_forbidden_delete",
+      "table": "material_usage",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_material_usage_stable_id_update",
+      "table": "material_usage",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_stock_count_delete_forbidden_delete",
+      "table": "stock_count",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_stock_count_stable_id_update",
+      "table": "stock_count",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_supplier_delete_forbidden_delete",
+      "table": "supplier",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_supplier_stable_id_update",
+      "table": "supplier",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_purchase_order_delete_forbidden_delete",
+      "table": "purchase_order",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_purchase_order_stable_id_update",
+      "table": "purchase_order",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_purchase_order_item_delete_forbidden_delete",
+      "table": "purchase_order_item",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_purchase_order_item_stable_id_update",
+      "table": "purchase_order_item",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_purchase_receipt_delete_forbidden_delete",
+      "table": "purchase_receipt",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_purchase_receipt_stable_id_update",
+      "table": "purchase_receipt",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_purchase_receipt_item_delete_forbidden_delete",
+      "table": "purchase_receipt_item",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_purchase_receipt_item_stable_id_update",
+      "table": "purchase_receipt_item",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_purchase_issue_delete_forbidden_delete",
+      "table": "purchase_issue",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_purchase_issue_stable_id_update",
+      "table": "purchase_issue",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_supplier_funds_delete_forbidden_delete",
+      "table": "supplier_funds",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_supplier_funds_stable_id_update",
+      "table": "supplier_funds",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_supplier_payment_delete_forbidden_delete",
+      "table": "supplier_payment",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_supplier_payment_stable_id_update",
+      "table": "supplier_payment",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_supplier_allocation_delete_forbidden_delete",
+      "table": "supplier_allocation",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_supplier_allocation_stable_id_update",
+      "table": "supplier_allocation",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_supplier_refund_delete_forbidden_delete",
+      "table": "supplier_refund",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_supplier_refund_stable_id_update",
+      "table": "supplier_refund",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_instrument_pack_delete_forbidden_delete",
+      "table": "instrument_pack",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_instrument_pack_stable_id_update",
+      "table": "instrument_pack",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_processing_equipment_delete_forbidden_delete",
+      "table": "processing_equipment",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_processing_equipment_stable_id_update",
+      "table": "processing_equipment",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_instrument_processing_delete_forbidden_delete",
+      "table": "instrument_processing",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_instrument_processing_stable_id_update",
+      "table": "instrument_processing",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_instrument_pack_cycle_delete_forbidden_delete",
+      "table": "instrument_pack_cycle",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_instrument_pack_cycle_stable_id_update",
+      "table": "instrument_pack_cycle",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_processing_monitor_delete_forbidden_delete",
+      "table": "processing_monitor",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_processing_monitor_stable_id_update",
+      "table": "processing_monitor",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_instrument_use_delete_forbidden_delete",
+      "table": "instrument_use",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_instrument_use_stable_id_update",
+      "table": "instrument_use",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_cash_reconciliation_delete_forbidden_delete",
+      "table": "cash_reconciliation",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_cash_reconciliation_stable_id_update",
+      "table": "cash_reconciliation",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_reconciliation_item_delete_forbidden_delete",
+      "table": "reconciliation_item",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_reconciliation_item_stable_id_update",
+      "table": "reconciliation_item",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_issue_followup_delete_forbidden_delete",
+      "table": "issue_followup",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_issue_followup_stable_id_update",
+      "table": "issue_followup",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_decision_plan_item_delete_forbidden_delete",
+      "table": "decision_plan_item",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_decision_file_version_delete_forbidden_delete",
+      "table": "decision_file_version",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_user_account_delete_forbidden_delete",
+      "table": "user_account",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_user_account_stable_id_update",
+      "table": "user_account",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_access_role_delete_forbidden_delete",
+      "table": "access_role",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_access_role_stable_id_update",
+      "table": "access_role",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_access_permission_delete_forbidden_delete",
+      "table": "access_permission",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_access_permission_stable_id_update",
+      "table": "access_permission",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_staff_role_qualification_delete_forbidden_delete",
+      "table": "staff_role_qualification",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_staff_role_qualification_stable_id_update",
+      "table": "staff_role_qualification",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_account_role_delete_forbidden_delete",
+      "table": "account_role",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_account_role_stable_id_update",
+      "table": "account_role",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_role_permission_delete_forbidden_delete",
+      "table": "role_permission",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_role_permission_stable_id_update",
+      "table": "role_permission",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_login_session_delete_forbidden_delete",
+      "table": "login_session",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_login_session_stable_id_update",
+      "table": "login_session",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_authentication_event_delete_forbidden_delete",
+      "table": "authentication_event",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_authentication_event_stable_id_update",
+      "table": "authentication_event",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_request_submission_delete_forbidden_delete",
+      "table": "request_submission",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_request_submission_stable_id_update",
+      "table": "request_submission",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_operation_audit_delete_forbidden_delete",
+      "table": "operation_audit",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_operation_audit_stable_id_update",
+      "table": "operation_audit",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_audit_change_delete_forbidden_delete",
+      "table": "audit_change",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_audit_change_stable_id_update",
+      "table": "audit_change",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_backup_run_delete_forbidden_delete",
+      "table": "backup_run",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_backup_run_stable_id_update",
+      "table": "backup_run",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_backup_artifact_delete_forbidden_delete",
+      "table": "backup_artifact",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_backup_artifact_stable_id_update",
+      "table": "backup_artifact",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_backup_copy_delete_forbidden_delete",
+      "table": "backup_copy",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_backup_copy_stable_id_update",
+      "table": "backup_copy",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_restore_verification_delete_forbidden_delete",
+      "table": "restore_verification",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_restore_verification_stable_id_update",
+      "table": "restore_verification",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_restore_check_delete_forbidden_delete",
+      "table": "restore_check",
+      "rule": "历史保护",
+      "error": "delete_forbidden"
+    },
+    {
+      "name": "tr_restore_check_stable_id_update",
+      "table": "restore_check",
+      "rule": "历史保护",
+      "error": "stable_id"
+    },
+    {
+      "name": "tr_patient_change_immutable_fact_update",
+      "table": "patient_change",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_schedule_change_immutable_fact_update",
+      "table": "schedule_change",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_appointment_change_immutable_fact_update",
+      "table": "appointment_change",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_health_version_immutable_fact_update",
+      "table": "health_version",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_health_item_immutable_fact_update",
+      "table": "health_item",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_health_review_immutable_fact_update",
+      "table": "health_review",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_record_addendum_immutable_fact_update",
+      "table": "record_addendum",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_patient_decision_immutable_fact_update",
+      "table": "patient_decision",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_treatment_execution_immutable_fact_update",
+      "table": "treatment_execution",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_payment_allocation_immutable_fact_update",
+      "table": "payment_allocation",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_prepayment_offset_immutable_fact_update",
+      "table": "prepayment_offset",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_fee_adjustment_immutable_fact_update",
+      "table": "fee_adjustment",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_fee_adjustment_item_immutable_fact_update",
+      "table": "fee_adjustment_item",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_inventory_movement_immutable_fact_update",
+      "table": "inventory_movement",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_material_usage_immutable_fact_update",
+      "table": "material_usage",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_supplier_refund_immutable_fact_update",
+      "table": "supplier_refund",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_contact_history_immutable_fact_update",
+      "table": "contact_history",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_clinical_assessment_immutable_fact_update",
+      "table": "clinical_assessment",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_cash_reconciliation_immutable_fact_update",
+      "table": "cash_reconciliation",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_reconciliation_item_immutable_fact_update",
+      "table": "reconciliation_item",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_decision_plan_item_immutable_fact_update",
+      "table": "decision_plan_item",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_decision_file_version_immutable_fact_update",
+      "table": "decision_file_version",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_authentication_event_immutable_fact_update",
+      "table": "authentication_event",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_operation_audit_immutable_fact_update",
+      "table": "operation_audit",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_audit_change_immutable_fact_update",
+      "table": "audit_change",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_request_submission_immutable_fact_update",
+      "table": "request_submission",
+      "rule": "历史保护",
+      "error": "immutable_fact"
+    },
+    {
+      "name": "tr_appointment_immutable_ownership_update",
+      "table": "appointment",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_visit_immutable_ownership_update",
+      "table": "visit",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_clinical_record_immutable_ownership_update",
+      "table": "clinical_record",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_clinical_document_immutable_ownership_update",
+      "table": "clinical_document",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_document_version_immutable_ownership_update",
+      "table": "document_version",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_treatment_plan_immutable_ownership_update",
+      "table": "treatment_plan",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_plan_version_immutable_ownership_update",
+      "table": "plan_version",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_plan_item_immutable_ownership_update",
+      "table": "plan_item",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_bill_immutable_ownership_update",
+      "table": "bill",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_patient_funds_immutable_ownership_update",
+      "table": "patient_funds",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_patient_payment_immutable_ownership_update",
+      "table": "patient_payment",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_bill_item_immutable_ownership_update",
+      "table": "bill_item",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_fee_request_immutable_ownership_update",
+      "table": "fee_request",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_patient_refund_immutable_ownership_update",
+      "table": "patient_refund",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_followup_requirement_immutable_ownership_update",
+      "table": "followup_requirement",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_material_batch_immutable_ownership_update",
+      "table": "material_batch",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_batch_stock_immutable_ownership_update",
+      "table": "batch_stock",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_purchase_order_immutable_ownership_update",
+      "table": "purchase_order",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_purchase_order_item_immutable_ownership_update",
+      "table": "purchase_order_item",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_purchase_receipt_immutable_ownership_update",
+      "table": "purchase_receipt",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_purchase_receipt_item_immutable_ownership_update",
+      "table": "purchase_receipt_item",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_supplier_funds_immutable_ownership_update",
+      "table": "supplier_funds",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_supplier_payment_immutable_ownership_update",
+      "table": "supplier_payment",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_supplier_allocation_immutable_ownership_update",
+      "table": "supplier_allocation",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_user_account_immutable_ownership_update",
+      "table": "user_account",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_account_role_immutable_ownership_update",
+      "table": "account_role",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_staff_role_qualification_immutable_ownership_update",
+      "table": "staff_role_qualification",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_instrument_pack_cycle_immutable_ownership_update",
+      "table": "instrument_pack_cycle",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_instrument_use_immutable_ownership_update",
+      "table": "instrument_use",
+      "rule": "历史保护",
+      "error": "immutable_ownership"
+    },
+    {
+      "name": "tr_patient_payment_terminal_frozen_update",
+      "table": "patient_payment",
+      "rule": "历史保护",
+      "error": "terminal_frozen"
+    },
+    {
+      "name": "tr_patient_refund_terminal_frozen_update",
+      "table": "patient_refund",
+      "rule": "历史保护",
+      "error": "terminal_frozen"
+    },
+    {
+      "name": "tr_supplier_payment_terminal_frozen_update",
+      "table": "supplier_payment",
+      "rule": "历史保护",
+      "error": "terminal_frozen"
+    },
+    {
+      "name": "tr_supplier_allocation_terminal_frozen_update",
+      "table": "supplier_allocation",
+      "rule": "历史保护",
+      "error": "terminal_frozen"
+    },
+    {
+      "name": "tr_fee_request_terminal_frozen_update",
+      "table": "fee_request",
+      "rule": "历史保护",
+      "error": "terminal_frozen"
+    },
+    {
+      "name": "tr_clinical_record_terminal_frozen_update",
+      "table": "clinical_record",
+      "rule": "历史保护",
+      "error": "terminal_frozen"
+    },
+    {
+      "name": "tr_dated_schedule_schedule_overlap_insert",
+      "table": "dated_schedule",
+      "rule": "R-01",
+      "error": "schedule_overlap"
+    },
+    {
+      "name": "tr_dated_schedule_schedule_overlap_update",
+      "table": "dated_schedule",
+      "rule": "R-01",
+      "error": "schedule_overlap"
+    },
+    {
+      "name": "tr_dated_schedule_schedule_has_active_occupancy_update",
+      "table": "dated_schedule",
+      "rule": "R-02",
+      "error": "schedule_has_active_occupancy"
+    },
+    {
+      "name": "tr_resource_occupancy_occupancy_schedule_insert",
+      "table": "resource_occupancy",
+      "rule": "R-01",
+      "error": "occupancy_schedule"
+    },
+    {
+      "name": "tr_resource_occupancy_occupancy_schedule_update",
+      "table": "resource_occupancy",
+      "rule": "R-01",
+      "error": "occupancy_schedule"
+    },
+    {
+      "name": "tr_resource_occupancy_occupancy_overlap_insert",
+      "table": "resource_occupancy",
+      "rule": "R-01",
+      "error": "occupancy_overlap"
+    },
+    {
+      "name": "tr_resource_occupancy_occupancy_overlap_update",
+      "table": "resource_occupancy",
+      "rule": "R-01",
+      "error": "occupancy_overlap"
+    },
+    {
+      "name": "tr_resource_occupancy_occupancy_move_requires_new_update",
+      "table": "resource_occupancy",
+      "rule": "历史保护",
+      "error": "occupancy_move_requires_new"
+    },
+    {
+      "name": "tr_resource_occupancy_released_occupancy_frozen_update",
+      "table": "resource_occupancy",
+      "rule": "历史保护",
+      "error": "released_occupancy_frozen"
+    },
+    {
+      "name": "tr_health_version_version_order_insert",
+      "table": "health_version",
+      "rule": "R-03/R-05/R-07",
+      "error": "version_order"
+    },
+    {
+      "name": "tr_health_version_version_order_update",
+      "table": "health_version",
+      "rule": "R-03/R-05/R-07",
+      "error": "version_order"
+    },
+    {
+      "name": "tr_document_version_version_order_insert",
+      "table": "document_version",
+      "rule": "R-03/R-05/R-07",
+      "error": "version_order"
+    },
+    {
+      "name": "tr_document_version_version_order_update",
+      "table": "document_version",
+      "rule": "R-03/R-05/R-07",
+      "error": "version_order"
+    },
+    {
+      "name": "tr_plan_version_version_order_insert",
+      "table": "plan_version",
+      "rule": "R-03/R-05/R-07",
+      "error": "version_order"
+    },
+    {
+      "name": "tr_plan_version_version_order_update",
+      "table": "plan_version",
+      "rule": "R-03/R-05/R-07",
+      "error": "version_order"
+    },
+    {
+      "name": "tr_health_review_health_patient_insert",
+      "table": "health_review",
+      "rule": "R-03",
+      "error": "health_patient"
+    },
+    {
+      "name": "tr_health_review_health_patient_update",
+      "table": "health_review",
+      "rule": "R-03",
+      "error": "health_patient"
+    },
+    {
+      "name": "tr_clinical_record_sign_missing_evidence_insert",
+      "table": "clinical_record",
+      "rule": "R-04",
+      "error": "sign_missing_evidence"
+    },
+    {
+      "name": "tr_clinical_record_sign_missing_evidence_update",
+      "table": "clinical_record",
+      "rule": "R-04",
+      "error": "sign_missing_evidence"
+    },
+    {
+      "name": "tr_clinical_finding_signed_findings_frozen_insert",
+      "table": "clinical_finding",
+      "rule": "R-04",
+      "error": "signed_findings_frozen"
+    },
+    {
+      "name": "tr_clinical_finding_signed_findings_frozen_update",
+      "table": "clinical_finding",
+      "rule": "R-04",
+      "error": "signed_findings_frozen"
+    },
+    {
+      "name": "tr_clinical_finding_signed_findings_move_update",
+      "table": "clinical_finding",
+      "rule": "R-04",
+      "error": "signed_findings_move"
+    },
+    {
+      "name": "tr_record_addendum_addendum_unsigned_insert",
+      "table": "record_addendum",
+      "rule": "R-04",
+      "error": "addendum_unsigned"
+    },
+    {
+      "name": "tr_record_addendum_addendum_unsigned_update",
+      "table": "record_addendum",
+      "rule": "R-04",
+      "error": "addendum_unsigned"
+    },
+    {
+      "name": "tr_visit_visit_end_unsigned_insert",
+      "table": "visit",
+      "rule": "R-04",
+      "error": "visit_end_unsigned"
+    },
+    {
+      "name": "tr_visit_visit_end_unsigned_update",
+      "table": "visit",
+      "rule": "R-04",
+      "error": "visit_end_unsigned"
+    },
+    {
+      "name": "tr_clinical_document_context_patient_insert",
+      "table": "clinical_document",
+      "rule": "R-05/R-12",
+      "error": "context_patient"
+    },
+    {
+      "name": "tr_clinical_document_context_patient_update",
+      "table": "clinical_document",
+      "rule": "R-05/R-12",
+      "error": "context_patient"
+    },
+    {
+      "name": "tr_followup_requirement_context_patient_insert",
+      "table": "followup_requirement",
+      "rule": "R-05/R-12",
+      "error": "context_patient"
+    },
+    {
+      "name": "tr_followup_requirement_context_patient_update",
+      "table": "followup_requirement",
+      "rule": "R-05/R-12",
+      "error": "context_patient"
+    },
+    {
+      "name": "tr_plan_version_plan_source_patient_insert",
+      "table": "plan_version",
+      "rule": "R-07",
+      "error": "plan_source_patient"
+    },
+    {
+      "name": "tr_plan_version_plan_source_patient_update",
+      "table": "plan_version",
+      "rule": "R-07",
+      "error": "plan_source_patient"
+    },
+    {
+      "name": "tr_decision_plan_item_decision_wrong_version_insert",
+      "table": "decision_plan_item",
+      "rule": "R-06",
+      "error": "decision_wrong_version"
+    },
+    {
+      "name": "tr_decision_plan_item_decision_wrong_version_update",
+      "table": "decision_plan_item",
+      "rule": "R-06",
+      "error": "decision_wrong_version"
+    },
+    {
+      "name": "tr_decision_file_version_decision_file_patient_insert",
+      "table": "decision_file_version",
+      "rule": "R-06",
+      "error": "decision_file_patient"
+    },
+    {
+      "name": "tr_decision_file_version_decision_file_patient_update",
+      "table": "decision_file_version",
+      "rule": "R-06",
+      "error": "decision_file_patient"
+    },
+    {
+      "name": "tr_patient_decision_proxy_wrong_patient_or_time_insert",
+      "table": "patient_decision",
+      "rule": "R-06",
+      "error": "proxy_wrong_patient_or_time"
+    },
+    {
+      "name": "tr_patient_decision_proxy_wrong_patient_or_time_update",
+      "table": "patient_decision",
+      "rule": "R-06",
+      "error": "proxy_wrong_patient_or_time"
+    },
+    {
+      "name": "tr_treatment_execution_execution_patient_insert",
+      "table": "treatment_execution",
+      "rule": "R-07",
+      "error": "execution_patient"
+    },
+    {
+      "name": "tr_treatment_execution_execution_patient_update",
+      "table": "treatment_execution",
+      "rule": "R-07",
+      "error": "execution_patient"
+    },
+    {
+      "name": "tr_treatment_execution_correction_chain_insert",
+      "table": "treatment_execution",
+      "rule": "R-07",
+      "error": "correction_chain"
+    },
+    {
+      "name": "tr_treatment_execution_correction_chain_update",
+      "table": "treatment_execution",
+      "rule": "R-07",
+      "error": "correction_chain"
+    },
+    {
+      "name": "tr_service_price_price_overlap_insert",
+      "table": "service_price",
+      "rule": "R-08",
+      "error": "price_overlap"
+    },
+    {
+      "name": "tr_service_price_price_overlap_update",
+      "table": "service_price",
+      "rule": "R-08",
+      "error": "price_overlap"
+    },
+    {
+      "name": "tr_service_price_referenced_price_frozen_update",
+      "table": "service_price",
+      "rule": "历史保护",
+      "error": "referenced_price_frozen"
+    },
+    {
+      "name": "tr_bill_item_priced_item_frozen_update",
+      "table": "bill_item",
+      "rule": "历史保护",
+      "error": "priced_item_frozen"
+    },
+    {
+      "name": "tr_bill_item_bill_execution_patient_insert",
+      "table": "bill_item",
+      "rule": "R-08",
+      "error": "bill_execution_patient"
+    },
+    {
+      "name": "tr_bill_item_bill_execution_patient_update",
+      "table": "bill_item",
+      "rule": "R-08",
+      "error": "bill_execution_patient"
+    },
+    {
+      "name": "tr_bill_item_bill_price_source_insert",
+      "table": "bill_item",
+      "rule": "R-08",
+      "error": "bill_price_source"
+    },
+    {
+      "name": "tr_bill_item_bill_price_source_update",
+      "table": "bill_item",
+      "rule": "R-08",
+      "error": "bill_price_source"
+    },
+    {
+      "name": "tr_payment_allocation_allocation_owner_insert",
+      "table": "payment_allocation",
+      "rule": "R-09",
+      "error": "allocation_owner"
+    },
+    {
+      "name": "tr_payment_allocation_payment_budget_insert",
+      "table": "payment_allocation",
+      "rule": "R-09",
+      "error": "payment_budget"
+    },
+    {
+      "name": "tr_payment_allocation_release_budget_insert",
+      "table": "payment_allocation",
+      "rule": "R-09",
+      "error": "release_budget"
+    },
+    {
+      "name": "tr_prepayment_offset_allocation_owner_insert",
+      "table": "prepayment_offset",
+      "rule": "R-09",
+      "error": "allocation_owner"
+    },
+    {
+      "name": "tr_prepayment_offset_payment_budget_insert",
+      "table": "prepayment_offset",
+      "rule": "R-09",
+      "error": "payment_budget"
+    },
+    {
+      "name": "tr_prepayment_offset_release_budget_insert",
+      "table": "prepayment_offset",
+      "rule": "R-09",
+      "error": "release_budget"
+    },
+    {
+      "name": "tr_fee_adjustment_adjustment_approval_insert",
+      "table": "fee_adjustment",
+      "rule": "R-10",
+      "error": "adjustment_approval"
+    },
+    {
+      "name": "tr_fee_adjustment_item_adjustment_wrong_bill_insert",
+      "table": "fee_adjustment_item",
+      "rule": "R-10",
+      "error": "adjustment_wrong_bill"
+    },
+    {
+      "name": "tr_fee_adjustment_item_adjustment_negative_receivable_insert",
+      "table": "fee_adjustment_item",
+      "rule": "R-10",
+      "error": "adjustment_negative_receivable"
+    },
+    {
+      "name": "tr_patient_refund_refund_approval_insert",
+      "table": "patient_refund",
+      "rule": "R-11",
+      "error": "refund_approval"
+    },
+    {
+      "name": "tr_patient_refund_refund_approval_update",
+      "table": "patient_refund",
+      "rule": "R-11",
+      "error": "refund_approval"
+    },
+    {
+      "name": "tr_patient_refund_refund_budget_insert",
+      "table": "patient_refund",
+      "rule": "R-11",
+      "error": "refund_budget"
+    },
+    {
+      "name": "tr_patient_refund_refund_budget_update",
+      "table": "patient_refund",
+      "rule": "R-11",
+      "error": "refund_budget"
+    },
+    {
+      "name": "tr_patient_refund_refund_retry_not_failed_insert",
+      "table": "patient_refund",
+      "rule": "R-11",
+      "error": "refund_retry_not_failed"
+    },
+    {
+      "name": "tr_patient_refund_refund_retry_not_failed_update",
+      "table": "patient_refund",
+      "rule": "R-11",
+      "error": "refund_retry_not_failed"
+    },
+    {
+      "name": "tr_contact_history_followup_patient_insert",
+      "table": "contact_history",
+      "rule": "R-12",
+      "error": "followup_patient"
+    },
+    {
+      "name": "tr_contact_history_followup_patient_update",
+      "table": "contact_history",
+      "rule": "R-12",
+      "error": "followup_patient"
+    },
+    {
+      "name": "tr_clinical_assessment_followup_patient_insert",
+      "table": "clinical_assessment",
+      "rule": "R-12",
+      "error": "followup_patient"
+    },
+    {
+      "name": "tr_clinical_assessment_followup_patient_update",
+      "table": "clinical_assessment",
+      "rule": "R-12",
+      "error": "followup_patient"
+    },
+    {
+      "name": "tr_followup_requirement_assessment_required_insert",
+      "table": "followup_requirement",
+      "rule": "R-12",
+      "error": "assessment_required"
+    },
+    {
+      "name": "tr_followup_requirement_assessment_required_update",
+      "table": "followup_requirement",
+      "rule": "R-12",
+      "error": "assessment_required"
+    },
+    {
+      "name": "tr_material_material_units_frozen_update",
+      "table": "material",
+      "rule": "历史保护",
+      "error": "material_units_frozen"
+    },
+    {
+      "name": "tr_material_batch_expiry_required_insert",
+      "table": "material_batch",
+      "rule": "R-13",
+      "error": "expiry_required"
+    },
+    {
+      "name": "tr_material_batch_expiry_required_update",
+      "table": "material_batch",
+      "rule": "R-13",
+      "error": "expiry_required"
+    },
+    {
+      "name": "tr_batch_stock_stock_starts_zero_insert",
+      "table": "batch_stock",
+      "rule": "R-13",
+      "error": "stock_starts_zero"
+    },
+    {
+      "name": "tr_inventory_movement_stock_stale_insert",
+      "table": "inventory_movement",
+      "rule": "R-14",
+      "error": "stock_stale"
+    },
+    {
+      "name": "tr_inventory_movement_issue_batch_unavailable_insert",
+      "table": "inventory_movement",
+      "rule": "R-13",
+      "error": "issue_batch_unavailable"
+    },
+    {
+      "name": "tr_inventory_movement_movement_type_source_insert",
+      "table": "inventory_movement",
+      "rule": "R-14",
+      "error": "movement_type_source"
+    },
+    {
+      "name": "tr_inventory_movement_count_stale_insert",
+      "table": "inventory_movement",
+      "rule": "R-13",
+      "error": "count_stale"
+    },
+    {
+      "name": "tr_inventory_movement_receipt_stock_context_insert",
+      "table": "inventory_movement",
+      "rule": "R-14",
+      "error": "receipt_stock_context"
+    },
+    {
+      "name": "tr_inventory_movement_return_over_issue_insert",
+      "table": "inventory_movement",
+      "rule": "R-14",
+      "error": "return_over_issue"
+    },
+    {
+      "name": "tr_material_usage_usage_over_issue_insert",
+      "table": "material_usage",
+      "rule": "R-14",
+      "error": "usage_over_issue"
+    },
+    {
+      "name": "tr_inventory_movement_post",
+      "table": "inventory_movement",
+      "rule": "R-14",
+      "error": null
+    },
+    {
+      "name": "tr_batch_stock_stock_ledger_mismatch_update",
+      "table": "batch_stock",
+      "rule": "R-14",
+      "error": "stock_ledger_mismatch"
+    },
+    {
+      "name": "tr_purchase_receipt_item_receipt_order_material_insert",
+      "table": "purchase_receipt_item",
+      "rule": "R-15",
+      "error": "receipt_order_material"
+    },
+    {
+      "name": "tr_purchase_receipt_item_receipt_order_material_update",
+      "table": "purchase_receipt_item",
+      "rule": "R-15",
+      "error": "receipt_order_material"
+    },
+    {
+      "name": "tr_purchase_receipt_item_accepted_below_stocked_insert",
+      "table": "purchase_receipt_item",
+      "rule": "R-15",
+      "error": "accepted_below_stocked"
+    },
+    {
+      "name": "tr_purchase_receipt_item_accepted_below_stocked_update",
+      "table": "purchase_receipt_item",
+      "rule": "R-15",
+      "error": "accepted_below_stocked"
+    },
+    {
+      "name": "tr_purchase_order_order_without_items_insert",
+      "table": "purchase_order",
+      "rule": "R-15",
+      "error": "order_without_items"
+    },
+    {
+      "name": "tr_purchase_order_order_without_items_update",
+      "table": "purchase_order",
+      "rule": "R-15",
+      "error": "order_without_items"
+    },
+    {
+      "name": "tr_purchase_order_item_confirmed_order_terms_frozen_update",
+      "table": "purchase_order_item",
+      "rule": "历史保护",
+      "error": "confirmed_order_terms_frozen"
+    },
+    {
+      "name": "tr_supplier_allocation_supplier_allocation_owner_insert",
+      "table": "supplier_allocation",
+      "rule": "R-16",
+      "error": "supplier_allocation_owner"
+    },
+    {
+      "name": "tr_supplier_allocation_supplier_allocation_owner_update",
+      "table": "supplier_allocation",
+      "rule": "R-16",
+      "error": "supplier_allocation_owner"
+    },
+    {
+      "name": "tr_supplier_allocation_supplier_release_insert",
+      "table": "supplier_allocation",
+      "rule": "R-16",
+      "error": "supplier_release"
+    },
+    {
+      "name": "tr_supplier_allocation_supplier_release_update",
+      "table": "supplier_allocation",
+      "rule": "R-16",
+      "error": "supplier_release"
+    },
+    {
+      "name": "tr_supplier_allocation_supplier_payment_budget_insert",
+      "table": "supplier_allocation",
+      "rule": "R-16",
+      "error": "supplier_payment_budget"
+    },
+    {
+      "name": "tr_supplier_allocation_supplier_payment_budget_update",
+      "table": "supplier_allocation",
+      "rule": "R-16",
+      "error": "supplier_payment_budget"
+    },
+    {
+      "name": "tr_supplier_refund_supplier_refund_owner_budget_insert",
+      "table": "supplier_refund",
+      "rule": "R-16",
+      "error": "supplier_refund_owner_budget"
+    },
+    {
+      "name": "tr_instrument_processing_release_missing_checks_insert",
+      "table": "instrument_processing",
+      "rule": "R-17",
+      "error": "release_missing_checks"
+    },
+    {
+      "name": "tr_instrument_processing_release_missing_checks_update",
+      "table": "instrument_processing",
+      "rule": "R-17",
+      "error": "release_missing_checks"
+    },
+    {
+      "name": "tr_instrument_use_pack_not_released_insert",
+      "table": "instrument_use",
+      "rule": "R-17",
+      "error": "pack_not_released"
+    },
+    {
+      "name": "tr_instrument_use_pack_not_released_update",
+      "table": "instrument_use",
+      "rule": "R-17",
+      "error": "pack_not_released"
+    },
+    {
+      "name": "tr_instrument_use_use_history_frozen_update",
+      "table": "instrument_use",
+      "rule": "历史保护",
+      "error": "use_history_frozen"
+    },
+    {
+      "name": "tr_reconciliation_item_reconcile_patient_payment_insert",
+      "table": "reconciliation_item",
+      "rule": "R-18",
+      "error": "reconcile_patient_payment"
+    },
+    {
+      "name": "tr_reconciliation_item_reconcile_patient_refund_insert",
+      "table": "reconciliation_item",
+      "rule": "R-18",
+      "error": "reconcile_patient_refund"
+    },
+    {
+      "name": "tr_reconciliation_item_reconcile_supplier_payment_insert",
+      "table": "reconciliation_item",
+      "rule": "R-18",
+      "error": "reconcile_supplier_payment"
+    },
+    {
+      "name": "tr_reconciliation_item_reconcile_supplier_refund_insert",
+      "table": "reconciliation_item",
+      "rule": "R-18",
+      "error": "reconcile_supplier_refund"
+    },
+    {
+      "name": "tr_staff_role_qualification_qualification_overlap_insert",
+      "table": "staff_role_qualification",
+      "rule": "R-19",
+      "error": "qualification_overlap"
+    },
+    {
+      "name": "tr_staff_role_qualification_qualification_overlap_update",
+      "table": "staff_role_qualification",
+      "rule": "R-19",
+      "error": "qualification_overlap"
+    },
+    {
+      "name": "tr_account_role_qualification_account_insert",
+      "table": "account_role",
+      "rule": "R-19",
+      "error": "qualification_account"
+    },
+    {
+      "name": "tr_account_role_qualification_account_update",
+      "table": "account_role",
+      "rule": "R-19",
+      "error": "qualification_account"
+    },
+    {
+      "name": "tr_account_role_grant_overlap_insert",
+      "table": "account_role",
+      "rule": "R-19",
+      "error": "grant_overlap"
+    },
+    {
+      "name": "tr_account_role_grant_overlap_update",
+      "table": "account_role",
+      "rule": "R-19",
+      "error": "grant_overlap"
+    },
+    {
+      "name": "tr_backup_run_backup_success_gate_insert",
+      "table": "backup_run",
+      "rule": "R-21",
+      "error": "backup_success_gate"
+    },
+    {
+      "name": "tr_backup_run_backup_success_gate_update",
+      "table": "backup_run",
+      "rule": "R-21",
+      "error": "backup_success_gate"
+    },
+    {
+      "name": "tr_plan_version_plan_publish_empty_update",
+      "table": "plan_version",
+      "rule": "R-06/R-07",
+      "error": "plan_publish_empty"
+    },
+    {
+      "name": "tr_plan_item_plan_scope_frozen_insert",
+      "table": "plan_item",
+      "rule": "R-06/R-07",
+      "error": "plan_scope_frozen"
+    },
+    {
+      "name": "tr_plan_item_plan_scope_frozen_update",
+      "table": "plan_item",
+      "rule": "R-06/R-07",
+      "error": "plan_scope_frozen"
+    },
+    {
+      "name": "tr_plan_item_plan_old_scope_frozen_update",
+      "table": "plan_item",
+      "rule": "R-06/R-07",
+      "error": "plan_old_scope_frozen"
+    },
+    {
+      "name": "tr_plan_version_published_plan_content_frozen_update",
+      "table": "plan_version",
+      "rule": "历史保护",
+      "error": "published_plan_content_frozen"
+    },
+    {
+      "name": "tr_health_item_reviewed_health_frozen_insert",
+      "table": "health_item",
+      "rule": "R-03",
+      "error": "reviewed_health_frozen"
+    },
+    {
+      "name": "tr_processing_monitor_processing_scope_frozen_insert",
+      "table": "processing_monitor",
+      "rule": "R-17",
+      "error": "processing_scope_frozen"
+    },
+    {
+      "name": "tr_instrument_pack_cycle_processing_scope_frozen_insert",
+      "table": "instrument_pack_cycle",
+      "rule": "R-17",
+      "error": "processing_scope_frozen"
+    },
+    {
+      "name": "tr_processing_monitor_released_monitor_frozen_update",
+      "table": "processing_monitor",
+      "rule": "历史保护",
+      "error": "released_monitor_frozen"
+    },
+    {
+      "name": "tr_instrument_pack_cycle_released_pack_identity_frozen_update",
+      "table": "instrument_pack_cycle",
+      "rule": "历史保护",
+      "error": "released_pack_identity_frozen"
+    },
+    {
+      "name": "tr_instrument_processing_release_evidence_frozen_update",
+      "table": "instrument_processing",
+      "rule": "历史保护",
+      "error": "release_evidence_frozen"
+    },
+    {
+      "name": "tr_stock_count_completed_workflow_frozen_update",
+      "table": "stock_count",
+      "rule": "历史保护",
+      "error": "completed_workflow_frozen"
+    },
+    {
+      "name": "tr_followup_requirement_completed_workflow_frozen_update",
+      "table": "followup_requirement",
+      "rule": "历史保护",
+      "error": "completed_workflow_frozen"
+    },
+    {
+      "name": "tr_appointment_state_initial_insert",
+      "table": "appointment",
+      "rule": "C状态机:../diagrams/c04-appointment.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_appointment_state_transition_update",
+      "table": "appointment",
+      "rule": "C状态机:../diagrams/c04-appointment.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_visit_state_initial_insert",
+      "table": "visit",
+      "rule": "C状态机:../diagrams/c04-visit.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_visit_state_transition_update",
+      "table": "visit",
+      "rule": "C状态机:../diagrams/c04-visit.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_clinical_record_state_initial_insert",
+      "table": "clinical_record",
+      "rule": "C状态机:../diagrams/c04-clinical.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_clinical_record_state_transition_update",
+      "table": "clinical_record",
+      "rule": "C状态机:../diagrams/c04-clinical.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_plan_version_state_initial_insert",
+      "table": "plan_version",
+      "rule": "C状态机:../diagrams/c04-plan.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_plan_version_state_transition_update",
+      "table": "plan_version",
+      "rule": "C状态机:../diagrams/c04-plan.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_followup_requirement_state_initial_insert",
+      "table": "followup_requirement",
+      "rule": "C状态机:../diagrams/c04-followup.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_followup_requirement_state_transition_update",
+      "table": "followup_requirement",
+      "rule": "C状态机:../diagrams/c04-followup.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_service_price_state_initial_insert",
+      "table": "service_price",
+      "rule": "C状态机:../diagrams/c04-price.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_service_price_state_transition_update",
+      "table": "service_price",
+      "rule": "C状态机:../diagrams/c04-price.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_patient_payment_state_initial_insert",
+      "table": "patient_payment",
+      "rule": "C状态机:../diagrams/c04-payment.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_patient_payment_state_transition_update",
+      "table": "patient_payment",
+      "rule": "C状态机:../diagrams/c04-payment.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_fee_request_state_initial_insert",
+      "table": "fee_request",
+      "rule": "C状态机:../diagrams/c04-request.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_fee_request_state_transition_update",
+      "table": "fee_request",
+      "rule": "C状态机:../diagrams/c04-request.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_patient_refund_state_initial_insert",
+      "table": "patient_refund",
+      "rule": "C状态机:../diagrams/c04-refund.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_patient_refund_state_transition_update",
+      "table": "patient_refund",
+      "rule": "C状态机:../diagrams/c04-refund.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_supplier_payment_state_initial_insert",
+      "table": "supplier_payment",
+      "rule": "C状态机:../diagrams/c04-supply_payment.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_supplier_payment_state_transition_update",
+      "table": "supplier_payment",
+      "rule": "C状态机:../diagrams/c04-supply_payment.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_material_batch_state_initial_insert",
+      "table": "material_batch",
+      "rule": "C状态机:../diagrams/c04-batch.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_material_batch_state_transition_update",
+      "table": "material_batch",
+      "rule": "C状态机:../diagrams/c04-batch.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_stock_count_state_initial_insert",
+      "table": "stock_count",
+      "rule": "C状态机:../diagrams/c04-count.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_stock_count_state_transition_update",
+      "table": "stock_count",
+      "rule": "C状态机:../diagrams/c04-count.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_instrument_processing_state_initial_insert",
+      "table": "instrument_processing",
+      "rule": "C状态机:../diagrams/c04-process.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_instrument_processing_state_transition_update",
+      "table": "instrument_processing",
+      "rule": "C状态机:../diagrams/c04-process.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_instrument_pack_cycle_state_initial_insert",
+      "table": "instrument_pack_cycle",
+      "rule": "C状态机:../diagrams/c04-packcycle.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_instrument_pack_cycle_state_transition_update",
+      "table": "instrument_pack_cycle",
+      "rule": "C状态机:../diagrams/c04-packcycle.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_purchase_order_item_state_initial_insert",
+      "table": "purchase_order_item",
+      "rule": "C状态机:../diagrams/c04-purchase_item.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_purchase_order_item_state_transition_update",
+      "table": "purchase_order_item",
+      "rule": "C状态机:../diagrams/c04-purchase_item.puml",
+      "error": "state_transition"
+    },
+    {
+      "name": "tr_document_version_state_initial_insert",
+      "table": "document_version",
+      "rule": "C状态机:../diagrams/c04-file.puml",
+      "error": "state_initial"
+    },
+    {
+      "name": "tr_document_version_state_transition_update",
+      "table": "document_version",
+      "rule": "C状态机:../diagrams/c04-file.puml",
+      "error": "state_transition"
+    }
+  ],
+  "state_contracts": [
+    {
+      "table": "appointment",
+      "field": "status",
+      "source": "../diagrams/c04-appointment.puml",
+      "source_sha256": "9cfd8145c1b3f7d0dc5fd492841951a2a25c0ecc9d5c39aff8a5ee7d8fcd592c",
+      "states": [
+        "已预约",
+        "已取消",
+        "已到诊",
+        "未到"
+      ],
+      "initial": [
+        {
+          "state": "已预约",
+          "condition": "确认安排\\n[日期资源有效且无冲突]\\n/ 关联有效占用"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "已预约",
+          "to": "已取消",
+          "condition": "变更或取消安排\\n[选择取消且未到诊]\\n/ 释放占用并保留原因"
+        },
+        {
+          "from": "已预约",
+          "to": "已到诊",
+          "condition": "关联到诊结果\\n[当日且无已有就诊]\\n/ 关联唯一就诊"
+        },
+        {
+          "from": "已预约",
+          "to": "未到",
+          "condition": "确认未到事实\\n[已过计划且人工核实未到]\\n/ 保留未到依据"
+        }
+      ]
+    },
+    {
+      "table": "visit",
+      "field": "status",
+      "source": "../diagrams/c04-visit.puml",
+      "source_sha256": "8e212938472bb32a4024b5472e6e810ac6e6ce29f19ec8f28bb7c4817bc73037",
+      "states": [
+        "候诊",
+        "接诊中",
+        "诊疗结束"
+      ],
+      "initial": [
+        {
+          "state": "候诊",
+          "condition": "登记到诊\\n[患者与安排已核实]\\n/ 建立病历草稿"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "候诊",
+          "to": "接诊中",
+          "condition": "确认实际接诊\\n[具备接诊或交接资格]\\n/ 记接诊开始"
+        },
+        {
+          "from": "接诊中",
+          "to": "诊疗结束",
+          "condition": "结束本次诊疗\\n[病历已签署]\\n/ 保留独立收费与诊后状态"
+        }
+      ]
+    },
+    {
+      "table": "clinical_record",
+      "field": "status",
+      "source": "../diagrams/c04-clinical.puml",
+      "source_sha256": "078391df9c1c15767194c939b312df69db898cccb58c0a6e63fbb4974bff159a",
+      "states": [
+        "草稿",
+        "已签署"
+      ],
+      "initial": [
+        {
+          "state": "草稿",
+          "condition": "建立当次草稿\\n[有效就诊]\\n/ 形成当次正文"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "草稿",
+          "to": "已签署",
+          "condition": "签署当前正文\\n[必填完整且责任有效]\\n/ 冻结正文和签署依据"
+        }
+      ]
+    },
+    {
+      "table": "plan_version",
+      "field": "status",
+      "source": "../diagrams/c04-plan.puml",
+      "source_sha256": "75529ffff4e2574551e07e09bf91397c50c092f7d56b2acc52f528713e0f0d82",
+      "states": [
+        "草稿",
+        "待确认",
+        "已确认",
+        "暂缓",
+        "已拒绝",
+        "停止后续执行",
+        "本版执行完成"
+      ],
+      "initial": [
+        {
+          "state": "草稿",
+          "condition": "形成待确认版本\\n[来源与项目有据]\\n/ 建立草稿明细"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "草稿",
+          "to": "待确认",
+          "condition": "提交方案说明\\n[明细完整]\\n/ 固定待确认内容"
+        },
+        {
+          "from": "待确认",
+          "to": "已确认",
+          "condition": "登记确认经历\\n[患者同意具体范围]\\n/ 保留决定及文书"
+        },
+        {
+          "from": "待确认",
+          "to": "暂缓",
+          "condition": "登记确认经历\\n[患者暂缓]\\n/ 保留未执行安排"
+        },
+        {
+          "from": "待确认",
+          "to": "已拒绝",
+          "condition": "登记确认经历\\n[患者拒绝]\\n/ 保留拒绝依据"
+        },
+        {
+          "from": "暂缓",
+          "to": "待确认",
+          "condition": "重新说明方案\\n[内容未改变]\\n/ 重新取得决定"
+        },
+        {
+          "from": "已确认",
+          "to": "停止后续执行",
+          "condition": "停止后续安排\\n[撤回同意或新版本替代]\\n/ 保留已执行关联"
+        },
+        {
+          "from": "已确认",
+          "to": "本版执行完成",
+          "condition": "核对本版完成\\n[同意范围已完成]\\n/ 保留每次执行来源"
+        }
+      ]
+    },
+    {
+      "table": "followup_requirement",
+      "field": "status",
+      "source": "../diagrams/c04-followup.puml",
+      "source_sha256": "eb79f24929b91f17623d4ecbf18494a7d73f267dcdf1dd70d8993b4af87bf7d8",
+      "states": [
+        "待发布",
+        "待联系",
+        "待到诊或评估",
+        "已完成",
+        "已撤销"
+      ],
+      "initial": [
+        {
+          "state": "待发布",
+          "condition": "提出诊后要求\\n[来源尚未确认]\\n/ 保留草稿"
+        },
+        {
+          "state": "待联系",
+          "condition": "提出诊后要求\\n[来源已签署或已确认]\\n/ 交责任前台"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待发布",
+          "to": "待联系",
+          "condition": "判断发布条件\\n[来源已签署或已确认]\\n/ 交责任前台"
+        },
+        {
+          "from": "待联系",
+          "to": "待到诊或评估",
+          "condition": "衔接后续安排\\n[预约已关联或等待牙医评估]\\n/ 保留待办"
+        },
+        {
+          "from": "待到诊或评估",
+          "to": "待联系",
+          "condition": "恢复待安排\\n[复诊取消或需重新联系]\\n/ 保留历史预约"
+        },
+        {
+          "from": "待到诊或评估",
+          "to": "已完成",
+          "condition": "判断完成或继续\\n[牙医确认评估完成]\\n/ 保留评估依据"
+        },
+        {
+          "from": "待联系",
+          "to": "已完成",
+          "condition": "判断完成或继续\\n[无需临床评估且联系目标达成]\\n/ 保留完成依据"
+        },
+        {
+          "from": "待到诊或评估",
+          "to": "待联系",
+          "condition": "判断完成或继续\\n[仍需跟进]\\n/ 指定日期与责任"
+        },
+        {
+          "from": "待联系",
+          "to": "已撤销",
+          "condition": "确认撤销要求\\n[牙医确认理由]\\n/ 保留原要求"
+        },
+        {
+          "from": "待到诊或评估",
+          "to": "已撤销",
+          "condition": "确认撤销要求\\n[牙医确认理由]\\n/ 保留原要求"
+        }
+      ]
+    },
+    {
+      "table": "service_price",
+      "field": "status",
+      "source": "../diagrams/c04-price.puml",
+      "source_sha256": "8c59d90b4a2a3539bf04e5cfee3fe829111ec65ba12e8e671f410d1b2b8f5df0",
+      "states": [
+        "价目草稿",
+        "待负责人确认",
+        "已确认可适用",
+        "已退回",
+        "不再用于新计费"
+      ],
+      "initial": [
+        {
+          "state": "价目草稿",
+          "condition": "核对区间及金额\\n[金额与项目有效]\\n/ 保存草稿"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "价目草稿",
+          "to": "待负责人确认",
+          "condition": "提交确认\\n[区间候选无冲突]\\n/ 等待负责人"
+        },
+        {
+          "from": "待负责人确认",
+          "to": "已确认可适用",
+          "condition": "发布确认版本\\n[负责人同意且仍无冲突]\\n/ 保留确认区间"
+        },
+        {
+          "from": "待负责人确认",
+          "to": "已退回",
+          "condition": "退回修改\\n[有处理意见]\\n/ 保留原草稿"
+        },
+        {
+          "from": "已退回",
+          "to": "待负责人确认",
+          "condition": "重新提交\\n[修改后重新校验]\\n/ 保留变更"
+        },
+        {
+          "from": "已确认可适用",
+          "to": "不再用于新计费",
+          "condition": "停止后续适用\\n[到达截止或新版本替代]\\n/ 原费用快照保持"
+        }
+      ]
+    },
+    {
+      "table": "patient_payment",
+      "field": "status",
+      "source": "../diagrams/c04-payment.puml",
+      "source_sha256": "cecaea98c8defb9b93f1a8f740114bb0d3a09938062324e993ca9969104b5c0f",
+      "states": [
+        "待核实",
+        "到账已确认",
+        "未到账已核实"
+      ],
+      "initial": [
+        {
+          "state": "待核实",
+          "condition": "提出到账核查\\n[有患者与交易线索]\\n/ 不计可用余额"
+        },
+        {
+          "state": "到账已确认",
+          "condition": "确认到账\\n[登记时已取得到账证据]\\n/ 形成可分配来源"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待核实",
+          "to": "到账已确认",
+          "condition": "确认到账\\n[已核实金额与渠道]\\n/ 形成可分配来源"
+        },
+        {
+          "from": "待核实",
+          "to": "未到账已核实",
+          "condition": "确认未到账\\n[有明确失败依据]\\n/ 保留核查结论"
+        }
+      ]
+    },
+    {
+      "table": "fee_request",
+      "field": "status",
+      "source": "../diagrams/c04-request.puml",
+      "source_sha256": "ef5cc8c8afad36e7af0724a653158565455797969b0b30b178dba32c02d3113f",
+      "states": [
+        "待审核",
+        "已退回",
+        "已拒绝",
+        "已同意",
+        "已撤回"
+      ],
+      "initial": [
+        {
+          "state": "待审核",
+          "condition": "提出费用处理\\n[原单及金额范围有效]\\n/ 保存申请版本"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待审核",
+          "to": "已退回",
+          "condition": "保存审核结论\\n[材料不足]\\n/ 保留退回意见"
+        },
+        {
+          "from": "已退回",
+          "to": "待审核",
+          "condition": "重新提交申请\\n[已补正并重新核对]\\n/ 新增申请版本"
+        },
+        {
+          "from": "待审核",
+          "to": "已拒绝",
+          "condition": "保存审核结论\\n[不予处理且有理由]\\n/ 不改变原资金"
+        },
+        {
+          "from": "待审核",
+          "to": "已同意",
+          "condition": "保存审核结论\\n[批准范围及原版本有效]\\n/ 调整与分配更正共同生效"
+        },
+        {
+          "from": "待审核",
+          "to": "已撤回",
+          "condition": "撤回申请\\n[尚未批准]\\n/ 保留原因"
+        }
+      ]
+    },
+    {
+      "table": "patient_refund",
+      "field": "status",
+      "source": "../diagrams/c04-refund.puml",
+      "source_sha256": "97ddd4eace398c45efe015616bf7ba90dc5c6bcae1e04594bb80526625dcc93a",
+      "states": [
+        "待办理",
+        "待核实",
+        "已确认退款",
+        "已失败"
+      ],
+      "initial": [
+        {
+          "state": "待办理",
+          "condition": "建立额度占用\\n[原款与批准额度足够]\\n/ 生成唯一办理依据"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待办理",
+          "to": "待核实",
+          "condition": "保留额度占用\\n[实际结果不明]\\n/ 继续占用并待核查"
+        },
+        {
+          "from": "待办理",
+          "to": "已确认退款",
+          "condition": "核实办理结果\\n[实际退款已确认且金额相符]\\n/ 一次确认有效流出"
+        },
+        {
+          "from": "待办理",
+          "to": "已失败",
+          "condition": "核实办理结果\\n[明确失败且有证据]\\n/ 释放未执行额度"
+        },
+        {
+          "from": "待核实",
+          "to": "已确认退款",
+          "condition": "核实办理结果\\n[渠道证实成功]\\n/ 确认原办理的流出"
+        },
+        {
+          "from": "待核实",
+          "to": "已失败",
+          "condition": "核实办理结果\\n[渠道证实失败]\\n/ 释放原占用"
+        }
+      ]
+    },
+    {
+      "table": "supplier_payment",
+      "field": "status",
+      "source": "../diagrams/c04-supply_payment.puml",
+      "source_sha256": "e20f0b7d863c9d72db49491240de43c78c41d43077f0b46ad6eec97acebad6b1",
+      "states": [
+        "待付款",
+        "待核实",
+        "已确认付款",
+        "已失败"
+      ],
+      "initial": [
+        {
+          "state": "待付款",
+          "condition": "建立付款占用\\n[负责人确认且额度足够]\\n/ 形成唯一办理依据"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待付款",
+          "to": "待核实",
+          "condition": "核实待定结果\\n[结果不明]\\n/ 保留占用"
+        },
+        {
+          "from": "待付款",
+          "to": "已确认付款",
+          "condition": "确认实际支出\\n[实际付款已核实]\\n/ 形成供货分配"
+        },
+        {
+          "from": "待付款",
+          "to": "已失败",
+          "condition": "核实待定结果\\n[明确失败]\\n/ 释放占用"
+        },
+        {
+          "from": "待核实",
+          "to": "已确认付款",
+          "condition": "确认实际支出\\n[核查证实成功]\\n/ 一次确认支出"
+        },
+        {
+          "from": "待核实",
+          "to": "已失败",
+          "condition": "核实待定结果\\n[核查证实失败]\\n/ 释放原占用"
+        }
+      ]
+    },
+    {
+      "table": "material_batch",
+      "field": "status",
+      "source": "../diagrams/c04-batch.puml",
+      "source_sha256": "f917ea1abd5fbaff696d74b6eff2e1b861ca62e5b8695c589df52bbc13f5497b",
+      "states": [
+        "待检",
+        "可用",
+        "隔离",
+        "停用",
+        "过期"
+      ],
+      "initial": [
+        {
+          "state": "待检",
+          "condition": "形成批次来源\\n[已知材料和到货来源]\\n/ 保留效期与批号"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待检",
+          "to": "可用",
+          "condition": "确认合格范围\\n[验收已认可且未过期]\\n/ 允许合格量计可用"
+        },
+        {
+          "from": "可用",
+          "to": "隔离",
+          "condition": "立即隔离批次\\n[发现异常]\\n/ 立即禁止正常领用"
+        },
+        {
+          "from": "隔离",
+          "to": "停用",
+          "condition": "审核恢复或停用\\n[负责人决定停用]\\n/ 保留原因"
+        },
+        {
+          "from": "隔离",
+          "to": "可用",
+          "condition": "审核恢复或停用\\n[依据充分且未过期]\\n/ 保留恢复确认"
+        },
+        {
+          "from": "停用",
+          "to": "可用",
+          "condition": "审核恢复或停用\\n[异常解决且未过期]\\n/ 保留恢复依据"
+        },
+        {
+          "from": "可用",
+          "to": "过期",
+          "condition": "判断效期\\n[已过有效期]\\n/ 停止正常领用"
+        },
+        {
+          "from": "隔离",
+          "to": "过期",
+          "condition": "判断效期\\n[已过有效期]\\n/ 保持不可用"
+        },
+        {
+          "from": "待检",
+          "to": "过期",
+          "condition": "判断效期\\n[已过有效期]\\n/ 不得转可用"
+        }
+      ]
+    },
+    {
+      "table": "stock_count",
+      "field": "status",
+      "source": "../diagrams/c04-count.puml",
+      "source_sha256": "050ac5b1f1173aef35b694199cb8f737792bb6d8aff7037db940d3613ed78b34",
+      "states": [
+        "待确认差异",
+        "待重新核对",
+        "差异已确认",
+        "不予调整"
+      ],
+      "initial": [
+        {
+          "state": "待确认差异",
+          "condition": "保留实点快照\\n[有批次位置与盘点时点]\\n/ 暂不改变库存"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待确认差异",
+          "to": "待重新核对",
+          "condition": "核对确认依据\\n[快照后有新变动]\\n/ 要求重核差异"
+        },
+        {
+          "from": "待重新核对",
+          "to": "待确认差异",
+          "condition": "重新确认实点\\n[新快照及原因完整]\\n/ 保留原核实经历"
+        },
+        {
+          "from": "待确认差异",
+          "to": "差异已确认",
+          "condition": "核对确认依据\\n[负责人同意且依据一致]\\n/ 形成唯一差异变动"
+        },
+        {
+          "from": "待确认差异",
+          "to": "不予调整",
+          "condition": "拒绝差异调整\\n[负责人说明原因]\\n/ 库存不变"
+        }
+      ]
+    },
+    {
+      "table": "instrument_processing",
+      "field": "status",
+      "source": "../diagrams/c04-process.puml",
+      "source_sha256": "22678a5324cccd6f2466cf46dc2f313e30ea3415f24cafe4bd12b5b83aed28f4",
+      "states": [
+        "处理中",
+        "待核对放行",
+        "已放行",
+        "隔离停用"
+      ],
+      "initial": [
+        {
+          "state": "处理中",
+          "condition": "登记本轮处理\\n[设备与包范围已核实]\\n/ 保留处理经历"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "处理中",
+          "to": "待核对放行",
+          "condition": "完成处理登记\\n[实际处理完成]\\n/ 等待监测与核对"
+        },
+        {
+          "from": "待核对放行",
+          "to": "已放行",
+          "condition": "确认放行或隔离\\n[依据齐全且无未解决异常]\\n/ 保留放行责任与时间"
+        },
+        {
+          "from": "待核对放行",
+          "to": "隔离停用",
+          "condition": "确认放行或隔离\\n[监测异常或未能确认]\\n/ 不得正常使用"
+        },
+        {
+          "from": "已放行",
+          "to": "隔离停用",
+          "condition": "标记事后异常\\n[后续发现问题]\\n/ 停用并追溯相关就诊"
+        }
+      ]
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "field": "status",
+      "source": "../diagrams/c04-packcycle.puml",
+      "source_sha256": "a173d59636677d5005a774102a5c1c31cffaeb3857bc2974463311f3a6d479b5",
+      "states": [
+        "待放行",
+        "可用",
+        "已发放待确认",
+        "已使用",
+        "隔离"
+      ],
+      "initial": [
+        {
+          "state": "待放行",
+          "condition": "建立本轮包次\\n[属于本轮处理]\\n/ 保留包装及期限"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待放行",
+          "to": "可用",
+          "condition": "接受本轮放行\\n[处理已放行且本包有效]\\n/ 允许发放"
+        },
+        {
+          "from": "可用",
+          "to": "已发放待确认",
+          "condition": "登记发放\\n[本轮未使用且实物核对通过]\\n/ 关联待使用就诊"
+        },
+        {
+          "from": "已发放待确认",
+          "to": "已使用",
+          "condition": "登记实际使用\\n[实际使用已确认]\\n/ 保留就诊与本轮关联"
+        },
+        {
+          "from": "已发放待确认",
+          "to": "可用",
+          "condition": "确认未用退回\\n[未使用且实物仍有效]\\n/ 保留退回经历"
+        },
+        {
+          "from": "可用",
+          "to": "隔离",
+          "condition": "停止后续正常使用\\n[异常或过期]\\n/ 禁止发放"
+        },
+        {
+          "from": "已发放待确认",
+          "to": "隔离",
+          "condition": "停止后续正常使用\\n[异常或实物不明]\\n/ 保留发放关联"
+        }
+      ]
+    },
+    {
+      "table": "purchase_order_item",
+      "field": "status",
+      "source": "../diagrams/c04-purchase_item.puml",
+      "source_sha256": "b7b3b1596f95ee6cbbec1b5841943415edc0b99e90c53571dfafe3da3504c93c",
+      "states": [
+        "待交付",
+        "履行中",
+        "待差异处理",
+        "履行已完成",
+        "剩余已取消"
+      ],
+      "initial": [
+        {
+          "state": "待交付",
+          "condition": "组织约定明细\\n[采购已确认]\\n/ 保留约定数量"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待交付",
+          "to": "履行中",
+          "condition": "核对交付及差异\\n[已部分到货且未完成]\\n/ 累计交付与验收"
+        },
+        {
+          "from": "待交付",
+          "to": "履行已完成",
+          "condition": "核对交付及差异\\n[一次交付完成且全部合格]\\n/ 保留履行结果"
+        },
+        {
+          "from": "待交付",
+          "to": "待差异处理",
+          "condition": "核对交付及差异\\n[拒收或交付差异未解决]\\n/ 保留待处理量"
+        },
+        {
+          "from": "履行中",
+          "to": "待差异处理",
+          "condition": "核对交付及差异\\n[拒收或交付差异未解决]\\n/ 保留待处理量"
+        },
+        {
+          "from": "待差异处理",
+          "to": "履行中",
+          "condition": "确认差异安排\\n[仍有未交付]\\n/ 保留补换或调整依据"
+        },
+        {
+          "from": "履行中",
+          "to": "履行已完成",
+          "condition": "核对交付及差异\\n[交付完成且差异已解决]\\n/ 保留履行结果"
+        },
+        {
+          "from": "待差异处理",
+          "to": "履行已完成",
+          "condition": "确认差异安排\\n[剩余及拒收均已处理]\\n/ 保留处理依据"
+        },
+        {
+          "from": "待交付",
+          "to": "剩余已取消",
+          "condition": "取消未履行部分\\n[负责人确认]\\n/ 保留取消原因"
+        },
+        {
+          "from": "履行中",
+          "to": "剩余已取消",
+          "condition": "取消未履行部分\\n[只取消剩余且已发生事实保留]\\n/ 保留验收与付款"
+        }
+      ]
+    },
+    {
+      "table": "document_version",
+      "field": "status",
+      "source": "../diagrams/c04-file.puml",
+      "source_sha256": "9a39baeece6a170cc09c80dd1d138b1b2eabf6257d615422faedc75b1b9065f2",
+      "states": [
+        "原件待确认",
+        "原件已确认",
+        "退回核对",
+        "缺失或不可读"
+      ],
+      "initial": [
+        {
+          "state": "原件待确认",
+          "condition": "核对原件完整性\\n[文件实际保存且校验通过]\\n/ 保留来源和归属"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "原件待确认",
+          "to": "原件已确认",
+          "condition": "保留确认原件\\n[牙医核对内容及归属]\\n/ 保留确认人和时间"
+        },
+        {
+          "from": "原件待确认",
+          "to": "退回核对",
+          "condition": "退回原件核对\\n[关联或内容不符]\\n/ 保留原件与原因"
+        },
+        {
+          "from": "原件已确认",
+          "to": "缺失或不可读",
+          "condition": "报告读取异常\\n[文件缺失或校验不符]\\n/ 保留原业务关联"
+        },
+        {
+          "from": "缺失或不可读",
+          "to": "原件已确认",
+          "condition": "核实恢复原件\\n[恢复文件与原校验一致]\\n/ 保留恢复依据"
+        }
+      ]
+    }
+  ],
+  "aggregate_work_unit": "状态与集合校验设计.py：无封存列聚合由工作单元保护，直接SQL不会执行提交门禁。",
+  "service_gates_pending": [
+    "全部32用例的授权、接诊范围、实时钟/营业日期、乐观revision及审计原子性；16类转移方向已生成SQL保护，事件警戒条件仍需服务验证。",
+    "临床签署摘要计算、同意/撤回时间线与有效执行链数量；集合提交门禁已形成隔离设计样例，须由D2各写入口强制调用，不能仅依赖直接SQL。",
+    "资金安全整数逐步运算；批准调整明细总和与审批额一致；供应商各原单预占上限及批准退换上限；部分实付后用途重分配；原授权版本核验。",
+    "采购累计交付/取消剩余和精确换算取整；确认合格量与入库量最终相等；批次实时效期、退供依据和已用材料核验。",
+    "器械完整必检项目集合、当前时钟与实物；收支核对完整来源集合、摘要、营业日期和差异跟进。",
+    "资格撤销的反向授权处理、auth_version与会话失效；固定权限对象规则、审计字段白名单及敏感数据屏蔽。",
+    "备份快照附件集合完整性、真实文件摘要/异机副本、恢复必检集合与RPO/RTO；不能由SQL登记状态自证。",
+    "16类状态集与转移来源逐一核对，代表性非法方向与新增业务反例已验证；全部事件警戒、反向修改与故障注入继续验收；旧库迁移、旧数据清洗、应用衔接及回退另做。"
+  ]
+}

@@ -1,0 +1,52 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "前台" as A0
+boundary "<u>:前台接口</u>" as B0
+control "<u>:查询预约及接诊</u>\n<u>安排控制</u>" as K
+participant "<u>:患者</u>" as Patient
+participant "<u>:预约</u>" as Appointment
+A0 -> B0 : 查询UC-02办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-02办理(对象、依据)
+activate K
+K -> Patient : 核对身份(患者或日期查询范围)
+activate Patient
+Patient --> K : 处理结果或拒绝原因
+deactivate Patient
+K -> Appointment : 提供安排及经历(筛选条件、岗位范围)
+activate Appointment
+Appointment --> K : 处理结果或拒绝原因
+deactivate Appointment
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Appointment
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

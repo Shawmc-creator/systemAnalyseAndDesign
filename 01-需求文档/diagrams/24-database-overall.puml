@@ -1,0 +1,1662 @@
+' 85表总图的15个PlantUML分区；拼版脚本见数据层设计/生成数据库图.py
+@startuml d1-db-01
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EDF5FA
+}
+title G01  患者与职员  ·  5张表
+entity "患者\npatient" as patient {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} birth_date : TEXT [NULL]
+  {field} phone : TEXT [NULL]
+  {field} phone_owner : TEXT [NULL]
+  {field} address : TEXT [NULL]
+  {field} contact_preference : TEXT [NULL]
+  {field} contact_unavailable_reason : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "职员\nstaff" as staff {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} employed_from : TEXT [NN]
+  {field} employed_until : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NULL]  → staff.id
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "患者资料变更\npatient_change" as patient_change {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id
+  {field} old_value : TEXT [NULL]
+  {field} new_value : TEXT [NULL]
+  {field} reason : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} field_name : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "代理关系\npatient_proxy" as patient_proxy {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id
+  {field} proxy_name : TEXT [NN]
+  {field} relationship : TEXT [NN]
+  {field} scope : TEXT [NN]
+  {field} valid_from : TEXT [NN]
+  {field} valid_until : TEXT [NULL]
+  {field} verification_basis : TEXT [NN]
+  {field} verified_by : INTEGER [FK, NN]  → staff.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "接诊交接\nclinical_handover" as clinical_handover {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id
+  {field} receiving_dentist_id : INTEGER [FK, NN]  → staff.id
+  {field} handover_by : INTEGER [FK, NN]  → staff.id
+  {field} scope : TEXT [NN]
+  {field} valid_from : TEXT [NN]
+  {field} valid_until : TEXT [NULL]
+  {field} reason : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+clinical_handover --> patient
+patient_change --> patient
+patient_proxy --> patient
+patient -[hidden]right- staff
+@enduml
+
+@startuml d1-db-02
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EFF5ED
+}
+title G02  预约、排班与到诊  ·  7张表
+entity "诊椅\ndental_chair" as dental_chair {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} available_from : TEXT [NN]
+  {field} available_until : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "日期安排\ndated_schedule" as dated_schedule {
+  {field} id : INTEGER [PK, NN]
+  {field} dentist_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} dental_chair_id : INTEGER [FK, NN]  → dental_chair.id
+  {field} business_date : TEXT [NN]
+  {field} starts_at : TEXT [NN]
+  {field} ends_at : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} closure_reason : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "安排变更\nschedule_change" as schedule_change {
+  {field} id : INTEGER [PK, NN]
+  {field} dated_schedule_id : INTEGER [FK, NN]  → dated_schedule.id
+  {field} old_business_date : TEXT [NN]
+  {field} old_starts_at : TEXT [NN]
+  {field} old_ends_at : TEXT [NN]
+  {field} new_business_date : TEXT [NN]
+  {field} new_starts_at : TEXT [NN]
+  {field} new_ends_at : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} change_kind : TEXT [NN]
+  {field} affected_handling : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} old_dentist_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} new_dentist_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} old_chair_id : INTEGER [FK, NN]  → dental_chair.id
+  {field} new_chair_id : INTEGER [FK, NN]  → dental_chair.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "接诊占用\nresource_occupancy" as resource_occupancy {
+  {field} id : INTEGER [PK, NN]
+  {field} dated_schedule_id : INTEGER [FK, NN]  → dated_schedule.id
+  {field} appointment_id : INTEGER [FK, NULL]  → appointment.id
+  {field} visit_id : INTEGER [FK, NULL]  → visit.id
+  {field} starts_at : TEXT [NN]
+  {field} ends_at : TEXT [NN]
+  {field} released_at : TEXT [NULL]
+  {field} arrangement_revision : INTEGER [NN]
+  {field} release_reason : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} released_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "预约\nappointment" as appointment {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} planned_start : TEXT [NN]
+  {field} planned_end : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} due_at : TEXT [NN]
+  {field} arrangement_revision : INTEGER [NN]
+  {field} status_reason : TEXT [NULL]
+  {field} notified_at : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} notified_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "预约变更\nappointment_change" as appointment_change {
+  {field} id : INTEGER [PK, NN]
+  {field} appointment_id : INTEGER [FK, NN]  → appointment.id
+  {field} old_start : TEXT [NN]
+  {field} old_end : TEXT [NN]
+  {field} old_revision : INTEGER [NN]
+  {field} new_start : TEXT [NULL]
+  {field} new_end : TEXT [NULL]
+  {field} new_revision : INTEGER [NN]
+  {field} reason : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} change_kind : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} old_schedule_id : INTEGER [FK, NN]  → dated_schedule.id
+  {field} new_schedule_id : INTEGER [FK, NULL]  → dated_schedule.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "就诊\nvisit" as visit {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} appointment_id : INTEGER [UQ, FK, NULL]  → appointment.id
+  {field} dentist_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} arrived_at : TEXT [NN]
+  {field} started_at : TEXT [NULL]
+  {field} ended_at : TEXT [NULL]
+  {field} arrival_source : TEXT [NN]
+  {field} registered_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+appointment_change --> appointment
+appointment_change --> dated_schedule
+dated_schedule --> dental_chair
+resource_occupancy --> appointment
+resource_occupancy --> dated_schedule
+resource_occupancy --> visit
+schedule_change --> dated_schedule
+schedule_change --> dental_chair
+visit --> appointment
+@enduml
+
+@startuml d1-db-03
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F7F0E6
+}
+title G03  健康资料与病历  ·  6张表
+entity "健康版本\nhealth_version" as health_version {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} formed_at : TEXT [NN]
+  {field} change_reason : TEXT [NN]
+  {field} version_no : INTEGER [NN]
+  {field} effective_at : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} previous_version_id : INTEGER [FK, NULL]  → health_version.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "健康条目\nhealth_item" as health_item {
+  {field} id : INTEGER [PK, NN]
+  {field} health_version_id : INTEGER [FK, NN]  → health_version.id
+  {field} category : TEXT [NN]
+  {field} content : TEXT [NN]
+  {field} certainty : TEXT [NN]
+  {field} reported_at : TEXT [NN]
+  {field} source : TEXT [NN]
+  {field} occurred_at : TEXT [NULL]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "健康复核\nhealth_review" as health_review {
+  {field} id : INTEGER [PK, NN]
+  {field} visit_id : INTEGER [FK, NN]  → visit.id (G02)
+  {field} health_version_id : INTEGER [FK, NN]  → health_version.id
+  {field} reviewed_at : TEXT [NN]
+  {field} conclusion : TEXT [NN]
+  {field} reviewed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "病历\nclinical_record" as clinical_record {
+  {field} id : INTEGER [PK, NN]
+  {field} visit_id : INTEGER [UQ, FK, NN]  → visit.id (G02)
+  {field} chief_complaint : TEXT [NULL]
+  {field} diagnosis : TEXT [NULL]
+  {field} treatment_advice : TEXT [NULL]
+  {field} signed_at : TEXT [NULL]
+  {field} signed_revision : INTEGER [NULL]
+  {field} content_hash : TEXT [NULL]
+  {field} signed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "检查所见\nclinical_finding" as clinical_finding {
+  {field} id : INTEGER [PK, NN]
+  {field} clinical_record_id : INTEGER [FK, NN]  → clinical_record.id
+  {field} tooth_code : TEXT [NULL]
+  {field} surface_code : TEXT [NULL]
+  {field} finding_text : TEXT [NN]
+  {field} sequence_no : INTEGER [NN]
+  {field} recorded_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "病历补充\nrecord_addendum" as record_addendum {
+  {field} id : INTEGER [PK, NN]
+  {field} clinical_record_id : INTEGER [FK, NN]  → clinical_record.id
+  {field} content : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} added_at : TEXT [NN]
+  {field} content_hash : TEXT [NN]
+  {field} signed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+clinical_finding --> clinical_record
+health_item --> health_version
+health_review --> health_version
+record_addendum --> clinical_record
+@enduml
+
+@startuml d1-db-04
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F0ECF7
+}
+title G04  方案、文件与执行  ·  9张表
+entity "诊疗文件\nclinical_document" as clinical_document {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} visit_id : INTEGER [FK, NULL]  → visit.id (G02)
+  {field} plan_version_id : INTEGER [FK, NULL]  → plan_version.id
+  {field} document_type : TEXT [NN]
+  {field} source : TEXT [NN]
+  {field} ownership_note : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "文件版本\ndocument_version" as document_version {
+  {field} id : INTEGER [PK, NN]
+  {field} clinical_document_id : INTEGER [FK, NN]  → clinical_document.id
+  {field} original_name : TEXT [NN]
+  {field} size_bytes : INTEGER [NN]
+  {field} sha256 : TEXT [NN]
+  {field} captured_at : TEXT [NULL]
+  {field} confirmed_at : TEXT [NULL]
+  {field} change_reason : TEXT [NN]
+  {field} version_no : INTEGER [NN]
+  {field} storage_key : TEXT [NN]
+  {field} media_type : TEXT [NN]
+  {field} verification_note : TEXT [NULL]
+  {field} uploaded_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} previous_version_id : INTEGER [FK, NULL]  → document_version.id
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "治疗方案\ntreatment_plan" as treatment_plan {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} goal : TEXT [NN]
+  {field} established_at : TEXT [NN]
+  {field} termination_reason : TEXT [NULL]
+  {field} closed_at : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} closed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "方案版本\nplan_version" as plan_version {
+  {field} id : INTEGER [PK, NN]
+  {field} treatment_plan_id : INTEGER [FK, NN]  → treatment_plan.id
+  {field} source_visit_id : INTEGER [FK, NULL]  → visit.id (G02)
+  {field} diagnostic_basis : TEXT [NN]
+  {field} explained_at : TEXT [NULL]
+  {field} change_reason : TEXT [NN]
+  {field} planned_schedule : TEXT [NN]
+  {field} version_no : INTEGER [NN]
+  {field} stopped_at : TEXT [NULL]
+  {field} stop_reason : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} explained_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} previous_version_id : INTEGER [FK, NULL]  → plan_version.id
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "方案项目\nplan_item" as plan_item {
+  {field} id : INTEGER [PK, NN]
+  {field} plan_version_id : INTEGER [FK, NN]  → plan_version.id
+  {field} item_description : TEXT [NN]
+  {field} tooth_code : TEXT [NULL]
+  {field} surface_code : TEXT [NULL]
+  {field} planned_quantity : INTEGER [NN]
+  {field} sequence_no : INTEGER [NN]
+  {field} estimated_cents : INTEGER [NULL]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "患者决定\npatient_decision" as patient_decision {
+  {field} id : INTEGER [PK, NN]
+  {field} plan_version_id : INTEGER [FK, NN]  → plan_version.id
+  {field} patient_proxy_id : INTEGER [FK, NULL]  → patient_proxy.id (G01)
+  {field} decision : TEXT [NN]
+  {field} decided_at : TEXT [NN]
+  {field} explanation_basis : TEXT [NN]
+  {field} scope_note : TEXT [NN]
+  {field} explained_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} recorded_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "诊疗执行\ntreatment_execution" as treatment_execution {
+  {field} id : INTEGER [PK, NN]
+  {field} visit_id : INTEGER [FK, NN]  → visit.id (G02)
+  {field} plan_item_id : INTEGER [FK, NULL]  → plan_item.id
+  {field} service_id : INTEGER [FK, NN]  → service.id (G05)
+  {field} original_execution_id : INTEGER [FK, NULL]  → treatment_execution.id
+  {field} tooth_code : TEXT [NULL]
+  {field} surface_code : TEXT [NULL]
+  {field} completed_quantity : INTEGER [NN]
+  {field} procedure_note : TEXT [NN]
+  {field} completed_at : TEXT [NN]
+  {field} correction_reason : TEXT [NULL]
+  {field} execution_kind : TEXT [NN]
+  {field} performed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "患者决定—方案项目\ndecision_plan_item" as decision_plan_item {
+  {field} decision_id : INTEGER [PK, FK, NN]  → patient_decision.id
+  {field} plan_item_id : INTEGER [PK, FK, NN]  → plan_item.id
+  {field} linked_at : TEXT [NN]
+  {field} linked_by : INTEGER [FK, NN]  → staff.id (G01)
+}
+entity "患者决定—确认原件\ndecision_file_version" as decision_file_version {
+  {field} decision_id : INTEGER [PK, FK, NN]  → patient_decision.id
+  {field} document_version_id : INTEGER [PK, FK, NN]  → document_version.id
+  {field} linked_at : TEXT [NN]
+  {field} linked_by : INTEGER [FK, NN]  → staff.id (G01)
+}
+clinical_document --> plan_version
+decision_file_version --> document_version
+decision_file_version --> patient_decision
+decision_plan_item --> patient_decision
+decision_plan_item --> plan_item
+document_version --> clinical_document
+patient_decision --> plan_version
+plan_item --> plan_version
+plan_version --> treatment_plan
+treatment_execution --> plan_item
+@enduml
+
+@startuml d1-db-05
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF4F4
+}
+title G05  价目、应收与患者账户  ·  5张表
+entity "收费项目\nservice" as service {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} billing_unit : TEXT [NN]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "价目\nservice_price" as service_price {
+  {field} id : INTEGER [PK, NN]
+  {field} service_id : INTEGER [FK, NN]  → service.id
+  {field} unit_price_cents : INTEGER [NN]
+  {field} valid_from : TEXT [NN]
+  {field} valid_until : TEXT [NULL]
+  {field} change_reason : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} review_note : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "应收账目\nbill" as bill {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} patient_funds_id : INTEGER [FK, NN]  → patient_funds.id
+  {field} formed_at : TEXT [NN]
+  {field} period_start : TEXT [NN]
+  {field} period_end : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "应收项目\nbill_item" as bill_item {
+  {field} id : INTEGER [PK, NN]
+  {field} bill_id : INTEGER [FK, NN]  → bill.id
+  {field} treatment_execution_id : INTEGER [FK, NN]  → treatment_execution.id (G04)
+  {field} service_price_id : INTEGER [FK, NULL]  → service_price.id
+  {field} quantity : INTEGER [NN]
+  {field} unit_price_cents : INTEGER [NULL]
+  {field} priced_at : TEXT [NN]
+  {field} pricing_note : TEXT [NULL]
+  {field} pricing_status : TEXT [NN]
+  {field} priced_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "患者资金\npatient_funds" as patient_funds {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [UQ, FK, NN]  → patient.id (G01)
+  {field} opened_at : TEXT [NN]
+  {field} opened_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+bill --> patient_funds
+bill_item --> bill
+bill_item --> service_price
+service_price --> service
+@enduml
+
+@startuml d1-db-06
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EDF5FA
+}
+title G06  患者付款、调整与退款  ·  7张表
+entity "患者付款\npatient_payment" as patient_payment {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_funds_id : INTEGER [FK, NN]  → patient_funds.id (G05)
+  {field} net_cents : INTEGER [NN]
+  {field} received_cents : INTEGER [NN]
+  {field} change_cents : INTEGER [NN]
+  {field} channel : TEXT [NN]
+  {field} received_at : TEXT [NULL]
+  {field} transaction_evidence : TEXT [NN]
+  {field} external_reference : TEXT [NULL]
+  {field} verified_at : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "付款分配\npayment_allocation" as payment_allocation {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_payment_id : INTEGER [FK, NN]  → patient_payment.id
+  {field} bill_id : INTEGER [FK, NN]  → bill.id (G05)
+  {field} amount_cents : INTEGER [NN]
+  {field} effective_at : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} original_allocation_id : INTEGER [FK, NULL]  → payment_allocation.id
+  {field} fee_request_id : INTEGER [FK, NULL]  → fee_request.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "预付抵扣\nprepayment_offset" as prepayment_offset {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_payment_id : INTEGER [FK, NN]  → patient_payment.id
+  {field} bill_id : INTEGER [FK, NN]  → bill.id (G05)
+  {field} amount_cents : INTEGER [NN]
+  {field} effective_at : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} original_offset_id : INTEGER [FK, NULL]  → prepayment_offset.id
+  {field} fee_request_id : INTEGER [FK, NULL]  → fee_request.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "费用申请\nfee_request" as fee_request {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_funds_id : INTEGER [FK, NN]  → patient_funds.id (G05)
+  {field} bill_id : INTEGER [FK, NULL]  → bill.id (G05)
+  {field} patient_payment_id : INTEGER [FK, NULL]  → patient_payment.id
+  {field} reason : TEXT [NN]
+  {field} proposed_adjustment_cents : INTEGER [NN]
+  {field} proposed_refund_cents : INTEGER [NN]
+  {field} evidence : TEXT [NN]
+  {field} submitted_at : TEXT [NN]
+  {field} review_note : TEXT [NULL]
+  {field} submission_no : INTEGER [NN]
+  {field} approved_adjustment_cents : INTEGER [NULL]
+  {field} approved_refund_cents : INTEGER [NULL]
+  {field} reviewed_at : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} reviewed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "费用调整\nfee_adjustment" as fee_adjustment {
+  {field} id : INTEGER [PK, NN]
+  {field} fee_request_id : INTEGER [UQ, FK, NN]  → fee_request.id
+  {field} bill_id : INTEGER [FK, NN]  → bill.id (G05)
+  {field} reason : TEXT [NN]
+  {field} effective_at : TEXT [NN]
+  {field} approved_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "调整项目\nfee_adjustment_item" as fee_adjustment_item {
+  {field} id : INTEGER [PK, NN]
+  {field} fee_adjustment_id : INTEGER [FK, NN]  → fee_adjustment.id
+  {field} bill_item_id : INTEGER [FK, NN]  → bill_item.id (G05)
+  {field} amount_cents : INTEGER [NN]
+  {field} note : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "退款办理\npatient_refund" as patient_refund {
+  {field} id : INTEGER [PK, NN]
+  {field} fee_request_id : INTEGER [FK, NN]  → fee_request.id
+  {field} patient_payment_id : INTEGER [FK, NN]  → patient_payment.id
+  {field} patient_funds_id : INTEGER [FK, NN]  → patient_funds.id (G05)
+  {field} requested_cents : INTEGER [NN]
+  {field} actual_cents : INTEGER [NULL]
+  {field} initiated_at : TEXT [NN]
+  {field} channel : TEXT [NN]
+  {field} transaction_evidence : TEXT [NULL]
+  {field} verification_note : TEXT [NULL]
+  {field} external_reference : TEXT [NULL]
+  {field} verified_at : TEXT [NULL]
+  {field} recipient_verification : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} previous_attempt_id : INTEGER [FK, NULL]  → patient_refund.id
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+fee_adjustment --> fee_request
+fee_adjustment_item --> fee_adjustment
+fee_request --> patient_payment
+patient_refund --> fee_request
+patient_refund --> patient_payment
+payment_allocation --> fee_request
+payment_allocation --> patient_payment
+prepayment_offset --> fee_request
+prepayment_offset --> patient_payment
+@enduml
+
+@startuml d1-db-07
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EFF5ED
+}
+title G07  复诊与随访  ·  3张表
+entity "诊后要求\nfollowup_requirement" as followup_requirement {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} source_visit_id : INTEGER [FK, NULL]  → visit.id (G02)
+  {field} source_plan_version_id : INTEGER [FK, NULL]  → plan_version.id (G04)
+  {field} purpose : TEXT [NN]
+  {field} followup_type : TEXT [NN]
+  {field} target_start : TEXT [NN]
+  {field} target_end : TEXT [NN]
+  {field} requires_assessment : INTEGER [NN]
+  {field} cancellation_reason : TEXT [NULL]
+  {field} next_contact_date : TEXT [NULL]
+  {field} closed_at : TEXT [NULL]
+  {field} closure_basis : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} responsible_frontdesk_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} closed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "联系经历\ncontact_history" as contact_history {
+  {field} id : INTEGER [PK, NN]
+  {field} followup_requirement_id : INTEGER [FK, NN]  → followup_requirement.id
+  {field} appointment_id : INTEGER [FK, NULL]  → appointment.id (G02)
+  {field} method : TEXT [NN]
+  {field} contacted_at : TEXT [NN]
+  {field} result : TEXT [NN]
+  {field} next_contact_date : TEXT [NULL]
+  {field} note : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "临床评估\nclinical_assessment" as clinical_assessment {
+  {field} id : INTEGER [PK, NN]
+  {field} followup_requirement_id : INTEGER [FK, NN]  → followup_requirement.id
+  {field} visit_id : INTEGER [FK, NULL]  → visit.id (G02)
+  {field} method : TEXT [NN]
+  {field} assessed_at : TEXT [NN]
+  {field} result : TEXT [NN]
+  {field} advice : TEXT [NN]
+  {field} next_date : TEXT [NULL]
+  {field} assessed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} responsible_staff_id : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+clinical_assessment --> followup_requirement
+contact_history --> followup_requirement
+@enduml
+
+@startuml d1-db-08
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F7F0E6
+}
+title G08  材料批次与库存  ·  8张表
+entity "材料\nmaterial" as material {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} specification : TEXT [NN]
+  {field} base_unit : TEXT [NN]
+  {field} purchase_unit : TEXT [NN]
+  {field} conversion_numerator : INTEGER [NN]
+  {field} conversion_denominator : INTEGER [NN]
+  {field} quantity_scale : INTEGER [NN]
+  {field} requires_trace : INTEGER [NN]
+  {field} requires_expiry : INTEGER [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "材料批次\nmaterial_batch" as material_batch {
+  {field} id : INTEGER [PK, NN]
+  {field} material_id : INTEGER [FK, NN]  → material.id
+  {field} batch_no : TEXT [NN]
+  {field} expiry_date : TEXT [NULL]
+  {field} source_note : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "批次变更\nbatch_change" as batch_change {
+  {field} id : INTEGER [PK, NN]
+  {field} material_batch_id : INTEGER [FK, NN]  → material_batch.id
+  {field} old_status : TEXT [NN]
+  {field} new_status : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} confirmed_at : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "存放位置\nstock_location" as stock_location {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} purpose : TEXT [NN]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "批次存量\nbatch_stock" as batch_stock {
+  {field} id : INTEGER [PK, NN]
+  {field} material_batch_id : INTEGER [FK, NN]  → material_batch.id
+  {field} stock_location_id : INTEGER [FK, NN]  → stock_location.id
+  {field} quantity_scaled : INTEGER [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "库存变动\ninventory_movement" as inventory_movement {
+  {field} id : INTEGER [PK, NN]
+  {field} batch_stock_id : INTEGER [FK, NN]  → batch_stock.id
+  {field} original_movement_id : INTEGER [FK, NULL]  → inventory_movement.id
+  {field} stock_count_id : INTEGER [UQ, FK, NULL]  → stock_count.id
+  {field} purchase_receipt_item_id : INTEGER [FK, NULL]  → purchase_receipt_item.id (G09)
+  {field} movement_type : TEXT [NN]
+  {field} delta_scaled : INTEGER [NN]
+  {field} before_scaled : INTEGER [NN]
+  {field} after_scaled : INTEGER [NN]
+  {field} reason : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} purchase_issue_id : INTEGER [FK, NULL]  → purchase_issue.id (G09)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "实际用料\nmaterial_usage" as material_usage {
+  {field} id : INTEGER [PK, NN]
+  {field} inventory_movement_id : INTEGER [FK, NN]  → inventory_movement.id
+  {field} visit_id : INTEGER [FK, NN]  → visit.id (G02)
+  {field} quantity_scaled : INTEGER [NN]
+  {field} used_at : TEXT [NN]
+  {field} note : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "盘点核实\nstock_count" as stock_count {
+  {field} id : INTEGER [PK, NN]
+  {field} batch_stock_id : INTEGER [FK, NN]  → batch_stock.id
+  {field} snapshot_quantity_scaled : INTEGER [NN]
+  {field} counted_quantity_scaled : INTEGER [NN]
+  {field} reason : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} stock_revision : INTEGER [NN]
+  {field} counted_at : TEXT [NN]
+  {field} review_note : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+batch_change --> material_batch
+batch_stock --> material_batch
+batch_stock --> stock_location
+inventory_movement --> batch_stock
+inventory_movement --> stock_count
+material_batch --> material
+material_usage --> inventory_movement
+stock_count --> batch_stock
+@enduml
+
+@startuml d1-db-09
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F0ECF7
+}
+title G09  采购、验收与差异  ·  6张表
+entity "供应商\nsupplier" as supplier {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} contact_name : TEXT [NN]
+  {field} phone : TEXT [NN]
+  {field} address : TEXT [NULL]
+  {field} settlement_basis : TEXT [NN]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "采购\npurchase_order" as purchase_order {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_id : INTEGER [FK, NN]  → supplier.id
+  {field} agreed_at : TEXT [NN]
+  {field} delivery_terms : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} request_reason : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "采购项目\npurchase_order_item" as purchase_order_item {
+  {field} id : INTEGER [PK, NN]
+  {field} purchase_order_id : INTEGER [FK, NN]  → purchase_order.id
+  {field} material_id : INTEGER [FK, NN]  → material.id (G08)
+  {field} ordered_quantity_scaled : INTEGER [NN]
+  {field} unit_price_cents : INTEGER [NN]
+  {field} purchase_unit : TEXT [NN]
+  {field} conversion_numerator : INTEGER [NN]
+  {field} conversion_denominator : INTEGER [NN]
+  {field} quantity_scale : INTEGER [NN]
+  {field} sequence_no : INTEGER [NN]
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "验收\npurchase_receipt" as purchase_receipt {
+  {field} id : INTEGER [PK, NN]
+  {field} purchase_order_id : INTEGER [FK, NN]  → purchase_order.id
+  {field} arrived_at : TEXT [NN]
+  {field} delivery_evidence : TEXT [NN]
+  {field} accepted_at : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "验收项目\npurchase_receipt_item" as purchase_receipt_item {
+  {field} id : INTEGER [PK, NN]
+  {field} purchase_receipt_id : INTEGER [FK, NN]  → purchase_receipt.id
+  {field} purchase_order_item_id : INTEGER [FK, NN]  → purchase_order_item.id
+  {field} material_batch_id : INTEGER [FK, NULL]  → material_batch.id (G08)
+  {field} arrived_quantity_scaled : INTEGER [NN]
+  {field} accepted_quantity_scaled : INTEGER [NN]
+  {field} rejected_quantity_scaled : INTEGER [NN]
+  {field} pending_quantity_scaled : INTEGER [NN]
+  {field} accepted_amount_cents : INTEGER [NULL]
+  {field} inspection_note : TEXT [NN]
+  {field} stock_location_id : INTEGER [FK, NULL]  → stock_location.id (G08)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "采购差异\npurchase_issue" as purchase_issue {
+  {field} id : INTEGER [PK, NN]
+  {field} purchase_order_item_id : INTEGER [FK, NN]  → purchase_order_item.id
+  {field} purchase_receipt_item_id : INTEGER [FK, NULL]  → purchase_receipt_item.id
+  {field} quantity_scaled : INTEGER [NN]
+  {field} reason : TEXT [NN]
+  {field} resolution : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} issue_kind : TEXT [NN]
+  {field} adjustment_cents : INTEGER [NN]
+  {field} resolved_at : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+purchase_issue --> purchase_order_item
+purchase_issue --> purchase_receipt_item
+purchase_order --> supplier
+purchase_order_item --> purchase_order
+purchase_receipt --> purchase_order
+purchase_receipt_item --> purchase_order_item
+purchase_receipt_item --> purchase_receipt
+@enduml
+
+@startuml d1-db-10
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF4F4
+}
+title G10  供应商资金结算  ·  4张表
+entity "供应商资金\nsupplier_funds" as supplier_funds {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_id : INTEGER [UQ, FK, NN]  → supplier.id (G09)
+  {field} opened_at : TEXT [NN]
+  {field} opened_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "供货付款\nsupplier_payment" as supplier_payment {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_funds_id : INTEGER [FK, NN]  → supplier_funds.id
+  {field} requested_cents : INTEGER [NN]
+  {field} actual_cents : INTEGER [NULL]
+  {field} channel : TEXT [NN]
+  {field} initiated_at : TEXT [NN]
+  {field} transaction_evidence : TEXT [NULL]
+  {field} external_reference : TEXT [NULL]
+  {field} verified_at : TEXT [NULL]
+  {field} authorization_basis : TEXT [NN]
+  {field} authorized_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} previous_attempt_id : INTEGER [FK, NULL]  → supplier_payment.id
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "供货分配\nsupplier_allocation" as supplier_allocation {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_payment_id : INTEGER [FK, NN]  → supplier_payment.id
+  {field} purchase_order_id : INTEGER [FK, NULL]  → purchase_order.id (G09)
+  {field} purchase_receipt_id : INTEGER [FK, NULL]  → purchase_receipt.id (G09)
+  {field} amount_cents : INTEGER [NN]
+  {field} effective_at : TEXT [NULL]
+  {field} allocation_state : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} original_allocation_id : INTEGER [FK, NULL]  → supplier_allocation.id
+  {field} purchase_issue_id : INTEGER [FK, NULL]  → purchase_issue.id (G09)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "供货退款\nsupplier_refund" as supplier_refund {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_payment_id : INTEGER [FK, NN]  → supplier_payment.id
+  {field} purchase_issue_id : INTEGER [FK, NN]  → purchase_issue.id (G09)
+  {field} supplier_funds_id : INTEGER [FK, NN]  → supplier_funds.id
+  {field} received_cents : INTEGER [NN]
+  {field} channel : TEXT [NN]
+  {field} received_at : TEXT [NN]
+  {field} transaction_evidence : TEXT [NN]
+  {field} external_reference : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+supplier_allocation --> supplier_payment
+supplier_payment --> supplier_funds
+supplier_refund --> supplier_funds
+supplier_refund --> supplier_payment
+@enduml
+
+@startuml d1-db-11
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EDF5FA
+}
+title G11  器械处理与使用  ·  6张表
+entity "器械包\ninstrument_pack" as instrument_pack {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} composition_note : TEXT [NN]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "处理设备\nprocessing_equipment" as processing_equipment {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} available_from : TEXT [NN]
+  {field} available_until : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "器械处理\ninstrument_processing" as instrument_processing {
+  {field} id : INTEGER [PK, NN]
+  {field} processing_equipment_id : INTEGER [FK, NN]  → processing_equipment.id
+  {field} previous_processing_id : INTEGER [FK, NULL]  → instrument_processing.id
+  {field} preparation_note : TEXT [NN]
+  {field} started_at : TEXT [NN]
+  {field} ended_at : TEXT [NULL]
+  {field} released_at : TEXT [NULL]
+  {field} release_basis : TEXT [NULL]
+  {field} exception_reason : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} released_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} isolated_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "器械包处理\ninstrument_pack_cycle" as instrument_pack_cycle {
+  {field} id : INTEGER [PK, NN]
+  {field} instrument_processing_id : INTEGER [FK, NN]  → instrument_processing.id
+  {field} instrument_pack_id : INTEGER [FK, NN]  → instrument_pack.id
+  {field} packaging_check : TEXT [NN]
+  {field} expires_at : TEXT [NN]
+  {field} checked_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "处理监测\nprocessing_monitor" as processing_monitor {
+  {field} id : INTEGER [PK, NN]
+  {field} instrument_processing_id : INTEGER [FK, NN]  → instrument_processing.id
+  {field} monitor_item : TEXT [NN]
+  {field} result : TEXT [NN]
+  {field} obtained_at : TEXT [NULL]
+  {field} evidence : TEXT [NN]
+  {field} recorded_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "器械使用\ninstrument_use" as instrument_use {
+  {field} id : INTEGER [PK, NN]
+  {field} visit_id : INTEGER [FK, NN]  → visit.id (G02)
+  {field} instrument_pack_cycle_id : INTEGER [FK, NN]  → instrument_pack_cycle.id
+  {field} issued_at : TEXT [NN]
+  {field} used_at : TEXT [NULL]
+  {field} physical_check : TEXT [NN]
+  {field} exception_note : TEXT [NULL]
+  {field} use_status : TEXT [NN]
+  {field} returned_at : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} used_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+instrument_pack_cycle --> instrument_pack
+instrument_pack_cycle --> instrument_processing
+instrument_processing --> processing_equipment
+instrument_use --> instrument_pack_cycle
+processing_monitor --> instrument_processing
+@enduml
+
+@startuml d1-db-12
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EFF5ED
+}
+title G12  收支核对与差异跟进  ·  3张表
+entity "收支核对\ncash_reconciliation" as cash_reconciliation {
+  {field} id : INTEGER [PK, NN]
+  {field} business_date : TEXT [NN]
+  {field} channel : TEXT [NN]
+  {field} cutoff_at : TEXT [NN]
+  {field} actual_cents : INTEGER [NN]
+  {field} opening_cash_cents : INTEGER [NULL]
+  {field} cash_transfer_evidence : TEXT [NULL]
+  {field} cash_transfer_cents : INTEGER [NN]
+  {field} reconciliation_basis : TEXT [NN]
+  {field} source_digest : TEXT [NN]
+  {field} expected_cents : INTEGER [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "核对项目\nreconciliation_item" as reconciliation_item {
+  {field} id : INTEGER [PK, NN]
+  {field} cash_reconciliation_id : INTEGER [FK, NN]  → cash_reconciliation.id
+  {field} patient_payment_id : INTEGER [FK, NULL]  → patient_payment.id (G06)
+  {field} patient_refund_id : INTEGER [FK, NULL]  → patient_refund.id (G06)
+  {field} supplier_payment_id : INTEGER [FK, NULL]  → supplier_payment.id (G10)
+  {field} supplier_refund_id : INTEGER [FK, NULL]  → supplier_refund.id (G10)
+  {field} source_type : TEXT [NN]
+  {field} included_cents : INTEGER [NN]
+  {field} source_at : TEXT [NN]
+  {field} source_revision : INTEGER [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "差异跟进\nissue_followup" as issue_followup {
+  {field} id : INTEGER [PK, NN]
+  {field} cash_reconciliation_id : INTEGER [FK, NULL]  → cash_reconciliation.id
+  {field} instrument_processing_id : INTEGER [FK, NULL]  → instrument_processing.id (G11)
+  {field} assigned_to : INTEGER [FK, NN]  → staff.id (G01)
+  {field} reason : TEXT [NN]
+  {field} due_date : TEXT [NN]
+  {field} action_note : TEXT [NN]
+  {field} completed_at : TEXT [NULL]
+  {field} status : TEXT [NN]
+  {field} result_basis : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} completed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+issue_followup --> cash_reconciliation
+reconciliation_item --> cash_reconciliation
+@enduml
+
+@startuml d1-db-13
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F7F0E6
+}
+title G13  身份、岗位与权限  ·  8张表
+entity "职员账号\nuser_account" as user_account {
+  {field} id : INTEGER [PK, NN]
+  {field} staff_id : INTEGER [UQ, FK, NN]  → staff.id (G01)
+  {field} login_name : TEXT [UQ, NN]
+  {field} password_hash : TEXT [NN]
+  {field} status : TEXT [NN]
+  {field} auth_version : INTEGER [NN]
+  {field} password_changed_at : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} disabled_at : TEXT [NULL]
+  {field} disabled_reason : TEXT [NULL]
+  {field} revision : INTEGER [NN]
+}
+entity "访问角色\naccess_role" as access_role {
+  {field} id : INTEGER [PK, NN]
+  {field} code : TEXT [UQ, NN]
+  {field} name : TEXT [NN]
+  {field} description : TEXT [NN]
+  {field} created_at : TEXT [NN]
+}
+entity "操作权限\naccess_permission" as access_permission {
+  {field} id : INTEGER [PK, NN]
+  {field} code : TEXT [UQ, NN]
+  {field} usecase_no : TEXT [NULL]
+  {field} name : TEXT [NN]
+  {field} operation_kind : TEXT [NN]
+  {field} object_rule : TEXT [NN]
+  {field} config_version : INTEGER [NN]
+}
+entity "职员岗位资格\nstaff_role_qualification" as staff_role_qualification {
+  {field} id : INTEGER [PK, NN]
+  {field} staff_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} role_id : INTEGER [FK, NN]  → access_role.id
+  {field} valid_from : TEXT [NN]
+  {field} valid_until : TEXT [NULL]
+  {field} verified_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verification_basis : TEXT [NN]
+  {field} revoked_at : TEXT [NULL]
+  {field} revoked_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} revocation_reason : TEXT [NULL]
+  {field} created_at : TEXT [NN]
+}
+entity "账号角色授权\naccount_role" as account_role {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NN]  → user_account.id
+  {field} role_id : INTEGER [FK, NN]  → access_role.id
+  {field} qualification_id : INTEGER [FK, NN]  → staff_role_qualification.id
+  {field} granted_by : INTEGER [FK, NN]  → user_account.id
+  {field} granted_at : TEXT [NN]
+  {field} valid_until : TEXT [NULL]
+  {field} grant_reason : TEXT [NN]
+  {field} revoked_by : INTEGER [FK, NULL]  → user_account.id
+  {field} revoked_at : TEXT [NULL]
+  {field} revocation_reason : TEXT [NULL]
+}
+entity "角色操作授权\nrole_permission" as role_permission {
+  {field} id : INTEGER [PK, NN]
+  {field} role_id : INTEGER [FK, NN]  → access_role.id
+  {field} permission_id : INTEGER [FK, NN]  → access_permission.id
+  {field} config_version : INTEGER [NN]
+  {field} created_at : TEXT [NN]
+}
+entity "登录会话\nlogin_session" as login_session {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NN]  → user_account.id
+  {field} token_hash : TEXT [UQ, NN]
+  {field} csrf_hash : TEXT [NN]
+  {field} auth_version : INTEGER [NN]
+  {field} runtime_epoch : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} last_seen_at : TEXT [NN]
+  {field} expires_at : TEXT [NN]
+  {field} revoked_at : TEXT [NULL]
+  {field} revocation_reason : TEXT [NULL]
+}
+entity "身份验证事件\nauthentication_event" as authentication_event {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NULL]  → user_account.id
+  {field} session_id : INTEGER [FK, NULL]  → login_session.id
+  {field} event_type : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} login_digest : TEXT [NN]
+  {field} source_digest : TEXT [NN]
+  {field} reason_code : TEXT [NN]
+  {field} correlation_id : TEXT [NN]
+}
+account_role --> access_role
+account_role --> staff_role_qualification
+account_role --> user_account
+authentication_event --> login_session
+authentication_event --> user_account
+login_session --> user_account
+role_permission --> access_permission
+role_permission --> access_role
+staff_role_qualification --> access_role
+@enduml
+
+@startuml d1-db-14
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F0ECF7
+}
+title G14  提交控制与审计  ·  3张表
+entity "操作提交\nrequest_submission" as request_submission {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NN]  → user_account.id (G13)
+  {field} permission_id : INTEGER [FK, NN]  → access_permission.id (G13)
+  {field} request_key : TEXT [NN]
+  {field} payload_digest : TEXT [NN]
+  {field} command_version : INTEGER [NN]
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} committed_at : TEXT [NULL]
+  {field} result_kind : TEXT [NULL]
+  {field} result_key : TEXT [NULL]
+  {field} result_revision : INTEGER [NULL]
+  {field} result_code : TEXT [NULL]
+  {field} correlation_id : TEXT [NN]
+}
+entity "操作审计\noperation_audit" as operation_audit {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NULL]  → user_account.id (G13)
+  {field} staff_id : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} session_id : INTEGER [FK, NULL]  → login_session.id (G13)
+  {field} submission_id : INTEGER [FK, NULL]  → request_submission.id
+  {field} permission_id : INTEGER [FK, NULL]  → access_permission.id (G13)
+  {field} actor_kind : TEXT [NN]
+  {field} event_type : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} object_kind : TEXT [NN]
+  {field} object_key : TEXT [NN]
+  {field} before_revision : INTEGER [NULL]
+  {field} after_revision : INTEGER [NULL]
+  {field} reason : TEXT [NN]
+  {field} outcome_code : TEXT [NN]
+  {field} correlation_id : TEXT [NN]
+  {field} authority_snapshot : TEXT [NN]
+}
+entity "审计字段变化\naudit_change" as audit_change {
+  {field} id : INTEGER [PK, NN]
+  {field} audit_id : INTEGER [FK, NN]  → operation_audit.id
+  {field} field_name : TEXT [NN]
+  {field} value_type : TEXT [NN]
+  {field} before_value : TEXT [NULL]
+  {field} after_value : TEXT [NULL]
+  {field} sequence_no : INTEGER [NN]
+}
+audit_change --> operation_audit
+operation_audit --> request_submission
+@enduml
+
+@startuml d1-db-15
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF4F4
+}
+title G15  备份与恢复验证  ·  5张表
+entity "备份任务\nbackup_run" as backup_run {
+  {field} id : INTEGER [PK, NN]
+  {field} run_no : TEXT [UQ, NN]
+  {field} trigger_kind : TEXT [NN]
+  {field} requested_by : INTEGER [FK, NULL]  → user_account.id (G13)
+  {field} responsible_staff_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} started_at : TEXT [NULL]
+  {field} snapshot_at : TEXT [NULL]
+  {field} finished_at : TEXT [NULL]
+  {field} schema_version : INTEGER [NULL]
+  {field} application_version : TEXT [NULL]
+  {field} manifest_key : TEXT [NULL]
+  {field} manifest_sha256 : TEXT [NULL]
+  {field} error_code : TEXT [NULL]
+  {field} created_at : TEXT [NN]
+}
+entity "备份文件清单\nbackup_artifact" as backup_artifact {
+  {field} id : INTEGER [PK, NN]
+  {field} backup_id : INTEGER [FK, NN]  → backup_run.id
+  {field} artifact_kind : TEXT [NN]
+  {field} document_version_id : INTEGER [FK, NULL]  → document_version.id (G04)
+  {field} relative_path : TEXT [NN]
+  {field} size_bytes : INTEGER [NN]
+  {field} sha256 : TEXT [NN]
+  {field} verification_status : TEXT [NN]
+  {field} verified_at : TEXT [NULL]
+  {field} result_note : TEXT [NULL]
+}
+entity "备份副本\nbackup_copy" as backup_copy {
+  {field} id : INTEGER [PK, NN]
+  {field} backup_id : INTEGER [FK, NN]  → backup_run.id
+  {field} location_kind : TEXT [NN]
+  {field} storage_key : TEXT [NN]
+  {field} manifest_sha256 : TEXT [NN]
+  {field} status : TEXT [NN]
+  {field} started_at : TEXT [NN]
+  {field} verified_at : TEXT [NULL]
+  {field} removed_at : TEXT [NULL]
+  {field} removal_reason : TEXT [NULL]
+  {field} verified_by : INTEGER [FK, NULL]  → user_account.id (G13)
+  {field} error_code : TEXT [NULL]
+}
+entity "恢复验证\nrestore_verification" as restore_verification {
+  {field} id : INTEGER [PK, NN]
+  {field} backup_id : INTEGER [FK, NN]  → backup_run.id
+  {field} copy_id : INTEGER [FK, NN]  → backup_copy.id
+  {field} verified_by : INTEGER [FK, NN]  → user_account.id (G13)
+  {field} trigger_kind : TEXT [NN]
+  {field} status : TEXT [NN]
+  {field} isolated_path : TEXT [NN]
+  {field} started_at : TEXT [NULL]
+  {field} finished_at : TEXT [NULL]
+  {field} source_snapshot_at : TEXT [NN]
+  {field} recovery_target_at : TEXT [NN]
+  {field} application_version : TEXT [NN]
+  {field} result_note : TEXT [NULL]
+}
+entity "恢复检查明细\nrestore_check" as restore_check {
+  {field} id : INTEGER [PK, NN]
+  {field} restore_id : INTEGER [FK, NN]  → restore_verification.id
+  {field} check_code : TEXT [NN]
+  {field} status : TEXT [NN]
+  {field} checked_at : TEXT [NULL]
+  {field} expected_value : TEXT [NN]
+  {field} actual_value : TEXT [NULL]
+  {field} evidence_key : TEXT [NULL]
+  {field} failure_note : TEXT [NULL]
+}
+backup_artifact --> backup_run
+backup_copy --> backup_run
+restore_check --> restore_verification
+restore_verification --> backup_copy
+restore_verification --> backup_run
+@enduml

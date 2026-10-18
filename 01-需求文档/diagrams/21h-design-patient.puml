@@ -1,0 +1,35 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+top to bottom direction
+class "患者" as E0 <<entity>> {
+- id : 标识
+- name : 文本
+- phone : 文本
+- revision : 版本
+--
++ 匹配候选(条件) : 患者集合
++ 维护资料(命令, 版本) : 资料变更集
+}
+class "患者资料变更" as E1 <<entity>> {
+- patient_id : 标识
+- old_revision : 版本
+- reason : 文本
+--
++ 记录原值(旧资料, 原因, 经办人) : 变更
+}
+E0 "1" *-- "0..*" E1
+@enduml

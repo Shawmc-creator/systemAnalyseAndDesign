@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+hide footbox
+skinparam maxMessageSize 180
+participant ":诊疗确认" as C
+participant ":诊疗明细" as I
+participant ":方案项目" as Q
+participant ":价目" as P
+autonumber
+loop 拟生效完整集合中的每条明细
+ C -> I : 核验及计价(实际输入, 原明细, 方案, 价目)
+ activate I
+ I -> I : 检查有效项目、牙位和正整数数量
+ I -> I : 到诊时刻 <= 完成时刻 <= 提交时刻
+ alt 关联本次方案项目
+  I -> Q : 核验实际(就诊, 牙位, 拟生效完整集合)
+  Q --> I : 同意且不超过预计量，或拒绝
+ else 方案外项目
+  I -> I : 核对原因及患者确认事实
+ end
+ alt 原当前明细且收费项目未换
+  I -> I : 继承原计价时点和已有价目
+ else 新增或更换收费项目
+  I -> I : 计价时点取本次确认时刻
+ end
+ opt 尚无价目引用
+  I -> P : 判断适用(已确定的计价时点)
+  P --> I : 唯一适用价目或仍缺价
+ end
+ I --> C : 合法明细及计价依据，或拒绝原因
+ deactivate I
+end
+C -> C : 合并同项目、牙位及全部依据一致的重复行
+C -> C : 以完整集合复核方案预计量
+note over C,P
+ 任一业务校验失败，外层工作单元回滚。
+ 缺价保留明细并阻止结算；零价具有明确价目。
+end note
+@enduml

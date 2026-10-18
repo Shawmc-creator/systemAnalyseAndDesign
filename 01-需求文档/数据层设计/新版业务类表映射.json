@@ -1,0 +1,3760 @@
+{
+  "version": "2026-10-17-D1-mapping",
+  "stage": "业务实体与关联映射；尚非完整物理结构或迁移脚本",
+  "entity_tables": [
+    {
+      "key": "Patient",
+      "name": "患者",
+      "table": "patient",
+      "source_uc": "01—03、08、09",
+      "reason": "身份与纵向诊疗、资金归属的共同主体。",
+      "attributes": [
+        "姓名",
+        "出生日期",
+        "联系电话",
+        "电话归属",
+        "联系地址",
+        "联系偏好"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Staff",
+      "name": "职员",
+      "table": "staff",
+      "source_uc": "01—32",
+      "reason": "接诊、经办、确认和签署的岗位承担者；兼岗不复制人员。",
+      "attributes": [
+        "姓名",
+        "在岗起止"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "IdentityChange",
+      "name": "患者资料变更",
+      "table": "patient_change",
+      "source_uc": "08",
+      "reason": "保留身份与联系方式更正经历。",
+      "attributes": [
+        "原值",
+        "新值",
+        "原因",
+        "发生时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Proxy",
+      "name": "代理关系",
+      "table": "patient_proxy",
+      "source_uc": "08、22、23",
+      "reason": "记录监护及授权办理的依据。",
+      "attributes": [
+        "代理人姓名",
+        "关系",
+        "授权范围",
+        "有效起止",
+        "核实依据"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Handover",
+      "name": "接诊交接",
+      "table": "clinical_handover",
+      "source_uc": "09—14、21—23",
+      "reason": "跨牙医访问与办理须有具体交接依据。",
+      "attributes": [
+        "授权范围",
+        "有效起止",
+        "交接原因"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Chair",
+      "name": "诊椅",
+      "table": "dental_chair",
+      "source_uc": "01、03、15、16",
+      "reason": "与牙医共同构成接诊资源。",
+      "attributes": [
+        "名称",
+        "可用起止"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Schedule",
+      "name": "日期安排",
+      "table": "dated_schedule",
+      "source_uc": "01、03、15、16",
+      "reason": "明确日期资源，不把每周模板当作实际排班。",
+      "attributes": [
+        "营业日期",
+        "起止时间",
+        "确认时间",
+        "停诊原因"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "ScheduleChange",
+      "name": "安排变更",
+      "table": "schedule_change",
+      "source_uc": "15",
+      "reason": "保存停诊、恢复与原安排。",
+      "attributes": [
+        "原日期时段",
+        "新日期时段",
+        "原因",
+        "发生时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Occupancy",
+      "name": "接诊占用",
+      "table": "resource_occupancy",
+      "source_uc": "01、03、15、16",
+      "reason": "预约和现场到诊共同占用日期资源，防止跨入口冲突。",
+      "attributes": [
+        "起止时间",
+        "释放时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Appointment",
+      "name": "预约",
+      "table": "appointment",
+      "source_uc": "01—03、13、15",
+      "reason": "预约可以取消、改约、未到或关联到诊。",
+      "attributes": [
+        "计划起止",
+        "就诊原因",
+        "到期时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "AppointmentChange",
+      "name": "预约变更",
+      "table": "appointment_change",
+      "source_uc": "01、15",
+      "reason": "保留改约和取消来源。",
+      "attributes": [
+        "原安排",
+        "新安排",
+        "原因",
+        "发生时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Visit",
+      "name": "就诊",
+      "table": "visit",
+      "source_uc": "03、04、09—14",
+      "reason": "独立表示一次接诊；预约来源可空。",
+      "attributes": [
+        "到诊时间",
+        "接诊开始",
+        "诊疗结束",
+        "到诊来源"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "HealthVersion",
+      "name": "健康版本",
+      "table": "health_version",
+      "source_uc": "09、10、21",
+      "reason": "长期健康资料的不可反改版本。",
+      "attributes": [
+        "形成时间",
+        "变更原因"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "HealthItem",
+      "name": "健康条目",
+      "table": "health_item",
+      "source_uc": "21",
+      "reason": "病史、过敏和用药可有多项，未知与否认分开。",
+      "attributes": [
+        "类别",
+        "内容",
+        "确认程度",
+        "报告时间",
+        "来源"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Review",
+      "name": "健康复核",
+      "table": "health_review",
+      "source_uc": "10、21",
+      "reason": "本次就诊保留当时采用的健康版本。",
+      "attributes": [
+        "复核时间",
+        "复核结论"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Record",
+      "name": "病历",
+      "table": "clinical_record",
+      "source_uc": "10、11",
+      "reason": "当次临床正文与签署责任。",
+      "attributes": [
+        "主诉",
+        "诊断",
+        "处理意见",
+        "签署时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Finding",
+      "name": "检查所见",
+      "table": "clinical_finding",
+      "source_uc": "10",
+      "reason": "一次检查有多项发现。",
+      "attributes": [
+        "牙位",
+        "牙面",
+        "所见内容"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Addendum",
+      "name": "病历补充",
+      "table": "record_addendum",
+      "source_uc": "11",
+      "reason": "签署后独立追加，不覆盖原文。",
+      "attributes": [
+        "内容",
+        "原因",
+        "补充时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Document",
+      "name": "诊疗文件",
+      "table": "clinical_document",
+      "source_uc": "09、22、23",
+      "reason": "影像或文书的业务归属及版本入口。",
+      "attributes": [
+        "类型",
+        "来源",
+        "归属说明"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "FileVersion",
+      "name": "文件版本",
+      "table": "document_version",
+      "source_uc": "23",
+      "reason": "保存每版原件、读取校验与确认依据。",
+      "attributes": [
+        "原文件名",
+        "大小",
+        "校验值",
+        "采集时间",
+        "确认时间",
+        "变更原因"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Plan",
+      "name": "治疗方案",
+      "table": "treatment_plan",
+      "source_uc": "04、12、22",
+      "reason": "属于患者，可贯穿多次就诊。",
+      "attributes": [
+        "目标",
+        "建立时间",
+        "终止原因"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "PlanVersion",
+      "name": "方案版本",
+      "table": "plan_version",
+      "source_uc": "22",
+      "reason": "每次实质调整独立形成确认依据。",
+      "attributes": [
+        "诊断依据说明",
+        "说明时间",
+        "变更原因",
+        "预计安排"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "PlanItem",
+      "name": "方案项目",
+      "table": "plan_item",
+      "source_uc": "04、22",
+      "reason": "把待执行计划与已完成事实分开。",
+      "attributes": [
+        "项目内容",
+        "牙位",
+        "牙面",
+        "计划数量",
+        "实施顺序",
+        "预计费用"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Decision",
+      "name": "患者决定",
+      "table": "patient_decision",
+      "source_uc": "22、23",
+      "reason": "同意、暂缓、拒绝、撤回均对应具体版本和项目范围。",
+      "attributes": [
+        "决定内容",
+        "决定时间",
+        "确认范围",
+        "说明依据"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Execution",
+      "name": "诊疗执行",
+      "table": "treatment_execution",
+      "source_uc": "04",
+      "reason": "每项实际执行属于一次就诊，可引用当时方案项目。",
+      "attributes": [
+        "牙位",
+        "牙面",
+        "完成数量",
+        "操作经过",
+        "完成时间",
+        "更正原因"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Service",
+      "name": "收费项目",
+      "table": "service",
+      "source_uc": "04—06",
+      "reason": "实际项目与计价目录的公共依据。",
+      "attributes": [
+        "名称",
+        "计价单位"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Price",
+      "name": "价目",
+      "table": "service_price",
+      "source_uc": "04、05",
+      "reason": "经确认版本用于新计价，历史快照保留。",
+      "attributes": [
+        "单价",
+        "生效起止",
+        "变更原因",
+        "确认时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Bill",
+      "name": "应收账目",
+      "table": "bill",
+      "source_uc": "04、06、07、24—26",
+      "reason": "对应需求中的账单，整体承担应收及调整后的余额判断。",
+      "attributes": [
+        "形成时间",
+        "计费期间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Charge",
+      "name": "应收项目",
+      "table": "bill_item",
+      "source_uc": "04、06",
+      "reason": "账目明细追溯实际执行与价目；待核价不等于零元。",
+      "attributes": [
+        "数量",
+        "单价快照",
+        "计费时点",
+        "核价说明"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Funds",
+      "name": "患者资金",
+      "table": "patient_funds",
+      "source_uc": "06、07、24—26",
+      "reason": "统筹同一患者付款、分配、抵扣和退款占用，避免重复使用余额。",
+      "attributes": [
+        "开户时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Payment",
+      "name": "患者付款",
+      "table": "patient_payment",
+      "source_uc": "07",
+      "reason": "一笔已核实实际到账，可分配多个账目。",
+      "attributes": [
+        "净额",
+        "实收",
+        "找零",
+        "渠道",
+        "到账时间",
+        "交易依据"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Allocation",
+      "name": "付款分配",
+      "table": "payment_allocation",
+      "source_uc": "07、25",
+      "reason": "把原付款分配给账目；更正追加经历，不复写原金额。",
+      "attributes": [
+        "分配金额",
+        "生效时间",
+        "变更原因"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Offset",
+      "name": "预付抵扣",
+      "table": "prepayment_offset",
+      "source_uc": "07",
+      "reason": "从同一患者的原付款未分配余额抵扣账目。",
+      "attributes": [
+        "抵扣金额",
+        "抵扣时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Request",
+      "name": "费用申请",
+      "table": "fee_request",
+      "source_uc": "24、25",
+      "reason": "把申请、审核和生效分开，保留原版本。",
+      "attributes": [
+        "处理理由",
+        "拟调整额",
+        "拟退额",
+        "核实依据",
+        "提交时间",
+        "审核意见"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Adjustment",
+      "name": "费用调整",
+      "table": "fee_adjustment",
+      "source_uc": "25",
+      "reason": "保留原账目和批准依据的调整整体。",
+      "attributes": [
+        "调整原因",
+        "生效时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "AdjustmentItem",
+      "name": "调整项目",
+      "table": "fee_adjustment_item",
+      "source_uc": "25",
+      "reason": "逐项指向原应收项目，支持增加或减少应收。",
+      "attributes": [
+        "调整金额",
+        "说明"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Refund",
+      "name": "退款办理",
+      "table": "patient_refund",
+      "source_uc": "26",
+      "reason": "办理前占用额度，未知结果不释放，确认后只扣一次。",
+      "attributes": [
+        "拟退额",
+        "实际额",
+        "办理时间",
+        "渠道",
+        "交易凭据",
+        "核实说明"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Followup",
+      "name": "诊后要求",
+      "table": "followup_requirement",
+      "source_uc": "12—14",
+      "reason": "来源于就诊或方案，联系与临床完成分开。",
+      "attributes": [
+        "目的",
+        "类型",
+        "目标日期",
+        "是否需评估",
+        "撤销原因"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Contact",
+      "name": "联系经历",
+      "table": "contact_history",
+      "source_uc": "13",
+      "reason": "每次尝试均保留。",
+      "attributes": [
+        "方式",
+        "联系时间",
+        "结果",
+        "下次日期"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Assessment",
+      "name": "临床评估",
+      "table": "clinical_assessment",
+      "source_uc": "14",
+      "reason": "可多次评估，继续跟进或明确完成。",
+      "attributes": [
+        "方式",
+        "评估时间",
+        "结果",
+        "处理意见"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Material",
+      "name": "材料",
+      "table": "material",
+      "source_uc": "17、18、27、32",
+      "reason": "材料目录及统一计量依据。",
+      "attributes": [
+        "名称",
+        "规格",
+        "基本单位",
+        "换算规则",
+        "追溯要求"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Batch",
+      "name": "材料批次",
+      "table": "material_batch",
+      "source_uc": "17、18、28、32",
+      "reason": "同材料不同来源和效期独立追溯。",
+      "attributes": [
+        "批号",
+        "效期",
+        "来源说明"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "BatchChange",
+      "name": "批次变更",
+      "table": "batch_change",
+      "source_uc": "32",
+      "reason": "隔离与恢复均保留确认经历。",
+      "attributes": [
+        "原可用性",
+        "新可用性",
+        "原因",
+        "确认时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Location",
+      "name": "存放位置",
+      "table": "stock_location",
+      "source_uc": "17、18、28",
+      "reason": "同批次可分处存放，来源于库存字段。",
+      "attributes": [
+        "名称",
+        "用途"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Stock",
+      "name": "批次存量",
+      "table": "batch_stock",
+      "source_uc": "17、18、28",
+      "reason": "一批次一位置的余额，负责并发非负约束。",
+      "attributes": [
+        "基本单位数量"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Movement",
+      "name": "库存变动",
+      "table": "inventory_movement",
+      "source_uc": "18、28",
+      "reason": "来源有据的收发与更正经历。",
+      "attributes": [
+        "类型",
+        "数量",
+        "前后数量",
+        "原因",
+        "发生时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Usage",
+      "name": "实际用料",
+      "table": "material_usage",
+      "source_uc": "18",
+      "reason": "领用与实际消耗分开，追溯到就诊与原领用。",
+      "attributes": [
+        "使用数量",
+        "使用时间",
+        "说明"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Count",
+      "name": "盘点核实",
+      "table": "stock_count",
+      "source_uc": "18",
+      "reason": "确认差异前不改变库存，保留快照与处理依据。",
+      "attributes": [
+        "账面快照",
+        "实点数量",
+        "原因",
+        "确认时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Supplier",
+      "name": "供应商",
+      "table": "supplier",
+      "source_uc": "27、29",
+      "reason": "采购及资金对手方。",
+      "attributes": [
+        "名称",
+        "联系资料",
+        "结算依据"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Purchase",
+      "name": "采购",
+      "table": "purchase_order",
+      "source_uc": "27",
+      "reason": "采购约定统筹分批到货和剩余安排。",
+      "attributes": [
+        "约定时间",
+        "交付条件",
+        "确认时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "PurchaseItem",
+      "name": "采购项目",
+      "table": "purchase_order_item",
+      "source_uc": "27、28",
+      "reason": "按项目分别累计交付与差异。",
+      "attributes": [
+        "约定数量",
+        "约定单价",
+        "计量单位"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Receipt",
+      "name": "验收",
+      "table": "purchase_receipt",
+      "source_uc": "28",
+      "reason": "一次实际到货整体。",
+      "attributes": [
+        "到货时间",
+        "随货依据",
+        "验收时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "ReceiptItem",
+      "name": "验收项目",
+      "table": "purchase_receipt_item",
+      "source_uc": "28",
+      "reason": "分批和分项验收，合格量才形成库存来源。",
+      "attributes": [
+        "到货量",
+        "合格量",
+        "拒收量",
+        "待检量"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "SupplyIssue",
+      "name": "采购差异",
+      "table": "purchase_issue",
+      "source_uc": "28、29",
+      "reason": "未交付、拒收、待补及退换分别处理。",
+      "attributes": [
+        "差异数量",
+        "原因",
+        "约定处理",
+        "确认时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "SupplierFunds",
+      "name": "供应商资金",
+      "table": "supplier_funds",
+      "source_uc": "29",
+      "reason": "统筹采购预付、验收结算、付款占用及退回款。",
+      "attributes": [
+        "建立时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "SupplyPayment",
+      "name": "供货付款",
+      "table": "supplier_payment",
+      "source_uc": "29",
+      "reason": "实际支出及办理结果明确，未知结果不重付。",
+      "attributes": [
+        "拟付额",
+        "实付额",
+        "渠道",
+        "办理时间",
+        "凭据"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "SupplyAllocation",
+      "name": "供货分配",
+      "table": "supplier_allocation",
+      "source_uc": "29",
+      "reason": "把同供应商付款用于采购预付或验收结算，抵扣不二次付款。",
+      "attributes": [
+        "分配金额",
+        "生效时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "SupplyRefund",
+      "name": "供货退款",
+      "table": "supplier_refund",
+      "source_uc": "29",
+      "reason": "原付款与确认退换形成实际退回款依据。",
+      "attributes": [
+        "实收额",
+        "渠道",
+        "到账时间",
+        "凭据"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Pack",
+      "name": "器械包",
+      "table": "instrument_pack",
+      "source_uc": "30、31",
+      "reason": "跨多次处理和使用保留同一物理对象。",
+      "attributes": [
+        "名称",
+        "组成说明"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Equipment",
+      "name": "处理设备",
+      "table": "processing_equipment",
+      "source_uc": "30",
+      "reason": "处理批次的设备来源，不增加自动控制接口。",
+      "attributes": [
+        "名称",
+        "可用起止"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Process",
+      "name": "器械处理",
+      "table": "instrument_processing",
+      "source_uc": "30",
+      "reason": "本次处理及监测、放行共同归属。",
+      "attributes": [
+        "回收准备情况",
+        "开始时间",
+        "结束时间",
+        "放行时间",
+        "放行依据",
+        "异常原因"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "PackCycle",
+      "name": "器械包处理",
+      "table": "instrument_pack_cycle",
+      "source_uc": "30、31",
+      "reason": "同一个包每轮处理独立，使用绑定本轮处理。",
+      "attributes": [
+        "包装核对",
+        "有效期限"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Monitor",
+      "name": "处理监测",
+      "table": "processing_monitor",
+      "source_uc": "30",
+      "reason": "同一处理过程有多项监测，不把未知当合格。",
+      "attributes": [
+        "项目",
+        "结果",
+        "取得时间",
+        "证据说明"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "InstrumentUse",
+      "name": "器械使用",
+      "table": "instrument_use",
+      "source_uc": "31",
+      "reason": "正常使用、未用退回和异常补录均有本轮处理来源。",
+      "attributes": [
+        "发放时间",
+        "使用时间",
+        "实物核对",
+        "异常说明"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "Reconciliation",
+      "name": "收支核对",
+      "table": "cash_reconciliation",
+      "source_uc": "19、20",
+      "reason": "保存同一核对快照，差异不改写原单。",
+      "attributes": [
+        "营业日期",
+        "渠道",
+        "核对时点",
+        "实际核实额",
+        "开班现金",
+        "存取款依据"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "ReconciliationItem",
+      "name": "核对项目",
+      "table": "reconciliation_item",
+      "source_uc": "20",
+      "reason": "复核可引用同一原资金事项；每次核对有独立项目集合。",
+      "attributes": [
+        "来源类别",
+        "计入金额",
+        "依据时点"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    },
+    {
+      "key": "FollowIssue",
+      "name": "差异跟进",
+      "table": "issue_followup",
+      "source_uc": "20、31",
+      "reason": "可跨日保留责任与处理经历，来源必须明确。",
+      "attributes": [
+        "原因",
+        "期限",
+        "处理意见",
+        "完成时间"
+      ],
+      "primary_key": [
+        "id"
+      ]
+    }
+  ],
+  "association_tables": [
+    {
+      "name": "患者决定—方案项目",
+      "table": "decision_plan_item",
+      "source_entities": [
+        "Decision",
+        "PlanItem"
+      ],
+      "primary_key": [
+        "decision_id",
+        "plan_item_id"
+      ]
+    },
+    {
+      "name": "患者决定—确认原件",
+      "table": "decision_file_version",
+      "source_entities": [
+        "Decision",
+        "FileVersion"
+      ],
+      "primary_key": [
+        "decision_id",
+        "document_version_id"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "R001",
+      "a": "Patient",
+      "ma": "1",
+      "b": "IdentityChange",
+      "mb": "0..*",
+      "meaning": "资料经历",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "patient_change",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R002",
+      "a": "Patient",
+      "ma": "1",
+      "b": "Proxy",
+      "mb": "0..*",
+      "meaning": "代理依据",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "patient_proxy",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R003",
+      "a": "Patient",
+      "ma": "1",
+      "b": "Handover",
+      "mb": "0..*",
+      "meaning": "访问范围",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "clinical_handover",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R004",
+      "a": "Staff",
+      "ma": "1",
+      "b": "Handover",
+      "mb": "0..*",
+      "meaning": "接收牙医",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "clinical_handover",
+      "column": "receiving_dentist_id",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R005",
+      "a": "Staff",
+      "ma": "1",
+      "b": "Handover",
+      "mb": "0..*",
+      "meaning": "交接人",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "clinical_handover",
+      "column": "handover_by",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R006",
+      "a": "Staff",
+      "ma": "1",
+      "b": "Schedule",
+      "mb": "0..*",
+      "meaning": "接诊牙医",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "dated_schedule",
+      "column": "dentist_id",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R007",
+      "a": "Chair",
+      "ma": "1",
+      "b": "Schedule",
+      "mb": "0..*",
+      "meaning": "使用诊椅",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "dated_schedule",
+      "column": "dental_chair_id",
+      "target": "dental_chair",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R008",
+      "a": "Schedule",
+      "ma": "1",
+      "b": "ScheduleChange",
+      "mb": "0..*",
+      "meaning": "安排经历",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "schedule_change",
+      "column": "dated_schedule_id",
+      "target": "dated_schedule",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R009",
+      "a": "Schedule",
+      "ma": "1",
+      "b": "Occupancy",
+      "mb": "0..*",
+      "meaning": "支持日期",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "resource_occupancy",
+      "column": "dated_schedule_id",
+      "target": "dated_schedule",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R010",
+      "a": "Appointment",
+      "ma": "0..1",
+      "b": "Occupancy",
+      "mb": "0..*",
+      "meaning": "预约来源",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "resource_occupancy",
+      "column": "appointment_id",
+      "target": "appointment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R011",
+      "a": "Visit",
+      "ma": "0..1",
+      "b": "Occupancy",
+      "mb": "0..*",
+      "meaning": "现场或到诊关联",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "resource_occupancy",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R012",
+      "a": "Patient",
+      "ma": "1",
+      "b": "Appointment",
+      "mb": "0..*",
+      "meaning": "预约者",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "appointment",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R013",
+      "a": "Appointment",
+      "ma": "1",
+      "b": "AppointmentChange",
+      "mb": "0..*",
+      "meaning": "变更经历",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "appointment_change",
+      "column": "appointment_id",
+      "target": "appointment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R014",
+      "a": "Patient",
+      "ma": "1",
+      "b": "Visit",
+      "mb": "0..*",
+      "meaning": "就诊者",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "visit",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R015",
+      "a": "Appointment",
+      "ma": "0..1",
+      "b": "Visit",
+      "mb": "0..1",
+      "meaning": "来源预约",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "visit",
+      "column": "appointment_id",
+      "target": "appointment",
+      "nullable": true,
+      "unique": true
+    },
+    {
+      "id": "R016",
+      "a": "Staff",
+      "ma": "1",
+      "b": "Visit",
+      "mb": "0..*",
+      "meaning": "责任牙医",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "visit",
+      "column": "dentist_id",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R017",
+      "a": "Patient",
+      "ma": "1",
+      "b": "HealthVersion",
+      "mb": "0..*",
+      "meaning": "长期健康",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "health_version",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R018",
+      "a": "HealthVersion",
+      "ma": "1",
+      "b": "HealthItem",
+      "mb": "0..*",
+      "meaning": "条目",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "health_item",
+      "column": "health_version_id",
+      "target": "health_version",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R019",
+      "a": "Visit",
+      "ma": "1",
+      "b": "Review",
+      "mb": "0..*",
+      "meaning": "当次复核",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "health_review",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R020",
+      "a": "HealthVersion",
+      "ma": "1",
+      "b": "Review",
+      "mb": "0..*",
+      "meaning": "所据版本",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "health_review",
+      "column": "health_version_id",
+      "target": "health_version",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R021",
+      "a": "Visit",
+      "ma": "1",
+      "b": "Record",
+      "mb": "1",
+      "meaning": "临床正文",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "clinical_record",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": true
+    },
+    {
+      "id": "R022",
+      "a": "Record",
+      "ma": "1",
+      "b": "Finding",
+      "mb": "0..*",
+      "meaning": "检查所见",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "clinical_finding",
+      "column": "clinical_record_id",
+      "target": "clinical_record",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R023",
+      "a": "Record",
+      "ma": "1",
+      "b": "Addendum",
+      "mb": "0..*",
+      "meaning": "签署后补充",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "record_addendum",
+      "column": "clinical_record_id",
+      "target": "clinical_record",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R024",
+      "a": "Patient",
+      "ma": "1",
+      "b": "Document",
+      "mb": "0..*",
+      "meaning": "文件归属",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "clinical_document",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R025",
+      "a": "Document",
+      "ma": "1",
+      "b": "FileVersion",
+      "mb": "1..*",
+      "meaning": "原件版本",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "document_version",
+      "column": "clinical_document_id",
+      "target": "clinical_document",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R026",
+      "a": "Visit",
+      "ma": "0..1",
+      "b": "Document",
+      "mb": "0..*",
+      "meaning": "就诊附件",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "clinical_document",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R027",
+      "a": "Patient",
+      "ma": "1",
+      "b": "Plan",
+      "mb": "0..*",
+      "meaning": "持续方案",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "treatment_plan",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R028",
+      "a": "Plan",
+      "ma": "1",
+      "b": "PlanVersion",
+      "mb": "1..*",
+      "meaning": "方案版本",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "plan_version",
+      "column": "treatment_plan_id",
+      "target": "treatment_plan",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R029",
+      "a": "PlanVersion",
+      "ma": "1",
+      "b": "PlanItem",
+      "mb": "1..*",
+      "meaning": "计划明细",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "plan_item",
+      "column": "plan_version_id",
+      "target": "plan_version",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R030",
+      "a": "PlanVersion",
+      "ma": "1",
+      "b": "Decision",
+      "mb": "0..*",
+      "meaning": "确认经历",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "patient_decision",
+      "column": "plan_version_id",
+      "target": "plan_version",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R031",
+      "a": "Decision",
+      "ma": "0..*",
+      "b": "PlanItem",
+      "mb": "1..*",
+      "meaning": "确认范围",
+      "kind": "--",
+      "mode": "bridge",
+      "table": "decision_plan_item",
+      "columns": [
+        "decision_id",
+        "plan_item_id"
+      ],
+      "primary_key": [
+        "decision_id",
+        "plan_item_id"
+      ],
+      "minimum_one": true
+    },
+    {
+      "id": "R032",
+      "a": "Proxy",
+      "ma": "0..1",
+      "b": "Decision",
+      "mb": "0..*",
+      "meaning": "代理依据",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "patient_decision",
+      "column": "patient_proxy_id",
+      "target": "patient_proxy",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R033",
+      "a": "FileVersion",
+      "ma": "0..*",
+      "b": "Decision",
+      "mb": "0..*",
+      "meaning": "确认原件",
+      "kind": "--",
+      "mode": "bridge",
+      "table": "decision_file_version",
+      "columns": [
+        "decision_id",
+        "document_version_id"
+      ],
+      "primary_key": [
+        "decision_id",
+        "document_version_id"
+      ],
+      "minimum_one": false
+    },
+    {
+      "id": "R034",
+      "a": "PlanVersion",
+      "ma": "0..1",
+      "b": "Document",
+      "mb": "0..*",
+      "meaning": "版本文书",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "clinical_document",
+      "column": "plan_version_id",
+      "target": "plan_version",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R035",
+      "a": "Visit",
+      "ma": "1",
+      "b": "Execution",
+      "mb": "0..*",
+      "meaning": "实际完成",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "treatment_execution",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R036",
+      "a": "PlanItem",
+      "ma": "0..1",
+      "b": "Execution",
+      "mb": "0..*",
+      "meaning": "所据计划",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "treatment_execution",
+      "column": "plan_item_id",
+      "target": "plan_item",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R037",
+      "a": "Service",
+      "ma": "1",
+      "b": "Execution",
+      "mb": "0..*",
+      "meaning": "实际项目",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "treatment_execution",
+      "column": "service_id",
+      "target": "service",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R038",
+      "a": "Execution",
+      "ma": "0..1",
+      "b": "Execution",
+      "mb": "0..*",
+      "meaning": "原执行与更正",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "treatment_execution",
+      "column": "original_execution_id",
+      "target": "treatment_execution",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R039",
+      "a": "Service",
+      "ma": "1",
+      "b": "Price",
+      "mb": "0..*",
+      "meaning": "适用价目",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "service_price",
+      "column": "service_id",
+      "target": "service",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R040",
+      "a": "Patient",
+      "ma": "1",
+      "b": "Bill",
+      "mb": "0..*",
+      "meaning": "账目归属",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "bill",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R041",
+      "a": "Bill",
+      "ma": "1",
+      "b": "Charge",
+      "mb": "1..*",
+      "meaning": "应收明细",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "bill_item",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R042",
+      "a": "Execution",
+      "ma": "1",
+      "b": "Charge",
+      "mb": "0..*",
+      "meaning": "计费依据",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "bill_item",
+      "column": "treatment_execution_id",
+      "target": "treatment_execution",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R043",
+      "a": "Price",
+      "ma": "0..1",
+      "b": "Charge",
+      "mb": "0..*",
+      "meaning": "适用价目",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "bill_item",
+      "column": "service_price_id",
+      "target": "service_price",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R044",
+      "a": "Patient",
+      "ma": "1",
+      "b": "Funds",
+      "mb": "1",
+      "meaning": "款项归属",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "patient_funds",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": true
+    },
+    {
+      "id": "R045",
+      "a": "Funds",
+      "ma": "1",
+      "b": "Payment",
+      "mb": "0..*",
+      "meaning": "实际到账",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "patient_payment",
+      "column": "patient_funds_id",
+      "target": "patient_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R046",
+      "a": "Payment",
+      "ma": "1",
+      "b": "Allocation",
+      "mb": "0..*",
+      "meaning": "到账分配",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "payment_allocation",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R047",
+      "a": "Bill",
+      "ma": "1",
+      "b": "Allocation",
+      "mb": "0..*",
+      "meaning": "被分配账目",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "payment_allocation",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R048",
+      "a": "Payment",
+      "ma": "1",
+      "b": "Offset",
+      "mb": "0..*",
+      "meaning": "未分配来源",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "prepayment_offset",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R049",
+      "a": "Bill",
+      "ma": "1",
+      "b": "Offset",
+      "mb": "0..*",
+      "meaning": "抵扣账目",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "prepayment_offset",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R050",
+      "a": "Funds",
+      "ma": "1",
+      "b": "Request",
+      "mb": "0..*",
+      "meaning": "费用事项",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "fee_request",
+      "column": "patient_funds_id",
+      "target": "patient_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R051",
+      "a": "Bill",
+      "ma": "0..1",
+      "b": "Request",
+      "mb": "0..*",
+      "meaning": "原账目",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "fee_request",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R052",
+      "a": "Payment",
+      "ma": "0..1",
+      "b": "Request",
+      "mb": "0..*",
+      "meaning": "原预付款",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "fee_request",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R053",
+      "a": "Request",
+      "ma": "1",
+      "b": "Adjustment",
+      "mb": "0..1",
+      "meaning": "批准调整",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "fee_adjustment",
+      "column": "fee_request_id",
+      "target": "fee_request",
+      "nullable": false,
+      "unique": true
+    },
+    {
+      "id": "R054",
+      "a": "Bill",
+      "ma": "1",
+      "b": "Adjustment",
+      "mb": "0..*",
+      "meaning": "所属账目",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "fee_adjustment",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R055",
+      "a": "Adjustment",
+      "ma": "1",
+      "b": "AdjustmentItem",
+      "mb": "1..*",
+      "meaning": "调整明细",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "fee_adjustment_item",
+      "column": "fee_adjustment_id",
+      "target": "fee_adjustment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R056",
+      "a": "Charge",
+      "ma": "1",
+      "b": "AdjustmentItem",
+      "mb": "0..*",
+      "meaning": "原应收项目",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "fee_adjustment_item",
+      "column": "bill_item_id",
+      "target": "bill_item",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R057",
+      "a": "Request",
+      "ma": "1",
+      "b": "Refund",
+      "mb": "0..*",
+      "meaning": "退款批准依据",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "patient_refund",
+      "column": "fee_request_id",
+      "target": "fee_request",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R058",
+      "a": "Payment",
+      "ma": "1",
+      "b": "Refund",
+      "mb": "0..*",
+      "meaning": "原款来源",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "patient_refund",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R059",
+      "a": "Funds",
+      "ma": "1",
+      "b": "Refund",
+      "mb": "0..*",
+      "meaning": "办理及占用",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "patient_refund",
+      "column": "patient_funds_id",
+      "target": "patient_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R060",
+      "a": "Patient",
+      "ma": "1",
+      "b": "Followup",
+      "mb": "0..*",
+      "meaning": "患者",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "followup_requirement",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R061",
+      "a": "Visit",
+      "ma": "0..1",
+      "b": "Followup",
+      "mb": "0..*",
+      "meaning": "来源就诊",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "followup_requirement",
+      "column": "source_visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R062",
+      "a": "PlanVersion",
+      "ma": "0..1",
+      "b": "Followup",
+      "mb": "0..*",
+      "meaning": "来源方案",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "followup_requirement",
+      "column": "source_plan_version_id",
+      "target": "plan_version",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R063",
+      "a": "Followup",
+      "ma": "1",
+      "b": "Contact",
+      "mb": "0..*",
+      "meaning": "联系尝试",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "contact_history",
+      "column": "followup_requirement_id",
+      "target": "followup_requirement",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R064",
+      "a": "Followup",
+      "ma": "1",
+      "b": "Assessment",
+      "mb": "0..*",
+      "meaning": "评估经历",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "clinical_assessment",
+      "column": "followup_requirement_id",
+      "target": "followup_requirement",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R065",
+      "a": "Contact",
+      "ma": "0..*",
+      "b": "Appointment",
+      "mb": "0..1",
+      "meaning": "复诊安排",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "contact_history",
+      "column": "appointment_id",
+      "target": "appointment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R066",
+      "a": "Assessment",
+      "ma": "0..*",
+      "b": "Visit",
+      "mb": "0..1",
+      "meaning": "实际复诊",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "clinical_assessment",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R067",
+      "a": "Material",
+      "ma": "1",
+      "b": "Batch",
+      "mb": "0..*",
+      "meaning": "材料批次",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "material_batch",
+      "column": "material_id",
+      "target": "material",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R068",
+      "a": "Batch",
+      "ma": "1",
+      "b": "BatchChange",
+      "mb": "0..*",
+      "meaning": "停用与恢复",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "batch_change",
+      "column": "material_batch_id",
+      "target": "material_batch",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R069",
+      "a": "Batch",
+      "ma": "1",
+      "b": "Stock",
+      "mb": "0..*",
+      "meaning": "分处存量",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "batch_stock",
+      "column": "material_batch_id",
+      "target": "material_batch",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R070",
+      "a": "Location",
+      "ma": "1",
+      "b": "Stock",
+      "mb": "0..*",
+      "meaning": "存放",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "batch_stock",
+      "column": "stock_location_id",
+      "target": "stock_location",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R071",
+      "a": "Stock",
+      "ma": "1",
+      "b": "Movement",
+      "mb": "0..*",
+      "meaning": "收发经历",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "inventory_movement",
+      "column": "batch_stock_id",
+      "target": "batch_stock",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R072",
+      "a": "Movement",
+      "ma": "0..1",
+      "b": "Movement",
+      "mb": "0..*",
+      "meaning": "原领用或更正来源",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "inventory_movement",
+      "column": "original_movement_id",
+      "target": "inventory_movement",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R073",
+      "a": "Movement",
+      "ma": "1",
+      "b": "Usage",
+      "mb": "0..*",
+      "meaning": "实际消耗",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "material_usage",
+      "column": "inventory_movement_id",
+      "target": "inventory_movement",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R074",
+      "a": "Visit",
+      "ma": "1",
+      "b": "Usage",
+      "mb": "0..*",
+      "meaning": "使用就诊",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "material_usage",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R075",
+      "a": "Count",
+      "ma": "0..1",
+      "b": "Movement",
+      "mb": "0..1",
+      "meaning": "批准差异调整",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "inventory_movement",
+      "column": "stock_count_id",
+      "target": "stock_count",
+      "nullable": true,
+      "unique": true
+    },
+    {
+      "id": "R076",
+      "a": "Supplier",
+      "ma": "1",
+      "b": "Purchase",
+      "mb": "0..*",
+      "meaning": "供货方",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "purchase_order",
+      "column": "supplier_id",
+      "target": "supplier",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R077",
+      "a": "Purchase",
+      "ma": "1",
+      "b": "PurchaseItem",
+      "mb": "1..*",
+      "meaning": "约定明细",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "purchase_order_item",
+      "column": "purchase_order_id",
+      "target": "purchase_order",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R078",
+      "a": "Material",
+      "ma": "1",
+      "b": "PurchaseItem",
+      "mb": "0..*",
+      "meaning": "采购材料",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "purchase_order_item",
+      "column": "material_id",
+      "target": "material",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R079",
+      "a": "Purchase",
+      "ma": "1",
+      "b": "Receipt",
+      "mb": "0..*",
+      "meaning": "分批验收",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "purchase_receipt",
+      "column": "purchase_order_id",
+      "target": "purchase_order",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R080",
+      "a": "Receipt",
+      "ma": "1",
+      "b": "ReceiptItem",
+      "mb": "1..*",
+      "meaning": "本次验收",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "purchase_receipt_item",
+      "column": "purchase_receipt_id",
+      "target": "purchase_receipt",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R081",
+      "a": "PurchaseItem",
+      "ma": "1",
+      "b": "ReceiptItem",
+      "mb": "0..*",
+      "meaning": "所据采购",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "purchase_receipt_item",
+      "column": "purchase_order_item_id",
+      "target": "purchase_order_item",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R082",
+      "a": "Batch",
+      "ma": "0..1",
+      "b": "ReceiptItem",
+      "mb": "0..*",
+      "meaning": "到货批次",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "purchase_receipt_item",
+      "column": "material_batch_id",
+      "target": "material_batch",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R083",
+      "a": "ReceiptItem",
+      "ma": "0..1",
+      "b": "Movement",
+      "mb": "0..*",
+      "meaning": "验收入库依据",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "inventory_movement",
+      "column": "purchase_receipt_item_id",
+      "target": "purchase_receipt_item",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R084",
+      "a": "PurchaseItem",
+      "ma": "1",
+      "b": "SupplyIssue",
+      "mb": "0..*",
+      "meaning": "交付与拒收差异",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "purchase_issue",
+      "column": "purchase_order_item_id",
+      "target": "purchase_order_item",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R085",
+      "a": "ReceiptItem",
+      "ma": "0..1",
+      "b": "SupplyIssue",
+      "mb": "0..*",
+      "meaning": "原验收",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "purchase_issue",
+      "column": "purchase_receipt_item_id",
+      "target": "purchase_receipt_item",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R086",
+      "a": "Supplier",
+      "ma": "1",
+      "b": "SupplierFunds",
+      "mb": "1",
+      "meaning": "资金归属",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "supplier_funds",
+      "column": "supplier_id",
+      "target": "supplier",
+      "nullable": false,
+      "unique": true
+    },
+    {
+      "id": "R087",
+      "a": "SupplierFunds",
+      "ma": "1",
+      "b": "SupplyPayment",
+      "mb": "0..*",
+      "meaning": "付款办理",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "supplier_payment",
+      "column": "supplier_funds_id",
+      "target": "supplier_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R088",
+      "a": "SupplyPayment",
+      "ma": "1",
+      "b": "SupplyAllocation",
+      "mb": "0..*",
+      "meaning": "用途分配",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "supplier_allocation",
+      "column": "supplier_payment_id",
+      "target": "supplier_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R089",
+      "a": "Purchase",
+      "ma": "0..1",
+      "b": "SupplyAllocation",
+      "mb": "0..*",
+      "meaning": "采购预付",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "supplier_allocation",
+      "column": "purchase_order_id",
+      "target": "purchase_order",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R090",
+      "a": "Receipt",
+      "ma": "0..1",
+      "b": "SupplyAllocation",
+      "mb": "0..*",
+      "meaning": "验收结算",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "supplier_allocation",
+      "column": "purchase_receipt_id",
+      "target": "purchase_receipt",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R091",
+      "a": "SupplyPayment",
+      "ma": "1",
+      "b": "SupplyRefund",
+      "mb": "0..*",
+      "meaning": "原付款",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "supplier_refund",
+      "column": "supplier_payment_id",
+      "target": "supplier_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R092",
+      "a": "SupplyIssue",
+      "ma": "1",
+      "b": "SupplyRefund",
+      "mb": "0..*",
+      "meaning": "退回依据",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "supplier_refund",
+      "column": "purchase_issue_id",
+      "target": "purchase_issue",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R093",
+      "a": "SupplierFunds",
+      "ma": "1",
+      "b": "SupplyRefund",
+      "mb": "0..*",
+      "meaning": "供货退回款",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "supplier_refund",
+      "column": "supplier_funds_id",
+      "target": "supplier_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R094",
+      "a": "Equipment",
+      "ma": "1",
+      "b": "Process",
+      "mb": "0..*",
+      "meaning": "处理设备",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "instrument_processing",
+      "column": "processing_equipment_id",
+      "target": "processing_equipment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R095",
+      "a": "Process",
+      "ma": "1",
+      "b": "PackCycle",
+      "mb": "1..*",
+      "meaning": "本轮包次",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "instrument_pack_cycle",
+      "column": "instrument_processing_id",
+      "target": "instrument_processing",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R096",
+      "a": "Pack",
+      "ma": "1",
+      "b": "PackCycle",
+      "mb": "0..*",
+      "meaning": "历轮处理",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "instrument_pack_cycle",
+      "column": "instrument_pack_id",
+      "target": "instrument_pack",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R097",
+      "a": "Process",
+      "ma": "1",
+      "b": "Monitor",
+      "mb": "0..*",
+      "meaning": "处理监测",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "processing_monitor",
+      "column": "instrument_processing_id",
+      "target": "instrument_processing",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R098",
+      "a": "Visit",
+      "ma": "1",
+      "b": "InstrumentUse",
+      "mb": "0..*",
+      "meaning": "关联就诊",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "instrument_use",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R099",
+      "a": "Process",
+      "ma": "0..1",
+      "b": "Process",
+      "mb": "0..*",
+      "meaning": "异常后重新处理",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "instrument_processing",
+      "column": "previous_processing_id",
+      "target": "instrument_processing",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R100",
+      "a": "Reconciliation",
+      "ma": "1",
+      "b": "ReconciliationItem",
+      "mb": "0..*",
+      "meaning": "核对快照",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "reconciliation_item",
+      "column": "cash_reconciliation_id",
+      "target": "cash_reconciliation",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R101",
+      "a": "Payment",
+      "ma": "0..1",
+      "b": "ReconciliationItem",
+      "mb": "0..*",
+      "meaning": "患者到账",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "reconciliation_item",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R102",
+      "a": "Refund",
+      "ma": "0..1",
+      "b": "ReconciliationItem",
+      "mb": "0..*",
+      "meaning": "患者退款",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "reconciliation_item",
+      "column": "patient_refund_id",
+      "target": "patient_refund",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R103",
+      "a": "SupplyPayment",
+      "ma": "0..1",
+      "b": "ReconciliationItem",
+      "mb": "0..*",
+      "meaning": "供货付款",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "reconciliation_item",
+      "column": "supplier_payment_id",
+      "target": "supplier_payment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R104",
+      "a": "SupplyRefund",
+      "ma": "0..1",
+      "b": "ReconciliationItem",
+      "mb": "0..*",
+      "meaning": "供货退回",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "reconciliation_item",
+      "column": "supplier_refund_id",
+      "target": "supplier_refund",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R105",
+      "a": "Reconciliation",
+      "ma": "0..1",
+      "b": "FollowIssue",
+      "mb": "0..*",
+      "meaning": "收支差异",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "issue_followup",
+      "column": "cash_reconciliation_id",
+      "target": "cash_reconciliation",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R106",
+      "a": "Process",
+      "ma": "0..1",
+      "b": "FollowIssue",
+      "mb": "0..*",
+      "meaning": "器械异常",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "issue_followup",
+      "column": "instrument_processing_id",
+      "target": "instrument_processing",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "id": "R107",
+      "a": "Staff",
+      "ma": "1",
+      "b": "FollowIssue",
+      "mb": "0..*",
+      "meaning": "跟进责任人",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "issue_followup",
+      "column": "assigned_to",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R108",
+      "a": "Stock",
+      "ma": "1",
+      "b": "Count",
+      "mb": "0..*",
+      "meaning": "盘点经历",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "stock_count",
+      "column": "batch_stock_id",
+      "target": "batch_stock",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R109",
+      "a": "PackCycle",
+      "ma": "1",
+      "b": "InstrumentUse",
+      "mb": "0..*",
+      "meaning": "本轮使用经历",
+      "kind": "*--",
+      "mode": "foreign_key",
+      "table": "instrument_use",
+      "column": "instrument_pack_cycle_id",
+      "target": "instrument_pack_cycle",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R110",
+      "a": "Funds",
+      "ma": "1",
+      "b": "Bill",
+      "mb": "0..*",
+      "meaning": "同患者结算范围",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "bill",
+      "column": "patient_funds_id",
+      "target": "patient_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "id": "R111",
+      "a": "Visit",
+      "ma": "0..1",
+      "b": "PlanVersion",
+      "mb": "0..*",
+      "meaning": "内部诊断来源",
+      "kind": "--",
+      "mode": "foreign_key",
+      "table": "plan_version",
+      "column": "source_visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    }
+  ],
+  "foreign_keys": [
+    {
+      "relation": "R001",
+      "table": "patient_change",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R002",
+      "table": "patient_proxy",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R003",
+      "table": "clinical_handover",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R004",
+      "table": "clinical_handover",
+      "column": "receiving_dentist_id",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R005",
+      "table": "clinical_handover",
+      "column": "handover_by",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R006",
+      "table": "dated_schedule",
+      "column": "dentist_id",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R007",
+      "table": "dated_schedule",
+      "column": "dental_chair_id",
+      "target": "dental_chair",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R008",
+      "table": "schedule_change",
+      "column": "dated_schedule_id",
+      "target": "dated_schedule",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R009",
+      "table": "resource_occupancy",
+      "column": "dated_schedule_id",
+      "target": "dated_schedule",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R010",
+      "table": "resource_occupancy",
+      "column": "appointment_id",
+      "target": "appointment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R011",
+      "table": "resource_occupancy",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R012",
+      "table": "appointment",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R013",
+      "table": "appointment_change",
+      "column": "appointment_id",
+      "target": "appointment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R014",
+      "table": "visit",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R015",
+      "table": "visit",
+      "column": "appointment_id",
+      "target": "appointment",
+      "nullable": true,
+      "unique": true
+    },
+    {
+      "relation": "R016",
+      "table": "visit",
+      "column": "dentist_id",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R017",
+      "table": "health_version",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R018",
+      "table": "health_item",
+      "column": "health_version_id",
+      "target": "health_version",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R019",
+      "table": "health_review",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R020",
+      "table": "health_review",
+      "column": "health_version_id",
+      "target": "health_version",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R021",
+      "table": "clinical_record",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": true
+    },
+    {
+      "relation": "R022",
+      "table": "clinical_finding",
+      "column": "clinical_record_id",
+      "target": "clinical_record",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R023",
+      "table": "record_addendum",
+      "column": "clinical_record_id",
+      "target": "clinical_record",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R024",
+      "table": "clinical_document",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R025",
+      "table": "document_version",
+      "column": "clinical_document_id",
+      "target": "clinical_document",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R026",
+      "table": "clinical_document",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R027",
+      "table": "treatment_plan",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R028",
+      "table": "plan_version",
+      "column": "treatment_plan_id",
+      "target": "treatment_plan",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R029",
+      "table": "plan_item",
+      "column": "plan_version_id",
+      "target": "plan_version",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R030",
+      "table": "patient_decision",
+      "column": "plan_version_id",
+      "target": "plan_version",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R031",
+      "table": "decision_plan_item",
+      "column": "decision_id",
+      "target": "patient_decision",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R031",
+      "table": "decision_plan_item",
+      "column": "plan_item_id",
+      "target": "plan_item",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R032",
+      "table": "patient_decision",
+      "column": "patient_proxy_id",
+      "target": "patient_proxy",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R033",
+      "table": "decision_file_version",
+      "column": "decision_id",
+      "target": "patient_decision",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R033",
+      "table": "decision_file_version",
+      "column": "document_version_id",
+      "target": "document_version",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R034",
+      "table": "clinical_document",
+      "column": "plan_version_id",
+      "target": "plan_version",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R035",
+      "table": "treatment_execution",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R036",
+      "table": "treatment_execution",
+      "column": "plan_item_id",
+      "target": "plan_item",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R037",
+      "table": "treatment_execution",
+      "column": "service_id",
+      "target": "service",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R038",
+      "table": "treatment_execution",
+      "column": "original_execution_id",
+      "target": "treatment_execution",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R039",
+      "table": "service_price",
+      "column": "service_id",
+      "target": "service",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R040",
+      "table": "bill",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R041",
+      "table": "bill_item",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R042",
+      "table": "bill_item",
+      "column": "treatment_execution_id",
+      "target": "treatment_execution",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R043",
+      "table": "bill_item",
+      "column": "service_price_id",
+      "target": "service_price",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R044",
+      "table": "patient_funds",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": true
+    },
+    {
+      "relation": "R045",
+      "table": "patient_payment",
+      "column": "patient_funds_id",
+      "target": "patient_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R046",
+      "table": "payment_allocation",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R047",
+      "table": "payment_allocation",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R048",
+      "table": "prepayment_offset",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R049",
+      "table": "prepayment_offset",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R050",
+      "table": "fee_request",
+      "column": "patient_funds_id",
+      "target": "patient_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R051",
+      "table": "fee_request",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R052",
+      "table": "fee_request",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R053",
+      "table": "fee_adjustment",
+      "column": "fee_request_id",
+      "target": "fee_request",
+      "nullable": false,
+      "unique": true
+    },
+    {
+      "relation": "R054",
+      "table": "fee_adjustment",
+      "column": "bill_id",
+      "target": "bill",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R055",
+      "table": "fee_adjustment_item",
+      "column": "fee_adjustment_id",
+      "target": "fee_adjustment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R056",
+      "table": "fee_adjustment_item",
+      "column": "bill_item_id",
+      "target": "bill_item",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R057",
+      "table": "patient_refund",
+      "column": "fee_request_id",
+      "target": "fee_request",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R058",
+      "table": "patient_refund",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R059",
+      "table": "patient_refund",
+      "column": "patient_funds_id",
+      "target": "patient_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R060",
+      "table": "followup_requirement",
+      "column": "patient_id",
+      "target": "patient",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R061",
+      "table": "followup_requirement",
+      "column": "source_visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R062",
+      "table": "followup_requirement",
+      "column": "source_plan_version_id",
+      "target": "plan_version",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R063",
+      "table": "contact_history",
+      "column": "followup_requirement_id",
+      "target": "followup_requirement",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R064",
+      "table": "clinical_assessment",
+      "column": "followup_requirement_id",
+      "target": "followup_requirement",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R065",
+      "table": "contact_history",
+      "column": "appointment_id",
+      "target": "appointment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R066",
+      "table": "clinical_assessment",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R067",
+      "table": "material_batch",
+      "column": "material_id",
+      "target": "material",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R068",
+      "table": "batch_change",
+      "column": "material_batch_id",
+      "target": "material_batch",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R069",
+      "table": "batch_stock",
+      "column": "material_batch_id",
+      "target": "material_batch",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R070",
+      "table": "batch_stock",
+      "column": "stock_location_id",
+      "target": "stock_location",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R071",
+      "table": "inventory_movement",
+      "column": "batch_stock_id",
+      "target": "batch_stock",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R072",
+      "table": "inventory_movement",
+      "column": "original_movement_id",
+      "target": "inventory_movement",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R073",
+      "table": "material_usage",
+      "column": "inventory_movement_id",
+      "target": "inventory_movement",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R074",
+      "table": "material_usage",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R075",
+      "table": "inventory_movement",
+      "column": "stock_count_id",
+      "target": "stock_count",
+      "nullable": true,
+      "unique": true
+    },
+    {
+      "relation": "R076",
+      "table": "purchase_order",
+      "column": "supplier_id",
+      "target": "supplier",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R077",
+      "table": "purchase_order_item",
+      "column": "purchase_order_id",
+      "target": "purchase_order",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R078",
+      "table": "purchase_order_item",
+      "column": "material_id",
+      "target": "material",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R079",
+      "table": "purchase_receipt",
+      "column": "purchase_order_id",
+      "target": "purchase_order",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R080",
+      "table": "purchase_receipt_item",
+      "column": "purchase_receipt_id",
+      "target": "purchase_receipt",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R081",
+      "table": "purchase_receipt_item",
+      "column": "purchase_order_item_id",
+      "target": "purchase_order_item",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R082",
+      "table": "purchase_receipt_item",
+      "column": "material_batch_id",
+      "target": "material_batch",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R083",
+      "table": "inventory_movement",
+      "column": "purchase_receipt_item_id",
+      "target": "purchase_receipt_item",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R084",
+      "table": "purchase_issue",
+      "column": "purchase_order_item_id",
+      "target": "purchase_order_item",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R085",
+      "table": "purchase_issue",
+      "column": "purchase_receipt_item_id",
+      "target": "purchase_receipt_item",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R086",
+      "table": "supplier_funds",
+      "column": "supplier_id",
+      "target": "supplier",
+      "nullable": false,
+      "unique": true
+    },
+    {
+      "relation": "R087",
+      "table": "supplier_payment",
+      "column": "supplier_funds_id",
+      "target": "supplier_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R088",
+      "table": "supplier_allocation",
+      "column": "supplier_payment_id",
+      "target": "supplier_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R089",
+      "table": "supplier_allocation",
+      "column": "purchase_order_id",
+      "target": "purchase_order",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R090",
+      "table": "supplier_allocation",
+      "column": "purchase_receipt_id",
+      "target": "purchase_receipt",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R091",
+      "table": "supplier_refund",
+      "column": "supplier_payment_id",
+      "target": "supplier_payment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R092",
+      "table": "supplier_refund",
+      "column": "purchase_issue_id",
+      "target": "purchase_issue",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R093",
+      "table": "supplier_refund",
+      "column": "supplier_funds_id",
+      "target": "supplier_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R094",
+      "table": "instrument_processing",
+      "column": "processing_equipment_id",
+      "target": "processing_equipment",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R095",
+      "table": "instrument_pack_cycle",
+      "column": "instrument_processing_id",
+      "target": "instrument_processing",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R096",
+      "table": "instrument_pack_cycle",
+      "column": "instrument_pack_id",
+      "target": "instrument_pack",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R097",
+      "table": "processing_monitor",
+      "column": "instrument_processing_id",
+      "target": "instrument_processing",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R098",
+      "table": "instrument_use",
+      "column": "visit_id",
+      "target": "visit",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R099",
+      "table": "instrument_processing",
+      "column": "previous_processing_id",
+      "target": "instrument_processing",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R100",
+      "table": "reconciliation_item",
+      "column": "cash_reconciliation_id",
+      "target": "cash_reconciliation",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R101",
+      "table": "reconciliation_item",
+      "column": "patient_payment_id",
+      "target": "patient_payment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R102",
+      "table": "reconciliation_item",
+      "column": "patient_refund_id",
+      "target": "patient_refund",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R103",
+      "table": "reconciliation_item",
+      "column": "supplier_payment_id",
+      "target": "supplier_payment",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R104",
+      "table": "reconciliation_item",
+      "column": "supplier_refund_id",
+      "target": "supplier_refund",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R105",
+      "table": "issue_followup",
+      "column": "cash_reconciliation_id",
+      "target": "cash_reconciliation",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R106",
+      "table": "issue_followup",
+      "column": "instrument_processing_id",
+      "target": "instrument_processing",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "relation": "R107",
+      "table": "issue_followup",
+      "column": "assigned_to",
+      "target": "staff",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R108",
+      "table": "stock_count",
+      "column": "batch_stock_id",
+      "target": "batch_stock",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R109",
+      "table": "instrument_use",
+      "column": "instrument_pack_cycle_id",
+      "target": "instrument_pack_cycle",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R110",
+      "table": "bill",
+      "column": "patient_funds_id",
+      "target": "patient_funds",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "relation": "R111",
+      "table": "plan_version",
+      "column": "source_visit_id",
+      "target": "visit",
+      "nullable": true,
+      "unique": false
+    }
+  ],
+  "counts": {
+    "analysis_entities": 67,
+    "entity_tables": 67,
+    "association_tables": 2,
+    "business_tables": 69,
+    "analysis_relations": 111,
+    "domain_foreign_keys": 113
+  },
+  "staff_roles": [
+    [
+      "就诊、诊疗执行、健康复核、病历、病历补充、方案版本、患者决定",
+      "dentist_id、performed_by、reviewed_by、signed_by 等",
+      "接诊、执行、复核、签署、说明责任分别引用职员；已在领域关联中出现的列复用。草稿签署人可空，签署后必填。"
+    ],
+    [
+      "患者资料变更、预约变更、联系经历",
+      "operator_id",
+      "经办前台；事实形成后非空。"
+    ],
+    [
+      "价目、日期安排、费用申请、采购、盘点核实、批次变更",
+      "created_by、confirmed_by",
+      "录入与确认职员分开；确认前允许确认人为空，确认或驳回时保存决定人、时间和意见。"
+    ],
+    [
+      "患者付款、退款办理、供货付款、供货退款、收支核对",
+      "operator_id、verified_by",
+      "办理与结果核实职责分开；已核实结果保留核实职员。"
+    ],
+    [
+      "验收、库存变动、实际用料、器械处理、器械使用",
+      "operator_id、released_by 等",
+      "经办、放行和异常确认不得共用一个最后修改人字段。放行列仅用于器械处理。"
+    ],
+    [
+      "诊疗文件、文件版本",
+      "uploaded_by、confirmed_by",
+      "上传人引用获准职员；确认人是有权限牙医，待确认版本可空。"
+    ]
+  ],
+  "invariants": [
+    [
+      "组合与历史",
+      "病历、版本、计划明细、款项分配、库存流水等组成部分的所属外键非空。新增整体及必需部分在一个事务内完成；已生效临床、资金及库存历史使用限制删除，不以级联删除清空。"
+    ],
+    [
+      "一对一",
+      "clinical_record.visit_id、patient_funds.patient_id、supplier_funds.supplier_id 非空且唯一。仅有唯一外键还不足以保证每个整体已有对应行，建档或首次建立业务整体时须一起创建。"
+    ],
+    [
+      "可选的一对一",
+      "visit.appointment_id 可空且唯一，支持现场到诊；inventory_movement.stock_count_id 可空且唯一，保证同一批准盘点最多形成一次调整；fee_adjustment.fee_request_id 非空且唯一。"
+    ],
+    [
+      "方案确认范围",
+      "decision_plan_item 的两端必须属于同一个方案版本，已确认决定至少有一个范围项目。决定与原件通过 decision_file_version 保留当时版本，不能改指新文件。"
+    ],
+    [
+      "患者归属",
+      "有来源预约、方案项目、诊断就诊或资金原款时，关联两端必须同患者。共享患者归属优先用复合候选键／复合外键表达；需要多级追溯的规则在事务内复核，不仅检查编号存在。"
+    ],
+    [
+      "排班与占用",
+      "resource_occupancy 引用日期安排，预约或就诊来源至少一个；两者同时存在时为同一接诊过程。时间按半开区间比较，患者、牙医和诊椅任一资源不能重复有效占用；普通唯一约束不能代替区间冲突检查。"
+    ],
+    [
+      "价目与应收",
+      "bill_item 的实际执行引用非空；价目引用可空表达待核价。数量、计价时点、单价快照和免收依据须保留，不能把缺价转换为零。同一执行的有效应收不得重复计入。"
+    ],
+    [
+      "患者付款与退款",
+      "patient_funds 是患者款项的协调归属，不再维护一份可任意修改的余额。余额由已核实付款、有效分配、抵扣、已退和未决占用共同计算；各项用途不得超过同一原款可用额。付款分配更正追加有依据的更正，不覆盖原金额。"
+    ],
+    [
+      "费用申请",
+      "fee_request 至少引用原账目或原预付款之一；两者同时存在须同患者。批准调整保留原应收项目；退款必须同时引用批准申请、原款和患者资金归属；结果未知时继续占用，确认只计一次。"
+    ],
+    [
+      "诊后要求",
+      "followup_requirement 的来源就诊与来源方案版本至少一个，均须同患者。联系可关联当时预约，评估可关联实际复诊；每项要求允许多次联系和评估，取消预约不能删除联系历史。"
+    ],
+    [
+      "批次与位置",
+      "batch_stock 对材料批次和存放位置的组合唯一；数量按统一基本单位。变动只属于一项存量，退回引用原领用，盘点引用原快照；领用提交时同时核对批次可用性和非负数量。"
+    ],
+    [
+      "采购验收",
+      "每条 purchase_receipt_item 引用一个采购项目；拒收／待检的批次可以为空，合格入库前须明确批次和位置。到货、合格、拒收和待检分别计量；拒收待处理量不因到货足量自动消失。"
+    ],
+    [
+      "供应商资金",
+      "supplier_allocation 的采购预付与验收结算来源恰选一个；同一分配、原付款和目标属于同一供应商。supplier_refund 同时引用原款和已确认采购差异；抵扣预付不新增实际支出。"
+    ],
+    [
+      "器械处理与使用",
+      "instrument_pack_cycle 对处理轮次和器械包的组合唯一。有效正常使用每包次最多一次；未用退回和异常经历可以多条。实际使用须同本轮放行、效期及实物核对；再次处理建立新轮次。"
+    ],
+    [
+      "核对与差异",
+      "reconciliation_item 的患者付款、患者退款、供货付款、供货退款四个来源恰选一个，同一次核对不能重复引用同一事项。issue_followup 的收支核对与器械异常来源恰选一个，并保存跟进责任。"
+    ]
+  ]
+}

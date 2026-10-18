@@ -1,0 +1,64 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 16
+skinparam dpi 160
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 65
+skinparam ranksep 85
+hide circle
+top to bottom direction
+class "备份任务" as backup_run {
+  id : INTEGER
+  requested_by : INTEGER
+  responsible_staff_id : INTEGER
+  status : TEXT
+  --
+  生成一致性快照()
+  核验完整备份()
+}
+class "备份文件清单" as backup_artifact {
+  id : INTEGER
+  backup_id : INTEGER
+  artifact_kind : TEXT
+  document_version_id : INTEGER
+  --
+  登记文件范围()
+  核验文件摘要()
+}
+class "备份副本" as backup_copy {
+  id : INTEGER
+  backup_id : INTEGER
+  location_kind : TEXT
+  status : TEXT
+  verified_by : INTEGER
+  --
+  核验副本()
+  记录轮换()
+}
+class "恢复验证" as restore_verification {
+  id : INTEGER
+  backup_id : INTEGER
+  copy_id : INTEGER
+  verified_by : INTEGER
+  status : TEXT
+  --
+  执行隔离恢复()
+  汇总验证结果()
+}
+class "恢复检查明细" as restore_check {
+  id : INTEGER
+  restore_id : INTEGER
+  check_code : TEXT
+  status : TEXT
+  --
+  保存逐项检查()
+}
+backup_run "1" -- "0..*" backup_artifact : 快照文件
+backup_run "1" -- "0..*" backup_copy : 存放副本
+backup_run "1" -- "0..*" restore_verification : 验证来源
+backup_copy "1" -- "0..*" restore_verification : 实际副本
+restore_verification "1" -- "0..*" restore_check : 逐项检查
+@enduml

@@ -1,0 +1,33 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "待付款" as Ready
+state "待核实" as Unknown
+state "已确认付款" as Done
+state "已失败" as Failed
+[*] --> Ready : 建立付款占用\n[负责人确认且额度足够]\n/ 形成唯一办理依据
+Ready --> Unknown : 核实待定结果\n[结果不明]\n/ 保留占用
+Ready --> Done : 确认实际支出\n[实际付款已核实]\n/ 形成供货分配
+Ready --> Failed : 核实待定结果\n[明确失败]\n/ 释放占用
+Unknown --> Done : 确认实际支出\n[核查证实成功]\n/ 一次确认支出
+Unknown --> Failed : 核实待定结果\n[核查证实失败]\n/ 释放原占用
+
+@enduml

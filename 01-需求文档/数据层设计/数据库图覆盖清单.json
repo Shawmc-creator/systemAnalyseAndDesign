@@ -1,0 +1,3233 @@
+{
+  "counts": {
+    "tables": 85,
+    "fields": 1048,
+    "foreign_key_columns": 254,
+    "groups": 15,
+    "drawn_edge_pairs": 83
+  },
+  "groups": [
+    {
+      "number": 1,
+      "title": "患者与职员",
+      "stem": "d1-db-01",
+      "tables": [
+        "patient",
+        "staff",
+        "patient_change",
+        "patient_proxy",
+        "clinical_handover"
+      ],
+      "fields": 56,
+      "edge_pairs": [
+        [
+          "clinical_handover",
+          "patient"
+        ],
+        [
+          "patient_change",
+          "patient"
+        ],
+        [
+          "patient_proxy",
+          "patient"
+        ]
+      ],
+      "svg_width": 1140.0,
+      "svg_height": 746.0,
+      "paper_mm": [
+        420,
+        297
+      ],
+      "field_font_pt": 12.38
+    },
+    {
+      "number": 2,
+      "title": "预约、排班与到诊",
+      "stem": "d1-db-02",
+      "tables": [
+        "dental_chair",
+        "dated_schedule",
+        "schedule_change",
+        "resource_occupancy",
+        "appointment",
+        "appointment_change",
+        "visit"
+      ],
+      "fields": 104,
+      "edge_pairs": [
+        [
+          "appointment_change",
+          "appointment"
+        ],
+        [
+          "appointment_change",
+          "dated_schedule"
+        ],
+        [
+          "dated_schedule",
+          "dental_chair"
+        ],
+        [
+          "resource_occupancy",
+          "appointment"
+        ],
+        [
+          "resource_occupancy",
+          "dated_schedule"
+        ],
+        [
+          "resource_occupancy",
+          "visit"
+        ],
+        [
+          "schedule_change",
+          "dated_schedule"
+        ],
+        [
+          "schedule_change",
+          "dental_chair"
+        ],
+        [
+          "visit",
+          "appointment"
+        ]
+      ],
+      "svg_width": 1461.0,
+      "svg_height": 1374.0,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "field_font_pt": 11.45
+    },
+    {
+      "number": 3,
+      "title": "健康资料与病历",
+      "stem": "d1-db-03",
+      "tables": [
+        "health_version",
+        "health_item",
+        "health_review",
+        "clinical_record",
+        "clinical_finding",
+        "record_addendum"
+      ],
+      "fields": 65,
+      "edge_pairs": [
+        [
+          "clinical_finding",
+          "clinical_record"
+        ],
+        [
+          "health_item",
+          "health_version"
+        ],
+        [
+          "health_review",
+          "health_version"
+        ],
+        [
+          "record_addendum",
+          "clinical_record"
+        ]
+      ],
+      "svg_width": 1877.0,
+      "svg_height": 746.0,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "field_font_pt": 12.38
+    },
+    {
+      "number": 4,
+      "title": "方案、文件与执行",
+      "stem": "d1-db-04",
+      "tables": [
+        "clinical_document",
+        "document_version",
+        "treatment_plan",
+        "plan_version",
+        "plan_item",
+        "patient_decision",
+        "treatment_execution",
+        "decision_plan_item",
+        "decision_file_version"
+      ],
+      "fields": 109,
+      "edge_pairs": [
+        [
+          "clinical_document",
+          "plan_version"
+        ],
+        [
+          "decision_file_version",
+          "document_version"
+        ],
+        [
+          "decision_file_version",
+          "patient_decision"
+        ],
+        [
+          "decision_plan_item",
+          "patient_decision"
+        ],
+        [
+          "decision_plan_item",
+          "plan_item"
+        ],
+        [
+          "document_version",
+          "clinical_document"
+        ],
+        [
+          "patient_decision",
+          "plan_version"
+        ],
+        [
+          "plan_item",
+          "plan_version"
+        ],
+        [
+          "plan_version",
+          "treatment_plan"
+        ],
+        [
+          "treatment_execution",
+          "plan_item"
+        ]
+      ],
+      "svg_width": 1656.0,
+      "svg_height": 1936.0,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "field_font_pt": 10.01
+    },
+    {
+      "number": 5,
+      "title": "价目、应收与患者账户",
+      "stem": "d1-db-05",
+      "tables": [
+        "service",
+        "service_price",
+        "bill",
+        "bill_item",
+        "patient_funds"
+      ],
+      "fields": 54,
+      "edge_pairs": [
+        [
+          "bill",
+          "patient_funds"
+        ],
+        [
+          "bill_item",
+          "bill"
+        ],
+        [
+          "bill_item",
+          "service_price"
+        ],
+        [
+          "service_price",
+          "service"
+        ]
+      ],
+      "svg_width": 872.0,
+      "svg_height": 1097.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "field_font_pt": 12.38
+    },
+    {
+      "number": 6,
+      "title": "患者付款、调整与退款",
+      "stem": "d1-db-06",
+      "tables": [
+        "patient_payment",
+        "payment_allocation",
+        "prepayment_offset",
+        "fee_request",
+        "fee_adjustment",
+        "fee_adjustment_item",
+        "patient_refund"
+      ],
+      "fields": 100,
+      "edge_pairs": [
+        [
+          "fee_adjustment",
+          "fee_request"
+        ],
+        [
+          "fee_adjustment_item",
+          "fee_adjustment"
+        ],
+        [
+          "fee_request",
+          "patient_payment"
+        ],
+        [
+          "patient_refund",
+          "fee_request"
+        ],
+        [
+          "patient_refund",
+          "patient_payment"
+        ],
+        [
+          "payment_allocation",
+          "fee_request"
+        ],
+        [
+          "payment_allocation",
+          "patient_payment"
+        ],
+        [
+          "prepayment_offset",
+          "fee_request"
+        ],
+        [
+          "prepayment_offset",
+          "patient_payment"
+        ]
+      ],
+      "svg_width": 2036.0,
+      "svg_height": 1842.0,
+      "paper_mm": [
+        841,
+        594
+      ],
+      "field_font_pt": 12.38
+    },
+    {
+      "number": 7,
+      "title": "复诊与随访",
+      "stem": "d1-db-07",
+      "tables": [
+        "followup_requirement",
+        "contact_history",
+        "clinical_assessment"
+      ],
+      "fields": 46,
+      "edge_pairs": [
+        [
+          "clinical_assessment",
+          "followup_requirement"
+        ],
+        [
+          "contact_history",
+          "followup_requirement"
+        ]
+      ],
+      "svg_width": 1145.0,
+      "svg_height": 924.0,
+      "paper_mm": [
+        420,
+        297
+      ],
+      "field_font_pt": 11.37
+    },
+    {
+      "number": 8,
+      "title": "材料批次与库存",
+      "stem": "d1-db-08",
+      "tables": [
+        "material",
+        "material_batch",
+        "batch_change",
+        "stock_location",
+        "batch_stock",
+        "inventory_movement",
+        "material_usage",
+        "stock_count"
+      ],
+      "fields": 96,
+      "edge_pairs": [
+        [
+          "batch_change",
+          "material_batch"
+        ],
+        [
+          "batch_stock",
+          "material_batch"
+        ],
+        [
+          "batch_stock",
+          "stock_location"
+        ],
+        [
+          "inventory_movement",
+          "batch_stock"
+        ],
+        [
+          "inventory_movement",
+          "stock_count"
+        ],
+        [
+          "material_batch",
+          "material"
+        ],
+        [
+          "material_usage",
+          "inventory_movement"
+        ],
+        [
+          "stock_count",
+          "batch_stock"
+        ]
+      ],
+      "svg_width": 1050.0,
+      "svg_height": 2366.0,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "field_font_pt": 9.78
+    },
+    {
+      "number": 9,
+      "title": "采购、验收与差异",
+      "stem": "d1-db-09",
+      "tables": [
+        "supplier",
+        "purchase_order",
+        "purchase_order_item",
+        "purchase_receipt",
+        "purchase_receipt_item",
+        "purchase_issue"
+      ],
+      "fields": 82,
+      "edge_pairs": [
+        [
+          "purchase_issue",
+          "purchase_order_item"
+        ],
+        [
+          "purchase_issue",
+          "purchase_receipt_item"
+        ],
+        [
+          "purchase_order",
+          "supplier"
+        ],
+        [
+          "purchase_order_item",
+          "purchase_order"
+        ],
+        [
+          "purchase_receipt",
+          "purchase_order"
+        ],
+        [
+          "purchase_receipt_item",
+          "purchase_order_item"
+        ],
+        [
+          "purchase_receipt_item",
+          "purchase_receipt"
+        ]
+      ],
+      "svg_width": 955.0,
+      "svg_height": 2035.0,
+      "paper_mm": [
+        420,
+        594
+      ],
+      "field_font_pt": 11.37
+    },
+    {
+      "number": 10,
+      "title": "供应商资金结算",
+      "stem": "d1-db-10",
+      "tables": [
+        "supplier_funds",
+        "supplier_payment",
+        "supplier_allocation",
+        "supplier_refund"
+      ],
+      "fields": 55,
+      "edge_pairs": [
+        [
+          "supplier_allocation",
+          "supplier_payment"
+        ],
+        [
+          "supplier_payment",
+          "supplier_funds"
+        ],
+        [
+          "supplier_refund",
+          "supplier_funds"
+        ],
+        [
+          "supplier_refund",
+          "supplier_payment"
+        ]
+      ],
+      "svg_width": 1069.0,
+      "svg_height": 1196.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "field_font_pt": 10.62
+    },
+    {
+      "number": 11,
+      "title": "器械处理与使用",
+      "stem": "d1-db-11",
+      "tables": [
+        "instrument_pack",
+        "processing_equipment",
+        "instrument_processing",
+        "instrument_pack_cycle",
+        "processing_monitor",
+        "instrument_use"
+      ],
+      "fields": 69,
+      "edge_pairs": [
+        [
+          "instrument_pack_cycle",
+          "instrument_pack"
+        ],
+        [
+          "instrument_pack_cycle",
+          "instrument_processing"
+        ],
+        [
+          "instrument_processing",
+          "processing_equipment"
+        ],
+        [
+          "instrument_use",
+          "instrument_pack_cycle"
+        ],
+        [
+          "processing_monitor",
+          "instrument_processing"
+        ]
+      ],
+      "svg_width": 1161.0,
+      "svg_height": 1507.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "field_font_pt": 9.78
+    },
+    {
+      "number": 12,
+      "title": "收支核对与差异跟进",
+      "stem": "d1-db-12",
+      "tables": [
+        "cash_reconciliation",
+        "reconciliation_item",
+        "issue_followup"
+      ],
+      "fields": 44,
+      "edge_pairs": [
+        [
+          "issue_followup",
+          "cash_reconciliation"
+        ],
+        [
+          "reconciliation_item",
+          "cash_reconciliation"
+        ]
+      ],
+      "svg_width": 1206.0,
+      "svg_height": 865.0,
+      "paper_mm": [
+        420,
+        297
+      ],
+      "field_font_pt": 12.14
+    },
+    {
+      "number": 13,
+      "title": "身份、岗位与权限",
+      "stem": "d1-db-13",
+      "tables": [
+        "user_account",
+        "access_role",
+        "access_permission",
+        "staff_role_qualification",
+        "account_role",
+        "role_permission",
+        "login_session",
+        "authentication_event"
+      ],
+      "fields": 71,
+      "edge_pairs": [
+        [
+          "account_role",
+          "access_role"
+        ],
+        [
+          "account_role",
+          "staff_role_qualification"
+        ],
+        [
+          "account_role",
+          "user_account"
+        ],
+        [
+          "authentication_event",
+          "login_session"
+        ],
+        [
+          "authentication_event",
+          "user_account"
+        ],
+        [
+          "login_session",
+          "user_account"
+        ],
+        [
+          "role_permission",
+          "access_permission"
+        ],
+        [
+          "role_permission",
+          "access_role"
+        ],
+        [
+          "staff_role_qualification",
+          "access_role"
+        ]
+      ],
+      "svg_width": 1646.0,
+      "svg_height": 1288.0,
+      "paper_mm": [
+        594,
+        420
+      ],
+      "field_font_pt": 12.21
+    },
+    {
+      "number": 14,
+      "title": "提交控制与审计",
+      "stem": "d1-db-14",
+      "tables": [
+        "request_submission",
+        "operation_audit",
+        "audit_change"
+      ],
+      "fields": 38,
+      "edge_pairs": [
+        [
+          "audit_change",
+          "operation_audit"
+        ],
+        [
+          "operation_audit",
+          "request_submission"
+        ]
+      ],
+      "svg_width": 506.0,
+      "svg_height": 1136.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "field_font_pt": 12.38
+    },
+    {
+      "number": 15,
+      "title": "备份与恢复验证",
+      "stem": "d1-db-15",
+      "tables": [
+        "backup_run",
+        "backup_artifact",
+        "backup_copy",
+        "restore_verification",
+        "restore_check"
+      ],
+      "fields": 59,
+      "edge_pairs": [
+        [
+          "backup_artifact",
+          "backup_run"
+        ],
+        [
+          "backup_copy",
+          "backup_run"
+        ],
+        [
+          "restore_check",
+          "restore_verification"
+        ],
+        [
+          "restore_verification",
+          "backup_copy"
+        ],
+        [
+          "restore_verification",
+          "backup_run"
+        ]
+      ],
+      "svg_width": 1153.0,
+      "svg_height": 1487.0,
+      "paper_mm": [
+        297,
+        420
+      ],
+      "field_font_pt": 9.85
+    }
+  ],
+  "relations": [
+    {
+      "table": "patient",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 1,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "staff",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 1,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_change",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 1,
+      "target_group": 1,
+      "drawn_edge": true
+    },
+    {
+      "table": "patient_change",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 1,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_proxy",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 1,
+      "target_group": 1,
+      "drawn_edge": true
+    },
+    {
+      "table": "patient_proxy",
+      "column": "verified_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 1,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_handover",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 1,
+      "target_group": 1,
+      "drawn_edge": true
+    },
+    {
+      "table": "clinical_handover",
+      "column": "receiving_dentist_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 1,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_handover",
+      "column": "handover_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 1,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "dental_chair",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "dated_schedule",
+      "column": "dentist_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "dated_schedule",
+      "column": "dental_chair_id",
+      "target_table": "dental_chair",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "dated_schedule",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "dated_schedule",
+      "column": "confirmed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "schedule_change",
+      "column": "dated_schedule_id",
+      "target_table": "dated_schedule",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "schedule_change",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "schedule_change",
+      "column": "old_dentist_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "schedule_change",
+      "column": "new_dentist_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "schedule_change",
+      "column": "old_chair_id",
+      "target_table": "dental_chair",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "schedule_change",
+      "column": "new_chair_id",
+      "target_table": "dental_chair",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "resource_occupancy",
+      "column": "dated_schedule_id",
+      "target_table": "dated_schedule",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "resource_occupancy",
+      "column": "appointment_id",
+      "target_table": "appointment",
+      "target_column": "id",
+      "nullable": true,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "resource_occupancy",
+      "column": "visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": true,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "resource_occupancy",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "resource_occupancy",
+      "column": "released_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "appointment",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "appointment",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "appointment",
+      "column": "notified_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "appointment_change",
+      "column": "appointment_id",
+      "target_table": "appointment",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "appointment_change",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "appointment_change",
+      "column": "old_schedule_id",
+      "target_table": "dated_schedule",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "appointment_change",
+      "column": "new_schedule_id",
+      "target_table": "dated_schedule",
+      "target_column": "id",
+      "nullable": true,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "visit",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "visit",
+      "column": "appointment_id",
+      "target_table": "appointment",
+      "target_column": "id",
+      "nullable": true,
+      "group": 2,
+      "target_group": 2,
+      "drawn_edge": true
+    },
+    {
+      "table": "visit",
+      "column": "dentist_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "visit",
+      "column": "registered_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 2,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "health_version",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "health_version",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "health_version",
+      "column": "previous_version_id",
+      "target_table": "health_version",
+      "target_column": "id",
+      "nullable": true,
+      "group": 3,
+      "target_group": 3,
+      "drawn_edge": false
+    },
+    {
+      "table": "health_item",
+      "column": "health_version_id",
+      "target_table": "health_version",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 3,
+      "drawn_edge": true
+    },
+    {
+      "table": "health_review",
+      "column": "visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "health_review",
+      "column": "health_version_id",
+      "target_table": "health_version",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 3,
+      "drawn_edge": true
+    },
+    {
+      "table": "health_review",
+      "column": "reviewed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_record",
+      "column": "visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_record",
+      "column": "signed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 3,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_finding",
+      "column": "clinical_record_id",
+      "target_table": "clinical_record",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 3,
+      "drawn_edge": true
+    },
+    {
+      "table": "clinical_finding",
+      "column": "recorded_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "record_addendum",
+      "column": "clinical_record_id",
+      "target_table": "clinical_record",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 3,
+      "drawn_edge": true
+    },
+    {
+      "table": "record_addendum",
+      "column": "signed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 3,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_document",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_document",
+      "column": "visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_document",
+      "column": "plan_version_id",
+      "target_table": "plan_version",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "clinical_document",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "document_version",
+      "column": "clinical_document_id",
+      "target_table": "clinical_document",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "document_version",
+      "column": "uploaded_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "document_version",
+      "column": "confirmed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "document_version",
+      "column": "previous_version_id",
+      "target_table": "document_version",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": false
+    },
+    {
+      "table": "treatment_plan",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "treatment_plan",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "treatment_plan",
+      "column": "closed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "plan_version",
+      "column": "treatment_plan_id",
+      "target_table": "treatment_plan",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "plan_version",
+      "column": "source_visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "plan_version",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "plan_version",
+      "column": "explained_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "plan_version",
+      "column": "previous_version_id",
+      "target_table": "plan_version",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": false
+    },
+    {
+      "table": "plan_item",
+      "column": "plan_version_id",
+      "target_table": "plan_version",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "patient_decision",
+      "column": "plan_version_id",
+      "target_table": "plan_version",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "patient_decision",
+      "column": "patient_proxy_id",
+      "target_table": "patient_proxy",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_decision",
+      "column": "explained_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_decision",
+      "column": "recorded_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "treatment_execution",
+      "column": "visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "treatment_execution",
+      "column": "plan_item_id",
+      "target_table": "plan_item",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "treatment_execution",
+      "column": "service_id",
+      "target_table": "service",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 5,
+      "drawn_edge": false
+    },
+    {
+      "table": "treatment_execution",
+      "column": "original_execution_id",
+      "target_table": "treatment_execution",
+      "target_column": "id",
+      "nullable": true,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": false
+    },
+    {
+      "table": "treatment_execution",
+      "column": "performed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "decision_plan_item",
+      "column": "decision_id",
+      "target_table": "patient_decision",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "decision_plan_item",
+      "column": "plan_item_id",
+      "target_table": "plan_item",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "decision_plan_item",
+      "column": "linked_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "decision_file_version",
+      "column": "decision_id",
+      "target_table": "patient_decision",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "decision_file_version",
+      "column": "document_version_id",
+      "target_table": "document_version",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 4,
+      "drawn_edge": true
+    },
+    {
+      "table": "decision_file_version",
+      "column": "linked_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 4,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "service",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "service_price",
+      "column": "service_id",
+      "target_table": "service",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 5,
+      "drawn_edge": true
+    },
+    {
+      "table": "service_price",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "service_price",
+      "column": "confirmed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 5,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "bill",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "bill",
+      "column": "patient_funds_id",
+      "target_table": "patient_funds",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 5,
+      "drawn_edge": true
+    },
+    {
+      "table": "bill",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "bill_item",
+      "column": "bill_id",
+      "target_table": "bill",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 5,
+      "drawn_edge": true
+    },
+    {
+      "table": "bill_item",
+      "column": "treatment_execution_id",
+      "target_table": "treatment_execution",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 4,
+      "drawn_edge": false
+    },
+    {
+      "table": "bill_item",
+      "column": "service_price_id",
+      "target_table": "service_price",
+      "target_column": "id",
+      "nullable": true,
+      "group": 5,
+      "target_group": 5,
+      "drawn_edge": true
+    },
+    {
+      "table": "bill_item",
+      "column": "priced_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 5,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_funds",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_funds",
+      "column": "opened_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 5,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_payment",
+      "column": "patient_funds_id",
+      "target_table": "patient_funds",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 5,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_payment",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_payment",
+      "column": "verified_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "payment_allocation",
+      "column": "patient_payment_id",
+      "target_table": "patient_payment",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": true
+    },
+    {
+      "table": "payment_allocation",
+      "column": "bill_id",
+      "target_table": "bill",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 5,
+      "drawn_edge": false
+    },
+    {
+      "table": "payment_allocation",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "payment_allocation",
+      "column": "original_allocation_id",
+      "target_table": "payment_allocation",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": false
+    },
+    {
+      "table": "payment_allocation",
+      "column": "fee_request_id",
+      "target_table": "fee_request",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": true
+    },
+    {
+      "table": "prepayment_offset",
+      "column": "patient_payment_id",
+      "target_table": "patient_payment",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": true
+    },
+    {
+      "table": "prepayment_offset",
+      "column": "bill_id",
+      "target_table": "bill",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 5,
+      "drawn_edge": false
+    },
+    {
+      "table": "prepayment_offset",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "prepayment_offset",
+      "column": "original_offset_id",
+      "target_table": "prepayment_offset",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": false
+    },
+    {
+      "table": "prepayment_offset",
+      "column": "fee_request_id",
+      "target_table": "fee_request",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": true
+    },
+    {
+      "table": "fee_request",
+      "column": "patient_funds_id",
+      "target_table": "patient_funds",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 5,
+      "drawn_edge": false
+    },
+    {
+      "table": "fee_request",
+      "column": "bill_id",
+      "target_table": "bill",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 5,
+      "drawn_edge": false
+    },
+    {
+      "table": "fee_request",
+      "column": "patient_payment_id",
+      "target_table": "patient_payment",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": true
+    },
+    {
+      "table": "fee_request",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "fee_request",
+      "column": "reviewed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "fee_adjustment",
+      "column": "fee_request_id",
+      "target_table": "fee_request",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": true
+    },
+    {
+      "table": "fee_adjustment",
+      "column": "bill_id",
+      "target_table": "bill",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 5,
+      "drawn_edge": false
+    },
+    {
+      "table": "fee_adjustment",
+      "column": "approved_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "fee_adjustment_item",
+      "column": "fee_adjustment_id",
+      "target_table": "fee_adjustment",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": true
+    },
+    {
+      "table": "fee_adjustment_item",
+      "column": "bill_item_id",
+      "target_table": "bill_item",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 5,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_refund",
+      "column": "fee_request_id",
+      "target_table": "fee_request",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": true
+    },
+    {
+      "table": "patient_refund",
+      "column": "patient_payment_id",
+      "target_table": "patient_payment",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": true
+    },
+    {
+      "table": "patient_refund",
+      "column": "patient_funds_id",
+      "target_table": "patient_funds",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 5,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_refund",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 6,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_refund",
+      "column": "verified_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "patient_refund",
+      "column": "previous_attempt_id",
+      "target_table": "patient_refund",
+      "target_column": "id",
+      "nullable": true,
+      "group": 6,
+      "target_group": 6,
+      "drawn_edge": false
+    },
+    {
+      "table": "followup_requirement",
+      "column": "patient_id",
+      "target_table": "patient",
+      "target_column": "id",
+      "nullable": false,
+      "group": 7,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "followup_requirement",
+      "column": "source_visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": true,
+      "group": 7,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "followup_requirement",
+      "column": "source_plan_version_id",
+      "target_table": "plan_version",
+      "target_column": "id",
+      "nullable": true,
+      "group": 7,
+      "target_group": 4,
+      "drawn_edge": false
+    },
+    {
+      "table": "followup_requirement",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 7,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "followup_requirement",
+      "column": "responsible_frontdesk_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 7,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "followup_requirement",
+      "column": "closed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 7,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "contact_history",
+      "column": "followup_requirement_id",
+      "target_table": "followup_requirement",
+      "target_column": "id",
+      "nullable": false,
+      "group": 7,
+      "target_group": 7,
+      "drawn_edge": true
+    },
+    {
+      "table": "contact_history",
+      "column": "appointment_id",
+      "target_table": "appointment",
+      "target_column": "id",
+      "nullable": true,
+      "group": 7,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "contact_history",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 7,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_assessment",
+      "column": "followup_requirement_id",
+      "target_table": "followup_requirement",
+      "target_column": "id",
+      "nullable": false,
+      "group": 7,
+      "target_group": 7,
+      "drawn_edge": true
+    },
+    {
+      "table": "clinical_assessment",
+      "column": "visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": true,
+      "group": 7,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_assessment",
+      "column": "assessed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 7,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "clinical_assessment",
+      "column": "responsible_staff_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 7,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "material",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "material",
+      "column": "confirmed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "material_batch",
+      "column": "material_id",
+      "target_table": "material",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 8,
+      "drawn_edge": true
+    },
+    {
+      "table": "material_batch",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "batch_change",
+      "column": "material_batch_id",
+      "target_table": "material_batch",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 8,
+      "drawn_edge": true
+    },
+    {
+      "table": "batch_change",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "batch_change",
+      "column": "confirmed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "stock_location",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "batch_stock",
+      "column": "material_batch_id",
+      "target_table": "material_batch",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 8,
+      "drawn_edge": true
+    },
+    {
+      "table": "batch_stock",
+      "column": "stock_location_id",
+      "target_table": "stock_location",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 8,
+      "drawn_edge": true
+    },
+    {
+      "table": "inventory_movement",
+      "column": "batch_stock_id",
+      "target_table": "batch_stock",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 8,
+      "drawn_edge": true
+    },
+    {
+      "table": "inventory_movement",
+      "column": "original_movement_id",
+      "target_table": "inventory_movement",
+      "target_column": "id",
+      "nullable": true,
+      "group": 8,
+      "target_group": 8,
+      "drawn_edge": false
+    },
+    {
+      "table": "inventory_movement",
+      "column": "stock_count_id",
+      "target_table": "stock_count",
+      "target_column": "id",
+      "nullable": true,
+      "group": 8,
+      "target_group": 8,
+      "drawn_edge": true
+    },
+    {
+      "table": "inventory_movement",
+      "column": "purchase_receipt_item_id",
+      "target_table": "purchase_receipt_item",
+      "target_column": "id",
+      "nullable": true,
+      "group": 8,
+      "target_group": 9,
+      "drawn_edge": false
+    },
+    {
+      "table": "inventory_movement",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "inventory_movement",
+      "column": "purchase_issue_id",
+      "target_table": "purchase_issue",
+      "target_column": "id",
+      "nullable": true,
+      "group": 8,
+      "target_group": 9,
+      "drawn_edge": false
+    },
+    {
+      "table": "material_usage",
+      "column": "inventory_movement_id",
+      "target_table": "inventory_movement",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 8,
+      "drawn_edge": true
+    },
+    {
+      "table": "material_usage",
+      "column": "visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "material_usage",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "stock_count",
+      "column": "batch_stock_id",
+      "target_table": "batch_stock",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 8,
+      "drawn_edge": true
+    },
+    {
+      "table": "stock_count",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "stock_count",
+      "column": "confirmed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 8,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier",
+      "column": "verified_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "purchase_order",
+      "column": "supplier_id",
+      "target_table": "supplier",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 9,
+      "drawn_edge": true
+    },
+    {
+      "table": "purchase_order",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "purchase_order",
+      "column": "confirmed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 9,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "purchase_order_item",
+      "column": "purchase_order_id",
+      "target_table": "purchase_order",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 9,
+      "drawn_edge": true
+    },
+    {
+      "table": "purchase_order_item",
+      "column": "material_id",
+      "target_table": "material",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 8,
+      "drawn_edge": false
+    },
+    {
+      "table": "purchase_receipt",
+      "column": "purchase_order_id",
+      "target_table": "purchase_order",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 9,
+      "drawn_edge": true
+    },
+    {
+      "table": "purchase_receipt",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "purchase_receipt",
+      "column": "confirmed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 9,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "purchase_receipt_item",
+      "column": "purchase_receipt_id",
+      "target_table": "purchase_receipt",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 9,
+      "drawn_edge": true
+    },
+    {
+      "table": "purchase_receipt_item",
+      "column": "purchase_order_item_id",
+      "target_table": "purchase_order_item",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 9,
+      "drawn_edge": true
+    },
+    {
+      "table": "purchase_receipt_item",
+      "column": "material_batch_id",
+      "target_table": "material_batch",
+      "target_column": "id",
+      "nullable": true,
+      "group": 9,
+      "target_group": 8,
+      "drawn_edge": false
+    },
+    {
+      "table": "purchase_receipt_item",
+      "column": "stock_location_id",
+      "target_table": "stock_location",
+      "target_column": "id",
+      "nullable": true,
+      "group": 9,
+      "target_group": 8,
+      "drawn_edge": false
+    },
+    {
+      "table": "purchase_issue",
+      "column": "purchase_order_item_id",
+      "target_table": "purchase_order_item",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 9,
+      "drawn_edge": true
+    },
+    {
+      "table": "purchase_issue",
+      "column": "purchase_receipt_item_id",
+      "target_table": "purchase_receipt_item",
+      "target_column": "id",
+      "nullable": true,
+      "group": 9,
+      "target_group": 9,
+      "drawn_edge": true
+    },
+    {
+      "table": "purchase_issue",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 9,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "purchase_issue",
+      "column": "confirmed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 9,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_funds",
+      "column": "supplier_id",
+      "target_table": "supplier",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 9,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_funds",
+      "column": "opened_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_payment",
+      "column": "supplier_funds_id",
+      "target_table": "supplier_funds",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 10,
+      "drawn_edge": true
+    },
+    {
+      "table": "supplier_payment",
+      "column": "authorized_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_payment",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_payment",
+      "column": "verified_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 10,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_payment",
+      "column": "previous_attempt_id",
+      "target_table": "supplier_payment",
+      "target_column": "id",
+      "nullable": true,
+      "group": 10,
+      "target_group": 10,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_allocation",
+      "column": "supplier_payment_id",
+      "target_table": "supplier_payment",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 10,
+      "drawn_edge": true
+    },
+    {
+      "table": "supplier_allocation",
+      "column": "purchase_order_id",
+      "target_table": "purchase_order",
+      "target_column": "id",
+      "nullable": true,
+      "group": 10,
+      "target_group": 9,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_allocation",
+      "column": "purchase_receipt_id",
+      "target_table": "purchase_receipt",
+      "target_column": "id",
+      "nullable": true,
+      "group": 10,
+      "target_group": 9,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_allocation",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_allocation",
+      "column": "original_allocation_id",
+      "target_table": "supplier_allocation",
+      "target_column": "id",
+      "nullable": true,
+      "group": 10,
+      "target_group": 10,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_allocation",
+      "column": "purchase_issue_id",
+      "target_table": "purchase_issue",
+      "target_column": "id",
+      "nullable": true,
+      "group": 10,
+      "target_group": 9,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_refund",
+      "column": "supplier_payment_id",
+      "target_table": "supplier_payment",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 10,
+      "drawn_edge": true
+    },
+    {
+      "table": "supplier_refund",
+      "column": "purchase_issue_id",
+      "target_table": "purchase_issue",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 9,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_refund",
+      "column": "supplier_funds_id",
+      "target_table": "supplier_funds",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 10,
+      "drawn_edge": true
+    },
+    {
+      "table": "supplier_refund",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "supplier_refund",
+      "column": "verified_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 10,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "instrument_pack",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "processing_equipment",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "instrument_processing",
+      "column": "processing_equipment_id",
+      "target_table": "processing_equipment",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 11,
+      "drawn_edge": true
+    },
+    {
+      "table": "instrument_processing",
+      "column": "previous_processing_id",
+      "target_table": "instrument_processing",
+      "target_column": "id",
+      "nullable": true,
+      "group": 11,
+      "target_group": 11,
+      "drawn_edge": false
+    },
+    {
+      "table": "instrument_processing",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "instrument_processing",
+      "column": "released_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 11,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "instrument_processing",
+      "column": "isolated_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 11,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "column": "instrument_processing_id",
+      "target_table": "instrument_processing",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 11,
+      "drawn_edge": true
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "column": "instrument_pack_id",
+      "target_table": "instrument_pack",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 11,
+      "drawn_edge": true
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "column": "checked_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "processing_monitor",
+      "column": "instrument_processing_id",
+      "target_table": "instrument_processing",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 11,
+      "drawn_edge": true
+    },
+    {
+      "table": "processing_monitor",
+      "column": "recorded_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "instrument_use",
+      "column": "visit_id",
+      "target_table": "visit",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 2,
+      "drawn_edge": false
+    },
+    {
+      "table": "instrument_use",
+      "column": "instrument_pack_cycle_id",
+      "target_table": "instrument_pack_cycle",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 11,
+      "drawn_edge": true
+    },
+    {
+      "table": "instrument_use",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 11,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "instrument_use",
+      "column": "used_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 11,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "cash_reconciliation",
+      "column": "operator_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 12,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "reconciliation_item",
+      "column": "cash_reconciliation_id",
+      "target_table": "cash_reconciliation",
+      "target_column": "id",
+      "nullable": false,
+      "group": 12,
+      "target_group": 12,
+      "drawn_edge": true
+    },
+    {
+      "table": "reconciliation_item",
+      "column": "patient_payment_id",
+      "target_table": "patient_payment",
+      "target_column": "id",
+      "nullable": true,
+      "group": 12,
+      "target_group": 6,
+      "drawn_edge": false
+    },
+    {
+      "table": "reconciliation_item",
+      "column": "patient_refund_id",
+      "target_table": "patient_refund",
+      "target_column": "id",
+      "nullable": true,
+      "group": 12,
+      "target_group": 6,
+      "drawn_edge": false
+    },
+    {
+      "table": "reconciliation_item",
+      "column": "supplier_payment_id",
+      "target_table": "supplier_payment",
+      "target_column": "id",
+      "nullable": true,
+      "group": 12,
+      "target_group": 10,
+      "drawn_edge": false
+    },
+    {
+      "table": "reconciliation_item",
+      "column": "supplier_refund_id",
+      "target_table": "supplier_refund",
+      "target_column": "id",
+      "nullable": true,
+      "group": 12,
+      "target_group": 10,
+      "drawn_edge": false
+    },
+    {
+      "table": "issue_followup",
+      "column": "cash_reconciliation_id",
+      "target_table": "cash_reconciliation",
+      "target_column": "id",
+      "nullable": true,
+      "group": 12,
+      "target_group": 12,
+      "drawn_edge": true
+    },
+    {
+      "table": "issue_followup",
+      "column": "instrument_processing_id",
+      "target_table": "instrument_processing",
+      "target_column": "id",
+      "nullable": true,
+      "group": 12,
+      "target_group": 11,
+      "drawn_edge": false
+    },
+    {
+      "table": "issue_followup",
+      "column": "assigned_to",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 12,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "issue_followup",
+      "column": "created_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 12,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "issue_followup",
+      "column": "completed_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 12,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "user_account",
+      "column": "staff_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "staff_role_qualification",
+      "column": "staff_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "staff_role_qualification",
+      "column": "role_id",
+      "target_table": "access_role",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "staff_role_qualification",
+      "column": "verified_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "staff_role_qualification",
+      "column": "revoked_by",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 13,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "account_role",
+      "column": "account_id",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "account_role",
+      "column": "role_id",
+      "target_table": "access_role",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "account_role",
+      "column": "qualification_id",
+      "target_table": "staff_role_qualification",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "account_role",
+      "column": "granted_by",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "account_role",
+      "column": "revoked_by",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": true,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "role_permission",
+      "column": "role_id",
+      "target_table": "access_role",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "role_permission",
+      "column": "permission_id",
+      "target_table": "access_permission",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "login_session",
+      "column": "account_id",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": false,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "authentication_event",
+      "column": "account_id",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": true,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "authentication_event",
+      "column": "session_id",
+      "target_table": "login_session",
+      "target_column": "id",
+      "nullable": true,
+      "group": 13,
+      "target_group": 13,
+      "drawn_edge": true
+    },
+    {
+      "table": "request_submission",
+      "column": "account_id",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": false,
+      "group": 14,
+      "target_group": 13,
+      "drawn_edge": false
+    },
+    {
+      "table": "request_submission",
+      "column": "permission_id",
+      "target_table": "access_permission",
+      "target_column": "id",
+      "nullable": false,
+      "group": 14,
+      "target_group": 13,
+      "drawn_edge": false
+    },
+    {
+      "table": "operation_audit",
+      "column": "account_id",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": true,
+      "group": 14,
+      "target_group": 13,
+      "drawn_edge": false
+    },
+    {
+      "table": "operation_audit",
+      "column": "staff_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": true,
+      "group": 14,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "operation_audit",
+      "column": "session_id",
+      "target_table": "login_session",
+      "target_column": "id",
+      "nullable": true,
+      "group": 14,
+      "target_group": 13,
+      "drawn_edge": false
+    },
+    {
+      "table": "operation_audit",
+      "column": "submission_id",
+      "target_table": "request_submission",
+      "target_column": "id",
+      "nullable": true,
+      "group": 14,
+      "target_group": 14,
+      "drawn_edge": true
+    },
+    {
+      "table": "operation_audit",
+      "column": "permission_id",
+      "target_table": "access_permission",
+      "target_column": "id",
+      "nullable": true,
+      "group": 14,
+      "target_group": 13,
+      "drawn_edge": false
+    },
+    {
+      "table": "audit_change",
+      "column": "audit_id",
+      "target_table": "operation_audit",
+      "target_column": "id",
+      "nullable": false,
+      "group": 14,
+      "target_group": 14,
+      "drawn_edge": true
+    },
+    {
+      "table": "backup_run",
+      "column": "requested_by",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": true,
+      "group": 15,
+      "target_group": 13,
+      "drawn_edge": false
+    },
+    {
+      "table": "backup_run",
+      "column": "responsible_staff_id",
+      "target_table": "staff",
+      "target_column": "id",
+      "nullable": false,
+      "group": 15,
+      "target_group": 1,
+      "drawn_edge": false
+    },
+    {
+      "table": "backup_artifact",
+      "column": "backup_id",
+      "target_table": "backup_run",
+      "target_column": "id",
+      "nullable": false,
+      "group": 15,
+      "target_group": 15,
+      "drawn_edge": true
+    },
+    {
+      "table": "backup_artifact",
+      "column": "document_version_id",
+      "target_table": "document_version",
+      "target_column": "id",
+      "nullable": true,
+      "group": 15,
+      "target_group": 4,
+      "drawn_edge": false
+    },
+    {
+      "table": "backup_copy",
+      "column": "backup_id",
+      "target_table": "backup_run",
+      "target_column": "id",
+      "nullable": false,
+      "group": 15,
+      "target_group": 15,
+      "drawn_edge": true
+    },
+    {
+      "table": "backup_copy",
+      "column": "verified_by",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": true,
+      "group": 15,
+      "target_group": 13,
+      "drawn_edge": false
+    },
+    {
+      "table": "restore_verification",
+      "column": "backup_id",
+      "target_table": "backup_run",
+      "target_column": "id",
+      "nullable": false,
+      "group": 15,
+      "target_group": 15,
+      "drawn_edge": true
+    },
+    {
+      "table": "restore_verification",
+      "column": "copy_id",
+      "target_table": "backup_copy",
+      "target_column": "id",
+      "nullable": false,
+      "group": 15,
+      "target_group": 15,
+      "drawn_edge": true
+    },
+    {
+      "table": "restore_verification",
+      "column": "verified_by",
+      "target_table": "user_account",
+      "target_column": "id",
+      "nullable": false,
+      "group": 15,
+      "target_group": 13,
+      "drawn_edge": false
+    },
+    {
+      "table": "restore_check",
+      "column": "restore_id",
+      "target_table": "restore_verification",
+      "target_column": "id",
+      "nullable": false,
+      "group": 15,
+      "target_group": 15,
+      "drawn_edge": true
+    }
+  ],
+  "source_sha256": "844f135d4f5f7c2390d6aa60e296002dccf92e93429ae23ae9e8b1a8e8783ea3",
+  "overall": {
+    "width_px": 8813.0,
+    "height_px": 6419.0,
+    "layout": "5 columns × 3 rows; native PlantUML diagrams at equal scale",
+    "source": "24-database-overall.puml"
+  },
+  "verified_date": "2026-10-18"
+}

@@ -1,0 +1,41 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam dpi 160
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+class "牙医接口" as UI <<boundary>> {
+ + 提交确认诊疗(输入)
+ - 反馈确认诊疗(结果)
+ + 提交查询诊疗资料(输入)
+ - 反馈查询诊疗资料(结果)
+ + 提交保存临床记录(输入)
+ - 反馈保存临床记录(结果)
+ + 提交签署或补充(输入)
+ - 反馈签署或补充(结果)
+ + 提交提出诊后要求(输入)
+ - 反馈提出诊后要求(结果)
+ + 提交完成临床评估(输入)
+ - 反馈完成临床评估(结果)
+ + 提交查询可用安排(输入)
+ - 反馈查询可用安排(结果)
+}
+class "页面状态" as S {
+ 当前对象标识
+ 当前业务版本
+ 草稿输入
+ 提交状态
+ --
+ 显示字段错误()
+ 刷新结果()
+}
+UI *-- S
+
+@enduml

@@ -1,0 +1,26 @@
+{
+  "sqlite_version": "3.53.1",
+  "schema_tables_prepared": 85,
+  "field_definitions": 1048,
+  "foreign_key_groups_prepared": 281,
+  "partial_unique_indexes_prepared": 9,
+  "query_indexes_prepared": 66,
+  "row_checks_parsed": 27,
+  "semantics_checks": [
+    "同归属复合外键可插入",
+    "存在父记录但归属错误被拒绝",
+    "可空来源允许合法现场记录",
+    "可选来源填写不存在ID仍被拒绝",
+    "可空唯一允许多条NULL",
+    "非空来源重复被拒绝",
+    "正常资源占用可建立",
+    "同资源重复正常占用被拒绝",
+    "先退回再发放保留旧经历",
+    "含非确定函数的部分索引被拒绝",
+    "动态now条件不能用于可写部分索引",
+    "回滚同时清除业务事实与命令结果",
+    "同账号同命令键不重复提交"
+  ],
+  "scope": "临时内存库结构与SQLite语义探针；不含完整跨表触发器/状态枚举约束，也不是全业务或并发验收。",
+  "production_sql_sha256": "c9d3d47d0e413ca967543ec83e1ee90a895106dafa120481a7199fbf2bb5177a"
+}

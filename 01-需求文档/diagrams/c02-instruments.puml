@@ -1,0 +1,100 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "器械包" as Pack <<entity>> {
+ 名称
+ 组成说明
+ --
+ 核对物理归属()
+}
+class "处理设备" as Equipment <<entity>> {
+ 名称
+ 可用起止
+ --
+ 核对设备归属()
+}
+class "器械处理" as Process <<entity>> {
+ 回收准备情况
+ 开始时间
+ 结束时间
+ 放行时间
+ 放行依据
+ 异常原因
+ --
+ 登记本轮处理()
+ 完成处理登记()
+ 确认放行或隔离()
+}
+class "器械包处理" as PackCycle <<entity>> {
+ 包装核对
+ 有效期限
+ --
+ 建立本轮包次()
+ 接受本轮放行()
+ 核对本轮可用性()
+}
+class "处理监测" as Monitor <<entity>> {
+ 项目
+ 结果
+ 取得时间
+ 证据说明
+ --
+ 保存实际监测()
+}
+class "器械使用" as InstrumentUse <<entity>> {
+ 发放时间
+ 使用时间
+ 实物核对
+ 异常说明
+ --
+ 保留使用关联()
+ 提供实际使用依据()
+}
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ 接诊开始
+ 诊疗结束
+ 到诊来源
+ --
+ 登记到诊()
+ 核对接诊责任()
+ 确认实际执行()
+}
+class "差异跟进" as FollowIssue <<entity>> {
+ 原因
+ 期限
+ 处理意见
+ 完成时间
+ --
+ 登记差异责任()
+ 登记异常追查()
+ 追加处理结论()
+}
+Equipment "1" -- "0..*" Process : 处理设备
+Process "1" *-- "1..*" PackCycle : 本轮包次
+Pack "1" -- "0..*" PackCycle : 历轮处理
+Process "1" *-- "0..*" Monitor : 处理监测
+Visit "1" -- "0..*" InstrumentUse : 关联就诊
+Process "0..1" -- "0..*" Process : 异常后重新处理
+Process "0..1" -- "0..*" FollowIssue : 器械异常
+PackCycle "1" *-- "0..*" InstrumentUse : 本轮使用经历
+
+@enduml

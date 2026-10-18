@@ -1,0 +1,124 @@
+@startuml d1-db-09
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F0ECF7
+}
+title G09  采购、验收与差异  ·  6张表
+entity "供应商\nsupplier" as supplier {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} contact_name : TEXT [NN]
+  {field} phone : TEXT [NN]
+  {field} address : TEXT [NULL]
+  {field} settlement_basis : TEXT [NN]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "采购\npurchase_order" as purchase_order {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_id : INTEGER [FK, NN]  → supplier.id
+  {field} agreed_at : TEXT [NN]
+  {field} delivery_terms : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} request_reason : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "采购项目\npurchase_order_item" as purchase_order_item {
+  {field} id : INTEGER [PK, NN]
+  {field} purchase_order_id : INTEGER [FK, NN]  → purchase_order.id
+  {field} material_id : INTEGER [FK, NN]  → material.id (G08)
+  {field} ordered_quantity_scaled : INTEGER [NN]
+  {field} unit_price_cents : INTEGER [NN]
+  {field} purchase_unit : TEXT [NN]
+  {field} conversion_numerator : INTEGER [NN]
+  {field} conversion_denominator : INTEGER [NN]
+  {field} quantity_scale : INTEGER [NN]
+  {field} sequence_no : INTEGER [NN]
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "验收\npurchase_receipt" as purchase_receipt {
+  {field} id : INTEGER [PK, NN]
+  {field} purchase_order_id : INTEGER [FK, NN]  → purchase_order.id
+  {field} arrived_at : TEXT [NN]
+  {field} delivery_evidence : TEXT [NN]
+  {field} accepted_at : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "验收项目\npurchase_receipt_item" as purchase_receipt_item {
+  {field} id : INTEGER [PK, NN]
+  {field} purchase_receipt_id : INTEGER [FK, NN]  → purchase_receipt.id
+  {field} purchase_order_item_id : INTEGER [FK, NN]  → purchase_order_item.id
+  {field} material_batch_id : INTEGER [FK, NULL]  → material_batch.id (G08)
+  {field} arrived_quantity_scaled : INTEGER [NN]
+  {field} accepted_quantity_scaled : INTEGER [NN]
+  {field} rejected_quantity_scaled : INTEGER [NN]
+  {field} pending_quantity_scaled : INTEGER [NN]
+  {field} accepted_amount_cents : INTEGER [NULL]
+  {field} inspection_note : TEXT [NN]
+  {field} stock_location_id : INTEGER [FK, NULL]  → stock_location.id (G08)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "采购差异\npurchase_issue" as purchase_issue {
+  {field} id : INTEGER [PK, NN]
+  {field} purchase_order_item_id : INTEGER [FK, NN]  → purchase_order_item.id
+  {field} purchase_receipt_item_id : INTEGER [FK, NULL]  → purchase_receipt_item.id
+  {field} quantity_scaled : INTEGER [NN]
+  {field} reason : TEXT [NN]
+  {field} resolution : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} issue_kind : TEXT [NN]
+  {field} adjustment_cents : INTEGER [NN]
+  {field} resolved_at : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+purchase_issue --> purchase_order_item
+purchase_issue --> purchase_receipt_item
+purchase_order --> supplier
+purchase_order_item --> purchase_order
+purchase_receipt --> purchase_order
+purchase_receipt_item --> purchase_order_item
+purchase_receipt_item --> purchase_receipt
+@enduml

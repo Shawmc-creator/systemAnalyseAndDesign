@@ -1,0 +1,38 @@
+@startuml
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam backgroundColor white
+hide footbox
+boundary "岗位接口" as B
+control "用例控制" as K
+participant "工作单元" as W
+participant "权限服务" as A
+participant "领域实体及映射器" as E
+B -> K : 办理(ctx, cmd)
+K -> W : 开始写事务()
+W --> K : 同一连接
+K -> A : 核对岗位及对象(ctx, 引用)
+A --> K : 当前授权
+K -> W : 核对提交(ctx, cmd)
+alt 相同账号及命令键已提交
+ W -> W : 比较操作、参数摘要及命令版本
+ W --> K : 原阶段结果；不重复执行业务
+ K -> W : 结束事务()
+else 新命令
+ K -> E : 装载来源；执行业务规则；保存变更
+ E --> K : 变更与版本或错误
+ alt 任一步骤拒绝、故障或末校验失败
+  K -> W : 回滚全部业务事实()
+  W --> K : 稳定错误码及冲突对象
+ else 全部通过
+  K -> W : 校验集合与来源()
+  K -> W : 保存结果与审计并提交()
+  W --> K : 已提交的阶段结果
+ end
+end
+K --> B : 办理结果
+note over K,W
+外部实际付款、文件复制及用户等待在事务外；
+结果未知用原办理号核实，不自动再付。
+end note
+@enduml

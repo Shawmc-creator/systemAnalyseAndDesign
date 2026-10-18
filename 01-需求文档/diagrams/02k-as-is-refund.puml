@@ -1,0 +1,49 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+actor "患者" as P
+participant "<img:business-worker.png>\n收费人员" as C
+participant "<img:business-worker.png>\n牙医" as D
+participant "<img:business-worker.png>\n诊所负责人" as M
+P -> C : 提出费用异议或退回未用预付款
+activate C
+C -> C : 查找账单、付款和已有退费凭据
+opt 涉及诊疗项目
+ C -> D : 核实实际治疗及费用依据
+ D --> C : 提供核实结果及更正说明
+end
+C -> M : 提交原因、依据及拟处理金额
+M --> C : 确认处理或说明不予办理原因
+alt 同意退费
+ C -> P : 核对退款金额及方式
+ P --> C : 确认退款接收信息
+ C -> C : 办理实际退款并核实结果
+ alt 实际退款已确认
+  C -> C : 另记调整、退款凭据及原单关联
+  C --> P : 交付退款结果与凭据
+ else 退款失败或结果不明
+  C -> C : 登记待核实事项及原因
+  C --> P : 告知核实进度
+ end
+else 不予办理或资料不足
+ C --> P : 说明理由及需补充事项
+end
+deactivate C
+@enduml

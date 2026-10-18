@@ -1,0 +1,106 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "诊疗助理" as A0
+boundary "<u>:诊疗助理接口</u>" as B0
+control "<u>:登记器械处理与</u>\n<u>放行控制</u>" as K
+participant "<u>:处理设备</u>" as Equipment
+participant "<u>:器械处理</u>" as Process
+participant "<u>:器械包处理</u>" as PackCycle
+participant "<u>:器械包</u>" as Pack
+participant "<u>:处理监测</u>" as Monitor
+A0 -> B0 : 提交UC-30办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-30办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Equipment : 核对设备归属(实际处理设备)
+activate Equipment
+Equipment --> K : 处理结果或拒绝原因
+deactivate Equipment
+K -> Process : 登记本轮处理(时间、设备、器械包范围)
+activate Process
+Process -> PackCycle : 建立本轮包次(包、包装核对及有效期)
+activate PackCycle
+PackCycle -> Pack : 核对物理归属(本轮器械包)
+activate Pack
+Pack --> PackCycle : 处理结果或拒绝原因
+deactivate Pack
+PackCycle --> Process : 处理结果或拒绝原因
+deactivate PackCycle
+Process -> Monitor : 保存实际监测(项目、结果及证据)
+activate Monitor
+Monitor --> Process : 处理结果或拒绝原因
+deactivate Monitor
+Process --> K : 处理结果或拒绝原因
+deactivate Process
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A0 -> B0 : 提交实际结束时间和监测
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-30办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Process : 完成处理登记(实际结束时间及已取得监测)
+activate Process
+Process --> K : 处理结果或拒绝原因
+deactivate Process
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A0 -> B0 : 提交实际放行或隔离结论
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-30办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Process : 确认放行或隔离(助理核对依据)
+activate Process
+Process -> Process : 核对放行条件(监测完整且无未解决异常)
+opt 本轮处理已确认放行
+Process -> PackCycle : 接受本轮放行(处理已确认放行且本包有效)
+activate PackCycle
+PackCycle --> Process : 处理结果或拒绝原因
+deactivate PackCycle
+end
+Process --> K : 处理结果或拒绝原因
+deactivate Process
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Monitor
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

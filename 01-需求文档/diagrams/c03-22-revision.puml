@@ -1,0 +1,73 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "牙医" as A0
+boundary "<u>:牙医接口</u>" as B0
+control "<u>:维护持续治疗方</u>\n<u>案及确认控制</u>" as K
+participant "<u>:治疗方案</u>" as Plan
+participant "<u>:方案版本</u>" as PlanVersion
+participant "<u>:方案项目</u>" as PlanItem
+participant "<u>:诊疗执行</u>" as Execution
+participant "<u>:患者决定</u>" as Decision
+A0 -> B0 : 提交UC-22办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-22办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Plan : 提出剩余项目改版(原确认版本、原因)
+activate Plan
+Plan -> PlanVersion : 保留原确认版本(原内容与决定)
+activate PlanVersion
+PlanVersion -> PlanItem : 识别未执行范围(既有执行关联)
+activate PlanItem
+PlanItem -> Execution : 核对已完成事实(原项目及数量)
+activate Execution
+Execution --> PlanItem : 处理结果或拒绝原因
+deactivate Execution
+PlanItem --> PlanVersion : 处理结果或拒绝原因
+deactivate PlanItem
+PlanVersion --> Plan : 处理结果或拒绝原因
+deactivate PlanVersion
+Plan -> PlanVersion : 形成待确认版本(仅后续安排)
+activate PlanVersion
+PlanVersion -> Decision : 保留患者决定(新版本确认或撤回)
+activate Decision
+Decision --> PlanVersion : 处理结果或拒绝原因
+deactivate Decision
+PlanVersion --> Plan : 处理结果或拒绝原因
+deactivate PlanVersion
+Plan --> K : 处理结果或拒绝原因
+deactivate Plan
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Decision
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

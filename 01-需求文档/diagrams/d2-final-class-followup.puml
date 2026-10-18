@@ -1,0 +1,129 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "患者" as Patient <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -birth_date: Text?
+ -phone: Text?
+ -phone_owner: Text?
+ +核对身份(依据: 操作输入): 业务结果
+ +核对身份候选(依据: 操作输入): 业务结果
+ +确认资料维护(依据: 操作输入): 业务结果
+ +核对临床访问(依据: 操作输入): 业务结果
+ +确认健康变更(依据: 操作输入): 业务结果
+}
+class "就诊" as Visit <<entity>> {
+ -id: ObjectId
+ -arrived_at: Text
+ -started_at: Text?
+ -ended_at: Text?
+ -arrival_source: Text
+ +登记到诊(依据: 操作输入): 业务结果
+ +核对接诊责任(依据: 操作输入): 业务结果
+ +确认实际执行(依据: 操作输入): 业务结果
+ +提供获准就诊(依据: 操作输入): 业务结果
+ +确认实际接诊(依据: 操作输入): 业务结果
+ +记录检查诊断(依据: 操作输入): 业务结果
+ +核对签署条件(依据: 操作输入): 业务结果
+ +结束本次诊疗(依据: 操作输入): 业务结果
+ +提供诊后来源(依据: 操作输入): 业务结果
+ +提供本次复诊依据(依据: 操作输入): 业务结果
+ +汇总诊疗发生(依据: 操作输入): 业务结果
+ +确认当次复核(依据: 操作输入): 业务结果
+ +核对使用归属(依据: 操作输入): 业务结果
+ +追加病历说明(依据: 操作输入): 业务结果
+ +提供获准追查信息(依据: 操作输入): 业务结果
+}
+class "方案版本" as PlanVersion <<entity>> {
+ -id: ObjectId
+ -diagnostic_basis: Text
+ -explained_at: Text?
+ -change_reason: Text
+ -planned_schedule: Text
+ +核对确认版本(依据: 操作输入): 业务结果
+ +提供确认来源(依据: 操作输入): 业务结果
+ +形成待确认版本(依据: 操作输入): 业务结果
+ +提交方案说明(依据: 操作输入): 业务结果
+ +登记确认经历(依据: 操作输入): 业务结果
+ +保留原确认版本(依据: 操作输入): 业务结果
+ +重新说明方案(依据: 操作输入): 业务结果
+ +停止后续安排(依据: 操作输入): 业务结果
+ +核对本版完成(依据: 操作输入): 业务结果
+}
+class "诊后要求" as Followup <<entity>> {
+ -id: ObjectId
+ -purpose: Text
+ -followup_type: Text
+ -target_start: Text
+ -target_end: Text
+ +提出诊后要求(依据: 操作输入): 业务结果
+ +判断发布条件(依据: 操作输入): 业务结果
+ +提供待联系事项(依据: 操作输入): 业务结果
+ +登记联系结果(依据: 操作输入): 业务结果
+ +衔接后续安排(依据: 操作输入): 业务结果
+ +核对评估责任(依据: 操作输入): 业务结果
+ +确认临床评估(依据: 操作输入): 业务结果
+ +判断完成或继续(依据: 操作输入): 业务结果
+ +恢复待安排(依据: 操作输入): 业务结果
+ +保留复诊待安排(依据: 操作输入): 业务结果
+ +确认撤销要求(依据: 操作输入): 业务结果
+}
+class "联系经历" as Contact <<entity>> {
+ -id: ObjectId
+ -method: Text
+ -contacted_at: Text
+ -result: Text
+ -next_contact_date: Text?
+ +追加联系经历(依据: 操作输入): 业务结果
+}
+class "临床评估" as Assessment <<entity>> {
+ -id: ObjectId
+ -method: Text
+ -assessed_at: Text
+ -result: Text
+ -advice: Text
+ +保留评估依据(依据: 操作输入): 业务结果
+}
+class "预约" as Appointment <<entity>> {
+ -id: ObjectId
+ -planned_start: Text
+ -planned_end: Text
+ -reason: Text
+ -due_at: Text
+ +确认安排(依据: 操作输入): 业务结果
+ +提供安排及经历(依据: 操作输入): 业务结果
+ +核对到诊来源(依据: 操作输入): 业务结果
+ +关联到诊结果(依据: 操作输入): 业务结果
+ +核对复诊关联(依据: 操作输入): 业务结果
+ +列出受影响安排(依据: 操作输入): 业务结果
+ +核对可变更性(依据: 操作输入): 业务结果
+ +变更或取消安排(依据: 操作输入): 业务结果
+ +标记受影响安排(依据: 操作输入): 业务结果
+ +核对后续处理(依据: 操作输入): 业务结果
+ +确认未到事实(依据: 操作输入): 业务结果
+}
+Patient "1" -- "0..*" Appointment : 预约者
+Patient "1" -- "0..*" Visit : 就诊者
+Appointment "0..1" -- "0..1" Visit : 来源预约
+Patient "1" -- "0..*" Followup : 患者
+Visit "0..1" -- "0..*" Followup : 来源就诊
+PlanVersion "0..1" -- "0..*" Followup : 来源方案
+Followup "1" *-- "0..*" Contact : 联系尝试
+Followup "1" *-- "0..*" Assessment : 评估经历
+Contact "0..*" -- "0..1" Appointment : 复诊安排
+Assessment "0..*" -- "0..1" Visit : 实际复诊
+Visit "0..1" -- "0..*" PlanVersion : 内部诊断来源
+@enduml

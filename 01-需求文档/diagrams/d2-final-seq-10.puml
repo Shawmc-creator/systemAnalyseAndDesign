@@ -1,0 +1,92 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 150
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "牙医" as A0
+boundary "<u>:牙医接口</u>" as B0
+control "<u>:记录检查与诊断</u>\n<u>控制</u>" as K
+participant "<u>:就诊</u>" as Visit
+participant "<u>:健康复核</u>" as Review
+participant "<u>:病历</u>" as Record
+participant "<u>:检查所见</u>" as Finding
+participant "工作单元" as W
+participant "数据映射器" as DM
+participant "权限与会话服务" as AUTH
+A0 -> B0 : 提交UC-10办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 办理(ctx, UC10Command)
+activate K
+group 本阶段同一写事务
+K -> W : 开始写事务()
+W --> K : 同一连接
+K -> AUTH : 核对岗位及对象(ctx, 引用)
+AUTH --> K : 有效授权依据或拒绝
+K -> W : 核对提交(ctx, cmd)
+W --> K : 新命令分支（原结果短路见公共图）
+K -> DM : 装载(对象引用、连接)
+DM --> K : 实体与依据快照
+K -> Visit : 核对接诊责任(执行者)
+activate Visit
+Visit --> K : 处理结果或拒绝原因
+deactivate Visit
+K -> Visit : 确认实际接诊(责任牙医及实际开始时间)
+activate Visit
+Visit -> Review : 提供当次复核(当前就诊)
+activate Review
+Review --> Visit : 处理结果或拒绝原因
+deactivate Review
+Visit --> K : 处理结果或拒绝原因
+deactivate Visit
+K -> Visit : 记录检查诊断(正文、当前版本)
+activate Visit
+Visit -> Record : 更新未签署正文(主诉、诊断、处理意见)
+activate Record
+Record -> Finding : 保留检查所见(牙位牙面及检查内容)
+activate Finding
+Finding --> Record : 处理结果或拒绝原因
+deactivate Finding
+Record --> Visit : 处理结果或拒绝原因
+deactivate Record
+Visit --> K : 处理结果或拒绝原因
+deactivate Visit
+alt 本阶段全部校验通过
+K -> DM : 保存(变更集合、连接)
+DM --> K : 保存成功或版本冲突
+K -> W : 校验集合与来源()
+W --> K : 末校验结果
+K -> W : 保存结果与审计并提交()
+else 任一步骤拒绝或保存失败
+K -> W : 回滚()
+end
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Finding
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

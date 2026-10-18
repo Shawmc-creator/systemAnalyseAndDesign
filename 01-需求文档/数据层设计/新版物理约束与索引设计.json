@@ -1,0 +1,5746 @@
+{
+  "version": "2026-10-18-D1-physical-design",
+  "stage": "约束、索引与事务设计；尚非完整可执行DDL或迁移验收",
+  "tables": [
+    {
+      "table": "patient",
+      "name": "患者",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "姓名和电话不唯一。birth_date不得晚于当日；有电话时必须说明电话归属，无电话须说明原因。"
+      ]
+    },
+    {
+      "table": "staff",
+      "name": "职员",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "在岗结束不得早于开始；岗位授权留运行支撑设计，业务表不复制登录口令。初始化首名职员允许created_by为空，后续通过可审计的初始化/维护入口登记。"
+      ]
+    },
+    {
+      "table": "patient_change",
+      "name": "患者资料变更",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "每行记录一个字段前后值；一次修改多字段在同一事务追加多行并由运行审计归为同次请求。原值与新值不得完全相同。"
+      ]
+    },
+    {
+      "table": "patient_proxy",
+      "name": "代理关系",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "verified_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "有效结束有值时晚于开始；访问或安排时核对当前有效区间，停用不影响历史读取。"
+      ]
+    },
+    {
+      "table": "clinical_handover",
+      "name": "接诊交接",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "receiving_dentist_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "handover_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "有效结束有值时晚于开始；访问或安排时核对当前有效区间，停用不影响历史读取。"
+      ]
+    },
+    {
+      "table": "dental_chair",
+      "name": "诊椅",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "有效结束有值时晚于开始；访问或安排时核对当前有效区间，停用不影响历史读取。"
+      ]
+    },
+    {
+      "table": "dated_schedule",
+      "name": "日期安排",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "dentist_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "dental_chair_id",
+          "references": "dental_chair.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "confirmed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "草稿",
+          "已确认",
+          "已停诊"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "区间结束晚于开始，转换到营业时区后属于记录日期；已确认需confirmed_by和confirmed_at；停诊需理由。发布时核对人员、诊椅有效性和冲突。"
+      ]
+    },
+    {
+      "table": "schedule_change",
+      "name": "安排变更",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "dated_schedule_id",
+          "references": "dated_schedule.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "old_dentist_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "new_dentist_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "old_chair_id",
+          "references": "dental_chair.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "new_chair_id",
+          "references": "dental_chair.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "前后资源和时间保留不可改快照，不能只查询当前安排还原历史。取消不生成虚假的新安排。多次通知与处理意见由追加变更/运行审计保留。"
+      ]
+    },
+    {
+      "table": "resource_occupancy",
+      "name": "接诊占用",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "dated_schedule_id",
+          "references": "dated_schedule.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "appointment_id",
+          "references": "appointment.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "visit_id",
+          "references": "visit.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "released_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "预约与就诊外键至少一个有值；同时存在须同一接诊过程。以[starts_at,ends_at)检查患者、牙医与诊椅冲突；安排版本一致，释放人、时间和原因成组出现。"
+      ]
+    },
+    {
+      "table": "appointment",
+      "name": "预约",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "notified_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "已预约",
+          "已取消",
+          "已到诊",
+          "未到"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "planned_end晚于planned_start；改约和原占用释放、新占用建立整体提交；有通知时间必须有实际通知人。复诊来源通过联系经历关联，不另存相互矛盾的来源列表。"
+      ]
+    },
+    {
+      "table": "appointment_change",
+      "name": "预约变更",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "appointment_id",
+          "references": "appointment.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "old_schedule_id",
+          "references": "dated_schedule.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "new_schedule_id",
+          "references": "dated_schedule.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "前后资源和时间保留不可改快照，不能只查询当前安排还原历史。取消不生成虚假的新安排。多次通知与处理意见由追加变更/运行审计保留。"
+      ]
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "appointment_id"
+        ],
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "appointment_id",
+          "references": "appointment.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "dentist_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "registered_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "候诊",
+          "接诊中",
+          "诊疗结束"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "appointment_id可空且唯一；来源为预约时必须有值，为现场时为空。接诊中必须有started_at，结束必须有ended_at及已签署病历，时间顺序不得倒置。"
+      ]
+    },
+    {
+      "table": "health_version",
+      "name": "健康版本",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "patient_id",
+          "version_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "previous_version_id",
+          "references": "health_version.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(patient_id,version_no)；版本及条目整体形成，新版不覆盖已引用版本；前版本同患者且更早。"
+      ]
+    },
+    {
+      "table": "health_item",
+      "name": "健康条目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "health_version_id",
+          "references": "health_version.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "类别和确认程度限定列示值；患者报告时间、实际发生时间和系统记录时间分别保存。不能把无记录当作无过敏。"
+      ]
+    },
+    {
+      "table": "health_review",
+      "name": "健康复核",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "visit_id",
+          "references": "visit.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "health_version_id",
+          "references": "health_version.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "reviewed_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "所复核版本与就诊同患者；多次复核允许追加，记录实际复核牙医。"
+      ]
+    },
+    {
+      "table": "clinical_record",
+      "name": "病历",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "visit_id"
+        ],
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "visit_id",
+          "references": "visit.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "signed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "草稿",
+          "已签署"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "visit_id非空且唯一；新建就诊同时建立草稿。签署要求主诉、诊断、处理意见、检查所见及本次健康复核完整，并保存签署人、时刻、版本及摘要；签后正文和所见冻结。"
+      ]
+    },
+    {
+      "table": "clinical_finding",
+      "name": "检查所见",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "clinical_record_id",
+          "sequence_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "clinical_record_id",
+          "references": "clinical_record.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "recorded_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(clinical_record_id,sequence_no)；牙面有值须有适用牙位。签后发现更正通过独立补充说明，不原位改写。"
+      ]
+    },
+    {
+      "table": "record_addendum",
+      "name": "病历补充",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "clinical_record_id",
+          "references": "clinical_record.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "signed_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "原病历已签署，签署人具备接诊/交接依据；正文、原因、签署人与时刻齐全后一次追加。"
+      ]
+    },
+    {
+      "table": "clinical_document",
+      "name": "诊疗文件",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "visit_id",
+          "references": "visit.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "plan_version_id",
+          "references": "plan_version.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "可只归属患者；关联就诊和方案版本时均须同患者。类型从既定类别选择，不接受无归属文件。"
+      ]
+    },
+    {
+      "table": "document_version",
+      "name": "文件版本",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "clinical_document_id",
+          "version_no"
+        ],
+        [
+          "storage_key"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "clinical_document_id",
+          "references": "clinical_document.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "uploaded_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "confirmed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "previous_version_id",
+          "references": "document_version.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "原件待确认",
+          "原件已确认",
+          "退回核对",
+          "缺失或不可读"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(clinical_document_id,version_no)及UNIQUE(storage_key)。上传内容、大小、类型和摘要一致才形成记录；确认须有牙医与时刻。旧版本内容不覆盖，缺失恢复必须匹配原摘要。"
+      ]
+    },
+    {
+      "table": "treatment_plan",
+      "name": "治疗方案",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "closed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "进行中",
+          "已完成",
+          "已终止"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "完成或终止由牙医核对；closed_at与closed_by成组。终止理由必填，不删除已执行版本。"
+      ]
+    },
+    {
+      "table": "plan_version",
+      "name": "方案版本",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "treatment_plan_id",
+          "version_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "treatment_plan_id",
+          "references": "treatment_plan.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "source_visit_id",
+          "references": "visit.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "explained_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "previous_version_id",
+          "references": "plan_version.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "草稿",
+          "待确认",
+          "已确认",
+          "暂缓",
+          "已拒绝",
+          "停止后续执行",
+          "本版执行完成"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(treatment_plan_id,version_no)；前版本同方案，来源就诊同患者。待确认前项目完整；实质变更新增版本，停止旧版只影响未执行部分。"
+      ]
+    },
+    {
+      "table": "plan_item",
+      "name": "方案项目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "plan_version_id",
+          "sequence_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "plan_version_id",
+          "references": "plan_version.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(plan_version_id,sequence_no)；计划数量为正，估算未知允许NULL；已提交确认版本的明细不原位修改。"
+      ]
+    },
+    {
+      "table": "patient_decision",
+      "name": "患者决定",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "plan_version_id",
+          "references": "plan_version.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "patient_proxy_id",
+          "references": "patient_proxy.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "explained_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "recorded_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "确认范围由decision_plan_item表达；有效同意至少一项。同意、暂缓、拒绝、撤回分别保留，不修改先前决定。代理授权在决定时有效且覆盖事项；文件版本同患者。"
+      ]
+    },
+    {
+      "table": "treatment_execution",
+      "name": "诊疗执行",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "visit_id",
+          "references": "visit.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "plan_item_id",
+          "references": "plan_item.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "service_id",
+          "references": "service.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "original_execution_id",
+          "references": "treatment_execution.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "performed_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "仅实际完成事实入表。计划项目若有，须同患者且属于同意范围；更正行引用原执行且说明原因，同一原执行不能形成并列有效替代，禁止引用环。"
+      ]
+    },
+    {
+      "table": "service",
+      "name": "收费项目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。"
+      ]
+    },
+    {
+      "table": "service_price",
+      "name": "价目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "service_id",
+          "references": "service.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "confirmed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "价目草稿",
+          "待负责人确认",
+          "已确认可适用",
+          "已退回",
+          "不再用于新计费"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "金额非负；有效结束晚于开始，已确认区间同项目不重叠。发布必须有确认人时间；有效价不反改既有快照。"
+      ]
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "patient_funds_id",
+          "references": "patient_funds.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "patient_funds对应同患者；计费期间结束晚于开始。应收、已付、退款与余额由各来源聚合，不设一个可任意改写的“已结清”标志。"
+      ]
+    },
+    {
+      "table": "bill_item",
+      "name": "应收项目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "treatment_execution_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "bill_id",
+          "references": "bill.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "treatment_execution_id",
+          "references": "treatment_execution.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "service_price_id",
+          "references": "service_price.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "priced_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "一个实际执行只生成一项有效应收，UNIQUE(treatment_execution_id)。执行与账目同患者；已核价必须有单价，价目可空仅用于缺价/明确免收依据。确认计价人及说明齐全后才进入可结算应收。"
+      ]
+    },
+    {
+      "table": "patient_funds",
+      "name": "患者资金",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "patient_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "opened_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "归属外键非空且唯一；与主体建立业务整体时共同创建。账户不维护可人工覆盖余额，版本用于同一资金归属下并发用途检查。"
+      ]
+    },
+    {
+      "table": "patient_payment",
+      "name": "患者付款",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_funds_id",
+          "references": "patient_funds.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "verified_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待核实",
+          "到账已确认",
+          "未到账已核实"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "received_cents>0且0<=change_cents<received_cents；net_cents=received_cents-change_cents为生成值。确认/失败有核实人时间，确认必须有到账时刻；非现金找零为0且需交易号。"
+      ]
+    },
+    {
+      "table": "payment_allocation",
+      "name": "付款分配",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "patient_payment_id",
+          "references": "patient_payment.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "bill_id",
+          "references": "bill.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "original_allocation_id",
+          "references": "payment_allocation.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "fee_request_id",
+          "references": "fee_request.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "正数分配/抵扣不超过最新账单余额与原款可用额；负数只释放所引用正向用途，累计释放不得超过原额。审批释放须引用同患者已批准申请；更正追加，不覆盖原金额。"
+      ]
+    },
+    {
+      "table": "prepayment_offset",
+      "name": "预付抵扣",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "patient_payment_id",
+          "references": "patient_payment.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "bill_id",
+          "references": "bill.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "original_offset_id",
+          "references": "prepayment_offset.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "fee_request_id",
+          "references": "fee_request.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "正数分配/抵扣不超过最新账单余额与原款可用额；负数只释放所引用正向用途，累计释放不得超过原额。审批释放须引用同患者已批准申请；更正追加，不覆盖原金额。"
+      ]
+    },
+    {
+      "table": "fee_request",
+      "name": "费用申请",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_funds_id",
+          "references": "patient_funds.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "bill_id",
+          "references": "bill.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "patient_payment_id",
+          "references": "patient_payment.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "reviewed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待审核",
+          "已退回",
+          "已拒绝",
+          "已同意",
+          "已撤回"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "原账目与原预付款至少一个，且都同资金归属。拟调整与拟退不可同时为0；退回重提递增submission_no，原提交与审核快照必须由运行审计保留。批准额、审核人时间和意见成组，批准退款不超过支持额度。"
+      ]
+    },
+    {
+      "table": "fee_adjustment",
+      "name": "费用调整",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "fee_request_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "fee_request_id",
+          "references": "fee_request.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "bill_id",
+          "references": "bill.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "approved_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "fee_request_id唯一且已批准，账目与申请一致；调整、明细、原用途释放在同一事务生效。"
+      ]
+    },
+    {
+      "table": "fee_adjustment_item",
+      "name": "调整项目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "fee_adjustment_id",
+          "bill_item_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "fee_adjustment_id",
+          "references": "fee_adjustment.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "bill_item_id",
+          "references": "bill_item.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(fee_adjustment_id,bill_item_id)；明细归属同账目，合计等于批准调整额；调整后应收不得为负。"
+      ]
+    },
+    {
+      "table": "patient_refund",
+      "name": "退款办理",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "fee_request_id",
+          "references": "fee_request.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "patient_payment_id",
+          "references": "patient_payment.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "patient_funds_id",
+          "references": "patient_funds.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "verified_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "previous_attempt_id",
+          "references": "patient_refund.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待办理",
+          "待核实",
+          "已确认退款",
+          "已失败"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "申请、原付款、患者资金同归属。待办理/待核实占用拟退额；成功占用实际额，剩余释放；失败释放全部未执行占用。确认/失败必须有核实人时间及凭据，成功实际额>0且不超过拟退额；同一批准累计不超额度。"
+      ]
+    },
+    {
+      "table": "followup_requirement",
+      "name": "诊后要求",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "patient_id",
+          "references": "patient.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "source_visit_id",
+          "references": "visit.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "source_plan_version_id",
+          "references": "plan_version.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "responsible_frontdesk_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "closed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待发布",
+          "待联系",
+          "待到诊或评估",
+          "已完成",
+          "已撤销"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "就诊与方案版本至少一项且同患者；目标日期有序，负责前台必填。继续跟进须日期与责任；撤销有牙医依据，需临床评估者不能仅凭联系成功完成。转交责任与前后值由运行审计保留。"
+      ]
+    },
+    {
+      "table": "contact_history",
+      "name": "联系经历",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "followup_requirement_id",
+          "references": "followup_requirement.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "appointment_id",
+          "references": "appointment.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "预约存在时必须同患者；实际结果限定为四类。需继续联系时next_contact_date必填，临床问题转交不能写为已完成评估。"
+      ]
+    },
+    {
+      "table": "clinical_assessment",
+      "name": "临床评估",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "followup_requirement_id",
+          "references": "followup_requirement.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "visit_id",
+          "references": "visit.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "assessed_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "responsible_staff_id",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "关联到诊须同患者；远程沟通不伪造就诊。继续跟进必须同时有next_date和responsible_staff_id。"
+      ]
+    },
+    {
+      "table": "material",
+      "name": "材料",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "confirmed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "转换分子/分母为正、数量精度0至6；投入使用前确认人和时间齐全。形成流水后单位、精度与换算规则固定。其他采购包装先精确换算为已定义单位，不能擅自改变历史换算。"
+      ]
+    },
+    {
+      "table": "material_batch",
+      "name": "材料批次",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "material_id",
+          "batch_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "material_id",
+          "references": "material.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待检",
+          "可用",
+          "隔离",
+          "停用",
+          "过期"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(material_id,batch_no)；不同效期的同批号资料冲突须核实，不能覆盖。效期未知不默认无限；需效期材料未取得效期不得进入可用。可用判定同时检查状态和实际日期。"
+      ]
+    },
+    {
+      "table": "batch_change",
+      "name": "批次变更",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "material_batch_id",
+          "references": "material_batch.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "confirmed_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "状态值与批次状态集合一致；立即隔离可由助理执行并留责任，恢复/停用须负责人确认依据；保存变化与批次状态更新同事务。"
+      ]
+    },
+    {
+      "table": "stock_location",
+      "name": "存放位置",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。"
+      ]
+    },
+    {
+      "table": "batch_stock",
+      "name": "批次存量",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "material_batch_id",
+          "stock_location_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "material_batch_id",
+          "references": "material_batch.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "stock_location_id",
+          "references": "stock_location.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(material_batch_id,stock_location_id)；账面数与流水同事务更新，版本比对；初始数量只能由有依据入库形成。"
+      ]
+    },
+    {
+      "table": "inventory_movement",
+      "name": "库存变动",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "stock_count_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "batch_stock_id",
+          "references": "batch_stock.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "original_movement_id",
+          "references": "inventory_movement.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "stock_count_id",
+          "references": "stock_count.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "purchase_receipt_item_id",
+          "references": "purchase_receipt_item.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "purchase_issue_id",
+          "references": "purchase_issue.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "after_scaled=before_scaled+delta_scaled且非负。入库正、领用/退供负；未用退回正且引用原领用；退供须采购差异依据。stock_count_id可空且唯一；原流水、采购、批次位置一致。"
+      ]
+    },
+    {
+      "table": "material_usage",
+      "name": "实际用料",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "inventory_movement_id",
+          "references": "inventory_movement.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "visit_id",
+          "references": "visit.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "引用领用流水；累计实际使用加已退回不得超过可分配领用量，同就诊与经办责任可追踪。实际使用不再扣第二次库存。"
+      ]
+    },
+    {
+      "table": "stock_count",
+      "name": "盘点核实",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "batch_stock_id",
+          "references": "batch_stock.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "confirmed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待确认差异",
+          "待重新核对",
+          "差异已确认",
+          "不予调整"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "确认时库存revision仍等于stock_revision，否则重新核实并保留旧快照审计；同意和差异流水同事务。零差异不生成零数量变动。确认/拒绝有负责人及时间。"
+      ]
+    },
+    {
+      "table": "supplier",
+      "name": "供应商",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "verified_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "结算依据变更保留前后值、核实人及依据的审计快照；历史付款必须保存当时账户核实凭据，不能只读取现供应商资料。"
+      ]
+    },
+    {
+      "table": "purchase_order",
+      "name": "采购",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "supplier_id",
+          "references": "supplier.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "confirmed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待确认",
+          "已确认",
+          "已取消"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "确认必须有负责人时间及至少一条采购项目；约定不形成库存或实际资金流。"
+      ]
+    },
+    {
+      "table": "purchase_order_item",
+      "name": "采购项目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "purchase_order_id",
+          "sequence_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "purchase_order_id",
+          "references": "purchase_order.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "material_id",
+          "references": "material.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待交付",
+          "履行中",
+          "待差异处理",
+          "履行已完成",
+          "剩余已取消"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(purchase_order_id,sequence_no)；冻结采购单位、换算及价格，数量按基本单位存储。交付、合格、拒收和待处理分别累计；取消剩余由确认采购差异留依据。"
+      ]
+    },
+    {
+      "table": "purchase_receipt",
+      "name": "验收",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "purchase_order_id",
+          "references": "purchase_order.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "confirmed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待验收",
+          "部分待检",
+          "已确认"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "引用同一采购；每次分批到货独立验收。确认保存经办与确认责任，后续待检结论追加审计且保留之前数量版本，不删除原到货事实。"
+      ]
+    },
+    {
+      "table": "purchase_receipt_item",
+      "name": "验收项目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "purchase_receipt_id",
+          "references": "purchase_receipt.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "purchase_order_item_id",
+          "references": "purchase_order_item.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "material_batch_id",
+          "references": "material_batch.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "stock_location_id",
+          "references": "stock_location.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "到货=合格+拒收+待检。批次必须属于采购项目材料；合格量>0须批次和位置。不同批次/位置拆行。仅新确认合格增量形成一次入库。认可应付=合格放大量×换算分母×采购单位分单价÷（10的精度次方×换算分子），逐行四舍五入到分后冻结；变更留审计。"
+      ]
+    },
+    {
+      "table": "purchase_issue",
+      "name": "采购差异",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "purchase_order_item_id",
+          "references": "purchase_order_item.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "purchase_receipt_item_id",
+          "references": "purchase_receipt_item.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "confirmed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待确认",
+          "待处理",
+          "已完成",
+          "已拒绝"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "采购和验收来源同一明细。退供关联既有验收与原库存；确认前不改变应付，确认后按依据追加流水和价款调整。未交、拒收、取消剩余及已退供数量不能相互抵消。"
+      ]
+    },
+    {
+      "table": "supplier_funds",
+      "name": "供应商资金",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "supplier_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "supplier_id",
+          "references": "supplier.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "opened_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "归属外键非空且唯一；与主体建立业务整体时共同创建。账户不维护可人工覆盖余额，版本用于同一资金归属下并发用途检查。"
+      ]
+    },
+    {
+      "table": "supplier_payment",
+      "name": "供货付款",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "supplier_funds_id",
+          "references": "supplier_funds.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "authorized_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "verified_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "previous_attempt_id",
+          "references": "supplier_payment.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待付款",
+          "待核实",
+          "已确认付款",
+          "已失败"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "拟付款由负责人按明确原单版本确认；实际未知保持占用。确认/失败必须有核实人时间，成功实付>0且不超过拟付；非现金成功需交易号，失败后重办另起编号。"
+      ]
+    },
+    {
+      "table": "supplier_allocation",
+      "name": "供货分配",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "supplier_payment_id",
+          "references": "supplier_payment.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "purchase_order_id",
+          "references": "purchase_order.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "purchase_receipt_id",
+          "references": "purchase_receipt.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "original_allocation_id",
+          "references": "supplier_allocation.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "purchase_issue_id",
+          "references": "purchase_issue.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "采购预付和验收结算外键恰选一个，均与原付款同供应商。待付款先建立正向待生效用途，合计等于拟付额；成功后按实付额确认用途，失败取消预占。待核实不释放。预付转结算通过等额负向释放原采购用途及正向验收分配同事务完成，不新增付款；负向不能超原分配。已生效必须有effective_at；原预占与最终额的变化留审计。"
+      ]
+    },
+    {
+      "table": "supplier_refund",
+      "name": "供货退款",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "supplier_payment_id",
+          "references": "supplier_payment.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "purchase_issue_id",
+          "references": "purchase_issue.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "supplier_funds_id",
+          "references": "supplier_funds.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "verified_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "仅已核实退回到账入表；原付款、已确认差异、供应商资金同归属。退款不超原款剩余及批准退换额度，关联的用途释放同时办理。"
+      ]
+    },
+    {
+      "table": "instrument_pack",
+      "name": "器械包",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。"
+      ]
+    },
+    {
+      "table": "processing_equipment",
+      "name": "处理设备",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "有效结束有值时晚于开始；访问或安排时核对当前有效区间，停用不影响历史读取。"
+      ]
+    },
+    {
+      "table": "instrument_processing",
+      "name": "器械处理",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "processing_equipment_id",
+          "references": "processing_equipment.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "previous_processing_id",
+          "references": "instrument_processing.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "released_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "isolated_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "处理中",
+          "待核对放行",
+          "已放行",
+          "隔离停用"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "结束不早于开始；放行需监测、包次、包装和效期依据齐全及放行人时间。事后隔离保留原放行事实；重新处理另起对象，previous_processing_id不得指向自身或形成环。"
+      ]
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "name": "器械包处理",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "instrument_processing_id",
+          "instrument_pack_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "instrument_processing_id",
+          "references": "instrument_processing.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "instrument_pack_id",
+          "references": "instrument_pack.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "checked_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {
+        "status": [
+          "待放行",
+          "可用",
+          "已发放待确认",
+          "已使用",
+          "隔离"
+        ]
+      },
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "UNIQUE(instrument_processing_id,instrument_pack_id)；期限晚于放行，状态结合处理轮次与实物判定。每包次最多一条正常有效实际使用；未用退回允许新发放经历。"
+      ]
+    },
+    {
+      "table": "processing_monitor",
+      "name": "处理监测",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "instrument_processing_id",
+          "references": "instrument_processing.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "recorded_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "监测项目按本轮要求记录；未取得不视为通过；取得结果需obtained_at。放行后证据不能原位覆盖。"
+      ]
+    },
+    {
+      "table": "instrument_use",
+      "name": "器械使用",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "visit_id",
+          "references": "visit.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "instrument_pack_cycle_id",
+          "references": "instrument_pack_cycle.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "used_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "发放须本包次有效且未被使用或另行占用；正常使用必须有used_at和used_by，时间不早于发放。未用退回须returned_at且used_at为空；异常补录保留真实经历，不伪装为正常放行。"
+      ]
+    },
+    {
+      "table": "cash_reconciliation",
+      "name": "收支核对",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "record_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "operator_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "同营业日/渠道允许多次核对。现金actual_cents非负，预期=开班+凭据净流入+有据存取；非现金opening_cash_cents为空且cash_transfer_cents=0。差额实时取actual_cents-expected_cents；快照提交前验证source_digest，非零或未决须跟进。"
+      ]
+    },
+    {
+      "table": "reconciliation_item",
+      "name": "核对项目",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "cash_reconciliation_id",
+          "references": "cash_reconciliation.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "patient_payment_id",
+          "references": "patient_payment.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "patient_refund_id",
+          "references": "patient_refund.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "supplier_payment_id",
+          "references": "supplier_payment.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "supplier_refund_id",
+          "references": "supplier_refund.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "四个资金外键恰选一个且与source_type一致；同次核对同一原单只出现一次。金额、方向、渠道、时点和版本须与已核实原款一致，不能人工改数抹平。"
+      ]
+    },
+    {
+      "table": "issue_followup",
+      "name": "差异跟进",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "cash_reconciliation_id",
+          "references": "cash_reconciliation.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "instrument_processing_id",
+          "references": "instrument_processing.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "assigned_to",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "created_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "completed_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "两种来源恰选一个；负责人指定assigned_to，未完成保留期限；完成需completed_at、completed_by与结果依据。多次处理意见由运行审计保留，不能只存最后一句。"
+      ]
+    },
+    {
+      "table": "decision_plan_item",
+      "name": "患者决定—方案项目",
+      "primary_key": [
+        "decision_id",
+        "plan_item_id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "decision_id",
+          "references": "patient_decision.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "plan_item_id",
+          "references": "plan_item.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "linked_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "复合主键(decision_id,plan_item_id)；两端同方案版本，生效确认至少有一项；确认后冻结集合。"
+      ]
+    },
+    {
+      "table": "decision_file_version",
+      "name": "患者决定—确认原件",
+      "primary_key": [
+        "decision_id",
+        "document_version_id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "decision_id",
+          "references": "patient_decision.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "document_version_id",
+          "references": "document_version.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "linked_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
+        "复合主键(decision_id,document_version_id)；两端同患者，引用确认时原件版本；后续上传不改变旧关联。"
+      ]
+    },
+    {
+      "table": "user_account",
+      "name": "职员账号",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "staff_id"
+        ],
+        [
+          "login_name"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "staff_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "staff_id和login_name分别唯一；一个职员一个个人账号，不共享账号。",
+        "停用、口令更换或任一有效授权变化递增auth_version，与相关变更和审计同事务。禁止删除历史账号。",
+        "首名负责人经受控初始化创建，绑定既有职员并记录初始化审计；初始化入口在完成后关闭。"
+      ]
+    },
+    {
+      "table": "access_role",
+      "name": "访问角色",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "code"
+        ]
+      ],
+      "foreign_keys": [],
+      "enum_checks": {},
+      "rule_source": [
+        "五种角色与B规约执行者一致；固定代码不可改成新的业务角色。",
+        "职员岗位资格和账号获授访问角色同时有效，才允许使用该角色权限。"
+      ]
+    },
+    {
+      "table": "access_permission",
+      "name": "操作权限",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "code"
+        ]
+      ],
+      "foreign_keys": [],
+      "enum_checks": {},
+      "rule_source": [
+        "权限由受控配置发布；不是用户输入的表名或SQL。",
+        "查询权限不包含相应用例的变更权限。对象范围与岗位权限取交集，不能只检查菜单可见。"
+      ]
+    },
+    {
+      "table": "staff_role_qualification",
+      "name": "职员岗位资格",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "staff_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "role_id",
+          "references": "access_role.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "verified_by",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "revoked_by",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "同职员同角色的有效区间不得重叠；截止晚于开始，撤销三项成组。",
+        "重新任职新增经历，不复活旧资格行。资格失效时同步撤销不再满足条件的账号角色并使旧会话失效。",
+        "业务提交和查询每次检查当前日期与在岗区间，不能依赖定时任务及时停用。"
+      ]
+    },
+    {
+      "table": "account_role",
+      "name": "账号角色授权",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "account_id",
+          "references": "user_account.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "role_id",
+          "references": "access_role.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "qualification_id",
+          "references": "staff_role_qualification.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "granted_by",
+          "references": "user_account.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "revoked_by",
+          "references": "user_account.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "同账号同角色最多一条未撤销且仍有效的授权；历史再次授予新增行。",
+        "资格职员必须等于账号职员，角色也一致；授予人须有运行授权权限。撤销与auth_version递增、审计整体提交。"
+      ]
+    },
+    {
+      "table": "role_permission",
+      "name": "角色操作授权",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "role_id",
+          "permission_id"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "role_id",
+          "references": "access_role.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "permission_id",
+          "references": "access_permission.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "UNIQUE(role_id,permission_id)。按本节权限矩阵初始化，配置升级保留审计与版本并使受影响会话失效。",
+        "固定配置不提供随意扩大临床范围的网页开关。"
+      ]
+    },
+    {
+      "table": "login_session",
+      "name": "登录会话",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "token_hash"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "account_id",
+          "references": "user_account.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "仅令牌摘要和版本一致、未撤销、账号及岗位有效且未超时才返回业务数据。",
+        "沿用30分钟无活动、8小时绝对时限；每次请求服务端核验。重新登录轮换令牌，注销撤销服务端会话。",
+        "运行代号来自启动环境的新随机值，不从恢复库复用；恢复旧数据不会使旧Cookie重新有效。会话Cookie采用HttpOnly、Secure及合适SameSite，状态改变验证CSRF。"
+      ]
+    },
+    {
+      "table": "authentication_event",
+      "name": "身份验证事件",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "account_id",
+          "references": "user_account.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "session_id",
+          "references": "login_session.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "只追加，事件不得保存原会话令牌、口令或请求正文。",
+        "成功登录与会话记录同事务；失败事件单独提交。按登录摘要和来源共同限流，避免无限试错。摘要密钥单独受控保存。"
+      ]
+    },
+    {
+      "table": "request_submission",
+      "name": "操作提交",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "account_id",
+          "request_key"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "account_id",
+          "references": "user_account.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "permission_id",
+          "references": "access_permission.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "UNIQUE(account_id,request_key)；同键异操作/异摘要拒绝，不能覆盖旧结果。",
+        "在同一写事务中检查幂等键、执行业务、保存结果及审计后提交；不允许提交处理中行。失败整体回滚，再独立记录失败事件。",
+        "重试返回原阶段办理号及原结果，重新核验当前权限后可另查最新状态；付款/退款结果未知保存在业务表，不等于本地事务未提交。",
+        "外部核验不在数据库写锁内等待；先持久化待办理事实，再以新的命令登记核实结果。结果字段只作白名单定位，业务完整性由业务外键保证。"
+      ]
+    },
+    {
+      "table": "operation_audit",
+      "name": "操作审计",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "account_id",
+          "references": "user_account.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "staff_id",
+          "references": "staff.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "session_id",
+          "references": "login_session.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "submission_id",
+          "references": "request_submission.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "permission_id",
+          "references": "access_permission.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "只追加，不能用当前权限反推历史资格。一次命令改变多个对象时追加多条同提交事件。",
+        "受控多态定位不冒充SQL外键；服务端白名单解析对象类别及主键，成功事件须在事务内确认对象存在。失败/拒绝允许尚未形成对象，使用明确的命令目标类别。",
+        "权限日志不含原凭据及完整临床正文；临床内容引用业务版本、签署摘要和原表。审计读权限不自动包含临床读权限。"
+      ]
+    },
+    {
+      "table": "audit_change",
+      "name": "审计字段变化",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "audit_id",
+          "field_name"
+        ],
+        [
+          "audit_id",
+          "sequence_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "audit_id",
+          "references": "operation_audit.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "UNIQUE(audit_id,field_name)与UNIQUE(audit_id,sequence_no)。JSON null表示字段实际为空，SQL NULL表示该侧对象不存在；不得混用。",
+        "与业务变化、审计事件同事务；允许字段按本节历史矩阵固定。不把SQL、原口令、令牌或整份临床正文放进快照。",
+        "追加更正事件保留前一次变化，不能修改旧审计行。仅拥有该类对象历史权限的岗位可读前后值。"
+      ]
+    },
+    {
+      "table": "backup_run",
+      "name": "备份任务",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "run_no"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "requested_by",
+          "references": "user_account.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "responsible_staff_id",
+          "references": "staff.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "同类备份最多一个运行中任务；进程中断后记录失败及原因，不推断成功。",
+        "使用SQLite一致性备份接口；从完成的快照库读取附件版本集合，而不是从继续变化的运行库读取。附件按不可变storage_key保存，复制期间禁止清理该集合文件。",
+        "数据库完整性、外键、附件大小及摘要全部核对；本地和异机副本均完成验证后才标成功。外部清单保存任务结果，不能假设任务成功状态已包含在更早生成的快照库里。"
+      ]
+    },
+    {
+      "table": "backup_artifact",
+      "name": "备份文件清单",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "backup_id",
+          "relative_path"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "backup_id",
+          "references": "backup_run.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "document_version_id",
+          "references": "document_version.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "UNIQUE(backup_id,relative_path)；每任务恰一份database清单，附件版本在同任务唯一。",
+        "附件字段必须匹配快照内版本而非当前原件；缺失或不符不得标可用备份。清单本身的摘要放backup_run，避免自包含摘要循环。"
+      ]
+    },
+    {
+      "table": "backup_copy",
+      "name": "备份副本",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "backup_id",
+          "location_kind",
+          "storage_key"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "backup_id",
+          "references": "backup_run.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "verified_by",
+          "references": "user_account.id",
+          "nullable": true,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "UNIQUE(backup_id,location_kind,storage_key)；整份副本按清单逐项核验，不能只比较文件夹大小。",
+        "保留最近30份成功备份及异机副本；只有可用性核对通过才执行轮换。删除文件后保留元数据、原因及审计，失败不得记已移除。"
+      ]
+    },
+    {
+      "table": "restore_verification",
+      "name": "恢复验证",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [],
+      "foreign_keys": [
+        {
+          "column": "backup_id",
+          "references": "backup_run.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "copy_id",
+          "references": "backup_copy.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        },
+        {
+          "column": "verified_by",
+          "references": "user_account.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "copy_id所属backup_id一致且副本可用；隔离恢复不覆盖运行库。",
+        "全部必需检查通过才记通过；实际耗时和恢复点间隔从时刻计算，分别对照4小时与24小时目标，超标记失败或未达标结论。",
+        "生产切换另走受控停写、切换前备份、校验与回退；通过演练不自动切换。"
+      ]
+    },
+    {
+      "table": "restore_check",
+      "name": "恢复检查明细",
+      "primary_key": [
+        "id"
+      ],
+      "unique_keys": [
+        [
+          "restore_id",
+          "check_code"
+        ]
+      ],
+      "foreign_keys": [
+        {
+          "column": "restore_id",
+          "references": "restore_verification.id",
+          "nullable": false,
+          "on_delete": "RESTRICT",
+          "on_update": "RESTRICT"
+        }
+      ],
+      "enum_checks": {},
+      "rule_source": [
+        "UNIQUE(restore_id,check_code)；数据库完整性、外键、清单附件、签署版本、退款余额、停用权限、应用读取及恢复时长/恢复点均为必检。",
+        "检查证据不复制完整临床正文或明文凭据。关键检查缺行或未检不能汇总为通过。"
+      ]
+    }
+  ],
+  "composite_foreign_keys": [
+    {
+      "id": "CF-01",
+      "table": "resource_occupancy",
+      "columns": [
+        "visit_id",
+        "appointment_id"
+      ],
+      "parent": "visit",
+      "parent_columns": [
+        "id",
+        "appointment_id"
+      ],
+      "purpose": "同时填写就诊和预约时必须为同一接诊过程；单列外键保留。"
+    },
+    {
+      "id": "CF-02",
+      "table": "visit",
+      "columns": [
+        "appointment_id",
+        "patient_id"
+      ],
+      "parent": "appointment",
+      "parent_columns": [
+        "id",
+        "patient_id"
+      ],
+      "purpose": "预约来源就诊与预约同患者；现场到诊允许预约为空。"
+    },
+    {
+      "id": "CF-03",
+      "table": "health_version",
+      "columns": [
+        "previous_version_id",
+        "patient_id"
+      ],
+      "parent": "health_version",
+      "parent_columns": [
+        "id",
+        "patient_id"
+      ],
+      "purpose": "前一健康版本属于同患者。"
+    },
+    {
+      "id": "CF-04",
+      "table": "document_version",
+      "columns": [
+        "previous_version_id",
+        "clinical_document_id"
+      ],
+      "parent": "document_version",
+      "parent_columns": [
+        "id",
+        "clinical_document_id"
+      ],
+      "purpose": "文件历史版本属于同一逻辑文件。"
+    },
+    {
+      "id": "CF-05",
+      "table": "plan_version",
+      "columns": [
+        "previous_version_id",
+        "treatment_plan_id"
+      ],
+      "parent": "plan_version",
+      "parent_columns": [
+        "id",
+        "treatment_plan_id"
+      ],
+      "purpose": "前一方案版本属于同一治疗方案。"
+    },
+    {
+      "id": "CF-06",
+      "table": "bill",
+      "columns": [
+        "patient_funds_id",
+        "patient_id"
+      ],
+      "parent": "patient_funds",
+      "parent_columns": [
+        "id",
+        "patient_id"
+      ],
+      "purpose": "账目资金账户与患者一致。"
+    },
+    {
+      "id": "CF-07",
+      "table": "fee_request",
+      "columns": [
+        "bill_id",
+        "patient_funds_id"
+      ],
+      "parent": "bill",
+      "parent_columns": [
+        "id",
+        "patient_funds_id"
+      ],
+      "purpose": "申请引用账目时资金归属一致。"
+    },
+    {
+      "id": "CF-08",
+      "table": "fee_request",
+      "columns": [
+        "patient_payment_id",
+        "patient_funds_id"
+      ],
+      "parent": "patient_payment",
+      "parent_columns": [
+        "id",
+        "patient_funds_id"
+      ],
+      "purpose": "申请引用原付款时资金归属一致。"
+    },
+    {
+      "id": "CF-09",
+      "table": "fee_adjustment",
+      "columns": [
+        "fee_request_id",
+        "bill_id"
+      ],
+      "parent": "fee_request",
+      "parent_columns": [
+        "id",
+        "bill_id"
+      ],
+      "purpose": "费用调整使用申请所指账目。"
+    },
+    {
+      "id": "CF-10",
+      "table": "payment_allocation",
+      "columns": [
+        "original_allocation_id",
+        "patient_payment_id",
+        "bill_id"
+      ],
+      "parent": "payment_allocation",
+      "parent_columns": [
+        "id",
+        "patient_payment_id",
+        "bill_id"
+      ],
+      "purpose": "释放用途沿用原付款与原账目。"
+    },
+    {
+      "id": "CF-11",
+      "table": "prepayment_offset",
+      "columns": [
+        "original_offset_id",
+        "patient_payment_id",
+        "bill_id"
+      ],
+      "parent": "prepayment_offset",
+      "parent_columns": [
+        "id",
+        "patient_payment_id",
+        "bill_id"
+      ],
+      "purpose": "释放抵扣沿用原付款与原账目。"
+    },
+    {
+      "id": "CF-12",
+      "table": "patient_refund",
+      "columns": [
+        "fee_request_id",
+        "patient_funds_id"
+      ],
+      "parent": "fee_request",
+      "parent_columns": [
+        "id",
+        "patient_funds_id"
+      ],
+      "purpose": "退款申请与资金账户一致。"
+    },
+    {
+      "id": "CF-13",
+      "table": "patient_refund",
+      "columns": [
+        "patient_payment_id",
+        "patient_funds_id"
+      ],
+      "parent": "patient_payment",
+      "parent_columns": [
+        "id",
+        "patient_funds_id"
+      ],
+      "purpose": "退款原付款与资金账户一致。"
+    },
+    {
+      "id": "CF-14",
+      "table": "patient_refund",
+      "columns": [
+        "previous_attempt_id",
+        "patient_funds_id"
+      ],
+      "parent": "patient_refund",
+      "parent_columns": [
+        "id",
+        "patient_funds_id"
+      ],
+      "purpose": "重试引用同患者资金归属的前次办理；原申请和原款另由重办事务核对。"
+    },
+    {
+      "id": "CF-15",
+      "table": "inventory_movement",
+      "columns": [
+        "original_movement_id",
+        "batch_stock_id"
+      ],
+      "parent": "inventory_movement",
+      "parent_columns": [
+        "id",
+        "batch_stock_id"
+      ],
+      "purpose": "原流水与更正或退回流水属于同批次位置。"
+    },
+    {
+      "id": "CF-16",
+      "table": "inventory_movement",
+      "columns": [
+        "stock_count_id",
+        "batch_stock_id"
+      ],
+      "parent": "stock_count",
+      "parent_columns": [
+        "id",
+        "batch_stock_id"
+      ],
+      "purpose": "盘点调整与盘点对象一致。"
+    },
+    {
+      "id": "CF-17",
+      "table": "purchase_issue",
+      "columns": [
+        "purchase_receipt_item_id",
+        "purchase_order_item_id"
+      ],
+      "parent": "purchase_receipt_item",
+      "parent_columns": [
+        "id",
+        "purchase_order_item_id"
+      ],
+      "purpose": "采购差异与验收项目来自同一采购项目。"
+    },
+    {
+      "id": "CF-18",
+      "table": "supplier_payment",
+      "columns": [
+        "previous_attempt_id",
+        "supplier_funds_id"
+      ],
+      "parent": "supplier_payment",
+      "parent_columns": [
+        "id",
+        "supplier_funds_id"
+      ],
+      "purpose": "重办供货付款沿用同供应商资金归属。"
+    },
+    {
+      "id": "CF-19",
+      "table": "supplier_allocation",
+      "columns": [
+        "original_allocation_id",
+        "supplier_payment_id"
+      ],
+      "parent": "supplier_allocation",
+      "parent_columns": [
+        "id",
+        "supplier_payment_id"
+      ],
+      "purpose": "释放引用同一原付款的用途；相同采购/验收目标由跨表规则补足。"
+    },
+    {
+      "id": "CF-20",
+      "table": "supplier_refund",
+      "columns": [
+        "supplier_payment_id",
+        "supplier_funds_id"
+      ],
+      "parent": "supplier_payment",
+      "parent_columns": [
+        "id",
+        "supplier_funds_id"
+      ],
+      "purpose": "供应商退回原款与资金账户一致。"
+    },
+    {
+      "id": "CF-21",
+      "table": "account_role",
+      "columns": [
+        "qualification_id",
+        "role_id"
+      ],
+      "parent": "staff_role_qualification",
+      "parent_columns": [
+        "id",
+        "role_id"
+      ],
+      "purpose": "账号授权岗位与资格岗位一致；职员一致性由跨表规则保证。"
+    },
+    {
+      "id": "CF-22",
+      "table": "authentication_event",
+      "columns": [
+        "session_id",
+        "account_id"
+      ],
+      "parent": "login_session",
+      "parent_columns": [
+        "id",
+        "account_id"
+      ],
+      "purpose": "有会话的身份事件对应同一账号。"
+    },
+    {
+      "id": "CF-23",
+      "table": "operation_audit",
+      "columns": [
+        "session_id",
+        "account_id"
+      ],
+      "parent": "login_session",
+      "parent_columns": [
+        "id",
+        "account_id"
+      ],
+      "purpose": "审计会话与账号一致。"
+    },
+    {
+      "id": "CF-24",
+      "table": "operation_audit",
+      "columns": [
+        "submission_id",
+        "account_id"
+      ],
+      "parent": "request_submission",
+      "parent_columns": [
+        "id",
+        "account_id"
+      ],
+      "purpose": "审计提交记录与账号一致。"
+    },
+    {
+      "id": "CF-25",
+      "table": "operation_audit",
+      "columns": [
+        "account_id",
+        "staff_id"
+      ],
+      "parent": "user_account",
+      "parent_columns": [
+        "id",
+        "staff_id"
+      ],
+      "purpose": "职员审计的账号与职员一致。"
+    },
+    {
+      "id": "CF-26",
+      "table": "operation_audit",
+      "columns": [
+        "submission_id",
+        "permission_id"
+      ],
+      "parent": "request_submission",
+      "parent_columns": [
+        "id",
+        "permission_id"
+      ],
+      "purpose": "同次提交审计沿用相同操作权限。"
+    },
+    {
+      "id": "CF-27",
+      "table": "restore_verification",
+      "columns": [
+        "copy_id",
+        "backup_id"
+      ],
+      "parent": "backup_copy",
+      "parent_columns": [
+        "id",
+        "backup_id"
+      ],
+      "purpose": "恢复副本属于所引用备份任务。"
+    }
+  ],
+  "partial_unique_indexes": [
+    {
+      "name": "ux_treatment_execution_p1",
+      "table": "treatment_execution",
+      "columns": [
+        "original_execution_id"
+      ],
+      "where": "original_execution_id IS NOT NULL",
+      "purpose": "每个原执行只允许一个直接更正后继；后续更正引用上一后继，不允许分叉。"
+    },
+    {
+      "name": "ux_reconciliation_item_p1",
+      "table": "reconciliation_item",
+      "columns": [
+        "cash_reconciliation_id",
+        "patient_payment_id"
+      ],
+      "where": "patient_payment_id IS NOT NULL",
+      "purpose": "同次核对同一来源原单只出现一次；不同核对允许重复引用。"
+    },
+    {
+      "name": "ux_reconciliation_item_p2",
+      "table": "reconciliation_item",
+      "columns": [
+        "cash_reconciliation_id",
+        "patient_refund_id"
+      ],
+      "where": "patient_refund_id IS NOT NULL",
+      "purpose": "同次核对同一来源原单只出现一次；不同核对允许重复引用。"
+    },
+    {
+      "name": "ux_reconciliation_item_p3",
+      "table": "reconciliation_item",
+      "columns": [
+        "cash_reconciliation_id",
+        "supplier_payment_id"
+      ],
+      "where": "supplier_payment_id IS NOT NULL",
+      "purpose": "同次核对同一来源原单只出现一次；不同核对允许重复引用。"
+    },
+    {
+      "name": "ux_reconciliation_item_p4",
+      "table": "reconciliation_item",
+      "columns": [
+        "cash_reconciliation_id",
+        "supplier_refund_id"
+      ],
+      "where": "supplier_refund_id IS NOT NULL",
+      "purpose": "同次核对同一来源原单只出现一次；不同核对允许重复引用。"
+    },
+    {
+      "name": "ux_instrument_use_p1",
+      "table": "instrument_use",
+      "columns": [
+        "instrument_pack_cycle_id"
+      ],
+      "where": "use_status IN ('已发放','已使用')",
+      "purpose": "一个包次最多一个正常占用/使用；未用退回保留历史且解除占用。异常补录由隔离及追溯规则处理。"
+    },
+    {
+      "name": "ux_backup_artifact_p1",
+      "table": "backup_artifact",
+      "columns": [
+        "backup_id"
+      ],
+      "where": "artifact_kind = 'database'",
+      "purpose": "每任务最多一份数据库清单；成功前另核对恰好一份。"
+    },
+    {
+      "name": "ux_backup_artifact_p2",
+      "table": "backup_artifact",
+      "columns": [
+        "backup_id",
+        "document_version_id"
+      ],
+      "where": "artifact_kind = 'attachment'",
+      "purpose": "同备份同文件版本只列一次；附件类型要求版本非空。"
+    },
+    {
+      "name": "ux_backup_run_p1",
+      "table": "backup_run",
+      "columns": [
+        "trigger_kind"
+      ],
+      "where": "status = '运行中'",
+      "purpose": "同触发类别最多一个运行中任务；共用目标路径的任务另由作业串行协调。"
+    }
+  ],
+  "query_indexes": [
+    {
+      "name": "ix_patient_q1",
+      "table": "patient",
+      "columns": [
+        "name"
+      ],
+      "usecases": [
+        2,
+        8
+      ],
+      "purpose": "同名候选；前缀或精确检索，不把姓名作为身份唯一键。"
+    },
+    {
+      "name": "ix_patient_q2",
+      "table": "patient",
+      "columns": [
+        "phone"
+      ],
+      "usecases": [
+        2,
+        8
+      ],
+      "purpose": "电话候选与人工核对；同号可属于多个患者。"
+    },
+    {
+      "name": "ix_patient_change_q1",
+      "table": "patient_change",
+      "columns": [
+        "patient_id",
+        "occurred_at"
+      ],
+      "usecases": [
+        8,
+        9
+      ],
+      "purpose": "资料变更时间线。"
+    },
+    {
+      "name": "ix_appointment_q1",
+      "table": "appointment",
+      "columns": [
+        "planned_start",
+        "status"
+      ],
+      "usecases": [
+        1,
+        2,
+        3
+      ],
+      "purpose": "日期预约清单；时间区间先换算UTC。"
+    },
+    {
+      "name": "ix_appointment_q2",
+      "table": "appointment",
+      "columns": [
+        "patient_id",
+        "status",
+        "planned_start"
+      ],
+      "usecases": [
+        1,
+        2
+      ],
+      "purpose": "患者有效预约与冲突候选。"
+    },
+    {
+      "name": "ix_appointment_change_q1",
+      "table": "appointment_change",
+      "columns": [
+        "appointment_id",
+        "occurred_at"
+      ],
+      "usecases": [
+        1,
+        2
+      ],
+      "purpose": "改约取消历史。"
+    },
+    {
+      "name": "ix_dated_schedule_q1",
+      "table": "dated_schedule",
+      "columns": [
+        "dentist_id",
+        "status",
+        "starts_at",
+        "ends_at"
+      ],
+      "usecases": [
+        1,
+        15,
+        16
+      ],
+      "purpose": "牙医日期安排及区间候选。"
+    },
+    {
+      "name": "ix_dated_schedule_q2",
+      "table": "dated_schedule",
+      "columns": [
+        "dental_chair_id",
+        "status",
+        "starts_at",
+        "ends_at"
+      ],
+      "usecases": [
+        1,
+        15,
+        16
+      ],
+      "purpose": "诊椅日期安排及区间候选。"
+    },
+    {
+      "name": "ix_resource_occupancy_q1",
+      "table": "resource_occupancy",
+      "columns": [
+        "dated_schedule_id",
+        "starts_at",
+        "ends_at"
+      ],
+      "usecases": [
+        1,
+        3,
+        15,
+        16
+      ],
+      "purpose": "未释放占用的区间核对。",
+      "where": "released_at IS NULL"
+    },
+    {
+      "name": "ix_resource_occupancy_q2",
+      "table": "resource_occupancy",
+      "columns": [
+        "appointment_id"
+      ],
+      "usecases": [
+        1,
+        3,
+        15
+      ],
+      "purpose": "查当前预约占用。",
+      "where": "released_at IS NULL"
+    },
+    {
+      "name": "ix_resource_occupancy_q3",
+      "table": "resource_occupancy",
+      "columns": [
+        "visit_id"
+      ],
+      "usecases": [
+        3,
+        4,
+        15
+      ],
+      "purpose": "查现场或预约到诊占用。",
+      "where": "released_at IS NULL"
+    },
+    {
+      "name": "ix_visit_q1",
+      "table": "visit",
+      "columns": [
+        "patient_id",
+        "arrived_at"
+      ],
+      "usecases": [
+        3,
+        9,
+        14
+      ],
+      "purpose": "诊疗历史与复诊来源。"
+    },
+    {
+      "name": "ix_visit_q2",
+      "table": "visit",
+      "columns": [
+        "dentist_id",
+        "status",
+        "arrived_at"
+      ],
+      "usecases": [
+        3,
+        4,
+        9,
+        10,
+        11
+      ],
+      "purpose": "本人当日候诊、接诊清单。"
+    },
+    {
+      "name": "ix_clinical_handover_q1",
+      "table": "clinical_handover",
+      "columns": [
+        "patient_id",
+        "receiving_dentist_id",
+        "valid_from"
+      ],
+      "usecases": [
+        9,
+        10,
+        11
+      ],
+      "purpose": "接诊交接范围及有效区间。"
+    },
+    {
+      "name": "ix_record_addendum_q1",
+      "table": "record_addendum",
+      "columns": [
+        "clinical_record_id",
+        "added_at"
+      ],
+      "usecases": [
+        9,
+        11
+      ],
+      "purpose": "签署后补充时间线。"
+    },
+    {
+      "name": "ix_health_version_q1",
+      "table": "health_version",
+      "columns": [
+        "patient_id",
+        "effective_at"
+      ],
+      "usecases": [
+        9,
+        21
+      ],
+      "purpose": "患者某时点有效健康版本。"
+    },
+    {
+      "name": "ix_health_review_q1",
+      "table": "health_review",
+      "columns": [
+        "visit_id",
+        "reviewed_at"
+      ],
+      "usecases": [
+        10,
+        11,
+        21
+      ],
+      "purpose": "当前就诊实际复核版本。"
+    },
+    {
+      "name": "ix_treatment_plan_q1",
+      "table": "treatment_plan",
+      "columns": [
+        "patient_id",
+        "status",
+        "established_at"
+      ],
+      "usecases": [
+        9,
+        22
+      ],
+      "purpose": "患者持续治疗方案。"
+    },
+    {
+      "name": "ix_patient_decision_q1",
+      "table": "patient_decision",
+      "columns": [
+        "plan_version_id",
+        "decided_at",
+        "id"
+      ],
+      "usecases": [
+        4,
+        22
+      ],
+      "purpose": "版本及具体项目的决定时间线；相同时刻按id稳定排序。"
+    },
+    {
+      "name": "ix_treatment_execution_q1",
+      "table": "treatment_execution",
+      "columns": [
+        "plan_item_id",
+        "completed_at"
+      ],
+      "usecases": [
+        4,
+        22
+      ],
+      "purpose": "项目已执行、更正链与剩余数量。"
+    },
+    {
+      "name": "ix_treatment_execution_q2",
+      "table": "treatment_execution",
+      "columns": [
+        "visit_id",
+        "completed_at"
+      ],
+      "usecases": [
+        4,
+        6,
+        9
+      ],
+      "purpose": "本次实际执行与应收来源。"
+    },
+    {
+      "name": "ix_clinical_document_q1",
+      "table": "clinical_document",
+      "columns": [
+        "patient_id",
+        "document_type",
+        "created_at"
+      ],
+      "usecases": [
+        9,
+        23
+      ],
+      "purpose": "患者原件分类检索。"
+    },
+    {
+      "name": "ix_document_version_q1",
+      "table": "document_version",
+      "columns": [
+        "clinical_document_id",
+        "version_no"
+      ],
+      "usecases": [
+        23
+      ],
+      "purpose": "已有复合唯一键支持版本检索，不额外建立相同索引。",
+      "reuse_constraint_index": true
+    },
+    {
+      "name": "ix_service_price_q1",
+      "table": "service_price",
+      "columns": [
+        "service_id",
+        "status",
+        "valid_from",
+        "valid_until"
+      ],
+      "usecases": [
+        4,
+        5,
+        6
+      ],
+      "purpose": "按项目和计价时点确定已确认价格。"
+    },
+    {
+      "name": "ix_bill_q1",
+      "table": "bill",
+      "columns": [
+        "patient_id",
+        "formed_at"
+      ],
+      "usecases": [
+        6,
+        7,
+        19,
+        24
+      ],
+      "purpose": "患者账单与结算历史。"
+    },
+    {
+      "name": "ix_bill_item_q1",
+      "table": "bill_item",
+      "columns": [
+        "bill_id",
+        "pricing_status"
+      ],
+      "usecases": [
+        6,
+        7,
+        24
+      ],
+      "purpose": "本账目缺价和有效应收项目。"
+    },
+    {
+      "name": "ix_patient_payment_q1",
+      "table": "patient_payment",
+      "columns": [
+        "patient_funds_id",
+        "status",
+        "received_at"
+      ],
+      "usecases": [
+        7,
+        19,
+        24,
+        26
+      ],
+      "purpose": "已确认原款、预付与可退余额。"
+    },
+    {
+      "name": "ix_payment_allocation_q1",
+      "table": "payment_allocation",
+      "columns": [
+        "bill_id",
+        "effective_at"
+      ],
+      "usecases": [
+        6,
+        7,
+        25
+      ],
+      "purpose": "账目用途及释放累计。"
+    },
+    {
+      "name": "ix_prepayment_offset_q1",
+      "table": "prepayment_offset",
+      "columns": [
+        "bill_id",
+        "effective_at"
+      ],
+      "usecases": [
+        6,
+        7,
+        25
+      ],
+      "purpose": "预付抵扣及释放累计。"
+    },
+    {
+      "name": "ix_fee_request_q1",
+      "table": "fee_request",
+      "columns": [
+        "status",
+        "submitted_at"
+      ],
+      "usecases": [
+        24,
+        25
+      ],
+      "purpose": "待审核和重提任务。"
+    },
+    {
+      "name": "ix_patient_refund_q1",
+      "table": "patient_refund",
+      "columns": [
+        "fee_request_id",
+        "status"
+      ],
+      "usecases": [
+        25,
+        26
+      ],
+      "purpose": "批准额度下待办理、待核实和成功退款。"
+    },
+    {
+      "name": "ix_patient_refund_q2",
+      "table": "patient_refund",
+      "columns": [
+        "patient_payment_id",
+        "status"
+      ],
+      "usecases": [
+        7,
+        26
+      ],
+      "purpose": "原款退款占用与实退累计。"
+    },
+    {
+      "name": "ix_followup_requirement_q1",
+      "table": "followup_requirement",
+      "columns": [
+        "responsible_frontdesk_id",
+        "status",
+        "next_contact_date"
+      ],
+      "usecases": [
+        12,
+        13
+      ],
+      "purpose": "负责人的待联系清单。"
+    },
+    {
+      "name": "ix_followup_requirement_q2",
+      "table": "followup_requirement",
+      "columns": [
+        "patient_id",
+        "status",
+        "target_start"
+      ],
+      "usecases": [
+        12,
+        13,
+        14
+      ],
+      "purpose": "患者复诊窗口及未完成要求。"
+    },
+    {
+      "name": "ix_contact_history_q1",
+      "table": "contact_history",
+      "columns": [
+        "followup_requirement_id",
+        "contacted_at"
+      ],
+      "usecases": [
+        13,
+        14
+      ],
+      "purpose": "联系与复诊预约历史。"
+    },
+    {
+      "name": "ix_clinical_assessment_q1",
+      "table": "clinical_assessment",
+      "columns": [
+        "followup_requirement_id",
+        "assessed_at"
+      ],
+      "usecases": [
+        14
+      ],
+      "purpose": "多次临床评估及后续处理。"
+    },
+    {
+      "name": "ix_material_batch_q1",
+      "table": "material_batch",
+      "columns": [
+        "material_id",
+        "status",
+        "expiry_date"
+      ],
+      "usecases": [
+        17,
+        18,
+        32
+      ],
+      "purpose": "可用批次和临期筛选；仍逐次检查真实日期。"
+    },
+    {
+      "name": "ix_inventory_movement_q1",
+      "table": "inventory_movement",
+      "columns": [
+        "batch_stock_id",
+        "occurred_at",
+        "id"
+      ],
+      "usecases": [
+        17,
+        18,
+        28
+      ],
+      "purpose": "批次位置流水及余额追溯。"
+    },
+    {
+      "name": "ix_material_usage_q1",
+      "table": "material_usage",
+      "columns": [
+        "visit_id",
+        "used_at"
+      ],
+      "usecases": [
+        9,
+        18
+      ],
+      "purpose": "实际使用批次追溯。"
+    },
+    {
+      "name": "ix_stock_count_q1",
+      "table": "stock_count",
+      "columns": [
+        "status",
+        "counted_at"
+      ],
+      "usecases": [
+        18
+      ],
+      "purpose": "待确认盘点差异。"
+    },
+    {
+      "name": "ix_purchase_order_q1",
+      "table": "purchase_order",
+      "columns": [
+        "supplier_id",
+        "status",
+        "agreed_at"
+      ],
+      "usecases": [
+        27,
+        28,
+        29
+      ],
+      "purpose": "供应商采购履行与预付来源。"
+    },
+    {
+      "name": "ix_purchase_receipt_q1",
+      "table": "purchase_receipt",
+      "columns": [
+        "purchase_order_id",
+        "arrived_at"
+      ],
+      "usecases": [
+        28,
+        29
+      ],
+      "purpose": "分批到货与验收累计。"
+    },
+    {
+      "name": "ix_purchase_receipt_item_q1",
+      "table": "purchase_receipt_item",
+      "columns": [
+        "purchase_order_item_id"
+      ],
+      "usecases": [
+        28
+      ],
+      "purpose": "同采购明细的分批验收量。"
+    },
+    {
+      "name": "ix_purchase_issue_q1",
+      "table": "purchase_issue",
+      "columns": [
+        "status",
+        "created_at"
+      ],
+      "usecases": [
+        28,
+        29
+      ],
+      "purpose": "待处理差异、退供及价款调整。"
+    },
+    {
+      "name": "ix_supplier_payment_q1",
+      "table": "supplier_payment",
+      "columns": [
+        "supplier_funds_id",
+        "status",
+        "initiated_at"
+      ],
+      "usecases": [
+        19,
+        29
+      ],
+      "purpose": "供货付款预占、未知和成功事实。"
+    },
+    {
+      "name": "ix_supplier_allocation_q1",
+      "table": "supplier_allocation",
+      "columns": [
+        "purchase_order_id",
+        "allocation_state"
+      ],
+      "usecases": [
+        27,
+        29
+      ],
+      "purpose": "采购预付款的待生效/生效/释放用途。"
+    },
+    {
+      "name": "ix_supplier_allocation_q2",
+      "table": "supplier_allocation",
+      "columns": [
+        "purchase_receipt_id",
+        "allocation_state"
+      ],
+      "usecases": [
+        28,
+        29
+      ],
+      "purpose": "验收应付余额与已付款分配。"
+    },
+    {
+      "name": "ix_supplier_refund_q1",
+      "table": "supplier_refund",
+      "columns": [
+        "supplier_payment_id",
+        "received_at"
+      ],
+      "usecases": [
+        19,
+        29
+      ],
+      "purpose": "原供货付款退款累计。"
+    },
+    {
+      "name": "ix_instrument_processing_q1",
+      "table": "instrument_processing",
+      "columns": [
+        "status",
+        "started_at"
+      ],
+      "usecases": [
+        30
+      ],
+      "purpose": "待核对放行及隔离轮次。"
+    },
+    {
+      "name": "ix_instrument_pack_cycle_q1",
+      "table": "instrument_pack_cycle",
+      "columns": [
+        "instrument_pack_id",
+        "status",
+        "expires_at"
+      ],
+      "usecases": [
+        30,
+        31
+      ],
+      "purpose": "器械包当前轮次、占用和有效期。"
+    },
+    {
+      "name": "ix_instrument_use_q1",
+      "table": "instrument_use",
+      "columns": [
+        "visit_id",
+        "issued_at"
+      ],
+      "usecases": [
+        9,
+        31
+      ],
+      "purpose": "按患者就诊追溯包次；由既有visit患者索引定位。"
+    },
+    {
+      "name": "ix_cash_reconciliation_q1",
+      "table": "cash_reconciliation",
+      "columns": [
+        "business_date",
+        "channel",
+        "cutoff_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "营业日各渠道多次核对快照。"
+    },
+    {
+      "name": "ix_issue_followup_q1",
+      "table": "issue_followup",
+      "columns": [
+        "assigned_to",
+        "status",
+        "due_date"
+      ],
+      "usecases": [
+        20,
+        30
+      ],
+      "purpose": "负责人指派的未决问题。"
+    },
+    {
+      "name": "ix_patient_payment_q2",
+      "table": "patient_payment",
+      "columns": [
+        "channel",
+        "received_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "按渠道和UTC起止区间取得原始资金事实；另按确认状态过滤。"
+    },
+    {
+      "name": "ix_patient_refund_q3",
+      "table": "patient_refund",
+      "columns": [
+        "channel",
+        "verified_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "按渠道和UTC起止区间取得原始资金事实；另按确认状态过滤。"
+    },
+    {
+      "name": "ix_supplier_payment_q2",
+      "table": "supplier_payment",
+      "columns": [
+        "channel",
+        "verified_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "按渠道和UTC起止区间取得原始资金事实；另按确认状态过滤。"
+    },
+    {
+      "name": "ix_supplier_refund_q2",
+      "table": "supplier_refund",
+      "columns": [
+        "channel",
+        "received_at"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "purpose": "按渠道和UTC起止区间取得原始资金事实；另按确认状态过滤。"
+    },
+    {
+      "name": "ix_account_role_q1",
+      "table": "account_role",
+      "columns": [
+        "account_id",
+        "role_id",
+        "granted_at"
+      ],
+      "usecases": [],
+      "purpose": "请求权限核对；运行支撑。"
+    },
+    {
+      "name": "ix_staff_role_qualification_q1",
+      "table": "staff_role_qualification",
+      "columns": [
+        "staff_id",
+        "role_id",
+        "valid_from"
+      ],
+      "usecases": [],
+      "purpose": "岗位有效区间与重叠核验；运行支撑。"
+    },
+    {
+      "name": "ix_authentication_event_q1",
+      "table": "authentication_event",
+      "columns": [
+        "login_digest",
+        "source_digest",
+        "occurred_at"
+      ],
+      "usecases": [],
+      "purpose": "登录失败限流窗口；另分别限制单来源/单账号维度。"
+    },
+    {
+      "name": "ix_authentication_event_q2",
+      "table": "authentication_event",
+      "columns": [
+        "source_digest",
+        "occurred_at"
+      ],
+      "usecases": [],
+      "purpose": "来源维度限流窗口。"
+    },
+    {
+      "name": "ix_authentication_event_q3",
+      "table": "authentication_event",
+      "columns": [
+        "login_digest",
+        "occurred_at"
+      ],
+      "usecases": [],
+      "purpose": "账号维度限流窗口。"
+    },
+    {
+      "name": "ix_operation_audit_q1",
+      "table": "operation_audit",
+      "columns": [
+        "object_kind",
+        "object_key",
+        "occurred_at"
+      ],
+      "usecases": [],
+      "purpose": "按受控对象追溯操作历史。"
+    },
+    {
+      "name": "ix_operation_audit_q2",
+      "table": "operation_audit",
+      "columns": [
+        "submission_id"
+      ],
+      "usecases": [],
+      "purpose": "一项命令涉及多个对象的审计集合。"
+    },
+    {
+      "name": "ix_backup_run_q1",
+      "table": "backup_run",
+      "columns": [
+        "status",
+        "created_at"
+      ],
+      "usecases": [],
+      "purpose": "备份任务恢复与保留策略。"
+    },
+    {
+      "name": "ix_backup_copy_q1",
+      "table": "backup_copy",
+      "columns": [
+        "backup_id",
+        "status"
+      ],
+      "usecases": [],
+      "purpose": "核对本地及异机可用副本。"
+    },
+    {
+      "name": "ix_restore_verification_q1",
+      "table": "restore_verification",
+      "columns": [
+        "backup_id",
+        "started_at"
+      ],
+      "usecases": [],
+      "purpose": "备份恢复演练历史。"
+    }
+  ],
+  "checks": [
+    {
+      "id": "CK-01",
+      "table": "resource_occupancy",
+      "fields": [
+        "appointment_id",
+        "visit_id",
+        "starts_at",
+        "ends_at"
+      ],
+      "predicate": "(appointment_id IS NOT NULL OR visit_id IS NOT NULL) AND ends_at > starts_at",
+      "reason": "占用必须有来源且时段正向。"
+    },
+    {
+      "id": "CK-02",
+      "table": "resource_occupancy",
+      "fields": [
+        "released_at",
+        "released_by",
+        "release_reason"
+      ],
+      "predicate": "(released_at IS NULL AND released_by IS NULL AND release_reason IS NULL) OR (released_at IS NOT NULL AND released_by IS NOT NULL AND release_reason IS NOT NULL)",
+      "reason": "释放事实成组。"
+    },
+    {
+      "id": "CK-03",
+      "table": "appointment",
+      "fields": [
+        "planned_start",
+        "planned_end"
+      ],
+      "predicate": "planned_end > planned_start",
+      "reason": "预约时段正向。"
+    },
+    {
+      "id": "CK-04",
+      "table": "dated_schedule",
+      "fields": [
+        "starts_at",
+        "ends_at"
+      ],
+      "predicate": "ends_at > starts_at",
+      "reason": "排班时段正向。"
+    },
+    {
+      "id": "CK-05",
+      "table": "visit",
+      "fields": [
+        "arrived_at",
+        "started_at",
+        "ended_at"
+      ],
+      "predicate": "(started_at IS NULL OR started_at >= arrived_at) AND (ended_at IS NULL OR (started_at IS NOT NULL AND ended_at >= started_at))",
+      "reason": "就诊实际时间不倒置；状态所需字段另按状态门禁检查。"
+    },
+    {
+      "id": "CK-06",
+      "table": "patient_change",
+      "fields": [
+        "old_value",
+        "new_value"
+      ],
+      "predicate": "old_value IS NOT new_value",
+      "reason": "NULL也参与前后值相等比较。"
+    },
+    {
+      "id": "CK-07",
+      "table": "patient_payment",
+      "fields": [
+        "received_cents",
+        "change_cents"
+      ],
+      "predicate": "received_cents > 0 AND change_cents >= 0 AND change_cents < received_cents",
+      "reason": "净额由生成列计算；不能人工提供另一套金额。"
+    },
+    {
+      "id": "CK-08",
+      "table": "payment_allocation",
+      "fields": [
+        "amount_cents",
+        "original_allocation_id",
+        "fee_request_id"
+      ],
+      "predicate": "(amount_cents > 0 AND original_allocation_id IS NULL) OR (amount_cents < 0 AND original_allocation_id IS NOT NULL AND fee_request_id IS NOT NULL)",
+      "reason": "负向用途必须追溯原正向用途和已批准申请。"
+    },
+    {
+      "id": "CK-09",
+      "table": "prepayment_offset",
+      "fields": [
+        "amount_cents",
+        "original_offset_id",
+        "fee_request_id"
+      ],
+      "predicate": "(amount_cents > 0 AND original_offset_id IS NULL) OR (amount_cents < 0 AND original_offset_id IS NOT NULL AND fee_request_id IS NOT NULL)",
+      "reason": "负向用途必须追溯原正向用途和已批准申请。"
+    },
+    {
+      "id": "CK-10",
+      "table": "fee_request",
+      "fields": [
+        "bill_id",
+        "patient_payment_id",
+        "proposed_adjustment_cents",
+        "proposed_refund_cents"
+      ],
+      "predicate": "(bill_id IS NOT NULL OR patient_payment_id IS NOT NULL) AND proposed_refund_cents >= 0 AND (proposed_adjustment_cents <> 0 OR proposed_refund_cents <> 0)",
+      "reason": "申请有原单且至少有一项有效金额。"
+    },
+    {
+      "id": "CK-11",
+      "table": "fee_request",
+      "fields": [
+        "bill_id",
+        "proposed_adjustment_cents"
+      ],
+      "predicate": "proposed_adjustment_cents = 0 OR bill_id IS NOT NULL",
+      "reason": "应收调整必须有原账目。"
+    },
+    {
+      "id": "CK-12",
+      "table": "patient_refund",
+      "fields": [
+        "requested_cents",
+        "actual_cents"
+      ],
+      "predicate": "requested_cents > 0 AND (actual_cents IS NULL OR (actual_cents > 0 AND actual_cents <= requested_cents))",
+      "reason": "实际未知保留NULL，已取得实际额不得超过拟退额。"
+    },
+    {
+      "id": "CK-13",
+      "table": "supplier_payment",
+      "fields": [
+        "requested_cents",
+        "actual_cents"
+      ],
+      "predicate": "requested_cents > 0 AND (actual_cents IS NULL OR (actual_cents > 0 AND actual_cents <= requested_cents))",
+      "reason": "未知与零付款区别处理。"
+    },
+    {
+      "id": "CK-14",
+      "table": "supplier_allocation",
+      "fields": [
+        "purchase_order_id",
+        "purchase_receipt_id"
+      ],
+      "predicate": "(purchase_order_id IS NOT NULL) + (purchase_receipt_id IS NOT NULL) = 1",
+      "reason": "预付与验收结算恰选一个目标。"
+    },
+    {
+      "id": "CK-15",
+      "table": "supplier_allocation",
+      "fields": [
+        "amount_cents",
+        "original_allocation_id",
+        "allocation_state",
+        "effective_at"
+      ],
+      "predicate": "amount_cents <> 0 AND (amount_cents > 0 OR original_allocation_id IS NOT NULL) AND (allocation_state <> '待生效' OR amount_cents > 0) AND (allocation_state <> '已生效' OR effective_at IS NOT NULL)",
+      "reason": "负向引用原用途，待生效仅预占正数，生效有时刻。"
+    },
+    {
+      "id": "CK-16",
+      "table": "followup_requirement",
+      "fields": [
+        "source_visit_id",
+        "source_plan_version_id",
+        "target_start",
+        "target_end"
+      ],
+      "predicate": "(source_visit_id IS NOT NULL OR source_plan_version_id IS NOT NULL) AND target_end >= target_start",
+      "reason": "随访有来源，日期窗口有序。"
+    },
+    {
+      "id": "CK-17",
+      "table": "material",
+      "fields": [
+        "conversion_numerator",
+        "conversion_denominator",
+        "quantity_scale"
+      ],
+      "predicate": "conversion_numerator > 0 AND conversion_denominator > 0 AND quantity_scale BETWEEN 0 AND 6",
+      "reason": "材料单位换算为正数，精度采用既定范围。"
+    },
+    {
+      "id": "CK-18",
+      "table": "batch_stock",
+      "fields": [
+        "quantity_scaled"
+      ],
+      "predicate": "quantity_scaled >= 0",
+      "reason": "批次位置余额不为负。"
+    },
+    {
+      "id": "CK-19",
+      "table": "inventory_movement",
+      "fields": [
+        "before_scaled",
+        "delta_scaled",
+        "after_scaled"
+      ],
+      "predicate": "before_scaled >= 0 AND delta_scaled <> 0 AND after_scaled >= 0 AND after_scaled = before_scaled + delta_scaled",
+      "reason": "流水数量平衡；同时在事务中校验真实旧余额。"
+    },
+    {
+      "id": "CK-20",
+      "table": "purchase_receipt_item",
+      "fields": [
+        "arrived_quantity_scaled",
+        "accepted_quantity_scaled",
+        "rejected_quantity_scaled",
+        "pending_quantity_scaled"
+      ],
+      "predicate": "arrived_quantity_scaled > 0 AND accepted_quantity_scaled >= 0 AND rejected_quantity_scaled >= 0 AND pending_quantity_scaled >= 0 AND arrived_quantity_scaled = accepted_quantity_scaled + rejected_quantity_scaled + pending_quantity_scaled",
+      "reason": "验收数量严格分解。"
+    },
+    {
+      "id": "CK-21",
+      "table": "purchase_receipt_item",
+      "fields": [
+        "accepted_quantity_scaled",
+        "material_batch_id",
+        "stock_location_id",
+        "accepted_amount_cents"
+      ],
+      "predicate": "accepted_quantity_scaled = 0 OR (material_batch_id IS NOT NULL AND stock_location_id IS NOT NULL AND accepted_amount_cents IS NOT NULL AND accepted_amount_cents >= 0)",
+      "reason": "认可合格量必须同时明确批次、位置及应付依据。"
+    },
+    {
+      "id": "CK-22",
+      "table": "instrument_use",
+      "fields": [
+        "issued_at",
+        "used_at",
+        "used_by",
+        "returned_at",
+        "use_status"
+      ],
+      "predicate": "(used_at IS NULL OR used_at >= issued_at) AND (use_status <> '已使用' OR (used_at IS NOT NULL AND used_by IS NOT NULL)) AND (use_status <> '未用退回' OR (returned_at IS NOT NULL AND returned_at >= issued_at AND used_at IS NULL))",
+      "reason": "正常使用和未用退回分别保存真实时刻。"
+    },
+    {
+      "id": "CK-23",
+      "table": "reconciliation_item",
+      "fields": [
+        "patient_payment_id",
+        "patient_refund_id",
+        "supplier_payment_id",
+        "supplier_refund_id"
+      ],
+      "predicate": "(patient_payment_id IS NOT NULL) + (patient_refund_id IS NOT NULL) + (supplier_payment_id IS NOT NULL) + (supplier_refund_id IS NOT NULL) = 1",
+      "reason": "四类核对原单恰选一个；类型、渠道、金额另核对原单。"
+    },
+    {
+      "id": "CK-24",
+      "table": "issue_followup",
+      "fields": [
+        "cash_reconciliation_id",
+        "instrument_processing_id"
+      ],
+      "predicate": "(cash_reconciliation_id IS NOT NULL) + (instrument_processing_id IS NOT NULL) = 1",
+      "reason": "差异跟进恰有一个业务来源。"
+    },
+    {
+      "id": "CK-25",
+      "table": "backup_artifact",
+      "fields": [
+        "artifact_kind",
+        "document_version_id"
+      ],
+      "predicate": "(artifact_kind = 'database' AND document_version_id IS NULL) OR (artifact_kind = 'attachment' AND document_version_id IS NOT NULL)",
+      "reason": "数据库文件与附件版本的归属区别处理。"
+    },
+    {
+      "id": "CK-26",
+      "table": "authentication_event",
+      "fields": [
+        "session_id",
+        "account_id"
+      ],
+      "predicate": "session_id IS NULL OR account_id IS NOT NULL",
+      "reason": "有会话事件不能利用账号NULL绕过复合归属。"
+    },
+    {
+      "id": "CK-27",
+      "table": "operation_audit",
+      "fields": [
+        "session_id",
+        "account_id",
+        "staff_id",
+        "submission_id",
+        "permission_id",
+        "actor_kind"
+      ],
+      "predicate": "(session_id IS NULL OR account_id IS NOT NULL) AND (submission_id IS NULL OR (account_id IS NOT NULL AND permission_id IS NOT NULL)) AND (actor_kind <> '职员' OR (account_id IS NOT NULL AND staff_id IS NOT NULL))",
+      "reason": "补足可空复合外键的伴随字段；无账号的计划任务或初始化仍可审计。"
+    }
+  ],
+  "cross_table_rules": [
+    {
+      "id": "R-01",
+      "tables": [
+        "dated_schedule",
+        "resource_occupancy",
+        "appointment",
+        "visit"
+      ],
+      "usecases": [
+        1,
+        3,
+        15,
+        16
+      ],
+      "rule": "占用在已确认安排内，牙医/诊椅有效；安排版本匹配。不同安排也按同牙医或同诊椅查冲突，同时从预约或就诊取得患者核对重叠；预约到诊的双来源只计一个过程。",
+      "mechanism": "发布或调整先检查同牙医/诊椅其他已确认安排的区间，再查全部未释放占用，判定old.start < new.end AND new.start < old.end；反向检查既有占用，不能只对同schedule_id设唯一。"
+    },
+    {
+      "id": "R-02",
+      "tables": [
+        "dated_schedule",
+        "resource_occupancy",
+        "appointment_change",
+        "schedule_change"
+      ],
+      "usecases": [
+        1,
+        15
+      ],
+      "rule": "停诊、改约和取消不得留下仍指向旧安排的有效占用，受影响预约必须有处理结果及历史。",
+      "mechanism": "变更旧行条件与范围检查、释放旧占用、建立新占用、快照和通知办理状态同事务；当前时钟/岗位复核由服务执行。"
+    },
+    {
+      "id": "R-03",
+      "tables": [
+        "health_version",
+        "health_item",
+        "health_review",
+        "visit"
+      ],
+      "usecases": [
+        21
+      ],
+      "rule": "前版本同患者且版本递增；复核版本属于就诊患者；实际复核牙医具备本次接诊或交接依据。",
+      "mechanism": "同患者复合外键加版本顺序触发器；复核写入时JOIN就诊与版本检查，相关归属列形成引用后固定。"
+    },
+    {
+      "id": "R-04",
+      "tables": [
+        "clinical_record",
+        "clinical_finding",
+        "health_review",
+        "record_addendum"
+      ],
+      "usecases": [
+        10,
+        11
+      ],
+      "rule": "签署时正文、检查和健康复核完整；签署摘要对应同版本内容；签后正文、检查与签署事实冻结，补充只能引用已签署病历。",
+      "mechanism": "草稿填充后经签署状态门禁触发器检查集合，服务生成摘要；UPDATE/DELETE触发器保护签后字段及子项；补充追加。"
+    },
+    {
+      "id": "R-05",
+      "tables": [
+        "clinical_document",
+        "document_version",
+        "treatment_plan",
+        "plan_version",
+        "visit"
+      ],
+      "usecases": [
+        23
+      ],
+      "rule": "文件及关联就诊、方案版本同患者；前文件版本同逻辑文件；确认后内容、摘要和存储标识不改写。",
+      "mechanism": "跨表归属触发器覆盖INSERT/相关UPDATE；文件内容变更新建版本；确认和缺失核验状态可按白名单变更并审计。"
+    },
+    {
+      "id": "R-06",
+      "tables": [
+        "patient_decision",
+        "decision_plan_item",
+        "decision_file_version",
+        "plan_item",
+        "patient_proxy"
+      ],
+      "usecases": [
+        22
+      ],
+      "rule": "决定范围与方案版本一致；原件与患者一致；代理资格在决定时覆盖事项；有效同意至少有一项。",
+      "mechanism": "两关联表复合主键防重；同版本/患者触发器；代理有效时点由服务检查；追加决定及范围后在提交前检查非空集合。"
+    },
+    {
+      "id": "R-07",
+      "tables": [
+        "plan_version",
+        "plan_item",
+        "treatment_execution",
+        "visit"
+      ],
+      "usecases": [
+        4,
+        22
+      ],
+      "rule": "执行属于本次患者，关联项目具备有效同意且未停止后续执行；按项目决定时间线计算可执行量。更正不得分叉、自指或成环。",
+      "mechanism": "复合唯一与更正后继部分唯一、递归链检查；服务在锁内合计有效执行链，未执行部分停止不抹去历史。"
+    },
+    {
+      "id": "R-08",
+      "tables": [
+        "service_price",
+        "bill_item",
+        "treatment_execution",
+        "bill"
+      ],
+      "usecases": [
+        4,
+        5,
+        6
+      ],
+      "rule": "应收执行与账目同患者；价目属于执行收费项目且覆盖计价时点；已确认价目区间不重叠；已核价才进入结算。",
+      "mechanism": "INSERT/UPDATE触发器核对归属和半开区间；更改价目反查被引用时点；零价仍须明确免收依据及计价责任。"
+    },
+    {
+      "id": "R-09",
+      "tables": [
+        "payment_allocation",
+        "prepayment_offset",
+        "patient_payment",
+        "bill",
+        "fee_request"
+      ],
+      "usecases": [
+        7,
+        25
+      ],
+      "rule": "付款与账目同资金归属，仅到账已确认原款可分配；负向用途引用正向原用途且不超原额，已批准申请与账目/原款相符。",
+      "mechanism": "归属触发器与复合外键；锁内同时汇总两种用途、释放、待核实退款占用和成功退款，防止跨入口重复消费同一原款。"
+    },
+    {
+      "id": "R-10",
+      "tables": [
+        "fee_request",
+        "fee_adjustment",
+        "fee_adjustment_item",
+        "bill_item"
+      ],
+      "usecases": [
+        24,
+        25
+      ],
+      "rule": "申请有效提交版本与审核版本一致；调整项目均属原账目，合计等于批准额，调整后应收不负。",
+      "mechanism": "申请revision条件更新；唯一申请调整、防跨账目触发器；批准、调整明细、必要用途释放和审计整体生效。"
+    },
+    {
+      "id": "R-11",
+      "tables": [
+        "patient_refund",
+        "patient_payment",
+        "fee_request"
+      ],
+      "usecases": [
+        26
+      ],
+      "rule": "申请已同意；原付款到账且同患者；待办理/待核实保留拟退占用，成功计实际额，失败才释放；不能凭超时当失败重付。",
+      "mechanism": "复合外键、终态字段门禁及不可覆盖保护；锁内按申请批准额和原款可用额双限额核验；失败重办保留前次编号并核对原申请/原款。"
+    },
+    {
+      "id": "R-12",
+      "tables": [
+        "followup_requirement",
+        "contact_history",
+        "clinical_assessment",
+        "appointment",
+        "visit",
+        "plan_version"
+      ],
+      "usecases": [
+        12,
+        13,
+        14
+      ],
+      "rule": "所有来源、预约与实际评估就诊同患者；继续跟进保留日期和责任；需要临床评估的要求不能仅凭联系完成。",
+      "mechanism": "归属触发器及关闭状态门禁；取消预约同步恢复未完成要求的待联系状态，保留历史关联。"
+    },
+    {
+      "id": "R-13",
+      "tables": [
+        "material",
+        "material_batch",
+        "batch_stock",
+        "inventory_movement",
+        "stock_count"
+      ],
+      "usecases": [
+        18,
+        32
+      ],
+      "rule": "已有流水后单位/精度/换算冻结；批次恢复可用需责任确认与效期资料；盘点确认时旧库存版本仍一致。",
+      "mechanism": "冻结字段触发器；效期既作格式校验也在每次领用时按营业日期验证；盘点确认与唯一差异流水、余额同事务，零差异不生成流水。"
+    },
+    {
+      "id": "R-14",
+      "tables": [
+        "inventory_movement",
+        "material_usage",
+        "purchase_receipt_item",
+        "purchase_issue"
+      ],
+      "usecases": [
+        18,
+        28
+      ],
+      "rule": "库存流水与批次位置、采购材料及盘点来源一致；未用退回必须引用原领用，实际用量与退回量合计不超领用；实际使用不重复扣库存。",
+      "mechanism": "归属与流水类型触发器；锁内校验旧余额及累计数量；已确认验收只为新增合格增量入库，保留审计前后值。"
+    },
+    {
+      "id": "R-15",
+      "tables": [
+        "purchase_order",
+        "purchase_order_item",
+        "purchase_receipt",
+        "purchase_receipt_item",
+        "purchase_issue"
+      ],
+      "usecases": [
+        27,
+        28
+      ],
+      "rule": "验收父单和采购项目属于同采购，批次材料一致；累计交付、拒收、待检、退供及取消剩余分别核算，不能相互冲抵。",
+      "mechanism": "复合外键及归属触发器；采购确认至少一项；采购单位、换算和价格形成事实后冻结；按行精确计算应付后取整到分。"
+    },
+    {
+      "id": "R-16",
+      "tables": [
+        "supplier_payment",
+        "supplier_allocation",
+        "supplier_funds",
+        "purchase_order",
+        "purchase_receipt",
+        "purchase_issue",
+        "supplier_refund"
+      ],
+      "usecases": [
+        29
+      ],
+      "rule": "资金、采购/验收和差异属于同供应商；负向释放目标与原分配一致；待核实保留预占，预付转验收不重复付款。",
+      "mechanism": "跨表触发器；同事务汇总原付款实付、预占/生效用途、释放及退回，按授权版本校验；外部实际支付分阶段登记。"
+    },
+    {
+      "id": "R-17",
+      "tables": [
+        "instrument_processing",
+        "instrument_pack_cycle",
+        "processing_monitor",
+        "instrument_use"
+      ],
+      "usecases": [
+        30,
+        31
+      ],
+      "rule": "放行前包次、包装、监测证据及有效期齐全；正常发放要求处理轮次已放行且未隔离；包次无正常占用且未过期。",
+      "mechanism": "放行门禁与部分唯一索引；每次发放复核实际时钟和实物检查；事后隔离保留放行原事实并追溯全部使用就诊，异常补录不受正常放行伪装。"
+    },
+    {
+      "id": "R-18",
+      "tables": [
+        "cash_reconciliation",
+        "reconciliation_item",
+        "issue_followup"
+      ],
+      "usecases": [
+        19,
+        20
+      ],
+      "rule": "核对原单类型、渠道、核实时点、金额方向及revision一致；集合限定到cutoff_at，不混入未确认款；差异或未决有跟进责任。",
+      "mechanism": "四个部分唯一索引防重复；快照整体保存前锁内重查来源集合及摘要；保存后原集合与金额不再增删覆盖。"
+    },
+    {
+      "id": "R-19",
+      "tables": [
+        "staff_role_qualification",
+        "account_role",
+        "user_account",
+        "access_role",
+        "login_session"
+      ],
+      "usecases": [],
+      "rule": "同职员同岗位的有效区间不重叠；授权岗位和职员与资格一致，账号授权不得超过资格范围；重新授权不复活历史。",
+      "mechanism": "资格岗位复合外键+职员JOIN检查；区间触发器兼顾截止与撤销时刻；每次请求核验当前时刻，不能在部分索引里使用now。变更递增auth_version。"
+    },
+    {
+      "id": "R-20",
+      "tables": [
+        "request_submission",
+        "operation_audit",
+        "audit_change"
+      ],
+      "usecases": [],
+      "rule": "账号+命令键唯一；相同键不同权限或摘要拒绝；业务成功、结果定位、审计及字段历史同事务；失败另记事件。",
+      "mechanism": "先BEGIN IMMEDIATE再查键；仅在成功事务末保存已提交结果（无需持久化处理中行），所有失败整体回滚。多态对象由白名单解析，不虚构外键。"
+    },
+    {
+      "id": "R-21",
+      "tables": [
+        "backup_run",
+        "backup_artifact",
+        "backup_copy",
+        "restore_verification",
+        "restore_check"
+      ],
+      "usecases": [],
+      "rule": "成功备份至少包含一份数据库清单和快照引用的全部附件，本地/异机均验证；恢复副本属于任务，必需检查完整且全部通过。",
+      "mechanism": "复合外键、每任务数据库文件部分唯一和成功状态门禁；文件摘要、恢复读取与RPO/RTO在隔离作业中验证，不能由SQL状态字段自证成功。"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "TX-01",
+      "usecases": [
+        1,
+        3,
+        15
+      ],
+      "title": "预约、到诊与排班",
+      "facts": "排班/预约版本、旧占用释放、新占用、变更经历；到诊时唯一就诊和病历草稿一起创建。",
+      "commit_gate": "取得写锁后重新检查人员/诊椅/患者冲突及安排版本；关闭/迁移旧占用后再建新占用；失败全部回滚。"
+    },
+    {
+      "id": "TX-02",
+      "usecases": [
+        8,
+        21
+      ],
+      "title": "身份与健康资料",
+      "facts": "患者变化与每字段原值；新健康版本及完整条目；就诊复核追加。",
+      "commit_gate": "原值由锁内读取，revision匹配；未知健康事实不可填成否定；前版本和复核患者一致。"
+    },
+    {
+      "id": "TX-03",
+      "usecases": [
+        10,
+        11,
+        22,
+        23,
+        4
+      ],
+      "title": "临床与持续治疗",
+      "facts": "草稿及检查；签署摘要；补充；方案版本及项目；决定与范围原件；实际执行及应收。",
+      "commit_gate": "各操作独立事务，按生命周期状态门禁；来源患者和执行权限一致；完整集合及有效同意核对完毕才提交。文件先写临时文件并核对，原件就绪后登记不可变storage_key，失败清理未引用文件。"
+    },
+    {
+      "id": "TX-04",
+      "usecases": [
+        5
+      ],
+      "title": "价目发布",
+      "facts": "新价目及负责人确认依据；终止旧价适用区间。",
+      "commit_gate": "同项目区间无重叠，已引用价目时点不失效；先截断旧区间再激活新版本，同事务完成。"
+    },
+    {
+      "id": "TX-05",
+      "usecases": [
+        7
+      ],
+      "title": "患者收款、预付及抵扣",
+      "facts": "真实原款、初始分配/抵扣与审计；非现金未核实保留待核实原款。",
+      "commit_gate": "同患者资金归属的两类用途、退款占用合并计算；未知到账不分配；确定到账后独立命令核实并分配。"
+    },
+    {
+      "id": "TX-06",
+      "usecases": [
+        24,
+        25
+      ],
+      "title": "费用申请和批准生效",
+      "facts": "申请提交版本、审核事实、费用调整头/明细及必要用途释放。",
+      "commit_gate": "审核读取最新申请revision；批准金额与明细一致；调整后账目不负、已有用途不超新的应收；不同患者/原款拒绝。"
+    },
+    {
+      "id": "TX-07",
+      "usecases": [
+        26
+      ],
+      "title": "退款办理与核实",
+      "facts": "先保存退款待办理及额度占用；真实支付后新命令登记成功/失败。",
+      "commit_gate": "外部支付不持有数据库写锁；响应未知维持占用并核实，禁止自动再付；同申请批准额和同原款可用额都要满足。"
+    },
+    {
+      "id": "TX-08",
+      "usecases": [
+        12,
+        13,
+        14
+      ],
+      "title": "复诊随访",
+      "facts": "要求责任、联系经历、关联预约；临床评估及后续日期，关闭结果。",
+      "commit_gate": "继续跟进和关闭采用不同条件；同患者来源检查；需评估者以临床依据关闭，改约取消不会删除联系历史。"
+    },
+    {
+      "id": "TX-09",
+      "usecases": [
+        18,
+        32
+      ],
+      "title": "批次库存与盘点",
+      "facts": "流水、batch_stock余额及revision；用料追溯；盘点确认或批次状态变化和审计。",
+      "commit_gate": "用旧revision和旧余额作条件更新且影响一行；领用、退回、实际使用和退供数量分别核验，任何一步失败整体回滚。"
+    },
+    {
+      "id": "TX-10",
+      "usecases": [
+        27,
+        28
+      ],
+      "title": "采购与分批验收",
+      "facts": "采购及项目；到货与验收条目；新增合格增量的入库；退供差异和价款依据。",
+      "commit_gate": "验收前后数量及金额快照保留；同采购项目、同材料批次；认可合格量的增量只入库一次，重试返回原结果。"
+    },
+    {
+      "id": "TX-11",
+      "usecases": [
+        29
+      ],
+      "title": "供应商付款与结算",
+      "facts": "待付原款和正向待生效用途；核实后实际付款与用途；预付转验收的成对释放/分配；退款到账及用途释放。",
+      "commit_gate": "原授权单据revision匹配；未知付款保持预占；成功用途合计等于实付，失败才取消预占；来源和剩余额度均核对。"
+    },
+    {
+      "id": "TX-12",
+      "usecases": [
+        30,
+        31
+      ],
+      "title": "器械放行与使用",
+      "facts": "轮次与包次、监测证据、放行或隔离；发放/退回/使用经历与包次状态。",
+      "commit_gate": "放行前完整检查；先结束未用退回占用再新发放；正常使用的包次只能使用一次，异常追溯不改写原放行。"
+    },
+    {
+      "id": "TX-13",
+      "usecases": [
+        20
+      ],
+      "title": "收支核对",
+      "facts": "核对头、完整原单集合和必要差异跟进。",
+      "commit_gate": "只读快照取得来源后，短写事务内重新核对集合摘要和revision；金额/渠道/时点一致才提交。"
+    },
+    {
+      "id": "TX-14",
+      "usecases": [
+        2,
+        6,
+        9,
+        16,
+        17,
+        19
+      ],
+      "title": "查询与统计",
+      "facts": "使用同一读事务或同一查询快照计算列表、明细、汇总；不写虚构结算状态。",
+      "commit_gate": "查询权限与患者范围同样校验；各模块汇总不能跨不同快照相加；大量结果分页，长报表避免长期占用写事务。"
+    },
+    {
+      "id": "TX-15",
+      "usecases": [],
+      "title": "授权、幂等与审计",
+      "facts": "账号/资格/授权变化、auth_version、会话撤销与审计；业务命令结果及字段历史。",
+      "commit_gate": "授权的时间区间和资格实时复核；提交前无未完成集合、无本地处理中结果；权限失效后重试仍需重新授权。"
+    },
+    {
+      "id": "TX-16",
+      "usecases": [],
+      "title": "备份与恢复",
+      "facts": "任务、冻结快照的文件清单、副本核验和逐项恢复检查结果。",
+      "commit_gate": "只用短事务登记阶段；文件复制与恢复在事务外执行。全部证据通过后才记成功；恢复新运行代号使旧会话失效。"
+    }
+  ],
+  "composite_parent_unique_keys": {
+    "visit": [
+      [
+        "id",
+        "appointment_id"
+      ]
+    ],
+    "appointment": [
+      [
+        "id",
+        "patient_id"
+      ]
+    ],
+    "health_version": [
+      [
+        "id",
+        "patient_id"
+      ]
+    ],
+    "document_version": [
+      [
+        "id",
+        "clinical_document_id"
+      ]
+    ],
+    "plan_version": [
+      [
+        "id",
+        "treatment_plan_id"
+      ]
+    ],
+    "patient_funds": [
+      [
+        "id",
+        "patient_id"
+      ]
+    ],
+    "bill": [
+      [
+        "id",
+        "patient_funds_id"
+      ]
+    ],
+    "patient_payment": [
+      [
+        "id",
+        "patient_funds_id"
+      ]
+    ],
+    "fee_request": [
+      [
+        "id",
+        "bill_id"
+      ],
+      [
+        "id",
+        "patient_funds_id"
+      ]
+    ],
+    "payment_allocation": [
+      [
+        "id",
+        "patient_payment_id",
+        "bill_id"
+      ]
+    ],
+    "prepayment_offset": [
+      [
+        "id",
+        "patient_payment_id",
+        "bill_id"
+      ]
+    ],
+    "patient_refund": [
+      [
+        "id",
+        "patient_funds_id"
+      ]
+    ],
+    "inventory_movement": [
+      [
+        "id",
+        "batch_stock_id"
+      ]
+    ],
+    "stock_count": [
+      [
+        "id",
+        "batch_stock_id"
+      ]
+    ],
+    "purchase_receipt_item": [
+      [
+        "id",
+        "purchase_order_item_id"
+      ]
+    ],
+    "supplier_payment": [
+      [
+        "id",
+        "supplier_funds_id"
+      ]
+    ],
+    "supplier_allocation": [
+      [
+        "id",
+        "supplier_payment_id"
+      ]
+    ],
+    "staff_role_qualification": [
+      [
+        "id",
+        "role_id"
+      ]
+    ],
+    "login_session": [
+      [
+        "id",
+        "account_id"
+      ]
+    ],
+    "request_submission": [
+      [
+        "id",
+        "account_id"
+      ],
+      [
+        "id",
+        "permission_id"
+      ]
+    ],
+    "user_account": [
+      [
+        "id",
+        "staff_id"
+      ]
+    ],
+    "backup_copy": [
+      [
+        "id",
+        "backup_id"
+      ]
+    ]
+  },
+  "counts": {
+    "tables": 85,
+    "base_foreign_keys": 254,
+    "composite_foreign_keys": 27,
+    "compound_parent_unique_keys": 24,
+    "partial_unique_indexes": 9,
+    "query_entries": 67,
+    "new_query_indexes": 66,
+    "explicit_row_checks": 27,
+    "cross_table_rules": 21,
+    "transaction_groups": 16
+  },
+  "source_sha256": "844f135d4f5f7c2390d6aa60e296002dccf92e93429ae23ae9e8b1a8e8783ea3"
+}

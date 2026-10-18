@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+hide footbox
+skinparam maxMessageSize 160
+boundary ":岗位接口" as B
+control ":用例控制" as K
+participant ":领域实体" as E
+participant ":领域映射器" as M
+participant ":工作单元" as W
+autonumber
+B -> K : 提交(命令, 原版本, 同一请求键)
+K -> W : 开启写事务()
+alt 未取得写入机会
+ W --> K : SQLITE_BUSY
+ K --> B : BUSY；保留输入及原提交标识
+else 已开启事务
+ K -> M : 读取当前依据()
+ K -> E : 核验并产生变更集()
+ alt 业务核验失败
+  E --> K : 具体拒绝原因
+  K -> W : 回滚()
+  K --> B : 业务错误及可修正字段
+ else 保存条件更新或约束失败
+  K -> M : 保存(原版本条件)
+  M --> K : 影响行数不符或约束错误
+  K -> W : 回滚业务、操作提交及成功审计()
+  K --> B : 冲突；重新查询后核对
+ else 业务及提交结果、成功审计全部保存成功
+  K -> W : 提交()
+  alt 提交成功且连接正常
+   W --> K : 已提交
+   K --> B : 成功及原业务标识
+  else 响应未收到或提交结果不明
+   B -> K : 查询原办理(同一请求依据)
+   K -> M : 新连接核对操作提交与本人请求摘要()
+   M --> K : 原结果／未找到／仍无法确认
+   K --> B : 返回核验结果；不再次确认现金已收
+  end
+ end
+end
+@enduml

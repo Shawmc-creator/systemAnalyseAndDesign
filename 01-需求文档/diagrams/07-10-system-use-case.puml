@@ -5,8 +5,8 @@ skinparam defaultFontName SimSun
 skinparam defaultFontSize 18
 skinparam dpi 220
 skinparam ArrowColor black
-skinparam nodesep 24
-skinparam ranksep 65
+skinparam nodesep 22
+skinparam ranksep 48
 skinparam actor {
  BorderColor black
  BackgroundColor white
@@ -22,7 +22,7 @@ skinparam rectangle {
 left to right direction
 actor "牙医" as A0
 rectangle "牙科诊所管理系统" {
- usecase "UC-10\n记录检查诊断及方案" as U
+ usecase "UC-10\n记录检查与诊断" as U
 }
 A0 -- U
 

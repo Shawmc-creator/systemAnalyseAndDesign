@@ -1,0 +1,97 @@
+@startuml d1-db-15
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF4F4
+}
+title G15  备份与恢复验证  ·  5张表
+entity "备份任务\nbackup_run" as backup_run {
+  {field} id : INTEGER [PK, NN]
+  {field} run_no : TEXT [UQ, NN]
+  {field} trigger_kind : TEXT [NN]
+  {field} requested_by : INTEGER [FK, NULL]  → user_account.id (G13)
+  {field} responsible_staff_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} started_at : TEXT [NULL]
+  {field} snapshot_at : TEXT [NULL]
+  {field} finished_at : TEXT [NULL]
+  {field} schema_version : INTEGER [NULL]
+  {field} application_version : TEXT [NULL]
+  {field} manifest_key : TEXT [NULL]
+  {field} manifest_sha256 : TEXT [NULL]
+  {field} error_code : TEXT [NULL]
+  {field} created_at : TEXT [NN]
+}
+entity "备份文件清单\nbackup_artifact" as backup_artifact {
+  {field} id : INTEGER [PK, NN]
+  {field} backup_id : INTEGER [FK, NN]  → backup_run.id
+  {field} artifact_kind : TEXT [NN]
+  {field} document_version_id : INTEGER [FK, NULL]  → document_version.id (G04)
+  {field} relative_path : TEXT [NN]
+  {field} size_bytes : INTEGER [NN]
+  {field} sha256 : TEXT [NN]
+  {field} verification_status : TEXT [NN]
+  {field} verified_at : TEXT [NULL]
+  {field} result_note : TEXT [NULL]
+}
+entity "备份副本\nbackup_copy" as backup_copy {
+  {field} id : INTEGER [PK, NN]
+  {field} backup_id : INTEGER [FK, NN]  → backup_run.id
+  {field} location_kind : TEXT [NN]
+  {field} storage_key : TEXT [NN]
+  {field} manifest_sha256 : TEXT [NN]
+  {field} status : TEXT [NN]
+  {field} started_at : TEXT [NN]
+  {field} verified_at : TEXT [NULL]
+  {field} removed_at : TEXT [NULL]
+  {field} removal_reason : TEXT [NULL]
+  {field} verified_by : INTEGER [FK, NULL]  → user_account.id (G13)
+  {field} error_code : TEXT [NULL]
+}
+entity "恢复验证\nrestore_verification" as restore_verification {
+  {field} id : INTEGER [PK, NN]
+  {field} backup_id : INTEGER [FK, NN]  → backup_run.id
+  {field} copy_id : INTEGER [FK, NN]  → backup_copy.id
+  {field} verified_by : INTEGER [FK, NN]  → user_account.id (G13)
+  {field} trigger_kind : TEXT [NN]
+  {field} status : TEXT [NN]
+  {field} isolated_path : TEXT [NN]
+  {field} started_at : TEXT [NULL]
+  {field} finished_at : TEXT [NULL]
+  {field} source_snapshot_at : TEXT [NN]
+  {field} recovery_target_at : TEXT [NN]
+  {field} application_version : TEXT [NN]
+  {field} result_note : TEXT [NULL]
+}
+entity "恢复检查明细\nrestore_check" as restore_check {
+  {field} id : INTEGER [PK, NN]
+  {field} restore_id : INTEGER [FK, NN]  → restore_verification.id
+  {field} check_code : TEXT [NN]
+  {field} status : TEXT [NN]
+  {field} checked_at : TEXT [NULL]
+  {field} expected_value : TEXT [NN]
+  {field} actual_value : TEXT [NULL]
+  {field} evidence_key : TEXT [NULL]
+  {field} failure_note : TEXT [NULL]
+}
+backup_artifact --> backup_run
+backup_copy --> backup_run
+restore_check --> restore_verification
+restore_verification --> backup_copy
+restore_verification --> backup_run
+@enduml

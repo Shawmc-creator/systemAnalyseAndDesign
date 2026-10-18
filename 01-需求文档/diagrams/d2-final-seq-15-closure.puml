@@ -1,0 +1,90 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 150
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "诊所负责人" as A0
+boundary "<u>:诊所负责人接口</u>" as B0
+control "<u>:维护日期排班与</u>\n<u>诊椅安排控制</u>" as K
+participant "<u>:日期安排</u>" as Schedule
+participant "<u>:安排变更</u>" as ScheduleChange
+participant "<u>:预约</u>" as Appointment
+participant "<u>:诊后要求</u>" as Followup
+participant "工作单元" as W
+participant "数据映射器" as DM
+participant "权限与会话服务" as AUTH
+A0 -> B0 : 提交UC-15办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 办理(ctx, UC15Command)
+activate K
+group 本阶段同一写事务
+K -> W : 开始写事务()
+W --> K : 同一连接
+K -> AUTH : 核对岗位及对象(ctx, 引用)
+AUTH --> K : 有效授权依据或拒绝
+K -> W : 核对提交(ctx, cmd)
+W --> K : 新命令分支（原结果短路见公共图）
+K -> DM : 装载(对象引用、连接)
+DM --> K : 实体与依据快照
+K -> Schedule : 确认指定日期停诊(日期范围和原因)
+activate Schedule
+Schedule -> ScheduleChange : 保留日期例外(原安排及确认依据)
+activate ScheduleChange
+ScheduleChange --> Schedule : 处理结果或拒绝原因
+deactivate ScheduleChange
+Schedule --> K : 处理结果或拒绝原因
+deactivate Schedule
+K -> Appointment : 标记受影响安排(停诊范围和责任前台)
+activate Appointment
+Appointment --> K : 处理结果或拒绝原因
+deactivate Appointment
+opt 受影响预约关联诊后要求
+K -> Followup : 保留复诊待安排(受影响预约来源)
+activate Followup
+Followup --> K : 处理结果或拒绝原因
+deactivate Followup
+end
+K -> Appointment : 核对后续处理(通知、改约或取消结果)
+activate Appointment
+Appointment --> K : 处理结果或拒绝原因
+deactivate Appointment
+alt 本阶段全部校验通过
+K -> DM : 保存(变更集合、连接)
+DM --> K : 保存成功或版本冲突
+K -> W : 校验集合与来源()
+W --> K : 末校验结果
+K -> W : 保存结果与审计并提交()
+else 任一步骤拒绝或保存失败
+K -> W : 回滚()
+end
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Followup
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

@@ -1,0 +1,66 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+top to bottom direction
+class "诊疗确认" as E0 <<entity>> {
+- visit_id : 标识
+- version_no : 版本
+--
++ 构造版本(明细集, 原确认, 方案, 价目) : 确认
++ 合计费用(明细及价目) : 费用结果
+}
+class "诊疗明细" as E1 <<entity>> {
+- confirmation_id : 标识
+- price_id : 可空标识
+- priced_at : 时刻
+- completed_at : 时刻
+--
++ 核验及计价(输入, 原明细, 方案, 价目) : 明细
++ 补齐缺价(按原时点的价目) : 明细
++ 计算金额() : 整数分
+}
+class "收费项目" as E2 <<entity>> {
+- id : 标识
+- is_active : 布尔
+- revision : 版本
+--
++ 安排价目版本(命令, 引用) : 价目变更集
+}
+class "价目" as E3 <<entity>> {
+- service_id : 标识
+- unit_price_cents : 整数分
+- valid_from : 时刻
+- valid_to : 可空时刻
+--
++ 核验区间(原区间, 新区间, 引用时点) : 校验结果
++ 判断适用(计价时点) : 布尔
+}
+class "现金收款" as E4 <<entity>> {
+- visit_id : 标识
+- confirmation_id : 标识
+- received_at : 时刻
+--
++ 建立收款(应收, 实收, 确认, 经办人) : 收款
++ 计算找零() : 整数分
++ 计算净收() : 整数分
++ 汇总净收(日期区间) : 原收据及金额
+}
+E0 "1" *-- "1..*" E1
+E2 "1" *-- "0..*" E3
+E2 "1" -- "0..*" E1
+E3 "0..1" -- "0..*" E1
+E0 "1" -- "0..1" E4
+@enduml

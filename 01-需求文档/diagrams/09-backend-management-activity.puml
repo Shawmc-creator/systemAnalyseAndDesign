@@ -1,0 +1,39 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam activity {
+  BackgroundColor #F7FBFD
+  BorderColor #35546B
+  DiamondBackgroundColor #FFF6D8
+  DiamondBorderColor #9A6B16
+}
+title 管理后台操作活动图
+
+|诊所负责人|
+start
+:登录管理后台;
+|诊所管理系统|
+:验证负责人角色和会话;
+if (身份有效？) then (是)
+  :显示人员、资源、审批、报表和审计入口;
+else (否)
+  :拒绝访问并记录失败结果;
+  stop
+endif
+|诊所负责人|
+:选择管理任务并提交变更;
+|诊所管理系统|
+:校验必填项、角色约束和业务冲突;
+if (允许变更？) then (是)
+  :在事务中保存业务数据;
+  :写入操作者、时间、对象和变更摘要;
+  :返回处理成功结果;
+else (否)
+  :返回可处理的错误原因;
+endif
+|诊所负责人|
+:查看结果或继续处理下一项;
+stop
+@enduml

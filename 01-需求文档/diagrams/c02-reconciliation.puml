@@ -1,0 +1,109 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者付款" as Payment <<entity>> {
+ 净额
+ 实收
+ 找零
+ 渠道
+ 到账时间
+ 交易依据
+ --
+ 核算来源余额()
+ 确认到账()
+ 分配已收款()
+}
+class "退款办理" as Refund <<entity>> {
+ 拟退额
+ 实际额
+ 办理时间
+ 渠道
+ 交易凭据
+ 核实说明
+ --
+ 建立额度占用()
+ 核实办理结果()
+ 提供办理进度()
+}
+class "供货付款" as SupplyPayment <<entity>> {
+ 拟付额
+ 实付额
+ 渠道
+ 办理时间
+ 凭据
+ --
+ 建立付款占用()
+ 确认实际支出()
+ 核实待定结果()
+}
+class "供货退款" as SupplyRefund <<entity>> {
+ 实收额
+ 渠道
+ 到账时间
+ 凭据
+ --
+ 保留原款退款()
+}
+class "收支核对" as Reconciliation <<entity>> {
+ 营业日期
+ 渠道
+ 核对时点
+ 实际核实额
+ 开班现金
+ 存取款依据
+ --
+ 形成核对快照()
+ 计算核对差额()
+}
+class "核对项目" as ReconciliationItem <<entity>> {
+ 来源类别
+ 计入金额
+ 依据时点
+ --
+ 保留核对项目()
+}
+class "差异跟进" as FollowIssue <<entity>> {
+ 原因
+ 期限
+ 处理意见
+ 完成时间
+ --
+ 登记差异责任()
+ 登记异常追查()
+ 追加处理结论()
+}
+class "职员" as Staff <<entity>> {
+ 姓名
+ 在岗起止
+ --
+ 核对在岗与职责()
+}
+Payment "1" -- "0..*" Refund : 原款来源
+SupplyPayment "1" -- "0..*" SupplyRefund : 原付款
+Reconciliation "1" *-- "0..*" ReconciliationItem : 核对快照
+Payment "0..1" -- "0..*" ReconciliationItem : 患者到账
+Refund "0..1" -- "0..*" ReconciliationItem : 患者退款
+SupplyPayment "0..1" -- "0..*" ReconciliationItem : 供货付款
+SupplyRefund "0..1" -- "0..*" ReconciliationItem : 供货退回
+Reconciliation "0..1" -- "0..*" FollowIssue : 收支差异
+Staff "1" -- "0..*" FollowIssue : 跟进责任人
+
+@enduml

@@ -1,0 +1,113 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者" as Patient <<entity>> {
+ 姓名
+ 出生日期
+ 联系电话
+ 电话归属
+ 联系地址
+ 联系偏好
+ --
+ 核对身份()
+ 核对身份候选()
+ 确认资料维护()
+}
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ 接诊开始
+ 诊疗结束
+ 到诊来源
+ --
+ 登记到诊()
+ 核对接诊责任()
+ 确认实际执行()
+}
+class "治疗方案" as Plan <<entity>> {
+ 目标
+ 建立时间
+ 终止原因
+ --
+ 核对执行依据()
+ 提供版本及执行依据()
+ 提供诊后方案依据()
+}
+class "方案版本" as PlanVersion <<entity>> {
+ 诊断依据说明
+ 说明时间
+ 变更原因
+ 预计安排
+ --
+ 核对确认版本()
+ 提供确认来源()
+ 形成待确认版本()
+}
+class "方案项目" as PlanItem <<entity>> {
+ 项目内容
+ 牙位
+ 牙面
+ 计划数量
+ 实施顺序
+ 预计费用
+ --
+ 核对可执行范围()
+ 组织计划明细()
+ 识别未执行范围()
+}
+class "患者决定" as Decision <<entity>> {
+ 决定内容
+ 决定时间
+ 确认范围
+ 说明依据
+ --
+ 保留患者决定()
+}
+class "诊疗执行" as Execution <<entity>> {
+ 牙位
+ 牙面
+ 完成数量
+ 操作经过
+ 完成时间
+ 更正原因
+ --
+ 保留执行依据()
+ 核对已完成事实()
+}
+class "收费项目" as Service <<entity>> {
+ 名称
+ 计价单位
+ --
+ 提出新价目()
+ 确认价目发布()
+}
+Patient "1" -- "0..*" Visit : 就诊者
+Patient "1" -- "0..*" Plan : 持续方案
+Plan "1" *-- "1..*" PlanVersion : 方案版本
+PlanVersion "1" *-- "1..*" PlanItem : 计划明细
+PlanVersion "1" *-- "0..*" Decision : 确认经历
+Decision "0..*" -- "1..*" PlanItem : 确认范围
+Visit "1" *-- "0..*" Execution : 实际完成
+PlanItem "0..1" -- "0..*" Execution : 所据计划
+Service "1" -- "0..*" Execution : 实际项目
+Execution "0..1" -- "0..*" Execution : 原执行与更正
+Visit "0..1" -- "0..*" PlanVersion : 内部诊断来源
+
+@enduml

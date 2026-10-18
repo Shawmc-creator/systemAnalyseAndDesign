@@ -1,0 +1,39 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam dpi 160
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+class "前台接口" as UI <<boundary>> {
+ + 提交维护安排(输入)
+ - 反馈维护安排(结果)
+ + 提交查询安排(输入)
+ - 反馈查询安排(结果)
+ + 提交登记到诊(输入)
+ - 反馈登记到诊(结果)
+ + 提交维护资料(输入)
+ - 反馈维护资料(结果)
+ + 提交办理联系(输入)
+ - 反馈办理联系(结果)
+ + 提交查询可用安排(输入)
+ - 反馈查询可用安排(结果)
+}
+class "页面状态" as S {
+ 当前对象标识
+ 当前业务版本
+ 草稿输入
+ 提交状态
+ --
+ 显示字段错误()
+ 刷新结果()
+}
+UI *-- S
+
+@enduml

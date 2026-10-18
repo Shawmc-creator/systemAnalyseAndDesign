@@ -1,0 +1,105 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 150
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "牙医" as A0
+boundary "<u>:牙医接口</u>" as B0
+control "<u>:确认诊疗项目与</u>\n<u>执行控制</u>" as K
+participant "<u>:就诊</u>" as Visit
+participant "<u>:治疗方案</u>" as Plan
+participant "<u>:方案版本</u>" as PlanVersion
+participant "<u>:方案项目</u>" as PlanItem
+participant "<u>:诊疗执行</u>" as Execution
+participant "<u>:应收账目</u>" as Bill
+participant "<u>:应收项目</u>" as Charge
+participant "工作单元" as W
+participant "数据映射器" as DM
+participant "权限与会话服务" as AUTH
+A0 -> B0 : 提交UC-04办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 办理(ctx, UC04Command)
+activate K
+group 本阶段同一写事务
+K -> W : 开始写事务()
+W --> K : 同一连接
+K -> AUTH : 核对岗位及对象(ctx, 引用)
+AUTH --> K : 有效授权依据或拒绝
+K -> W : 核对提交(ctx, cmd)
+W --> K : 新命令分支（原结果短路见公共图）
+K -> DM : 装载(对象引用、连接)
+DM --> K : 实体与依据快照
+K -> Visit : 核对接诊责任(执行者)
+activate Visit
+Visit --> K : 处理结果或拒绝原因
+deactivate Visit
+opt 执行引用持续治疗方案
+K -> Plan : 核对执行依据(所选方案版本和项目)
+activate Plan
+Plan -> PlanVersion : 核对确认版本(患者决定)
+activate PlanVersion
+PlanVersion -> PlanItem : 核对可执行范围(拟完成项目及数量)
+activate PlanItem
+PlanItem --> PlanVersion : 处理结果或拒绝原因
+deactivate PlanItem
+PlanVersion --> Plan : 处理结果或拒绝原因
+deactivate PlanVersion
+Plan --> K : 处理结果或拒绝原因
+deactivate Plan
+end
+K -> Visit : 确认实际执行(方案项目或独立检查、实际内容)
+activate Visit
+Visit -> Execution : 保留执行依据(牙位牙面、经过、数量)
+activate Execution
+Execution --> Visit : 处理结果或拒绝原因
+deactivate Execution
+Visit --> K : 处理结果或拒绝原因
+deactivate Visit
+K -> Bill : 形成应收依据(已确认执行)
+activate Bill
+Bill -> Charge : 确定计价依据(实际项目与发生时点)
+activate Charge
+Charge --> Bill : 处理结果或拒绝原因
+deactivate Charge
+Bill --> K : 处理结果或拒绝原因
+deactivate Bill
+alt 本阶段全部校验通过
+K -> DM : 保存(变更集合、连接)
+DM --> K : 保存成功或版本冲突
+K -> W : 校验集合与来源()
+W --> K : 末校验结果
+K -> W : 保存结果与审计并提交()
+else 任一步骤拒绝或保存失败
+K -> W : 回滚()
+end
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Charge
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

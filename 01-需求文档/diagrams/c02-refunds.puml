@@ -1,0 +1,90 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者资金" as Funds <<entity>> {
+ 开户时间
+ --
+ 核算付款及可用额()
+ 登记已核实付款()
+ 汇总患者资金()
+}
+class "患者付款" as Payment <<entity>> {
+ 净额
+ 实收
+ 找零
+ 渠道
+ 到账时间
+ 交易依据
+ --
+ 核算来源余额()
+ 确认到账()
+ 分配已收款()
+}
+class "应收账目" as Bill <<entity>> {
+ 形成时间
+ 计费期间
+ --
+ 形成应收依据()
+ 提供应收依据()
+ 核对可分配额()
+}
+class "费用申请" as Request <<entity>> {
+ 处理理由
+ 拟调整额
+ 拟退额
+ 核实依据
+ 提交时间
+ 审核意见
+ --
+ 提出费用处理()
+ 保留申请版本()
+ 核对待审核依据()
+}
+class "费用调整" as Adjustment <<entity>> {
+ 调整原因
+ 生效时间
+ --
+ 形成批准调整()
+}
+class "退款办理" as Refund <<entity>> {
+ 拟退额
+ 实际额
+ 办理时间
+ 渠道
+ 交易凭据
+ 核实说明
+ --
+ 建立额度占用()
+ 核实办理结果()
+ 提供办理进度()
+}
+Funds "1" *-- "0..*" Payment : 实际到账
+Funds "1" -- "0..*" Request : 费用事项
+Bill "0..1" -- "0..*" Request : 原账目
+Payment "0..1" -- "0..*" Request : 原预付款
+Request "1" -- "0..1" Adjustment : 批准调整
+Bill "1" -- "0..*" Adjustment : 所属账目
+Request "1" -- "0..*" Refund : 退款批准依据
+Payment "1" -- "0..*" Refund : 原款来源
+Funds "1" *-- "0..*" Refund : 办理及占用
+Funds "1" -- "0..*" Bill : 同患者结算范围
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "待放行" as Pending
+state "可用" as Ready
+state "已发放待确认" as Issued
+state "已使用" as Used
+state "隔离" as Isolated
+[*] --> Pending : 建立本轮包次\n[属于本轮处理]\n/ 保留包装及期限
+Pending --> Ready : 接受本轮放行\n[处理已放行且本包有效]\n/ 允许发放
+Ready --> Issued : 登记发放\n[本轮未使用且实物核对通过]\n/ 关联待使用就诊
+Issued --> Used : 登记实际使用\n[实际使用已确认]\n/ 保留就诊与本轮关联
+Issued --> Ready : 确认未用退回\n[未使用且实物仍有效]\n/ 保留退回经历
+Ready --> Isolated : 停止后续正常使用\n[异常或过期]\n/ 禁止发放
+Issued --> Isolated : 停止后续正常使用\n[异常或实物不明]\n/ 保留发放关联
+Used : 提供历史追溯 [批次后续异常]\n/ 保留原使用并形成追查
+
+@enduml

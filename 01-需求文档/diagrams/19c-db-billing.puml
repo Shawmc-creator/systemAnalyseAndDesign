@@ -1,0 +1,96 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam linetype ortho
+skinparam nodesep 45
+skinparam ranksep 55
+skinparam ArrowColor #526575
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor #FFFFFF
+ BorderColor #34495E
+ BorderThickness 1.3
+ HeaderBackgroundColor #EAF1F7
+ FontColor #172B3A
+}
+hide circle
+hide methods
+top to bottom direction
+entity "就诊\nvisit" as visit {
+ id [PK]
+ --
+ appointment_id [FK, UQ]
+ patient_id [FK]
+ registered_by [FK: staff]
+ current_confirmation_id [FK, UQ, 可空]
+ 到诊时间
+}
+entity "诊疗确认\ntreatment_confirmation" as treatment_confirmation {
+ id [PK]
+ --
+ visit_id [FK]
+ confirmed_by [FK: staff]
+ 版本
+ 确认时间
+}
+entity "诊疗明细\ntreatment_item" as treatment_item {
+ id [PK]
+ --
+ confirmation_id [FK]
+ service_id [FK]
+ price_id [FK, 可空]
+ plan_item_id [FK, 可空]
+ original_item_id [FK: 本表, 可空]
+ 牙位
+ 数量
+ 实际完成时间
+ 计价时点
+}
+entity "收费项目\nservice" as service {
+ id [PK]
+ --
+ 名称
+ 计价单位
+}
+entity "价目\nservice_price" as service_price {
+ id [PK]
+ --
+ service_id [FK]
+ confirmed_by [FK: staff]
+ maintained_by [FK: staff]
+ 单价
+ 适用开始
+ 适用结束
+}
+entity "方案项目\nplan_item" as plan_item {
+ id [PK]
+ --
+ plan_id [FK]
+ service_id [FK]
+ 牙位
+ 预计数量
+ 患者决定
+}
+entity "现金收款\ncash_receipt" as cash_receipt {
+ id [PK]
+ --
+ visit_id [FK, UQ]
+ confirmation_id [FK, UQ]
+ cashier_id [FK: staff]
+ 应收金额
+ 实际收到金额
+ 收款时间
+}
+visit ||--o{ treatment_confirmation : 所属就诊
+visit |o--o| treatment_confirmation : 当前版本
+treatment_confirmation ||--|{ treatment_item
+service ||--o{ treatment_item
+service ||--o{ service_price
+service_price |o--o{ treatment_item
+plan_item |o--o{ treatment_item
+visit ||--o| cash_receipt
+treatment_confirmation ||--o| cash_receipt
+@enduml

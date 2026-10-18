@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+top to bottom direction
+class "职员" as E0 <<entity>> {
+- id : 标识
+- 岗位资格 : 集合
+- is_active : 布尔
+--
++ 核验资格(岗位) : 校验结果
+}
+class "接诊时段" as E1 <<entity>> {
+- dentist_id : 标识
+- weekday : 星期
+- revision : 版本
+--
++ 核验覆盖(牙医, 区间, 时段) : 确认快照
++ 发布安排(时段集, 版本, 预约) : 变更集
++ 生成可用区间(日期, 时段) : 区间集
++ 扣除占用(区间, 时长) : 可用区间
+}
+class "接诊时段变更" as E2 <<entity>> {
+- slot_id : 标识
+- old_revision : 版本
+--
++ 记录原安排(旧值, 原确认, 原因) : 变更
+}
+class "预约" as E3 <<entity>> {
+- id : 标识
+- status : 预约状态
+- revision : 版本
+- arrangement_version : 版本
+--
++ 维护安排(命令, 版本, 候选) : 安排变更集
++ 登记到诊(日期, 版本) : 状态变更
++ 形成安排视图(候选, 时段, 预约) : 列表
++ 占用区间(牙医, 日期, 患者) : 区间集
+}
+E0 "1" -- "0..*" E1
+E1 "1" *-- "0..*" E2
+E1 "1..*" -- "0..*" E3
+@enduml

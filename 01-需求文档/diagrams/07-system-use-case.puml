@@ -5,8 +5,8 @@ skinparam defaultFontName SimSun
 skinparam defaultFontSize 18
 skinparam dpi 220
 skinparam ArrowColor black
-skinparam nodesep 24
-skinparam ranksep 65
+skinparam nodesep 22
+skinparam ranksep 48
 skinparam actor {
  BorderColor black
  BackgroundColor white
@@ -35,10 +35,10 @@ A -- U3
 A -- U8
 A -- U13
 A -- U16
-U1 -[hidden]left-> U2
-U2 -[hidden]left-> U3
-U3 -[hidden]left-> U8
-U8 -[hidden]left-> U13
-U13 -[hidden]left-> U16
+U2 -[hidden]right-> U1
+U3 -[hidden]right-> U2
+U8 -[hidden]right-> U3
+U13 -[hidden]right-> U8
+U16 -[hidden]right-> U13
 
 @enduml

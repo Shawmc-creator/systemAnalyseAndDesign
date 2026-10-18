@@ -1,0 +1,783 @@
+{
+  "version": "2026-10-18-D1-state-collections",
+  "sql_sha256": "6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d",
+  "state_machines": [
+    {
+      "table": "appointment",
+      "field": "status",
+      "source": "../diagrams/c04-appointment.puml",
+      "source_sha256": "9cfd8145c1b3f7d0dc5fd492841951a2a25c0ecc9d5c39aff8a5ee7d8fcd592c",
+      "states": [
+        "已预约",
+        "已取消",
+        "已到诊",
+        "未到"
+      ],
+      "initial": [
+        {
+          "state": "已预约",
+          "condition": "确认安排\\n[日期资源有效且无冲突]\\n/ 关联有效占用"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "已预约",
+          "to": "已取消",
+          "condition": "变更或取消安排\\n[选择取消且未到诊]\\n/ 释放占用并保留原因"
+        },
+        {
+          "from": "已预约",
+          "to": "已到诊",
+          "condition": "关联到诊结果\\n[当日且无已有就诊]\\n/ 关联唯一就诊"
+        },
+        {
+          "from": "已预约",
+          "to": "未到",
+          "condition": "确认未到事实\\n[已过计划且人工核实未到]\\n/ 保留未到依据"
+        }
+      ]
+    },
+    {
+      "table": "visit",
+      "field": "status",
+      "source": "../diagrams/c04-visit.puml",
+      "source_sha256": "8e212938472bb32a4024b5472e6e810ac6e6ce29f19ec8f28bb7c4817bc73037",
+      "states": [
+        "候诊",
+        "接诊中",
+        "诊疗结束"
+      ],
+      "initial": [
+        {
+          "state": "候诊",
+          "condition": "登记到诊\\n[患者与安排已核实]\\n/ 建立病历草稿"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "候诊",
+          "to": "接诊中",
+          "condition": "确认实际接诊\\n[具备接诊或交接资格]\\n/ 记接诊开始"
+        },
+        {
+          "from": "接诊中",
+          "to": "诊疗结束",
+          "condition": "结束本次诊疗\\n[病历已签署]\\n/ 保留独立收费与诊后状态"
+        }
+      ]
+    },
+    {
+      "table": "clinical_record",
+      "field": "status",
+      "source": "../diagrams/c04-clinical.puml",
+      "source_sha256": "078391df9c1c15767194c939b312df69db898cccb58c0a6e63fbb4974bff159a",
+      "states": [
+        "草稿",
+        "已签署"
+      ],
+      "initial": [
+        {
+          "state": "草稿",
+          "condition": "建立当次草稿\\n[有效就诊]\\n/ 形成当次正文"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "草稿",
+          "to": "已签署",
+          "condition": "签署当前正文\\n[必填完整且责任有效]\\n/ 冻结正文和签署依据"
+        }
+      ]
+    },
+    {
+      "table": "plan_version",
+      "field": "status",
+      "source": "../diagrams/c04-plan.puml",
+      "source_sha256": "75529ffff4e2574551e07e09bf91397c50c092f7d56b2acc52f528713e0f0d82",
+      "states": [
+        "草稿",
+        "待确认",
+        "已确认",
+        "暂缓",
+        "已拒绝",
+        "停止后续执行",
+        "本版执行完成"
+      ],
+      "initial": [
+        {
+          "state": "草稿",
+          "condition": "形成待确认版本\\n[来源与项目有据]\\n/ 建立草稿明细"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "草稿",
+          "to": "待确认",
+          "condition": "提交方案说明\\n[明细完整]\\n/ 固定待确认内容"
+        },
+        {
+          "from": "待确认",
+          "to": "已确认",
+          "condition": "登记确认经历\\n[患者同意具体范围]\\n/ 保留决定及文书"
+        },
+        {
+          "from": "待确认",
+          "to": "暂缓",
+          "condition": "登记确认经历\\n[患者暂缓]\\n/ 保留未执行安排"
+        },
+        {
+          "from": "待确认",
+          "to": "已拒绝",
+          "condition": "登记确认经历\\n[患者拒绝]\\n/ 保留拒绝依据"
+        },
+        {
+          "from": "暂缓",
+          "to": "待确认",
+          "condition": "重新说明方案\\n[内容未改变]\\n/ 重新取得决定"
+        },
+        {
+          "from": "已确认",
+          "to": "停止后续执行",
+          "condition": "停止后续安排\\n[撤回同意或新版本替代]\\n/ 保留已执行关联"
+        },
+        {
+          "from": "已确认",
+          "to": "本版执行完成",
+          "condition": "核对本版完成\\n[同意范围已完成]\\n/ 保留每次执行来源"
+        }
+      ]
+    },
+    {
+      "table": "followup_requirement",
+      "field": "status",
+      "source": "../diagrams/c04-followup.puml",
+      "source_sha256": "eb79f24929b91f17623d4ecbf18494a7d73f267dcdf1dd70d8993b4af87bf7d8",
+      "states": [
+        "待发布",
+        "待联系",
+        "待到诊或评估",
+        "已完成",
+        "已撤销"
+      ],
+      "initial": [
+        {
+          "state": "待发布",
+          "condition": "提出诊后要求\\n[来源尚未确认]\\n/ 保留草稿"
+        },
+        {
+          "state": "待联系",
+          "condition": "提出诊后要求\\n[来源已签署或已确认]\\n/ 交责任前台"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待发布",
+          "to": "待联系",
+          "condition": "判断发布条件\\n[来源已签署或已确认]\\n/ 交责任前台"
+        },
+        {
+          "from": "待联系",
+          "to": "待到诊或评估",
+          "condition": "衔接后续安排\\n[预约已关联或等待牙医评估]\\n/ 保留待办"
+        },
+        {
+          "from": "待到诊或评估",
+          "to": "待联系",
+          "condition": "恢复待安排\\n[复诊取消或需重新联系]\\n/ 保留历史预约"
+        },
+        {
+          "from": "待到诊或评估",
+          "to": "已完成",
+          "condition": "判断完成或继续\\n[牙医确认评估完成]\\n/ 保留评估依据"
+        },
+        {
+          "from": "待联系",
+          "to": "已完成",
+          "condition": "判断完成或继续\\n[无需临床评估且联系目标达成]\\n/ 保留完成依据"
+        },
+        {
+          "from": "待到诊或评估",
+          "to": "待联系",
+          "condition": "判断完成或继续\\n[仍需跟进]\\n/ 指定日期与责任"
+        },
+        {
+          "from": "待联系",
+          "to": "已撤销",
+          "condition": "确认撤销要求\\n[牙医确认理由]\\n/ 保留原要求"
+        },
+        {
+          "from": "待到诊或评估",
+          "to": "已撤销",
+          "condition": "确认撤销要求\\n[牙医确认理由]\\n/ 保留原要求"
+        }
+      ]
+    },
+    {
+      "table": "service_price",
+      "field": "status",
+      "source": "../diagrams/c04-price.puml",
+      "source_sha256": "8c59d90b4a2a3539bf04e5cfee3fe829111ec65ba12e8e671f410d1b2b8f5df0",
+      "states": [
+        "价目草稿",
+        "待负责人确认",
+        "已确认可适用",
+        "已退回",
+        "不再用于新计费"
+      ],
+      "initial": [
+        {
+          "state": "价目草稿",
+          "condition": "核对区间及金额\\n[金额与项目有效]\\n/ 保存草稿"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "价目草稿",
+          "to": "待负责人确认",
+          "condition": "提交确认\\n[区间候选无冲突]\\n/ 等待负责人"
+        },
+        {
+          "from": "待负责人确认",
+          "to": "已确认可适用",
+          "condition": "发布确认版本\\n[负责人同意且仍无冲突]\\n/ 保留确认区间"
+        },
+        {
+          "from": "待负责人确认",
+          "to": "已退回",
+          "condition": "退回修改\\n[有处理意见]\\n/ 保留原草稿"
+        },
+        {
+          "from": "已退回",
+          "to": "待负责人确认",
+          "condition": "重新提交\\n[修改后重新校验]\\n/ 保留变更"
+        },
+        {
+          "from": "已确认可适用",
+          "to": "不再用于新计费",
+          "condition": "停止后续适用\\n[到达截止或新版本替代]\\n/ 原费用快照保持"
+        }
+      ]
+    },
+    {
+      "table": "patient_payment",
+      "field": "status",
+      "source": "../diagrams/c04-payment.puml",
+      "source_sha256": "cecaea98c8defb9b93f1a8f740114bb0d3a09938062324e993ca9969104b5c0f",
+      "states": [
+        "待核实",
+        "到账已确认",
+        "未到账已核实"
+      ],
+      "initial": [
+        {
+          "state": "待核实",
+          "condition": "提出到账核查\\n[有患者与交易线索]\\n/ 不计可用余额"
+        },
+        {
+          "state": "到账已确认",
+          "condition": "确认到账\\n[登记时已取得到账证据]\\n/ 形成可分配来源"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待核实",
+          "to": "到账已确认",
+          "condition": "确认到账\\n[已核实金额与渠道]\\n/ 形成可分配来源"
+        },
+        {
+          "from": "待核实",
+          "to": "未到账已核实",
+          "condition": "确认未到账\\n[有明确失败依据]\\n/ 保留核查结论"
+        }
+      ]
+    },
+    {
+      "table": "fee_request",
+      "field": "status",
+      "source": "../diagrams/c04-request.puml",
+      "source_sha256": "ef5cc8c8afad36e7af0724a653158565455797969b0b30b178dba32c02d3113f",
+      "states": [
+        "待审核",
+        "已退回",
+        "已拒绝",
+        "已同意",
+        "已撤回"
+      ],
+      "initial": [
+        {
+          "state": "待审核",
+          "condition": "提出费用处理\\n[原单及金额范围有效]\\n/ 保存申请版本"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待审核",
+          "to": "已退回",
+          "condition": "保存审核结论\\n[材料不足]\\n/ 保留退回意见"
+        },
+        {
+          "from": "已退回",
+          "to": "待审核",
+          "condition": "重新提交申请\\n[已补正并重新核对]\\n/ 新增申请版本"
+        },
+        {
+          "from": "待审核",
+          "to": "已拒绝",
+          "condition": "保存审核结论\\n[不予处理且有理由]\\n/ 不改变原资金"
+        },
+        {
+          "from": "待审核",
+          "to": "已同意",
+          "condition": "保存审核结论\\n[批准范围及原版本有效]\\n/ 调整与分配更正共同生效"
+        },
+        {
+          "from": "待审核",
+          "to": "已撤回",
+          "condition": "撤回申请\\n[尚未批准]\\n/ 保留原因"
+        }
+      ]
+    },
+    {
+      "table": "patient_refund",
+      "field": "status",
+      "source": "../diagrams/c04-refund.puml",
+      "source_sha256": "97ddd4eace398c45efe015616bf7ba90dc5c6bcae1e04594bb80526625dcc93a",
+      "states": [
+        "待办理",
+        "待核实",
+        "已确认退款",
+        "已失败"
+      ],
+      "initial": [
+        {
+          "state": "待办理",
+          "condition": "建立额度占用\\n[原款与批准额度足够]\\n/ 生成唯一办理依据"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待办理",
+          "to": "待核实",
+          "condition": "保留额度占用\\n[实际结果不明]\\n/ 继续占用并待核查"
+        },
+        {
+          "from": "待办理",
+          "to": "已确认退款",
+          "condition": "核实办理结果\\n[实际退款已确认且金额相符]\\n/ 一次确认有效流出"
+        },
+        {
+          "from": "待办理",
+          "to": "已失败",
+          "condition": "核实办理结果\\n[明确失败且有证据]\\n/ 释放未执行额度"
+        },
+        {
+          "from": "待核实",
+          "to": "已确认退款",
+          "condition": "核实办理结果\\n[渠道证实成功]\\n/ 确认原办理的流出"
+        },
+        {
+          "from": "待核实",
+          "to": "已失败",
+          "condition": "核实办理结果\\n[渠道证实失败]\\n/ 释放原占用"
+        }
+      ]
+    },
+    {
+      "table": "supplier_payment",
+      "field": "status",
+      "source": "../diagrams/c04-supply_payment.puml",
+      "source_sha256": "e20f0b7d863c9d72db49491240de43c78c41d43077f0b46ad6eec97acebad6b1",
+      "states": [
+        "待付款",
+        "待核实",
+        "已确认付款",
+        "已失败"
+      ],
+      "initial": [
+        {
+          "state": "待付款",
+          "condition": "建立付款占用\\n[负责人确认且额度足够]\\n/ 形成唯一办理依据"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待付款",
+          "to": "待核实",
+          "condition": "核实待定结果\\n[结果不明]\\n/ 保留占用"
+        },
+        {
+          "from": "待付款",
+          "to": "已确认付款",
+          "condition": "确认实际支出\\n[实际付款已核实]\\n/ 形成供货分配"
+        },
+        {
+          "from": "待付款",
+          "to": "已失败",
+          "condition": "核实待定结果\\n[明确失败]\\n/ 释放占用"
+        },
+        {
+          "from": "待核实",
+          "to": "已确认付款",
+          "condition": "确认实际支出\\n[核查证实成功]\\n/ 一次确认支出"
+        },
+        {
+          "from": "待核实",
+          "to": "已失败",
+          "condition": "核实待定结果\\n[核查证实失败]\\n/ 释放原占用"
+        }
+      ]
+    },
+    {
+      "table": "material_batch",
+      "field": "status",
+      "source": "../diagrams/c04-batch.puml",
+      "source_sha256": "f917ea1abd5fbaff696d74b6eff2e1b861ca62e5b8695c589df52bbc13f5497b",
+      "states": [
+        "待检",
+        "可用",
+        "隔离",
+        "停用",
+        "过期"
+      ],
+      "initial": [
+        {
+          "state": "待检",
+          "condition": "形成批次来源\\n[已知材料和到货来源]\\n/ 保留效期与批号"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待检",
+          "to": "可用",
+          "condition": "确认合格范围\\n[验收已认可且未过期]\\n/ 允许合格量计可用"
+        },
+        {
+          "from": "可用",
+          "to": "隔离",
+          "condition": "立即隔离批次\\n[发现异常]\\n/ 立即禁止正常领用"
+        },
+        {
+          "from": "隔离",
+          "to": "停用",
+          "condition": "审核恢复或停用\\n[负责人决定停用]\\n/ 保留原因"
+        },
+        {
+          "from": "隔离",
+          "to": "可用",
+          "condition": "审核恢复或停用\\n[依据充分且未过期]\\n/ 保留恢复确认"
+        },
+        {
+          "from": "停用",
+          "to": "可用",
+          "condition": "审核恢复或停用\\n[异常解决且未过期]\\n/ 保留恢复依据"
+        },
+        {
+          "from": "可用",
+          "to": "过期",
+          "condition": "判断效期\\n[已过有效期]\\n/ 停止正常领用"
+        },
+        {
+          "from": "隔离",
+          "to": "过期",
+          "condition": "判断效期\\n[已过有效期]\\n/ 保持不可用"
+        },
+        {
+          "from": "待检",
+          "to": "过期",
+          "condition": "判断效期\\n[已过有效期]\\n/ 不得转可用"
+        }
+      ]
+    },
+    {
+      "table": "stock_count",
+      "field": "status",
+      "source": "../diagrams/c04-count.puml",
+      "source_sha256": "050ac5b1f1173aef35b694199cb8f737792bb6d8aff7037db940d3613ed78b34",
+      "states": [
+        "待确认差异",
+        "待重新核对",
+        "差异已确认",
+        "不予调整"
+      ],
+      "initial": [
+        {
+          "state": "待确认差异",
+          "condition": "保留实点快照\\n[有批次位置与盘点时点]\\n/ 暂不改变库存"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待确认差异",
+          "to": "待重新核对",
+          "condition": "核对确认依据\\n[快照后有新变动]\\n/ 要求重核差异"
+        },
+        {
+          "from": "待重新核对",
+          "to": "待确认差异",
+          "condition": "重新确认实点\\n[新快照及原因完整]\\n/ 保留原核实经历"
+        },
+        {
+          "from": "待确认差异",
+          "to": "差异已确认",
+          "condition": "核对确认依据\\n[负责人同意且依据一致]\\n/ 形成唯一差异变动"
+        },
+        {
+          "from": "待确认差异",
+          "to": "不予调整",
+          "condition": "拒绝差异调整\\n[负责人说明原因]\\n/ 库存不变"
+        }
+      ]
+    },
+    {
+      "table": "instrument_processing",
+      "field": "status",
+      "source": "../diagrams/c04-process.puml",
+      "source_sha256": "22678a5324cccd6f2466cf46dc2f313e30ea3415f24cafe4bd12b5b83aed28f4",
+      "states": [
+        "处理中",
+        "待核对放行",
+        "已放行",
+        "隔离停用"
+      ],
+      "initial": [
+        {
+          "state": "处理中",
+          "condition": "登记本轮处理\\n[设备与包范围已核实]\\n/ 保留处理经历"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "处理中",
+          "to": "待核对放行",
+          "condition": "完成处理登记\\n[实际处理完成]\\n/ 等待监测与核对"
+        },
+        {
+          "from": "待核对放行",
+          "to": "已放行",
+          "condition": "确认放行或隔离\\n[依据齐全且无未解决异常]\\n/ 保留放行责任与时间"
+        },
+        {
+          "from": "待核对放行",
+          "to": "隔离停用",
+          "condition": "确认放行或隔离\\n[监测异常或未能确认]\\n/ 不得正常使用"
+        },
+        {
+          "from": "已放行",
+          "to": "隔离停用",
+          "condition": "标记事后异常\\n[后续发现问题]\\n/ 停用并追溯相关就诊"
+        }
+      ]
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "field": "status",
+      "source": "../diagrams/c04-packcycle.puml",
+      "source_sha256": "a173d59636677d5005a774102a5c1c31cffaeb3857bc2974463311f3a6d479b5",
+      "states": [
+        "待放行",
+        "可用",
+        "已发放待确认",
+        "已使用",
+        "隔离"
+      ],
+      "initial": [
+        {
+          "state": "待放行",
+          "condition": "建立本轮包次\\n[属于本轮处理]\\n/ 保留包装及期限"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待放行",
+          "to": "可用",
+          "condition": "接受本轮放行\\n[处理已放行且本包有效]\\n/ 允许发放"
+        },
+        {
+          "from": "可用",
+          "to": "已发放待确认",
+          "condition": "登记发放\\n[本轮未使用且实物核对通过]\\n/ 关联待使用就诊"
+        },
+        {
+          "from": "已发放待确认",
+          "to": "已使用",
+          "condition": "登记实际使用\\n[实际使用已确认]\\n/ 保留就诊与本轮关联"
+        },
+        {
+          "from": "已发放待确认",
+          "to": "可用",
+          "condition": "确认未用退回\\n[未使用且实物仍有效]\\n/ 保留退回经历"
+        },
+        {
+          "from": "可用",
+          "to": "隔离",
+          "condition": "停止后续正常使用\\n[异常或过期]\\n/ 禁止发放"
+        },
+        {
+          "from": "已发放待确认",
+          "to": "隔离",
+          "condition": "停止后续正常使用\\n[异常或实物不明]\\n/ 保留发放关联"
+        }
+      ]
+    },
+    {
+      "table": "purchase_order_item",
+      "field": "status",
+      "source": "../diagrams/c04-purchase_item.puml",
+      "source_sha256": "b7b3b1596f95ee6cbbec1b5841943415edc0b99e90c53571dfafe3da3504c93c",
+      "states": [
+        "待交付",
+        "履行中",
+        "待差异处理",
+        "履行已完成",
+        "剩余已取消"
+      ],
+      "initial": [
+        {
+          "state": "待交付",
+          "condition": "组织约定明细\\n[采购已确认]\\n/ 保留约定数量"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "待交付",
+          "to": "履行中",
+          "condition": "核对交付及差异\\n[已部分到货且未完成]\\n/ 累计交付与验收"
+        },
+        {
+          "from": "待交付",
+          "to": "履行已完成",
+          "condition": "核对交付及差异\\n[一次交付完成且全部合格]\\n/ 保留履行结果"
+        },
+        {
+          "from": "待交付",
+          "to": "待差异处理",
+          "condition": "核对交付及差异\\n[拒收或交付差异未解决]\\n/ 保留待处理量"
+        },
+        {
+          "from": "履行中",
+          "to": "待差异处理",
+          "condition": "核对交付及差异\\n[拒收或交付差异未解决]\\n/ 保留待处理量"
+        },
+        {
+          "from": "待差异处理",
+          "to": "履行中",
+          "condition": "确认差异安排\\n[仍有未交付]\\n/ 保留补换或调整依据"
+        },
+        {
+          "from": "履行中",
+          "to": "履行已完成",
+          "condition": "核对交付及差异\\n[交付完成且差异已解决]\\n/ 保留履行结果"
+        },
+        {
+          "from": "待差异处理",
+          "to": "履行已完成",
+          "condition": "确认差异安排\\n[剩余及拒收均已处理]\\n/ 保留处理依据"
+        },
+        {
+          "from": "待交付",
+          "to": "剩余已取消",
+          "condition": "取消未履行部分\\n[负责人确认]\\n/ 保留取消原因"
+        },
+        {
+          "from": "履行中",
+          "to": "剩余已取消",
+          "condition": "取消未履行部分\\n[只取消剩余且已发生事实保留]\\n/ 保留验收与付款"
+        }
+      ]
+    },
+    {
+      "table": "document_version",
+      "field": "status",
+      "source": "../diagrams/c04-file.puml",
+      "source_sha256": "9a39baeece6a170cc09c80dd1d138b1b2eabf6257d615422faedc75b1b9065f2",
+      "states": [
+        "原件待确认",
+        "原件已确认",
+        "退回核对",
+        "缺失或不可读"
+      ],
+      "initial": [
+        {
+          "state": "原件待确认",
+          "condition": "核对原件完整性\\n[文件实际保存且校验通过]\\n/ 保留来源和归属"
+        }
+      ],
+      "transitions": [
+        {
+          "from": "原件待确认",
+          "to": "原件已确认",
+          "condition": "保留确认原件\\n[牙医核对内容及归属]\\n/ 保留确认人和时间"
+        },
+        {
+          "from": "原件待确认",
+          "to": "退回核对",
+          "condition": "退回原件核对\\n[关联或内容不符]\\n/ 保留原件与原因"
+        },
+        {
+          "from": "原件已确认",
+          "to": "缺失或不可读",
+          "condition": "报告读取异常\\n[文件缺失或校验不符]\\n/ 保留原业务关联"
+        },
+        {
+          "from": "缺失或不可读",
+          "to": "原件已确认",
+          "condition": "核实恢复原件\\n[恢复文件与原校验一致]\\n/ 保留恢复依据"
+        }
+      ]
+    }
+  ],
+  "state_scope": "SQL检查初态和转移方向；事件、警戒条件、责任与副作用仍由服务操作逐项核对。内部动作不等于允许修改冻结事实。",
+  "collections": [
+    {
+      "parent": "health_version",
+      "children": [
+        "health_item"
+      ],
+      "source": "UC-21/R-03",
+      "gate": "新版本必须明确病史、过敏、用药三类，有、无、未知分别记录；同事务补齐，提交后集合固定。"
+    },
+    {
+      "parent": "patient_decision",
+      "children": [
+        "decision_plan_item",
+        "decision_file_version"
+      ],
+      "source": "UC-22/R-06",
+      "gate": "同意至少一项具体范围；同事务形成关联，提交后不得扩大或更换集合。"
+    },
+    {
+      "parent": "fee_adjustment",
+      "children": [
+        "fee_adjustment_item"
+      ],
+      "source": "UC-25/R-10",
+      "gate": "批准非零调整同时建立调整；明细合计等于批准额，事务末共同确认，之后集合固定。"
+    },
+    {
+      "parent": "cash_reconciliation",
+      "children": [
+        "reconciliation_item"
+      ],
+      "source": "UC-20/R-18",
+      "gate": "所选来源、开班及有据存取的合计与头快照一致；有差异必须有跟进；提交后集合固定。"
+    },
+    {
+      "parent": "purchase_receipt_item",
+      "children": [
+        "inventory_movement"
+      ],
+      "source": "UC-28/R-14/R-15",
+      "gate": "本次新增或变化条目：累计验收入库等于认可合格量，价款按采购单位精确换算并取整；头与流水整体提交。"
+    },
+    {
+      "parent": "supplier_payment",
+      "children": [
+        "supplier_allocation"
+      ],
+      "source": "UC-29/R-16",
+      "gate": "付款变化时：待付/未知的预占合计等于拟付；确认后生效合计等于实付，无遗留待生效；失败取消全部预占。"
+    }
+  ],
+  "work_unit": "状态与集合校验设计.py/AggregateTransaction",
+  "integration_required": "隔离设计样例；D2必须让所有相关写入口经过工作单元。直接SQL不会自动执行事务末集合门禁，文件和真实支付不由此样例验证。"
+}

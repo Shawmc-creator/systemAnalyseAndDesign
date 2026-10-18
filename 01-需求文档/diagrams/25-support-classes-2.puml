@@ -1,0 +1,56 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam dpi 160
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+left to right direction
+skinparam linetype ortho
+class "操作提交" as request_submission {
+ id : INTEGER
+ account_id : INTEGER
+ permission_id : INTEGER
+ request_key : TEXT
+ status : TEXT
+ --
+ 辨认原提交()
+ 记录结果()
+}
+class "操作审计" as operation_audit {
+ id : INTEGER
+ account_id : INTEGER
+ permission_id : INTEGER
+ submission_id : INTEGER
+ --
+ 追加事件()
+ 按授权检索()
+}
+class "备份任务" as backup_run {
+ id : INTEGER
+ requested_by : INTEGER
+ status : TEXT
+ --
+ 开始备份()
+ 完成检查()
+ 标记失败()
+}
+class "恢复验证" as restore_verification {
+ id : INTEGER
+ backup_id : INTEGER
+ verified_by : INTEGER
+ status : TEXT
+ --
+ 验证恢复副本()
+ 记录验证结果()
+}
+operation_audit --> request_submission
+restore_verification --> backup_run
+
+@enduml

@@ -1,0 +1,66 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "牙医" as A0
+boundary "<u>:牙医接口</u>" as B0
+control "<u>:记录复诊随访评</u>\n<u>估控制</u>" as K
+participant "<u>:诊后要求</u>" as Followup
+participant "<u>:就诊</u>" as Visit
+participant "<u>:临床评估</u>" as Assessment
+A0 -> B0 : 提交UC-14办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-14办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Followup : 核对评估责任(牙医与来源)
+activate Followup
+Followup --> K : 处理结果或拒绝原因
+deactivate Followup
+opt 评估依据包含实际复诊
+K -> Visit : 提供本次复诊依据(同患者就诊或沟通来源)
+activate Visit
+Visit --> K : 处理结果或拒绝原因
+deactivate Visit
+end
+K -> Followup : 确认临床评估(结果、处理意见、后续日期)
+activate Followup
+Followup -> Assessment : 保留评估依据(实际方式、人员时间)
+activate Assessment
+Assessment --> Followup : 处理结果或拒绝原因
+deactivate Assessment
+Followup -> Followup : 判断完成或继续(是否仍需评估及跟进)
+Followup --> K : 处理结果或拒绝原因
+deactivate Followup
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Assessment
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 16
+skinparam dpi 180
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+top to bottom direction
+class "用例控制" as K <<control>> {
+ + 执行(上下文, 输入)
+}
+class "职员" as S <<entity>> {
+ + 核验岗位资格()
+}
+class "领域实体" as E <<entity>> {
+ + 核验业务条件()
+ + 产生变更集()
+}
+class "领域映射器" as M {
+ + 载入当前依据()
+ + 查原办理()
+ + 保存变更集()
+}
+class "工作单元" as W {
+ - 连接 : SQLite连接
+ + 开启读快照()
+ + 开启写事务()
+ + 提交()
+ + 回滚()
+}
+class "操作提交" as R {
+ + 辨认原提交()
+ + 记录结果()
+}
+class "操作审计" as A {
+ + 追加事件()
+}
+K --> S
+K --> E
+K --> M
+K --> W
+M --> W : 共用连接
+M --> R : 保存
+M --> A : 保存
+@enduml

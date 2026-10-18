@@ -1,0 +1,63 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "牙医" as A0
+boundary "<u>:牙医接口</u>" as B0
+control "<u>:签署及补充病历</u>\n<u>控制</u>" as K
+participant "<u>:就诊</u>" as Visit
+participant "<u>:病历</u>" as Record
+participant "<u>:病历补充</u>" as Addendum
+A0 -> B0 : 提交UC-11办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-11办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Visit : 核对接诊责任(补充牙医)
+activate Visit
+Visit --> K : 处理结果或拒绝原因
+deactivate Visit
+K -> Visit : 追加病历说明(已签署病历、正文和原因)
+activate Visit
+Visit -> Record : 核对原签署(原版本及签署依据)
+activate Record
+Record -> Addendum : 形成独立补充(正文、原因、人员时间)
+activate Addendum
+Addendum --> Record : 处理结果或拒绝原因
+deactivate Addendum
+Record --> Visit : 处理结果或拒绝原因
+deactivate Record
+Visit --> K : 处理结果或拒绝原因
+deactivate Visit
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Addendum
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+state "查看" as View
+state "编辑" as Edit
+state "预览核对" as Preview
+state "提交中" as Sending
+state "已保存" as Saved
+state "结果待查询" as Unknown
+state "需刷新重核" as Conflict
+[*] --> View
+View --> Edit : 有当前操作权限
+Edit --> Preview : 本地格式完整
+Preview --> Sending : 显式确认；保存本次命令键
+Sending --> Saved : 返回已提交结果
+Sending --> Unknown : 连接中断或响应超时
+Sending --> Conflict : 来源版本或业务条件变化
+Unknown --> Saved : 用原命令键查到提交结果
+Unknown --> Preview : 明确未提交；原键重试
+Conflict --> Edit : 获取最新依据并重新核对
+Saved --> View : 刷新版本和当前可执行动作
+@enduml

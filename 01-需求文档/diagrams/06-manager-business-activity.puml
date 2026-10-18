@@ -1,0 +1,44 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam activity {
+  BackgroundColor #F7FBFD
+  BorderColor #35546B
+  DiamondBackgroundColor #FFF6D8
+  DiamondBorderColor #9A6B16
+}
+title 管理人员业务活动图
+
+|诊所负责人|
+start
+:维护员工账号与岗位权限;
+:设置营业时间、牙医排班和牙椅;
+:维护诊疗项目与当前价格;
+|诊所管理系统|
+:校验排班、请假与未来预约冲突;
+if (设置有效？) then (是)
+  :保存设置并记录审计日志;
+else (否)
+  :返回冲突记录和原因;
+  |诊所负责人|
+  :调整设置或先处理冲突预约;
+  |诊所管理系统|
+  :重新校验并保存;
+endif
+|诊所负责人|
+:审核折扣和退款申请;
+|诊所管理系统|
+:执行批准结果并重算账单;
+|诊所负责人|
+:查看预约、收入、欠费和复诊统计;
+:抽查病历附件和操作日志;
+if (发现异常？) then (是)
+  :安排纠正处理;
+  :再次核对业务结果;
+else (否)
+  :确认当期运营情况;
+endif
+stop
+@enduml

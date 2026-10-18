@@ -1,0 +1,41 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+participant "<img:business-worker.png>\n诊疗助理" as A
+participant "<img:business-worker.png>\n诊所负责人" as M
+actor "供应商" as V
+participant "<img:business-worker.png>\n收费人员" as C
+A -> M : 提出材料补充需求
+M -> V : 确认采购项目、数量和交付条件
+V --> M : 确认供货安排
+M -> A : 交接采购明细
+loop 每次到货
+ V -> A : 交付材料及随货单据
+ A -> A : 核对数量、批号、效期和实物
+ A -> V : 告知合格、拒收及差异
+ V --> A : 确认补货或退换处理
+ A -> A : 登记合格入库及未到数量
+ A -> M : 报告验收结果和未结事项
+end
+M -> C : 确认结算依据和付款安排
+C -> V : 核对货款并按约定付款
+V --> C : 确认款项及凭据
+C -> C : 保存原采购、验收及支付依据
+@enduml

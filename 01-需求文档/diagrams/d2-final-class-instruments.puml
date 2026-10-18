@@ -1,0 +1,119 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "器械包" as Pack <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -composition_note: Text
+ -is_active: Int64
+ -record_no: Text
+ +核对物理归属(依据: 操作输入): 业务结果
+}
+class "处理设备" as Equipment <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -available_from: Text
+ -available_until: Text?
+ -record_no: Text
+ +核对设备归属(依据: 操作输入): 业务结果
+}
+class "器械处理" as Process <<entity>> {
+ -id: ObjectId
+ -preparation_note: Text
+ -started_at: Text
+ -ended_at: Text?
+ -released_at: Text?
+ +登记本轮处理(依据: 操作输入): 业务结果
+ +完成处理登记(依据: 操作输入): 业务结果
+ +确认放行或隔离(依据: 操作输入): 业务结果
+ +核对放行条件(依据: 操作输入): 业务结果
+ +核对包次可用性(依据: 操作输入): 业务结果
+ +登记本轮使用(依据: 操作输入): 业务结果
+ +标记事后异常(依据: 操作输入): 业务结果
+ +提供受影响包次(依据: 操作输入): 业务结果
+}
+class "器械包处理" as PackCycle <<entity>> {
+ -id: ObjectId
+ -packaging_check: Text
+ -expires_at: Text
+ -status: Text
+ +建立本轮包次(依据: 操作输入): 业务结果
+ +接受本轮放行(依据: 操作输入): 业务结果
+ +核对本轮可用性(依据: 操作输入): 业务结果
+ +登记发放(依据: 操作输入): 业务结果
+ +登记实际使用(依据: 操作输入): 业务结果
+ +停止后续正常使用(依据: 操作输入): 业务结果
+ +提供本轮追溯(依据: 操作输入): 业务结果
+ +确认未用退回(依据: 操作输入): 业务结果
+ +提供历史追溯(依据: 操作输入): 业务结果
+}
+class "处理监测" as Monitor <<entity>> {
+ -id: ObjectId
+ -monitor_item: Text
+ -result: Text
+ -obtained_at: Text?
+ -evidence: Text
+ +保存实际监测(依据: 操作输入): 业务结果
+}
+class "器械使用" as InstrumentUse <<entity>> {
+ -id: ObjectId
+ -issued_at: Text
+ -used_at: Text?
+ -physical_check: Text
+ -exception_note: Text?
+ +保留使用关联(依据: 操作输入): 业务结果
+ +提供实际使用依据(依据: 操作输入): 业务结果
+}
+class "就诊" as Visit <<entity>> {
+ -id: ObjectId
+ -arrived_at: Text
+ -started_at: Text?
+ -ended_at: Text?
+ -arrival_source: Text
+ +登记到诊(依据: 操作输入): 业务结果
+ +核对接诊责任(依据: 操作输入): 业务结果
+ +确认实际执行(依据: 操作输入): 业务结果
+ +提供获准就诊(依据: 操作输入): 业务结果
+ +确认实际接诊(依据: 操作输入): 业务结果
+ +记录检查诊断(依据: 操作输入): 业务结果
+ +核对签署条件(依据: 操作输入): 业务结果
+ +结束本次诊疗(依据: 操作输入): 业务结果
+ +提供诊后来源(依据: 操作输入): 业务结果
+ +提供本次复诊依据(依据: 操作输入): 业务结果
+ +汇总诊疗发生(依据: 操作输入): 业务结果
+ +确认当次复核(依据: 操作输入): 业务结果
+ +核对使用归属(依据: 操作输入): 业务结果
+ +追加病历说明(依据: 操作输入): 业务结果
+ +提供获准追查信息(依据: 操作输入): 业务结果
+}
+class "差异跟进" as FollowIssue <<entity>> {
+ -id: ObjectId
+ -reason: Text
+ -due_date: Text
+ -action_note: Text
+ -completed_at: Text?
+ +登记差异责任(依据: 操作输入): 业务结果
+ +登记异常追查(依据: 操作输入): 业务结果
+ +追加处理结论(依据: 操作输入): 业务结果
+}
+Equipment "1" -- "0..*" Process : 处理设备
+Process "1" *-- "1..*" PackCycle : 本轮包次
+Pack "1" -- "0..*" PackCycle : 历轮处理
+Process "1" *-- "0..*" Monitor : 处理监测
+Visit "1" -- "0..*" InstrumentUse : 关联就诊
+Process "0..1" -- "0..*" Process : 异常后重新处理
+Process "0..1" -- "0..*" FollowIssue : 器械异常
+PackCycle "1" *-- "0..*" InstrumentUse : 本轮使用经历
+@enduml

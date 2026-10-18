@@ -1,0 +1,71 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+top to bottom direction
+class "职员" as E0 <<entity>> {
+- id : 标识
+- 岗位资格 : 集合
+- is_active : 布尔
+--
++ 核验资格(岗位) : 校验结果
+}
+class "患者" as E1 <<entity>> {
+- id : 标识
+- name : 文本
+- phone : 文本
+- revision : 版本
+--
++ 匹配候选(条件) : 患者集合
++ 维护资料(命令, 版本) : 资料变更集
+}
+class "预约" as E2 <<entity>> {
+- id : 标识
+- status : 预约状态
+- revision : 版本
+- arrangement_version : 版本
+--
++ 维护安排(命令, 版本, 候选) : 安排变更集
++ 登记到诊(日期, 版本) : 状态变更
++ 形成安排视图(候选, 时段, 预约) : 列表
++ 占用区间(牙医, 日期, 患者) : 区间集
+}
+class "预约变更" as E3 <<entity>> {
+- appointment_id : 标识
+- old_revision : 版本
+- old_arrangement_version : 版本
+--
++ 记录原安排(旧值, 原因, 经办人) : 变更
+}
+class "就诊" as E4 <<entity>> {
+- id : 标识
+- current_confirmation_id : 可空标识
+- revision : 版本
+--
++ 建立到诊(预约, 患者, 经办人) : 就诊
++ 核验接诊归属(牙医) : 校验结果
++ 核验未结清(确认, 版本) : 校验结果
++ 采用确认(新确认) : 当前引用
++ 结算状态(确认, 收款) : 状态
++ 核验结算(依据, 明细, 收款) : 金额
++ 形成业务汇总(区间, 当前确认) : 汇总
++ 标记计价变更(原版本) : 修订变更
++ 核验已签署来源(牙医, 病历) : 患者依据
+}
+E1 "1" -- "0..*" E2
+E0 "1" -- "0..*" E2
+E2 "1" *-- "0..*" E3
+E2 "1" -- "0..1" E4
+@enduml

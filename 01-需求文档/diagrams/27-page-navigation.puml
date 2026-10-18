@@ -1,0 +1,48 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 16
+skinparam dpi 180
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam state {
+ BackgroundColor #F7FAFC
+ BorderColor #526575
+}
+left to right direction
+state "登录" as Login
+state "岗位工作台" as Home
+state "前台" as Front {
+ Front : P01 预约与到诊
+ Front : P02 患者资料
+ Front : P07 复诊随访联系
+ Front : P08 接诊安排查询
+}
+state "牙医" as Dentist {
+ Dentist : P03 临床诊疗
+ Dentist : P06 诊后要求与评估
+ Dentist : P08 本人安排查询
+}
+state "收费人员" as Cashier {
+ Cashier : P04 费用与收款
+ Cashier : P05 收费价目
+ Cashier : P10 收款查询与核对
+}
+state "诊疗助理" as Assistant {
+ Assistant : P09 材料库存与变动
+}
+state "负责人" as Manager {
+ Manager : P08 接诊安排维护
+ Manager : P09 材料库存查询
+ Manager : P10 日常业务与收款查询
+ Manager : 账号授权、审计、备份
+}
+[*] --> Login
+Login -right-> Home : 登录成功
+Home --> Login : 退出或会话失效
+Home --> Front
+Home --> Dentist
+Home --> Cashier
+Home --> Assistant
+Home --> Manager
+@enduml
+

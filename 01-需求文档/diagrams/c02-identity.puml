@@ -1,0 +1,70 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者" as Patient <<entity>> {
+ 姓名
+ 出生日期
+ 联系电话
+ 电话归属
+ 联系地址
+ 联系偏好
+ --
+ 核对身份()
+ 核对身份候选()
+ 确认资料维护()
+}
+class "职员" as Staff <<entity>> {
+ 姓名
+ 在岗起止
+ --
+ 核对在岗与职责()
+}
+class "患者资料变更" as IdentityChange <<entity>> {
+ 原值
+ 新值
+ 原因
+ 发生时间
+ --
+ 保留修改依据()
+}
+class "代理关系" as Proxy <<entity>> {
+ 代理人姓名
+ 关系
+ 授权范围
+ 有效起止
+ 核实依据
+ --
+ 确认代理范围()
+}
+class "接诊交接" as Handover <<entity>> {
+ 授权范围
+ 有效起止
+ 交接原因
+ --
+ 核对交接资格()
+}
+Patient "1" *-- "0..*" IdentityChange : 资料经历
+Patient "1" *-- "0..*" Proxy : 代理依据
+Patient "1" -- "0..*" Handover : 访问范围
+Staff "1" -- "0..*" Handover : 接收牙医
+Staff "1" -- "0..*" Handover : 交接人
+
+@enduml

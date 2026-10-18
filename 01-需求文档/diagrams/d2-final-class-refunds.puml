@@ -1,0 +1,106 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "患者资金" as Funds <<entity>> {
+ -id: ObjectId
+ -opened_at: Text
+ +核算付款及可用额(依据: 操作输入): 业务结果
+ +登记已核实付款(依据: 操作输入): 业务结果
+ +汇总患者资金(依据: 操作输入): 业务结果
+ +提供核对来源(依据: 操作输入): 业务结果
+ +核对可申请范围(依据: 操作输入): 业务结果
+ +核对可处理额度(依据: 操作输入): 业务结果
+ +更正付款分配(依据: 操作输入): 业务结果
+ +开始退款办理(依据: 操作输入): 业务结果
+ +确认实际退款(依据: 操作输入): 业务结果
+ +核算退款后余额(依据: 操作输入): 业务结果
+ +办理预付抵扣(依据: 操作输入): 业务结果
+ +恢复既有办理结果(依据: 操作输入): 业务结果
+ +登记结果待核实(依据: 操作输入): 业务结果
+ +确认核查结论(依据: 操作输入): 业务结果
+ +核对共同归属(依据: 操作输入): 业务结果
+}
+class "患者付款" as Payment <<entity>> {
+ -id: ObjectId
+ -net_cents: Int64
+ -received_cents: Int64
+ -change_cents: Int64
+ -channel: Text
+ +核算来源余额(依据: 操作输入): 业务结果
+ +确认到账(依据: 操作输入): 业务结果
+ +分配已收款(依据: 操作输入): 业务结果
+ +调整已分配范围(依据: 操作输入): 业务结果
+ +核对来源可退额(依据: 操作输入): 业务结果
+ +核对未分配余额(依据: 操作输入): 业务结果
+ +确认预付用途(依据: 操作输入): 业务结果
+ +提出到账核查(依据: 操作输入): 业务结果
+ +确认未到账(依据: 操作输入): 业务结果
+}
+class "应收账目" as Bill <<entity>> {
+ -id: ObjectId
+ -formed_at: Text
+ -period_start: Text
+ -period_end: Text
+ -record_no: Text
+ +形成应收依据(依据: 操作输入): 业务结果
+ +提供应收依据(依据: 操作输入): 业务结果
+ +核对可分配额(依据: 操作输入): 业务结果
+ +汇总有效应收(依据: 操作输入): 业务结果
+ +提供原费用依据(依据: 操作输入): 业务结果
+ +批准费用调整(依据: 操作输入): 业务结果
+ +核算调整后应收(依据: 操作输入): 业务结果
+}
+class "费用申请" as Request <<entity>> {
+ -id: ObjectId
+ -reason: Text
+ -proposed_adjustment_cents: Int64
+ -proposed_refund_cents: Int64
+ -evidence: Text
+ +提出费用处理(依据: 操作输入): 业务结果
+ +保留申请版本(依据: 操作输入): 业务结果
+ +核对待审核依据(依据: 操作输入): 业务结果
+ +保存审核结论(依据: 操作输入): 业务结果
+ +提供批准范围(依据: 操作输入): 业务结果
+ +重新提交申请(依据: 操作输入): 业务结果
+ +撤回申请(依据: 操作输入): 业务结果
+}
+class "费用调整" as Adjustment <<entity>> {
+ -id: ObjectId
+ -reason: Text
+ -effective_at: Text
+ +形成批准调整(依据: 操作输入): 业务结果
+}
+class "退款办理" as Refund <<entity>> {
+ -id: ObjectId
+ -requested_cents: Int64
+ -actual_cents: Int64?
+ -initiated_at: Text
+ -channel: Text
+ +建立额度占用(依据: 操作输入): 业务结果
+ +核实办理结果(依据: 操作输入): 业务结果
+ +提供办理进度(依据: 操作输入): 业务结果
+ +保留额度占用(依据: 操作输入): 业务结果
+}
+Funds "1" *-- "0..*" Payment : 实际到账
+Funds "1" -- "0..*" Request : 费用事项
+Bill "0..1" -- "0..*" Request : 原账目
+Payment "0..1" -- "0..*" Request : 原预付款
+Request "1" -- "0..1" Adjustment : 批准调整
+Bill "1" -- "0..*" Adjustment : 所属账目
+Request "1" -- "0..*" Refund : 退款批准依据
+Payment "1" -- "0..*" Refund : 原款来源
+Funds "1" *-- "0..*" Refund : 办理及占用
+Funds "1" -- "0..*" Bill : 同患者结算范围
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+hide footbox
+skinparam maxMessageSize 155
+skinparam sequence {
+ ParticipantBackgroundColor #EAF1F7
+ ParticipantBorderColor #34495E
+ LifeLineBorderColor #708090
+ GroupBackgroundColor white
+ GroupBorderColor #708090
+ MessageAlign left
+}
+autonumber
+boundary ":岗位接口" as B
+control ":UC-19控制" as K
+participant ":就诊" as E
+participant ":现金收款" as P
+participant ":领域映射器" as M
+participant ":工作单元" as W
+B -> K : 查询日常汇总(上下文, 条件)
+activate K
+K -> K : 职员.核验资格()；校验输入
+K -> W : 开启读快照()
+activate W
+K -> M : 载入授权查询依据(同一连接)
+M --> K : 实体及当前持久化状态
+group 业务条件不满足即进入统一失败出口
+K -> E : 形成业务汇总(日期区间, 当前确认)
+E --> K : 到诊、实际项目、未结清明细
+K -> P : 汇总净收(实际收款日期区间)
+P --> K : 净收合计及原收据
+K -> K : 组合汇总及查询依据
+end
+K -> W : 提交读事务()
+K --> B : 查询结果
+deactivate W
+deactivate K
+@enduml

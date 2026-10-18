@@ -1,0 +1,117 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者" as Patient <<entity>> {
+ 姓名
+ 出生日期
+ 联系电话
+ 电话归属
+ 联系地址
+ 联系偏好
+ --
+ 核对身份()
+ 核对身份候选()
+ 确认资料维护()
+}
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ 接诊开始
+ 诊疗结束
+ 到诊来源
+ --
+ 登记到诊()
+ 核对接诊责任()
+ 确认实际执行()
+}
+class "方案版本" as PlanVersion <<entity>> {
+ 诊断依据说明
+ 说明时间
+ 变更原因
+ 预计安排
+ --
+ 核对确认版本()
+ 提供确认来源()
+ 形成待确认版本()
+}
+class "诊疗文件" as Document <<entity>> {
+ 类型
+ 来源
+ 归属说明
+ --
+ 提供可读版本()
+ 接收原件版本()
+ 确认文件依据()
+}
+class "文件版本" as FileVersion <<entity>> {
+ 原文件名
+ 大小
+ 校验值
+ 采集时间
+ 确认时间
+ 变更原因
+ --
+ 核对原件完整性()
+ 保留确认原件()
+ 退回原件核对()
+}
+class "患者决定" as Decision <<entity>> {
+ 决定内容
+ 决定时间
+ 确认范围
+ 说明依据
+ --
+ 保留患者决定()
+}
+class "代理关系" as Proxy <<entity>> {
+ 代理人姓名
+ 关系
+ 授权范围
+ 有效起止
+ 核实依据
+ --
+ 确认代理范围()
+}
+class "方案项目" as PlanItem <<entity>> {
+ 项目内容
+ 牙位
+ 牙面
+ 计划数量
+ 实施顺序
+ 预计费用
+ --
+ 核对可执行范围()
+ 组织计划明细()
+ 识别未执行范围()
+}
+Patient "1" *-- "0..*" Proxy : 代理依据
+Patient "1" -- "0..*" Visit : 就诊者
+Patient "1" -- "0..*" Document : 文件归属
+Document "1" *-- "1..*" FileVersion : 原件版本
+Visit "0..1" -- "0..*" Document : 就诊附件
+PlanVersion "1" *-- "1..*" PlanItem : 计划明细
+PlanVersion "1" *-- "0..*" Decision : 确认经历
+Decision "0..*" -- "1..*" PlanItem : 确认范围
+Proxy "0..1" -- "0..*" Decision : 代理依据
+FileVersion "0..*" -- "0..*" Decision : 确认原件
+PlanVersion "0..1" -- "0..*" Document : 版本文书
+Visit "0..1" -- "0..*" PlanVersion : 内部诊断来源
+
+@enduml

@@ -1,0 +1,119 @@
+@startuml d1-db-13
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F7F0E6
+}
+title G13  身份、岗位与权限  ·  8张表
+entity "职员账号\nuser_account" as user_account {
+  {field} id : INTEGER [PK, NN]
+  {field} staff_id : INTEGER [UQ, FK, NN]  → staff.id (G01)
+  {field} login_name : TEXT [UQ, NN]
+  {field} password_hash : TEXT [NN]
+  {field} status : TEXT [NN]
+  {field} auth_version : INTEGER [NN]
+  {field} password_changed_at : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} disabled_at : TEXT [NULL]
+  {field} disabled_reason : TEXT [NULL]
+  {field} revision : INTEGER [NN]
+}
+entity "访问角色\naccess_role" as access_role {
+  {field} id : INTEGER [PK, NN]
+  {field} code : TEXT [UQ, NN]
+  {field} name : TEXT [NN]
+  {field} description : TEXT [NN]
+  {field} created_at : TEXT [NN]
+}
+entity "操作权限\naccess_permission" as access_permission {
+  {field} id : INTEGER [PK, NN]
+  {field} code : TEXT [UQ, NN]
+  {field} usecase_no : TEXT [NULL]
+  {field} name : TEXT [NN]
+  {field} operation_kind : TEXT [NN]
+  {field} object_rule : TEXT [NN]
+  {field} config_version : INTEGER [NN]
+}
+entity "职员岗位资格\nstaff_role_qualification" as staff_role_qualification {
+  {field} id : INTEGER [PK, NN]
+  {field} staff_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} role_id : INTEGER [FK, NN]  → access_role.id
+  {field} valid_from : TEXT [NN]
+  {field} valid_until : TEXT [NULL]
+  {field} verified_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verification_basis : TEXT [NN]
+  {field} revoked_at : TEXT [NULL]
+  {field} revoked_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} revocation_reason : TEXT [NULL]
+  {field} created_at : TEXT [NN]
+}
+entity "账号角色授权\naccount_role" as account_role {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NN]  → user_account.id
+  {field} role_id : INTEGER [FK, NN]  → access_role.id
+  {field} qualification_id : INTEGER [FK, NN]  → staff_role_qualification.id
+  {field} granted_by : INTEGER [FK, NN]  → user_account.id
+  {field} granted_at : TEXT [NN]
+  {field} valid_until : TEXT [NULL]
+  {field} grant_reason : TEXT [NN]
+  {field} revoked_by : INTEGER [FK, NULL]  → user_account.id
+  {field} revoked_at : TEXT [NULL]
+  {field} revocation_reason : TEXT [NULL]
+}
+entity "角色操作授权\nrole_permission" as role_permission {
+  {field} id : INTEGER [PK, NN]
+  {field} role_id : INTEGER [FK, NN]  → access_role.id
+  {field} permission_id : INTEGER [FK, NN]  → access_permission.id
+  {field} config_version : INTEGER [NN]
+  {field} created_at : TEXT [NN]
+}
+entity "登录会话\nlogin_session" as login_session {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NN]  → user_account.id
+  {field} token_hash : TEXT [UQ, NN]
+  {field} csrf_hash : TEXT [NN]
+  {field} auth_version : INTEGER [NN]
+  {field} runtime_epoch : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} last_seen_at : TEXT [NN]
+  {field} expires_at : TEXT [NN]
+  {field} revoked_at : TEXT [NULL]
+  {field} revocation_reason : TEXT [NULL]
+}
+entity "身份验证事件\nauthentication_event" as authentication_event {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NULL]  → user_account.id
+  {field} session_id : INTEGER [FK, NULL]  → login_session.id
+  {field} event_type : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} login_digest : TEXT [NN]
+  {field} source_digest : TEXT [NN]
+  {field} reason_code : TEXT [NN]
+  {field} correlation_id : TEXT [NN]
+}
+account_role --> access_role
+account_role --> staff_role_qualification
+account_role --> user_account
+authentication_event --> login_session
+authentication_event --> user_account
+login_session --> user_account
+role_permission --> access_permission
+role_permission --> access_role
+staff_role_qualification --> access_role
+@enduml

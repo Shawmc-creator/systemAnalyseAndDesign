@@ -1,0 +1,151 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 150
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "收费人员" as A0
+boundary "<u>:收费人员接口</u>" as B0
+control "<u>:办理与登记退款</u>\n<u>控制</u>" as K
+participant "<u>:患者资金</u>" as Funds
+participant "<u>:退款办理</u>" as Refund
+participant "<u>:患者付款</u>" as Payment
+participant "工作单元" as W
+participant "数据映射器" as DM
+participant "权限与会话服务" as AUTH
+A0 -> B0 : 提交UC-26办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 办理(ctx, UC26Command)
+activate K
+group 本阶段同一写事务
+K -> W : 开始写事务()
+W --> K : 同一连接
+K -> AUTH : 核对岗位及对象(ctx, 引用)
+AUTH --> K : 有效授权依据或拒绝
+K -> W : 核对提交(ctx, cmd)
+W --> K : 新命令分支（原结果短路见公共图）
+K -> DM : 装载(对象引用、连接)
+DM --> K : 实体与依据快照
+K -> Funds : 恢复既有办理结果(原办理依据)
+activate Funds
+Funds -> Refund : 提供办理进度(原请求及渠道线索)
+activate Refund
+Refund --> Funds : 处理结果或拒绝原因
+deactivate Refund
+Funds --> K : 处理结果或拒绝原因
+deactivate Funds
+alt 本阶段全部校验通过
+K -> DM : 保存(变更集合、连接)
+DM --> K : 保存成功或版本冲突
+K -> W : 校验集合与来源()
+W --> K : 末校验结果
+K -> W : 保存结果与审计并提交()
+else 任一步骤拒绝或保存失败
+K -> W : 回滚()
+end
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A0 -> B0 : 报告结果仍不明确
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 办理(ctx, UC26Command)
+activate K
+group 本阶段同一写事务
+K -> W : 开始写事务()
+W --> K : 同一连接
+K -> AUTH : 核对岗位及对象(ctx, 引用)
+AUTH --> K : 有效授权依据或拒绝
+K -> W : 核对提交(ctx, cmd)
+W --> K : 新命令分支（原结果短路见公共图）
+K -> DM : 装载(对象引用、连接)
+DM --> K : 实体与依据快照
+K -> Funds : 登记结果待核实(原办理、说明)
+activate Funds
+Funds -> Refund : 保留额度占用(待核实结果)
+activate Refund
+Refund --> Funds : 处理结果或拒绝原因
+deactivate Refund
+Funds --> K : 处理结果或拒绝原因
+deactivate Funds
+alt 本阶段全部校验通过
+K -> DM : 保存(变更集合、连接)
+DM --> K : 保存成功或版本冲突
+K -> W : 校验集合与来源()
+W --> K : 末校验结果
+K -> W : 保存结果与审计并提交()
+else 任一步骤拒绝或保存失败
+K -> W : 回滚()
+end
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A0 -> B0 : 提交渠道核查结论
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 办理(ctx, UC26Command)
+activate K
+group 本阶段同一写事务
+K -> W : 开始写事务()
+W --> K : 同一连接
+K -> AUTH : 核对岗位及对象(ctx, 引用)
+AUTH --> K : 有效授权依据或拒绝
+K -> W : 核对提交(ctx, cmd)
+W --> K : 新命令分支（原结果短路见公共图）
+K -> DM : 装载(对象引用、连接)
+DM --> K : 实体与依据快照
+K -> Funds : 确认核查结论(成功或确定失败的证据)
+activate Funds
+Funds -> Refund : 核实办理结果(实际金额与渠道凭据)
+activate Refund
+Refund --> Funds : 处理结果或拒绝原因
+deactivate Refund
+Funds -> Payment : 核对来源可退额(确认扣减或失败释放后余额)
+activate Payment
+Payment --> Funds : 处理结果或拒绝原因
+deactivate Payment
+Funds --> K : 处理结果或拒绝原因
+deactivate Funds
+alt 本阶段全部校验通过
+K -> DM : 保存(变更集合、连接)
+DM --> K : 保存成功或版本冲突
+K -> W : 校验集合与来源()
+W --> K : 末校验结果
+K -> W : 保存结果与审计并提交()
+else 任一步骤拒绝或保存失败
+K -> W : 回滚()
+end
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Payment
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

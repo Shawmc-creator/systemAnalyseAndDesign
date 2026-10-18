@@ -1,0 +1,2049 @@
+{
+  "version": "2026-10-17-D1-support",
+  "tables": [
+    {
+      "key": "user_account",
+      "table": "user_account",
+      "name": "职员账号",
+      "source": "Q-01、Q-02",
+      "reason": "职员与登录身份分开，保留账号及停用历史。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "staff_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "所属职员；唯一；引用staff.id。",
+          "source": "Q-01、Q-02",
+          "foreign_key": "staff",
+          "unique": true
+        },
+        {
+          "name": "login_name",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "规范化小写登录名；唯一，3至64位允许字符",
+          "source": "Q-01、Q-02",
+          "unique": true
+        },
+        {
+          "name": "password_hash",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "含算法、盐和参数的慢哈希编码；不保存原口令",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "启用或停用；首次显式指定",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "auth_version",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "授权/凭据版本；正整数，默认1",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "password_changed_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "最近凭据变更时刻",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "账号建立时刻",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "最近变更时刻",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "disabled_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "停用时刻；启用时可空",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "disabled_reason",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "停用依据；停用时必填",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "revision",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "并发版本；默认1",
+          "source": "Q-01、Q-02"
+        }
+      ],
+      "constraints": [
+        "staff_id和login_name分别唯一；一个职员一个个人账号，不共享账号。",
+        "停用、口令更换或任一有效授权变化递增auth_version，与相关变更和审计同事务。禁止删除历史账号。",
+        "首名负责人经受控初始化创建，绑定既有职员并记录初始化审计；初始化入口在完成后关闭。"
+      ],
+      "operations": [
+        "核验身份",
+        "停用并失效会话"
+      ]
+    },
+    {
+      "key": "access_role",
+      "table": "access_role",
+      "name": "访问角色",
+      "source": "Q-01",
+      "reason": "固定五类岗位身份，不以负责人身份推导全部临床权限。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-01"
+        },
+        {
+          "name": "code",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "唯一代码：frontdesk、dentist、cashier、assistant、manager",
+          "source": "Q-01",
+          "unique": true
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "固定岗位名称",
+          "source": "Q-01"
+        },
+        {
+          "name": "description",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "岗位职责说明",
+          "source": "Q-01"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "固定配置建立时刻",
+          "source": "Q-01"
+        }
+      ],
+      "constraints": [
+        "五种角色与B规约执行者一致；固定代码不可改成新的业务角色。",
+        "职员岗位资格和账号获授访问角色同时有效，才允许使用该角色权限。"
+      ],
+      "operations": [
+        "取得岗位定义"
+      ]
+    },
+    {
+      "key": "access_permission",
+      "table": "access_permission",
+      "name": "操作权限",
+      "source": "Q-01、Q-05",
+      "reason": "把多人参与用例拆成具体操作，避免一项权限同时授予录入与审核。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "code",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "唯一操作代码，最长64字符",
+          "source": "Q-01、Q-05",
+          "unique": true
+        },
+        {
+          "name": "usecase_no",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "UC-01至UC-32；运行管理权限为空",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "name",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "操作含义",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "operation_kind",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "查询、业务写入或运行管理",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "object_rule",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "必须执行的对象范围规则标识",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "config_version",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "固定权限配置版本；正整数",
+          "source": "Q-01、Q-05"
+        }
+      ],
+      "constraints": [
+        "权限由受控配置发布；不是用户输入的表名或SQL。",
+        "查询权限不包含相应用例的变更权限。对象范围与岗位权限取交集，不能只检查菜单可见。"
+      ],
+      "operations": [
+        "匹配具体操作",
+        "取得对象规则"
+      ]
+    },
+    {
+      "key": "staff_role_qualification",
+      "table": "staff_role_qualification",
+      "name": "职员岗位资格",
+      "source": "Q-01；C职员职责",
+      "reason": "保留职员可承担岗位的有效区间及核实依据，支撑接诊、审核和放行责任。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-01；C职员职责"
+        },
+        {
+          "name": "staff_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "资格所属职员；引用staff.id。",
+          "source": "Q-01；C职员职责",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "role_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "具备资格的岗位；引用access_role.id。",
+          "source": "Q-01；C职员职责",
+          "foreign_key": "access_role"
+        },
+        {
+          "name": "valid_from",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "资格生效时刻",
+          "source": "Q-01；C职员职责"
+        },
+        {
+          "name": "valid_until",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "资格截止；为空尚未届满",
+          "source": "Q-01；C职员职责"
+        },
+        {
+          "name": "verified_by",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "核实负责人；初始化时为被核实的首名负责人；引用staff.id。",
+          "source": "Q-01；C职员职责",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "verification_basis",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "岗位任命或专业资格核实依据",
+          "source": "Q-01；C职员职责"
+        },
+        {
+          "name": "revoked_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "提前撤销时刻",
+          "source": "Q-01；C职员职责"
+        },
+        {
+          "name": "revoked_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "撤销责任人；与撤销时间同时存在；引用staff.id。",
+          "source": "Q-01；C职员职责",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "revocation_reason",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "提前撤销原因",
+          "source": "Q-01；C职员职责"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "资格记录建立时刻",
+          "source": "Q-01；C职员职责"
+        }
+      ],
+      "constraints": [
+        "同职员同角色的有效区间不得重叠；截止晚于开始，撤销三项成组。",
+        "重新任职新增经历，不复活旧资格行。资格失效时同步撤销不再满足条件的账号角色并使旧会话失效。",
+        "业务提交和查询每次检查当前日期与在岗区间，不能依赖定时任务及时停用。"
+      ],
+      "operations": [
+        "核实岗位资格",
+        "撤销资格"
+      ]
+    },
+    {
+      "key": "account_role",
+      "table": "account_role",
+      "name": "账号角色授权",
+      "source": "Q-01、Q-02",
+      "reason": "记录谁在何时因何依据向账号授予岗位角色。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "account_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "获得角色的账号；引用user_account.id。",
+          "source": "Q-01、Q-02",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "role_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "获授角色；引用access_role.id。",
+          "source": "Q-01、Q-02",
+          "foreign_key": "access_role"
+        },
+        {
+          "name": "qualification_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同职员同角色的有效资格；引用staff_role_qualification.id。",
+          "source": "Q-01、Q-02",
+          "foreign_key": "staff_role_qualification"
+        },
+        {
+          "name": "granted_by",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "授予负责人账号；初始化可为首名负责人自身；引用user_account.id。",
+          "source": "Q-01、Q-02",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "granted_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "授予时刻",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "valid_until",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "截止；不得超出资格有效区间",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "grant_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "授权依据",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "revoked_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "撤销账号；引用user_account.id。",
+          "source": "Q-01、Q-02",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "revoked_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "撤销时刻",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "revocation_reason",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "撤销原因",
+          "source": "Q-01、Q-02"
+        }
+      ],
+      "constraints": [
+        "同账号同角色最多一条未撤销且仍有效的授权；历史再次授予新增行。",
+        "资格职员必须等于账号职员，角色也一致；授予人须有运行授权权限。撤销与auth_version递增、审计整体提交。"
+      ],
+      "operations": [
+        "授予角色",
+        "撤销角色"
+      ]
+    },
+    {
+      "key": "role_permission",
+      "table": "role_permission",
+      "name": "角色操作授权",
+      "source": "Q-01",
+      "reason": "固定岗位与细分操作的授权关联。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-01"
+        },
+        {
+          "name": "role_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "岗位角色；引用access_role.id。",
+          "source": "Q-01",
+          "foreign_key": "access_role"
+        },
+        {
+          "name": "permission_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "允许的具体操作；引用access_permission.id。",
+          "source": "Q-01",
+          "foreign_key": "access_permission"
+        },
+        {
+          "name": "config_version",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "配置版本",
+          "source": "Q-01"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "配置写入时刻",
+          "source": "Q-01"
+        }
+      ],
+      "constraints": [
+        "UNIQUE(role_id,permission_id)。按本节权限矩阵初始化，配置升级保留审计与版本并使受影响会话失效。",
+        "固定配置不提供随意扩大临床范围的网页开关。"
+      ],
+      "operations": [
+        "判断岗位可执行操作"
+      ]
+    },
+    {
+      "key": "login_session",
+      "table": "login_session",
+      "name": "登录会话",
+      "source": "Q-01、Q-05",
+      "reason": "服务端验证身份、有效期与授权版本。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "account_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "登录账号；引用user_account.id。",
+          "source": "Q-01、Q-05",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "token_hash",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "高熵随机会话令牌的摘要；唯一，不存原令牌",
+          "source": "Q-01、Q-05",
+          "unique": true
+        },
+        {
+          "name": "csrf_hash",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "会话绑定CSRF随机值摘要",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "auth_version",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "登录时账号授权版本",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "runtime_epoch",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次服务运行代号；恢复或重新启动后变更",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "会话建立时刻",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "last_seen_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "最近有效活动时刻",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "expires_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "绝对到期时刻",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "revoked_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "注销或撤销时刻",
+          "source": "Q-01、Q-05"
+        },
+        {
+          "name": "revocation_reason",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "注销、停用、授权变更等原因",
+          "source": "Q-01、Q-05"
+        }
+      ],
+      "constraints": [
+        "仅令牌摘要和版本一致、未撤销、账号及岗位有效且未超时才返回业务数据。",
+        "沿用30分钟无活动、8小时绝对时限；每次请求服务端核验。重新登录轮换令牌，注销撤销服务端会话。",
+        "运行代号来自启动环境的新随机值，不从恢复库复用；恢复旧数据不会使旧Cookie重新有效。会话Cookie采用HttpOnly、Secure及合适SameSite，状态改变验证CSRF。"
+      ],
+      "operations": [
+        "核验会话",
+        "撤销会话"
+      ]
+    },
+    {
+      "key": "authentication_event",
+      "table": "authentication_event",
+      "name": "身份验证事件",
+      "source": "Q-01、Q-02",
+      "reason": "记录已知或未知身份的成功、失败与注销，不为未知登录名创建职员。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "account_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "已识别账号；未知为空；引用user_account.id。",
+          "source": "Q-01、Q-02",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "session_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "已建立的会话；失败可空；引用login_session.id。",
+          "source": "Q-01、Q-02",
+          "foreign_key": "login_session"
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "成功、失败、注销、失效或限流",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "事件时刻",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "login_digest",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "规范化登录名的带密钥摘要",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "source_digest",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "来源地址的带密钥摘要；不保存口令",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "reason_code",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "受控原因码，不向外暴露账号是否存在",
+          "source": "Q-01、Q-02"
+        },
+        {
+          "name": "correlation_id",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "服务生成的请求关联号",
+          "source": "Q-01、Q-02"
+        }
+      ],
+      "constraints": [
+        "只追加，事件不得保存原会话令牌、口令或请求正文。",
+        "成功登录与会话记录同事务；失败事件单独提交。按登录摘要和来源共同限流，避免无限试错。摘要密钥单独受控保存。"
+      ],
+      "operations": [
+        "追加验证结果"
+      ]
+    },
+    {
+      "key": "request_submission",
+      "table": "request_submission",
+      "name": "操作提交",
+      "source": "Q-03、Q-05、Q-07",
+      "reason": "持久化一次本地业务命令的幂等结果，支持重试和结果查询。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "account_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "提交账号；引用user_account.id。",
+          "source": "Q-03、Q-05、Q-07",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "permission_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次具体操作；引用access_permission.id。",
+          "source": "Q-03、Q-05、Q-07",
+          "foreign_key": "access_permission"
+        },
+        {
+          "name": "request_key",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "客户端本次命令唯一键；最大128字符",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "payload_digest",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "规范化参数及操作版本的摘要，不存敏感原请求",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "command_version",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "命令结构版本；正整数",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "处理中或已提交；处理中只允许在未提交事务内存在",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本地处理开始时刻",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "committed_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "提交前设置完成时刻；已提交必填",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "result_kind",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "受控结果对象类别",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "result_key",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "结果对象编号或主键",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "result_revision",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "该阶段结果版本",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "result_code",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "稳定结果码；不能把业务待核实写成退款成功",
+          "source": "Q-03、Q-05、Q-07"
+        },
+        {
+          "name": "correlation_id",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "请求关联号",
+          "source": "Q-03、Q-05、Q-07"
+        }
+      ],
+      "constraints": [
+        "UNIQUE(account_id,request_key)；同键异操作/异摘要拒绝，不能覆盖旧结果。",
+        "在同一写事务中检查幂等键、执行业务、保存结果及审计后提交；不允许提交处理中行。失败整体回滚，再独立记录失败事件。",
+        "重试返回原阶段办理号及原结果，重新核验当前权限后可另查最新状态；付款/退款结果未知保存在业务表，不等于本地事务未提交。",
+        "外部核验不在数据库写锁内等待；先持久化待办理事实，再以新的命令登记核实结果。结果字段只作白名单定位，业务完整性由业务外键保证。"
+      ],
+      "operations": [
+        "识别重复命令",
+        "返回原阶段结果"
+      ]
+    },
+    {
+      "key": "operation_audit",
+      "table": "operation_audit",
+      "name": "操作审计",
+      "source": "Q-01、Q-02、Q-03",
+      "reason": "记录操作者、对象、结果和业务版本，为字段变化提供不可覆盖的事件归属。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "account_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "人工操作必填；计划任务和受控初始化可空；引用user_account.id。",
+          "source": "Q-01、Q-02、Q-03",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "staff_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "责任职员；与账号归属一致，初始化及计划任务明确责任人；引用staff.id。",
+          "source": "Q-01、Q-02、Q-03",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "session_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "人工已登录请求的会话；引用login_session.id。",
+          "source": "Q-01、Q-02、Q-03",
+          "foreign_key": "login_session"
+        },
+        {
+          "name": "submission_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "成功写命令所属提交；拒绝/失败可空；引用request_submission.id。",
+          "source": "Q-01、Q-02、Q-03",
+          "foreign_key": "request_submission"
+        },
+        {
+          "name": "permission_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "已识别操作；系统事件可空；引用access_permission.id。",
+          "source": "Q-01、Q-02、Q-03",
+          "foreign_key": "access_permission"
+        },
+        {
+          "name": "actor_kind",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "职员、计划任务或初始化",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "变更、查询、拒绝、失败或运行事件",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "服务端事件时刻",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "object_kind",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "受控对象类别；对应对象注册表",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "object_key",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "对象主键/业务号的规范化表示",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "before_revision",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "变更前版本；新建可空",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "after_revision",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "成功变更后的版本；查询/失败可空",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "操作依据；不复制临床正文",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "outcome_code",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "受控结果码",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "correlation_id",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "同一次操作的关联号",
+          "source": "Q-01、Q-02、Q-03"
+        },
+        {
+          "name": "authority_snapshot",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当时有效角色授权编号、对象依据编号及配置版本的JSON快照",
+          "source": "Q-01、Q-02、Q-03"
+        }
+      ],
+      "constraints": [
+        "只追加，不能用当前权限反推历史资格。一次命令改变多个对象时追加多条同提交事件。",
+        "受控多态定位不冒充SQL外键；服务端白名单解析对象类别及主键，成功事件须在事务内确认对象存在。失败/拒绝允许尚未形成对象，使用明确的命令目标类别。",
+        "权限日志不含原凭据及完整临床正文；临床内容引用业务版本、签署摘要和原表。审计读权限不自动包含临床读权限。"
+      ],
+      "operations": [
+        "追加事件",
+        "定位历史依据"
+      ]
+    },
+    {
+      "key": "audit_change",
+      "table": "audit_change",
+      "name": "审计字段变化",
+      "source": "Q-02；UC-13、18、24—29、31",
+      "reason": "逐字段保留允许审计的旧值和新值，承接业务字典明确依赖的历史。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-02；UC-13、18、24—29、31"
+        },
+        {
+          "name": "audit_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "成功变更事件；同事件下可多行；引用operation_audit.id。",
+          "source": "Q-02；UC-13、18、24—29、31",
+          "foreign_key": "operation_audit"
+        },
+        {
+          "name": "field_name",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "对应对象类型白名单字段名",
+          "source": "Q-02；UC-13、18、24—29、31"
+        },
+        {
+          "name": "value_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "字段声明的text、integer或boolean类型；前后值均可为JSON null",
+          "source": "Q-02；UC-13、18、24—29、31"
+        },
+        {
+          "name": "before_value",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "旧值的规范化JSON标量；对象新建时SQL NULL",
+          "source": "Q-02；UC-13、18、24—29、31"
+        },
+        {
+          "name": "after_value",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "新值的规范化JSON标量；对象删除时SQL NULL",
+          "source": "Q-02；UC-13、18、24—29、31"
+        },
+        {
+          "name": "sequence_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本事件内字段顺序；正整数",
+          "source": "Q-02；UC-13、18、24—29、31"
+        }
+      ],
+      "constraints": [
+        "UNIQUE(audit_id,field_name)与UNIQUE(audit_id,sequence_no)。JSON null表示字段实际为空，SQL NULL表示该侧对象不存在；不得混用。",
+        "与业务变化、审计事件同事务；允许字段按本节历史矩阵固定。不把SQL、原口令、令牌或整份临床正文放进快照。",
+        "追加更正事件保留前一次变化，不能修改旧审计行。仅拥有该类对象历史权限的岗位可读前后值。"
+      ],
+      "operations": [
+        "保留字段前后值"
+      ]
+    },
+    {
+      "key": "backup_run",
+      "table": "backup_run",
+      "name": "备份任务",
+      "source": "Q-04、Q-08",
+      "reason": "记录一次数据库与附件整体备份，成功以文件及副本验证为依据。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "run_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "备份任务编号；唯一",
+          "source": "Q-04、Q-08",
+          "unique": true
+        },
+        {
+          "name": "trigger_kind",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "每日计划、手工或升级前",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "requested_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "手工发起账号；计划任务可空；引用user_account.id。",
+          "source": "Q-04、Q-08",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "responsible_staff_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "计划配置或手工操作的责任职员；引用staff.id。",
+          "source": "Q-04、Q-08",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "待执行、运行中、成功或失败",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "started_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "实际开始时刻",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "snapshot_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "一致性数据库快照完成时刻",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "finished_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "结束时刻；终态必填",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "schema_version",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "快照数据库结构版本",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "application_version",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "配套应用版本",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "manifest_key",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "受控备份目录中的清单路径",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "manifest_sha256",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "最终清单的SHA-256",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "error_code",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "失败原因码；失败时必填",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "任务建立时刻",
+          "source": "Q-04、Q-08"
+        }
+      ],
+      "constraints": [
+        "同类备份最多一个运行中任务；进程中断后记录失败及原因，不推断成功。",
+        "使用SQLite一致性备份接口；从完成的快照库读取附件版本集合，而不是从继续变化的运行库读取。附件按不可变storage_key保存，复制期间禁止清理该集合文件。",
+        "数据库完整性、外键、附件大小及摘要全部核对；本地和异机副本均完成验证后才标成功。外部清单保存任务结果，不能假设任务成功状态已包含在更早生成的快照库里。"
+      ],
+      "operations": [
+        "生成一致性快照",
+        "核验完整备份"
+      ]
+    },
+    {
+      "key": "backup_artifact",
+      "table": "backup_artifact",
+      "name": "备份文件清单",
+      "source": "Q-04、Q-08",
+      "reason": "逐项证明一份快照包含数据库及所有需恢复的附件。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "backup_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "所属备份任务；引用backup_run.id。",
+          "source": "Q-04、Q-08",
+          "foreign_key": "backup_run"
+        },
+        {
+          "name": "artifact_kind",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "database或attachment",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "document_version_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "附件版本；数据库文件为空；引用document_version.id。",
+          "source": "Q-04、Q-08",
+          "foreign_key": "document_version"
+        },
+        {
+          "name": "relative_path",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "受控副本中的相对路径；禁止越出备份目录",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "size_bytes",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "预期字节数；非负",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "sha256",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "预期SHA-256",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "verification_status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "待检、通过、缺失或不符",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "verified_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "取得核验结果时刻",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "result_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "缺失、不符或核实说明",
+          "source": "Q-04、Q-08"
+        }
+      ],
+      "constraints": [
+        "UNIQUE(backup_id,relative_path)；每任务恰一份database清单，附件版本在同任务唯一。",
+        "附件字段必须匹配快照内版本而非当前原件；缺失或不符不得标可用备份。清单本身的摘要放backup_run，避免自包含摘要循环。"
+      ],
+      "operations": [
+        "登记文件范围",
+        "核验文件摘要"
+      ]
+    },
+    {
+      "key": "backup_copy",
+      "table": "backup_copy",
+      "name": "备份副本",
+      "source": "Q-04",
+      "reason": "区分本地和异机存放及各自核验结果，支持30份成功备份轮换。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-04"
+        },
+        {
+          "name": "backup_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "所属完整备份任务；引用backup_run.id。",
+          "source": "Q-04",
+          "foreign_key": "backup_run"
+        },
+        {
+          "name": "location_kind",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本地或异机",
+          "source": "Q-04"
+        },
+        {
+          "name": "storage_key",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "受控位置别名及路径；不含登录密钥",
+          "source": "Q-04"
+        },
+        {
+          "name": "manifest_sha256",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "副本清单摘要，与任务一致",
+          "source": "Q-04"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "复制中、已验证、失败或已移除",
+          "source": "Q-04"
+        },
+        {
+          "name": "started_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "复制开始时刻",
+          "source": "Q-04"
+        },
+        {
+          "name": "verified_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "完整清单及内容核验通过时刻",
+          "source": "Q-04"
+        },
+        {
+          "name": "removed_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "轮换移除时刻",
+          "source": "Q-04"
+        },
+        {
+          "name": "removal_reason",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "移除原因",
+          "source": "Q-04"
+        },
+        {
+          "name": "verified_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "手工核验账号；计划验证为空；引用user_account.id。",
+          "source": "Q-04",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "error_code",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "复制失败原因",
+          "source": "Q-04"
+        }
+      ],
+      "constraints": [
+        "UNIQUE(backup_id,location_kind,storage_key)；整份副本按清单逐项核验，不能只比较文件夹大小。",
+        "保留最近30份成功备份及异机副本；只有可用性核对通过才执行轮换。删除文件后保留元数据、原因及审计，失败不得记已移除。"
+      ],
+      "operations": [
+        "核验副本",
+        "记录轮换"
+      ]
+    },
+    {
+      "key": "restore_verification",
+      "table": "restore_verification",
+      "name": "恢复验证",
+      "source": "Q-04、Q-08",
+      "reason": "每次验证一份特定备份副本，保留实际恢复时长和总结果。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "backup_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "来源备份；引用backup_run.id。",
+          "source": "Q-04、Q-08",
+          "foreign_key": "backup_run"
+        },
+        {
+          "name": "copy_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "实际读取的已验证副本；引用backup_copy.id。",
+          "source": "Q-04、Q-08",
+          "foreign_key": "backup_copy"
+        },
+        {
+          "name": "verified_by",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "发起及负责验证的负责人账号；引用user_account.id。",
+          "source": "Q-04、Q-08",
+          "foreign_key": "user_account"
+        },
+        {
+          "name": "trigger_kind",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "每月、升级前或故障恢复",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "待执行、运行中、通过或失败",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "isolated_path",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "经检查的隔离目录，不得为生产目录",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "started_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "实际开始时刻",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "finished_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "验证结束时刻",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "source_snapshot_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "备份快照时刻",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "recovery_target_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次演练模拟/故障的恢复基准时刻",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "application_version",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "用于读取恢复数据的应用版本",
+          "source": "Q-04、Q-08"
+        },
+        {
+          "name": "result_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "缺失项、失败原因及结论",
+          "source": "Q-04、Q-08"
+        }
+      ],
+      "constraints": [
+        "copy_id所属backup_id一致且副本可用；隔离恢复不覆盖运行库。",
+        "全部必需检查通过才记通过；实际耗时和恢复点间隔从时刻计算，分别对照4小时与24小时目标，超标记失败或未达标结论。",
+        "生产切换另走受控停写、切换前备份、校验与回退；通过演练不自动切换。"
+      ],
+      "operations": [
+        "执行隔离恢复",
+        "汇总验证结果"
+      ]
+    },
+    {
+      "key": "restore_check",
+      "table": "restore_check",
+      "name": "恢复检查明细",
+      "source": "Q-04、Q-08；T12",
+      "reason": "保存每项恢复检查的结果及问题，避免只保留一个通过标志。",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "稳定内部主键；PK。",
+          "primary_key": true,
+          "source": "Q-04、Q-08；T12"
+        },
+        {
+          "name": "restore_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "所属恢复验证；引用restore_verification.id。",
+          "source": "Q-04、Q-08；T12",
+          "foreign_key": "restore_verification"
+        },
+        {
+          "name": "check_code",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "固定检查项目代码",
+          "source": "Q-04、Q-08；T12"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "待检、通过或失败",
+          "source": "Q-04、Q-08；T12"
+        },
+        {
+          "name": "checked_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "完成检查时刻",
+          "source": "Q-04、Q-08；T12"
+        },
+        {
+          "name": "expected_value",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "预期集合、计数或结果描述",
+          "source": "Q-04、Q-08；T12"
+        },
+        {
+          "name": "actual_value",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "实际核实值；未检为空",
+          "source": "Q-04、Q-08；T12"
+        },
+        {
+          "name": "evidence_key",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "受控报告或截图位置",
+          "source": "Q-04、Q-08；T12"
+        },
+        {
+          "name": "failure_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "失败或缺失说明",
+          "source": "Q-04、Q-08；T12"
+        }
+      ],
+      "constraints": [
+        "UNIQUE(restore_id,check_code)；数据库完整性、外键、清单附件、签署版本、退款余额、停用权限、应用读取及恢复时长/恢复点均为必检。",
+        "检查证据不复制完整临床正文或明文凭据。关键检查缺行或未检不能汇总为通过。"
+      ],
+      "operations": [
+        "保存逐项检查"
+      ]
+    }
+  ],
+  "permissions": [
+    {
+      "code": "uc01.maintain",
+      "usecase": 1,
+      "name": "维护与取消预约",
+      "roles": [
+        "frontdesk"
+      ]
+    },
+    {
+      "code": "uc02.query",
+      "usecase": 2,
+      "name": "查询预约",
+      "roles": [
+        "frontdesk"
+      ]
+    },
+    {
+      "code": "uc03.register",
+      "usecase": 3,
+      "name": "登记到诊",
+      "roles": [
+        "frontdesk"
+      ]
+    },
+    {
+      "code": "uc04.execute",
+      "usecase": 4,
+      "name": "确认实际执行",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc05.draft",
+      "usecase": 5,
+      "name": "录入价目",
+      "roles": [
+        "cashier"
+      ]
+    },
+    {
+      "code": "uc05.approve",
+      "usecase": 5,
+      "name": "确认或退回价目",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc06.query",
+      "usecase": 6,
+      "name": "查询费用",
+      "roles": [
+        "cashier"
+      ]
+    },
+    {
+      "code": "uc07.receive",
+      "usecase": 7,
+      "name": "登记患者付款",
+      "roles": [
+        "cashier"
+      ]
+    },
+    {
+      "code": "uc07.allocate",
+      "usecase": 7,
+      "name": "分配及抵扣",
+      "roles": [
+        "cashier"
+      ]
+    },
+    {
+      "code": "uc08.maintain",
+      "usecase": 8,
+      "name": "维护患者资料",
+      "roles": [
+        "frontdesk"
+      ]
+    },
+    {
+      "code": "uc09.query",
+      "usecase": 9,
+      "name": "查询获准诊疗资料",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc10.record",
+      "usecase": 10,
+      "name": "记录检查诊断",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc11.sign",
+      "usecase": 11,
+      "name": "签署或独立补充",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc12.propose",
+      "usecase": 12,
+      "name": "提出或撤销诊后要求",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc13.contact",
+      "usecase": 13,
+      "name": "联系及安排",
+      "roles": [
+        "frontdesk"
+      ]
+    },
+    {
+      "code": "uc14.assess",
+      "usecase": 14,
+      "name": "临床评估",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc15.schedule",
+      "usecase": 15,
+      "name": "确认排班或停诊",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc16.query",
+      "usecase": 16,
+      "name": "查询可用安排",
+      "roles": [
+        "frontdesk",
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc17.query",
+      "usecase": 17,
+      "name": "查询批次库存",
+      "roles": [
+        "assistant",
+        "manager"
+      ]
+    },
+    {
+      "code": "uc18.record",
+      "usecase": 18,
+      "name": "领用退回及盘点录入",
+      "roles": [
+        "assistant"
+      ]
+    },
+    {
+      "code": "uc18.approve",
+      "usecase": 18,
+      "name": "确认盘点差异",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc19.funds",
+      "usecase": 19,
+      "name": "查询收付业务明细",
+      "roles": [
+        "cashier"
+      ]
+    },
+    {
+      "code": "uc19.management",
+      "usecase": 19,
+      "name": "查询经营及资金明细",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc20.reconcile",
+      "usecase": 20,
+      "name": "登记收支核对",
+      "roles": [
+        "cashier"
+      ]
+    },
+    {
+      "code": "uc20.follow",
+      "usecase": 20,
+      "name": "指定与核实差异处理",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc21.health",
+      "usecase": 21,
+      "name": "记录及复核健康版本",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc22.plan",
+      "usecase": 22,
+      "name": "方案及患者决定",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc23.upload",
+      "usecase": 23,
+      "name": "上传原件及核对元数据",
+      "roles": [
+        "dentist",
+        "assistant"
+      ]
+    },
+    {
+      "code": "uc23.confirm",
+      "usecase": 23,
+      "name": "确认诊疗原件",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc24.apply",
+      "usecase": 24,
+      "name": "提交/重提/撤回申请",
+      "roles": [
+        "cashier"
+      ]
+    },
+    {
+      "code": "uc25.approve",
+      "usecase": 25,
+      "name": "审核费用及退费",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc26.refund",
+      "usecase": 26,
+      "name": "办理及核实退款",
+      "roles": [
+        "cashier"
+      ]
+    },
+    {
+      "code": "uc27.supplier",
+      "usecase": 27,
+      "name": "维护供应商及结算依据",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc27.draft",
+      "usecase": 27,
+      "name": "录入采购需求",
+      "roles": [
+        "assistant"
+      ]
+    },
+    {
+      "code": "uc27.approve",
+      "usecase": 27,
+      "name": "确认采购约定",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc28.receive",
+      "usecase": 28,
+      "name": "录入验收及差异",
+      "roles": [
+        "assistant"
+      ]
+    },
+    {
+      "code": "uc28.approve",
+      "usecase": 28,
+      "name": "确认退换差异",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc29.authorize",
+      "usecase": 29,
+      "name": "确认供货付款依据",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc29.pay",
+      "usecase": 29,
+      "name": "办理付款分配及退回款",
+      "roles": [
+        "cashier"
+      ]
+    },
+    {
+      "code": "uc30.process",
+      "usecase": 30,
+      "name": "记录处理监测及放行",
+      "roles": [
+        "assistant"
+      ]
+    },
+    {
+      "code": "uc31.use",
+      "usecase": 31,
+      "name": "登记实际使用及退回",
+      "roles": [
+        "assistant"
+      ]
+    },
+    {
+      "code": "uc31.clinical_trace",
+      "usecase": 31,
+      "name": "查看获准就诊使用依据",
+      "roles": [
+        "dentist"
+      ]
+    },
+    {
+      "code": "uc31.trace",
+      "usecase": 31,
+      "name": "追溯异常及处置跟进",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "uc32.record",
+      "usecase": 32,
+      "name": "录入材料批次及立即隔离",
+      "roles": [
+        "assistant"
+      ]
+    },
+    {
+      "code": "uc32.approve",
+      "usecase": 32,
+      "name": "确认配置与恢复停用",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "ops.identity.manage",
+      "usecase": null,
+      "name": "账号资格与授权维护",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "ops.audit.query",
+      "usecase": null,
+      "name": "按对象范围查询操作历史",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "ops.backup.manage",
+      "usecase": null,
+      "name": "备份及副本管理",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "ops.restore.verify",
+      "usecase": null,
+      "name": "隔离恢复验证",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "code": "ops.request.query",
+      "usecase": null,
+      "name": "查询本人提交结果",
+      "roles": [
+        "frontdesk",
+        "dentist",
+        "cashier",
+        "assistant",
+        "manager"
+      ]
+    }
+  ],
+  "history_allowlists": {
+    "fee_request": [
+      "申请重提与审核",
+      [
+        "reason",
+        "proposed_adjustment_cents",
+        "proposed_refund_cents",
+        "evidence",
+        "submitted_at",
+        "submission_no",
+        "status",
+        "review_note",
+        "reviewed_by",
+        "reviewed_at",
+        "approved_adjustment_cents",
+        "approved_refund_cents"
+      ]
+    ],
+    "supplier": [
+      "结算依据及联系变更",
+      [
+        "name",
+        "contact_name",
+        "phone",
+        "address",
+        "settlement_basis",
+        "verified_by",
+        "is_active"
+      ]
+    ],
+    "followup_requirement": [
+      "责任转交及状态变化",
+      [
+        "responsible_frontdesk_id",
+        "status",
+        "target_start",
+        "target_end",
+        "next_contact_date",
+        "closed_by",
+        "closed_at",
+        "closure_basis",
+        "cancellation_reason"
+      ]
+    ],
+    "stock_count": [
+      "重新核实盘点",
+      [
+        "snapshot_quantity_scaled",
+        "counted_quantity_scaled",
+        "stock_revision",
+        "counted_at",
+        "reason",
+        "status",
+        "review_note",
+        "confirmed_by",
+        "confirmed_at"
+      ]
+    ],
+    "purchase_receipt_item": [
+      "待检转为验收结论",
+      [
+        "accepted_quantity_scaled",
+        "rejected_quantity_scaled",
+        "pending_quantity_scaled",
+        "accepted_amount_cents",
+        "inspection_note",
+        "material_batch_id",
+        "stock_location_id"
+      ]
+    ],
+    "supplier_allocation": [
+      "预占、确认及取消",
+      [
+        "amount_cents",
+        "allocation_state",
+        "effective_at",
+        "reason"
+      ]
+    ],
+    "issue_followup": [
+      "处理意见追加与完成",
+      [
+        "assigned_to",
+        "due_date",
+        "action_note",
+        "status",
+        "result_basis",
+        "completed_at",
+        "completed_by"
+      ]
+    ],
+    "user_account": [
+      "账号状态及授权版本",
+      [
+        "status",
+        "auth_version",
+        "disabled_at",
+        "disabled_reason"
+      ]
+    ],
+    "role_permission": [
+      "权限配置发布",
+      [
+        "role_id",
+        "permission_id",
+        "config_version"
+      ]
+    ],
+    "staff_role_qualification": [
+      "资格核实及撤销",
+      [
+        "staff_id",
+        "role_id",
+        "valid_from",
+        "valid_until",
+        "verified_by",
+        "verification_basis",
+        "revoked_at",
+        "revoked_by",
+        "revocation_reason"
+      ]
+    ]
+  },
+  "counts": {
+    "support_tables": 16,
+    "support_fields": 168,
+    "permissions": 50
+  }
+}

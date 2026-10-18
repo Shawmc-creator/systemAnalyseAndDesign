@@ -1,0 +1,69 @@
+@startuml d1-db-14
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F0ECF7
+}
+title G14  提交控制与审计  ·  3张表
+entity "操作提交\nrequest_submission" as request_submission {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NN]  → user_account.id (G13)
+  {field} permission_id : INTEGER [FK, NN]  → access_permission.id (G13)
+  {field} request_key : TEXT [NN]
+  {field} payload_digest : TEXT [NN]
+  {field} command_version : INTEGER [NN]
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} committed_at : TEXT [NULL]
+  {field} result_kind : TEXT [NULL]
+  {field} result_key : TEXT [NULL]
+  {field} result_revision : INTEGER [NULL]
+  {field} result_code : TEXT [NULL]
+  {field} correlation_id : TEXT [NN]
+}
+entity "操作审计\noperation_audit" as operation_audit {
+  {field} id : INTEGER [PK, NN]
+  {field} account_id : INTEGER [FK, NULL]  → user_account.id (G13)
+  {field} staff_id : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} session_id : INTEGER [FK, NULL]  → login_session.id (G13)
+  {field} submission_id : INTEGER [FK, NULL]  → request_submission.id
+  {field} permission_id : INTEGER [FK, NULL]  → access_permission.id (G13)
+  {field} actor_kind : TEXT [NN]
+  {field} event_type : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} object_kind : TEXT [NN]
+  {field} object_key : TEXT [NN]
+  {field} before_revision : INTEGER [NULL]
+  {field} after_revision : INTEGER [NULL]
+  {field} reason : TEXT [NN]
+  {field} outcome_code : TEXT [NN]
+  {field} correlation_id : TEXT [NN]
+  {field} authority_snapshot : TEXT [NN]
+}
+entity "审计字段变化\naudit_change" as audit_change {
+  {field} id : INTEGER [PK, NN]
+  {field} audit_id : INTEGER [FK, NN]  → operation_audit.id
+  {field} field_name : TEXT [NN]
+  {field} value_type : TEXT [NN]
+  {field} before_value : TEXT [NULL]
+  {field} after_value : TEXT [NULL]
+  {field} sequence_no : INTEGER [NN]
+}
+audit_change --> operation_audit
+operation_audit --> request_submission
+@enduml

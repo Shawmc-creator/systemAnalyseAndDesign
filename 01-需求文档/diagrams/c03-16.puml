@@ -1,0 +1,58 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "前台" as A0
+boundary "<u>:前台接口</u>" as B0
+control "<u>:查询可用接诊安</u>\n<u>排控制</u>" as K
+participant "<u>:日期安排</u>" as Schedule
+participant "<u>:诊椅</u>" as Chair
+participant "<u>:接诊占用</u>" as Occupancy
+A0 -> B0 : 查询UC-16办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-16办理(对象、依据)
+activate K
+K -> Schedule : 提供可用组合(指定日期与时长)
+activate Schedule
+Schedule -> Chair : 核对可用区间(日期时段)
+activate Chair
+Chair --> Schedule : 处理结果或拒绝原因
+deactivate Chair
+Schedule -> Occupancy : 排除已有占用(患者、人员及诊椅)
+activate Occupancy
+Occupancy --> Schedule : 处理结果或拒绝原因
+deactivate Occupancy
+Schedule -> Schedule : 形成可用区间(排班、停诊及占用依据)
+Schedule --> K : 处理结果或拒绝原因
+deactivate Schedule
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Occupancy
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

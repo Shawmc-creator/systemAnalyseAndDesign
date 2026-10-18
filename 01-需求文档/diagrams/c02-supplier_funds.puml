@@ -1,0 +1,98 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "供应商" as Supplier <<entity>> {
+ 名称
+ 联系资料
+ 结算依据
+ --
+ 核对供货资格()
+}
+class "供应商资金" as SupplierFunds <<entity>> {
+ 建立时间
+ --
+ 汇总供货收支()
+ 提供核对来源()
+ 确认付款范围()
+}
+class "采购" as Purchase <<entity>> {
+ 约定时间
+ 交付条件
+ 确认时间
+ --
+ 提出采购安排()
+ 确认供货约定()
+ 核对到货依据()
+}
+class "验收" as Receipt <<entity>> {
+ 到货时间
+ 随货依据
+ 验收时间
+ --
+ 登记本次验收()
+ 提供合格结算依据()
+}
+class "供货付款" as SupplyPayment <<entity>> {
+ 拟付额
+ 实付额
+ 渠道
+ 办理时间
+ 凭据
+ --
+ 建立付款占用()
+ 确认实际支出()
+ 核实待定结果()
+}
+class "供货分配" as SupplyAllocation <<entity>> {
+ 分配金额
+ 生效时间
+ --
+ 形成供货分配()
+}
+class "供货退款" as SupplyRefund <<entity>> {
+ 实收额
+ 渠道
+ 到账时间
+ 凭据
+ --
+ 保留原款退款()
+}
+class "采购差异" as SupplyIssue <<entity>> {
+ 差异数量
+ 原因
+ 约定处理
+ 确认时间
+ --
+ 保留验收差异()
+ 提供确认退换()
+}
+Supplier "1" -- "0..*" Purchase : 供货方
+Purchase "1" -- "0..*" Receipt : 分批验收
+Supplier "1" -- "1" SupplierFunds : 资金归属
+SupplierFunds "1" *-- "0..*" SupplyPayment : 付款办理
+SupplyPayment "1" *-- "0..*" SupplyAllocation : 用途分配
+Purchase "0..1" -- "0..*" SupplyAllocation : 采购预付
+Receipt "0..1" -- "0..*" SupplyAllocation : 验收结算
+SupplyPayment "1" -- "0..*" SupplyRefund : 原付款
+SupplyIssue "1" -- "0..*" SupplyRefund : 退回依据
+SupplierFunds "1" *-- "0..*" SupplyRefund : 供货退回款
+
+@enduml

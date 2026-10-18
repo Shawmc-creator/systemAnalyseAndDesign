@@ -1,0 +1,5049 @@
+{
+  "version": "2026-10-18-ABCD-design",
+  "usecases": [
+    {
+      "n": 1,
+      "name": "维护预约及接诊安排",
+      "fields": "动作create/reschedule/cancel/noShow；patientId、appointmentId、scheduleId、startsAt、endsAt、reason；旧安排和预约revision",
+      "result": "预约号、预约及安排revision、占用编号、状态、受影响随访",
+      "gate": "日期安排已确认且在岗/诊椅有效；患者、牙医、诊椅三者无重叠。先释放旧占用，再创建新占用及变更快照；取消后恢复未完成诊后要求的待联系责任。",
+      "tables": [
+        "patient",
+        "dated_schedule",
+        "resource_occupancy",
+        "appointment",
+        "appointment_change",
+        "followup_requirement",
+        "contact_history"
+      ],
+      "screen": "预约与到诊",
+      "route": "appointments",
+      "permissions": [
+        {
+          "code": "uc01.maintain",
+          "usecase": 1,
+          "name": "维护与取消预约",
+          "roles": [
+            "frontdesk"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 1,
+          "keys": [
+            "Patient",
+            "Schedule",
+            "Occupancy",
+            "Appointment",
+            "AppointmentChange"
+          ],
+          "steps": [
+            [
+              "K",
+              "Patient",
+              "核对身份",
+              "患者选择"
+            ],
+            [
+              "K",
+              "Schedule",
+              "申请预约占用",
+              "日期、牙医、诊椅、起止"
+            ],
+            [
+              "Schedule",
+              "Occupancy",
+              "检查并占用",
+              "患者、共同资源"
+            ],
+            [
+              "K",
+              "Appointment",
+              "确认安排",
+              "患者、已获占用、来源"
+            ],
+            [
+              "Appointment",
+              "AppointmentChange",
+              "保留变更",
+              "旧安排、原因"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "预约新增；修改、取消见扩展图。",
+          "file": "c03-01"
+        },
+        {
+          "n": 1,
+          "keys": [
+            "Appointment",
+            "Schedule",
+            "Occupancy",
+            "AppointmentChange",
+            "Followup"
+          ],
+          "steps": [
+            [
+              "K",
+              "Appointment",
+              "核对可变更性",
+              "预约及当前版本"
+            ],
+            [
+              "K",
+              "Schedule",
+              "重新安排或释放",
+              "改约目标或取消"
+            ],
+            [
+              "Schedule",
+              "Occupancy",
+              "调整有效占用",
+              "患者、牙医、诊椅"
+            ],
+            [
+              "K",
+              "Appointment",
+              "变更或取消安排",
+              "原因及新占用"
+            ],
+            [
+              "Appointment",
+              "AppointmentChange",
+              "保留变更",
+              "原安排与办理依据"
+            ],
+            [
+              "K",
+              "Followup",
+              "恢复待安排",
+              "取消的复诊预约"
+            ]
+          ],
+          "extra": "change",
+          "title": "UC-01：改约、取消及资源冲突",
+          "focus": "对应1a、1b、4a、5a。未通过最新资源校验时保留原占用和原预约；取消不删除既有联系。",
+          "file": "c03-01-change"
+        }
+      ],
+      "control": "维护预约及接诊安排控制",
+      "operation": "办理",
+      "dto": "UC01Command",
+      "http": [
+        {
+          "permission": "uc01.maintain",
+          "roles": [
+            "frontdesk"
+          ],
+          "method": "POST",
+          "path": "/api/v2/appointments/maintain"
+        }
+      ],
+      "mapper": "维护预约及接诊安排映射器"
+    },
+    {
+      "n": 2,
+      "name": "查询预约及接诊安排",
+      "fields": "营业日期范围、患者候选条件、牙医、预约状态、分页游标",
+      "result": "预约列表、当前有效占用、改约历史及候诊提示",
+      "gate": "姓名电话仅用于找候选；选定患者稳定ID后查询。按已授权日期与对象筛选；空列表正常返回，不更新未到状态。",
+      "tables": [
+        "patient",
+        "appointment",
+        "appointment_change",
+        "resource_occupancy",
+        "dated_schedule",
+        "staff"
+      ],
+      "screen": "预约与到诊",
+      "route": "appointments",
+      "permissions": [
+        {
+          "code": "uc02.query",
+          "usecase": 2,
+          "name": "查询预约",
+          "roles": [
+            "frontdesk"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 2,
+          "keys": [
+            "Patient",
+            "Appointment"
+          ],
+          "steps": [
+            [
+              "K",
+              "Patient",
+              "核对身份",
+              "患者或日期查询范围"
+            ],
+            [
+              "K",
+              "Appointment",
+              "提供安排及经历",
+              "筛选条件、岗位范围"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-02"
+        }
+      ],
+      "control": "查询预约及接诊安排控制",
+      "operation": "查询",
+      "dto": "UC02Query",
+      "http": [
+        {
+          "permission": "uc02.query",
+          "roles": [
+            "frontdesk"
+          ],
+          "method": "GET",
+          "path": "/api/v2/appointments/query"
+        }
+      ],
+      "mapper": "查询预约及接诊安排映射器"
+    },
+    {
+      "n": 3,
+      "name": "登记到诊",
+      "fields": "patientId、预约来源或现场、appointmentId、dentistId、scheduleId、当前占用版本、arrivedAt",
+      "result": "就诊号、候诊状态、病历草稿号及预约关联",
+      "gate": "同患者预约至多关联一次就诊；现场和预约共用占用规则。在同事务中登记到诊、关联占用、建立病历草稿；预约来源同步已到诊。",
+      "tables": [
+        "patient",
+        "appointment",
+        "visit",
+        "dated_schedule",
+        "resource_occupancy",
+        "clinical_record"
+      ],
+      "screen": "预约与到诊",
+      "route": "visits",
+      "permissions": [
+        {
+          "code": "uc03.register",
+          "usecase": 3,
+          "name": "登记到诊",
+          "roles": [
+            "frontdesk"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 3,
+          "keys": [
+            "Patient",
+            "Appointment",
+            "Schedule",
+            "Occupancy",
+            "Visit",
+            "Record"
+          ],
+          "steps": [
+            [
+              "K",
+              "Patient",
+              "核对身份",
+              "到诊患者"
+            ],
+            [
+              "K",
+              "Appointment",
+              "核对到诊来源",
+              "预约编号或现场来源"
+            ],
+            [
+              "K",
+              "Schedule",
+              "确认到诊占用",
+              "既有占用或现场时段"
+            ],
+            [
+              "Schedule",
+              "Occupancy",
+              "关联到诊",
+              "患者、牙医、诊椅"
+            ],
+            [
+              "K",
+              "Visit",
+              "登记到诊",
+              "患者、来源、占用"
+            ],
+            [
+              "Visit",
+              "Record",
+              "建立当次草稿",
+              "就诊依据"
+            ],
+            [
+              "K",
+              "Appointment",
+              "关联到诊结果",
+              "已创建的同患者就诊"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "预约来源可空；现场到诊与预约到诊使用同一资源冲突规则。",
+          "file": "c03-03"
+        }
+      ],
+      "control": "登记到诊控制",
+      "operation": "办理",
+      "dto": "UC03Command",
+      "http": [
+        {
+          "permission": "uc03.register",
+          "roles": [
+            "frontdesk"
+          ],
+          "method": "POST",
+          "path": "/api/v2/visits/register"
+        }
+      ],
+      "mapper": "登记到诊映射器"
+    },
+    {
+      "n": 4,
+      "name": "确认诊疗项目与执行",
+      "fields": "visitId、可空planItemId、serviceId、牙位牙面、实际数量、completedAt、操作经过；更正时原执行ID与原因",
+      "result": "执行号、有效更正链、应收项目号、已核价或待核价",
+      "gate": "实际患者、有效同意范围和叶节点执行量一致；独立检查不伪造方案。事实先如实保存，缺价标待核价；更正追加，不自动抹去旧应收，费用更正走UC-24至26。",
+      "tables": [
+        "visit",
+        "treatment_plan",
+        "plan_version",
+        "plan_item",
+        "patient_decision",
+        "decision_plan_item",
+        "treatment_execution",
+        "service",
+        "service_price",
+        "bill",
+        "bill_item"
+      ],
+      "screen": "诊疗工作台",
+      "route": "executions",
+      "permissions": [
+        {
+          "code": "uc04.execute",
+          "usecase": 4,
+          "name": "确认实际执行",
+          "roles": [
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 4,
+          "keys": [
+            "Visit",
+            "Plan",
+            "PlanVersion",
+            "PlanItem",
+            "Execution",
+            "Bill",
+            "Charge"
+          ],
+          "steps": [
+            [
+              "K",
+              "Visit",
+              "核对接诊责任",
+              "执行者"
+            ],
+            [
+              "K",
+              "Plan",
+              "核对执行依据",
+              "所选方案版本和项目"
+            ],
+            [
+              "Plan",
+              "PlanVersion",
+              "核对确认版本",
+              "患者决定"
+            ],
+            [
+              "PlanVersion",
+              "PlanItem",
+              "核对可执行范围",
+              "拟完成项目及数量"
+            ],
+            [
+              "K",
+              "Visit",
+              "确认实际执行",
+              "方案项目或独立检查、实际内容"
+            ],
+            [
+              "Visit",
+              "Execution",
+              "保留执行依据",
+              "牙位牙面、经过、数量"
+            ],
+            [
+              "K",
+              "Bill",
+              "形成应收依据",
+              "已确认执行"
+            ],
+            [
+              "Bill",
+              "Charge",
+              "确定计价依据",
+              "实际项目与发生时点"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "临床事实可保留为待核价；费用更正另经 UC-24—26，不覆盖原执行。",
+          "file": "c03-04"
+        }
+      ],
+      "control": "确认诊疗项目与执行控制",
+      "operation": "办理",
+      "dto": "UC04Command",
+      "http": [
+        {
+          "permission": "uc04.execute",
+          "roles": [
+            "dentist"
+          ],
+          "method": "POST",
+          "path": "/api/v2/executions/execute"
+        }
+      ],
+      "mapper": "确认诊疗项目与执行映射器"
+    },
+    {
+      "n": 5,
+      "name": "维护收费价目",
+      "fields": "动作draft/submit/approve/return/stop；serviceId、分单价、生效区间、原因、expectedRevision、审核意见",
+      "result": "价目版本、状态、适用区间及确认人时刻",
+      "gate": "收费人员录入和重提，负责人确认；有效区间不重叠。发布后价格内容不覆盖，已引用历史价不能追改；零价必须明确免收依据。",
+      "tables": [
+        "service",
+        "service_price"
+      ],
+      "screen": "收费与退费",
+      "route": "service-prices",
+      "permissions": [
+        {
+          "code": "uc05.draft",
+          "usecase": 5,
+          "name": "录入价目",
+          "roles": [
+            "cashier"
+          ]
+        },
+        {
+          "code": "uc05.approve",
+          "usecase": 5,
+          "name": "确认或退回价目",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 5,
+          "keys": [
+            "Service",
+            "Price"
+          ],
+          "steps": [
+            [
+              "K",
+              "Service",
+              "提出新价目",
+              "金额、区间、原因"
+            ],
+            [
+              "Service",
+              "Price",
+              "核对区间及金额",
+              "已有适用区间"
+            ],
+            [
+              "Service",
+              "Price",
+              "提交确认",
+              "已核对价目草稿"
+            ],
+            [
+              "K",
+              "Service",
+              "确认价目发布",
+              "负责人意见"
+            ],
+            [
+              "Service",
+              "Price",
+              "发布确认版本",
+              "确认人、确认时间"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-05"
+        }
+      ],
+      "control": "维护收费价目控制",
+      "operation": "办理",
+      "dto": "UC05Command",
+      "http": [
+        {
+          "permission": "uc05.draft",
+          "roles": [
+            "cashier"
+          ],
+          "method": "POST",
+          "path": "/api/v2/service-prices/draft"
+        },
+        {
+          "permission": "uc05.approve",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/service-prices/approve"
+        }
+      ],
+      "mapper": "维护收费价目映射器"
+    },
+    {
+      "n": 6,
+      "name": "查询账单与待结算费用",
+      "fields": "patientId、billId、计费日期区间、待核价/未付筛选及分页",
+      "result": "实际项目、应收、调整、已付、退款、待核实占用及可用余额分别列示",
+      "gate": "同一读取快照聚合；待核价不算零元应收，已结束诊疗不表示付清。收费岗位返回费用需要的数据，不返回临床正文。",
+      "tables": [
+        "bill",
+        "bill_item",
+        "fee_adjustment",
+        "fee_adjustment_item",
+        "patient_funds",
+        "patient_payment",
+        "payment_allocation",
+        "prepayment_offset",
+        "patient_refund"
+      ],
+      "screen": "收费与退费",
+      "route": "patient-bills",
+      "permissions": [
+        {
+          "code": "uc06.query",
+          "usecase": 6,
+          "name": "查询费用",
+          "roles": [
+            "cashier"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 6,
+          "keys": [
+            "Bill",
+            "Charge",
+            "Funds",
+            "Payment"
+          ],
+          "steps": [
+            [
+              "K",
+              "Bill",
+              "提供应收依据",
+              "患者、账目范围"
+            ],
+            [
+              "Bill",
+              "Charge",
+              "核对计价完整性",
+              "执行及价目依据"
+            ],
+            [
+              "K",
+              "Funds",
+              "核算付款及可用额",
+              "患者、账目范围"
+            ],
+            [
+              "Funds",
+              "Payment",
+              "核算来源余额",
+              "有效分配、抵扣及退款占用"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "各实体分别给出应收和资金结果；控制不计算业务金额。",
+          "file": "c03-06"
+        }
+      ],
+      "control": "查询账单与待结算费用控制",
+      "operation": "查询",
+      "dto": "UC06Query",
+      "http": [
+        {
+          "permission": "uc06.query",
+          "roles": [
+            "cashier"
+          ],
+          "method": "GET",
+          "path": "/api/v2/patient-bills/query"
+        }
+      ],
+      "mapper": "查询账单与待结算费用映射器"
+    },
+    {
+      "n": 7,
+      "name": "登记患者付款与预付抵扣",
+      "fields": "动作receive/verify/allocate/offset；patientId、原款、渠道、实收分/找零分、到账依据、各账目分配、预期资金版本",
+      "result": "原付款号、净额、用途明细、可用余额与核实状态",
+      "gate": "仅确认到账原款可分配；分配和抵扣共用同一原款余额，并扣除待核实退款占用。非现金找零为零，交易号按渠道唯一；实际到账核实与用途变化同阶段原子保存。",
+      "tables": [
+        "patient_funds",
+        "patient_payment",
+        "bill",
+        "payment_allocation",
+        "prepayment_offset",
+        "patient_refund"
+      ],
+      "screen": "收费与退费",
+      "route": "patient-payments",
+      "permissions": [
+        {
+          "code": "uc07.receive",
+          "usecase": 7,
+          "name": "登记患者付款",
+          "roles": [
+            "cashier"
+          ]
+        },
+        {
+          "code": "uc07.allocate",
+          "usecase": 7,
+          "name": "分配及抵扣",
+          "roles": [
+            "cashier"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 7,
+          "keys": [
+            "Funds",
+            "Payment",
+            "Bill",
+            "Allocation"
+          ],
+          "steps": [
+            [
+              "K",
+              "Funds",
+              "登记已核实付款",
+              "患者、渠道、净额、交易依据"
+            ],
+            [
+              "Funds",
+              "Payment",
+              "确认到账",
+              "实际核实结果"
+            ],
+            [
+              "Funds",
+              "Bill",
+              "核对可分配额",
+              "目标账目及版本"
+            ],
+            [
+              "Funds",
+              "Payment",
+              "分配已收款",
+              "各账目金额"
+            ],
+            [
+              "Payment",
+              "Allocation",
+              "形成分配",
+              "账目及金额"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "基本路径为实际到账及分配；预付抵扣和重复请求见扩展图。",
+          "file": "c03-07"
+        },
+        {
+          "n": 7,
+          "keys": [
+            "Funds",
+            "Payment",
+            "Bill",
+            "Offset"
+          ],
+          "steps": [
+            [
+              "K",
+              "Funds",
+              "办理预付抵扣",
+              "原付款、账目及拟抵扣额"
+            ],
+            [
+              "Funds",
+              "Payment",
+              "核对未分配余额",
+              "已分配、已抵扣、退款与占用"
+            ],
+            [
+              "Funds",
+              "Bill",
+              "核对可分配额",
+              "当前未付及版本"
+            ],
+            [
+              "Funds",
+              "Payment",
+              "确认预付用途",
+              "本次抵扣金额"
+            ],
+            [
+              "Payment",
+              "Offset",
+              "保留预付抵扣",
+              "账目、金额与原款"
+            ],
+            [
+              "K",
+              "Funds",
+              "恢复既有办理结果",
+              "原请求及交易依据"
+            ]
+          ],
+          "extra": "offset",
+          "title": "UC-07：预付抵扣与重复付款恢复",
+          "focus": "对应1a、3a、3b、4a、5a。抵扣不生成第二次实际到账；余额不足或来源已占用则拒绝。",
+          "file": "c03-07-offset"
+        }
+      ],
+      "control": "登记患者付款与预付抵扣控制",
+      "operation": "办理",
+      "dto": "UC07Command",
+      "http": [
+        {
+          "permission": "uc07.receive",
+          "roles": [
+            "cashier"
+          ],
+          "method": "POST",
+          "path": "/api/v2/patient-payments/receive"
+        },
+        {
+          "permission": "uc07.allocate",
+          "roles": [
+            "cashier"
+          ],
+          "method": "POST",
+          "path": "/api/v2/patient-payments/allocate"
+        }
+      ],
+      "mapper": "登记患者付款与预付抵扣映射器"
+    },
+    {
+      "n": 8,
+      "name": "维护患者资料",
+      "fields": "patientId、资料白名单字段、电话归属或无联系方式原因、变更原因、expectedRevision；代理人与有效依据",
+      "result": "患者号、新revision、逐字段变更和代理依据",
+      "gate": "同名同电话不能自动合并；只改身份联系白名单字段；变更原值与新值逐项留痕。代理范围与有效期明确，不能借此获得临床维护权限。",
+      "tables": [
+        "patient",
+        "patient_change",
+        "patient_proxy"
+      ],
+      "screen": "患者资料",
+      "route": "patients",
+      "permissions": [
+        {
+          "code": "uc08.maintain",
+          "usecase": 8,
+          "name": "维护患者资料",
+          "roles": [
+            "frontdesk"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 8,
+          "keys": [
+            "Patient",
+            "IdentityChange",
+            "Proxy"
+          ],
+          "steps": [
+            [
+              "K",
+              "Patient",
+              "核对身份候选",
+              "身份线索"
+            ],
+            [
+              "K",
+              "Patient",
+              "确认资料维护",
+              "新值、原因、核实结论"
+            ],
+            [
+              "Patient",
+              "IdentityChange",
+              "保留修改依据",
+              "原值、新值、人员时间"
+            ],
+            [
+              "Patient",
+              "Proxy",
+              "确认代理范围",
+              "关系、有效期及核实依据"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-08"
+        }
+      ],
+      "control": "维护患者资料控制",
+      "operation": "办理",
+      "dto": "UC08Command",
+      "http": [
+        {
+          "permission": "uc08.maintain",
+          "roles": [
+            "frontdesk"
+          ],
+          "method": "POST",
+          "path": "/api/v2/patients/maintain"
+        }
+      ],
+      "mapper": "维护患者资料映射器"
+    },
+    {
+      "n": 9,
+      "name": "查询患者诊疗资料",
+      "fields": "patientId、visitId、时间范围、文件或版本过滤、分页",
+      "result": "获准病历、健康复核、方案、执行和文件版本；缺失原件明确提示",
+      "gate": "牙医须具备本次接诊或有效交接范围；历史版本按当时引用读取。文件下载再次校验对象范围及原件完整性，审计读权限不自动包含临床读权限。",
+      "tables": [
+        "patient",
+        "visit",
+        "clinical_handover",
+        "clinical_record",
+        "health_review",
+        "health_version",
+        "treatment_plan",
+        "plan_version",
+        "clinical_document",
+        "document_version"
+      ],
+      "screen": "诊疗工作台",
+      "route": "patient-clinical-data",
+      "permissions": [
+        {
+          "code": "uc09.query",
+          "usecase": 9,
+          "name": "查询获准诊疗资料",
+          "roles": [
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 9,
+          "keys": [
+            "Patient",
+            "Handover",
+            "Visit",
+            "Record",
+            "Plan",
+            "Document"
+          ],
+          "steps": [
+            [
+              "K",
+              "Patient",
+              "核对临床访问",
+              "牙医、对象范围"
+            ],
+            [
+              "Patient",
+              "Handover",
+              "核对交接资格",
+              "时间和所需范围"
+            ],
+            [
+              "K",
+              "Visit",
+              "提供获准就诊",
+              "患者、时间范围"
+            ],
+            [
+              "Visit",
+              "Record",
+              "提供签署及补充",
+              "获准范围"
+            ],
+            [
+              "K",
+              "Plan",
+              "提供版本及执行依据",
+              "患者"
+            ],
+            [
+              "K",
+              "Document",
+              "提供可读版本",
+              "获准归属"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-09"
+        }
+      ],
+      "control": "查询患者诊疗资料控制",
+      "operation": "查询",
+      "dto": "UC09Query",
+      "http": [
+        {
+          "permission": "uc09.query",
+          "roles": [
+            "dentist"
+          ],
+          "method": "GET",
+          "path": "/api/v2/patient-clinical-data/query"
+        }
+      ],
+      "mapper": "查询患者诊疗资料映射器"
+    },
+    {
+      "n": 10,
+      "name": "记录检查与诊断",
+      "fields": "visitId、recordId、主诉、诊断、处理意见、逐项牙位所见、expectedRevision",
+      "result": "草稿revision、按顺序的所见集合及未满足签署项",
+      "gate": "仅未签署草稿可编辑；牙面必须有适用牙位。按旧revision条件保存，实际临床结论由牙医填写；长期健康变化通过UC-21，不覆盖既往复核。",
+      "tables": [
+        "visit",
+        "clinical_record",
+        "clinical_finding",
+        "health_review"
+      ],
+      "screen": "诊疗工作台",
+      "route": "clinical-records",
+      "permissions": [
+        {
+          "code": "uc10.record",
+          "usecase": 10,
+          "name": "记录检查诊断",
+          "roles": [
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 10,
+          "keys": [
+            "Visit",
+            "Review",
+            "Record",
+            "Finding"
+          ],
+          "steps": [
+            [
+              "K",
+              "Visit",
+              "核对接诊责任",
+              "执行者"
+            ],
+            [
+              "K",
+              "Visit",
+              "确认实际接诊",
+              "责任牙医及实际开始时间"
+            ],
+            [
+              "Visit",
+              "Review",
+              "提供当次复核",
+              "当前就诊"
+            ],
+            [
+              "K",
+              "Visit",
+              "记录检查诊断",
+              "正文、当前版本"
+            ],
+            [
+              "Visit",
+              "Record",
+              "更新未签署正文",
+              "主诉、诊断、处理意见"
+            ],
+            [
+              "Record",
+              "Finding",
+              "保留检查所见",
+              "牙位牙面及检查内容"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-10"
+        }
+      ],
+      "control": "记录检查与诊断控制",
+      "operation": "办理",
+      "dto": "UC10Command",
+      "http": [
+        {
+          "permission": "uc10.record",
+          "roles": [
+            "dentist"
+          ],
+          "method": "POST",
+          "path": "/api/v2/clinical-records/record"
+        }
+      ],
+      "mapper": "记录检查与诊断映射器"
+    },
+    {
+      "n": 11,
+      "name": "签署及补充病历",
+      "fields": "动作sign/addendum；recordId、expectedRevision、签署确认；补充正文与更正原因",
+      "result": "签署版本、摘要、责任时间；或独立补充号",
+      "gate": "主诉诊断意见、所见和健康复核齐全；服务重读后生成规范化内容摘要。签后正文和所见冻结；补充独立追加，不把原病历变回草稿。",
+      "tables": [
+        "clinical_record",
+        "clinical_finding",
+        "health_review",
+        "record_addendum"
+      ],
+      "screen": "诊疗工作台",
+      "route": "clinical-record-signatures",
+      "permissions": [
+        {
+          "code": "uc11.sign",
+          "usecase": 11,
+          "name": "签署或独立补充",
+          "roles": [
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 11,
+          "keys": [
+            "Visit",
+            "Record"
+          ],
+          "steps": [
+            [
+              "K",
+              "Visit",
+              "核对签署条件",
+              "牙医、诊疗内容"
+            ],
+            [
+              "Visit",
+              "Record",
+              "签署当前正文",
+              "确认内容、版本、人员时间"
+            ],
+            [
+              "K",
+              "Visit",
+              "结束本次诊疗",
+              "签署依据、后续安排"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "无治疗项目也可结束诊疗；签署后补充见扩展图。",
+          "file": "c03-11"
+        },
+        {
+          "n": 11,
+          "keys": [
+            "Visit",
+            "Record",
+            "Addendum"
+          ],
+          "steps": [
+            [
+              "K",
+              "Visit",
+              "核对接诊责任",
+              "补充牙医"
+            ],
+            [
+              "K",
+              "Visit",
+              "追加病历说明",
+              "已签署病历、正文和原因"
+            ],
+            [
+              "Visit",
+              "Record",
+              "核对原签署",
+              "原版本及签署依据"
+            ],
+            [
+              "Record",
+              "Addendum",
+              "形成独立补充",
+              "正文、原因、人员时间"
+            ]
+          ],
+          "extra": "addendum",
+          "title": "UC-11：签署后补充与无治疗结束",
+          "focus": "对应2a、4a。补充不解除原签署；只有检查咨询时，签署的原就诊仍可结束。",
+          "file": "c03-11-addendum"
+        }
+      ],
+      "control": "签署及补充病历控制",
+      "operation": "办理",
+      "dto": "UC11Command",
+      "http": [
+        {
+          "permission": "uc11.sign",
+          "roles": [
+            "dentist"
+          ],
+          "method": "POST",
+          "path": "/api/v2/clinical-record-signatures/sign"
+        }
+      ],
+      "mapper": "签署及补充病历映射器"
+    },
+    {
+      "n": 12,
+      "name": "提出复诊随访要求",
+      "fields": "患者与来源就诊/方案版本、目的、复诊或随访、日期窗口、是否需评估、责任前台；撤销原因",
+      "result": "诊后要求号、待发布或待联系、责任及日期",
+      "gate": "来源同患者并已有效才发布；指定责任前台。撤销需要牙医依据；临床完成与是否付清分别判断，不自动生成已完成。",
+      "tables": [
+        "visit",
+        "plan_version",
+        "followup_requirement"
+      ],
+      "screen": "复诊随访",
+      "route": "followup-requirements",
+      "permissions": [
+        {
+          "code": "uc12.propose",
+          "usecase": 12,
+          "name": "提出或撤销诊后要求",
+          "roles": [
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 12,
+          "keys": [
+            "Visit",
+            "Plan",
+            "PlanVersion",
+            "Followup"
+          ],
+          "steps": [
+            [
+              "K",
+              "Visit",
+              "提供诊后来源",
+              "患者、签署依据或草稿"
+            ],
+            [
+              "K",
+              "Plan",
+              "提供诊后方案依据",
+              "持续方案或空"
+            ],
+            [
+              "Plan",
+              "PlanVersion",
+              "提供确认来源",
+              "具体版本"
+            ],
+            [
+              "K",
+              "Followup",
+              "提出诊后要求",
+              "有效来源、目的、目标日期、责任人"
+            ],
+            [
+              "Followup",
+              "Followup",
+              "判断发布条件",
+              "来源已签署或已确认"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-12"
+        }
+      ],
+      "control": "提出复诊随访要求控制",
+      "operation": "办理",
+      "dto": "UC12Command",
+      "http": [
+        {
+          "permission": "uc12.propose",
+          "roles": [
+            "dentist"
+          ],
+          "method": "POST",
+          "path": "/api/v2/followup-requirements/propose"
+        }
+      ],
+      "mapper": "提出复诊随访要求映射器"
+    },
+    {
+      "n": 13,
+      "name": "办理复诊随访联系",
+      "fields": "followupId、联系方式时刻、实际结果、下一联系日期、关联预约号、expectedRevision",
+      "result": "联系经历号、后续日期和待联系/待到诊或评估状态",
+      "gate": "每次尝试均追加；继续联系保留日期和责任。关联预约必须同患者；预约变更经UC-01，联系成功不能代替临床评估。",
+      "tables": [
+        "followup_requirement",
+        "contact_history",
+        "appointment"
+      ],
+      "screen": "复诊随访",
+      "route": "followup-contacts",
+      "permissions": [
+        {
+          "code": "uc13.contact",
+          "usecase": 13,
+          "name": "联系及安排",
+          "roles": [
+            "frontdesk"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 13,
+          "keys": [
+            "Followup",
+            "Contact",
+            "Appointment"
+          ],
+          "steps": [
+            [
+              "K",
+              "Followup",
+              "提供待联系事项",
+              "负责前台、日期"
+            ],
+            [
+              "K",
+              "Followup",
+              "登记联系结果",
+              "实际结果、下次日期"
+            ],
+            [
+              "Followup",
+              "Contact",
+              "追加联系经历",
+              "方式、时间、患者反馈"
+            ],
+            [
+              "K",
+              "Appointment",
+              "核对复诊关联",
+              "同患者有效预约"
+            ],
+            [
+              "K",
+              "Followup",
+              "衔接后续安排",
+              "预约或待评估"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-13"
+        }
+      ],
+      "control": "办理复诊随访联系控制",
+      "operation": "办理",
+      "dto": "UC13Command",
+      "http": [
+        {
+          "permission": "uc13.contact",
+          "roles": [
+            "frontdesk"
+          ],
+          "method": "POST",
+          "path": "/api/v2/followup-contacts/contact"
+        }
+      ],
+      "mapper": "办理复诊随访联系映射器"
+    },
+    {
+      "n": 14,
+      "name": "记录复诊随访评估",
+      "fields": "followupId、评估方式时刻、可空visitId、临床结论、处理意见、继续日期和责任人",
+      "result": "评估号、完成依据或继续跟进日期责任",
+      "gate": "到诊关联须同患者；远程评估不伪造就诊。继续跟进同时给日期和责任；需临床评估的要求由明确完成评估后关闭。",
+      "tables": [
+        "followup_requirement",
+        "clinical_assessment",
+        "visit"
+      ],
+      "screen": "复诊随访",
+      "route": "followup-assessments",
+      "permissions": [
+        {
+          "code": "uc14.assess",
+          "usecase": 14,
+          "name": "临床评估",
+          "roles": [
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 14,
+          "keys": [
+            "Followup",
+            "Visit",
+            "Assessment"
+          ],
+          "steps": [
+            [
+              "K",
+              "Followup",
+              "核对评估责任",
+              "牙医与来源"
+            ],
+            [
+              "K",
+              "Visit",
+              "提供本次复诊依据",
+              "同患者就诊或沟通来源"
+            ],
+            [
+              "K",
+              "Followup",
+              "确认临床评估",
+              "结果、处理意见、后续日期"
+            ],
+            [
+              "Followup",
+              "Assessment",
+              "保留评估依据",
+              "实际方式、人员时间"
+            ],
+            [
+              "Followup",
+              "Followup",
+              "判断完成或继续",
+              "是否仍需评估及跟进"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-14"
+        }
+      ],
+      "control": "记录复诊随访评估控制",
+      "operation": "办理",
+      "dto": "UC14Command",
+      "http": [
+        {
+          "permission": "uc14.assess",
+          "roles": [
+            "dentist"
+          ],
+          "method": "POST",
+          "path": "/api/v2/followup-assessments/assess"
+        }
+      ],
+      "mapper": "记录复诊随访评估映射器"
+    },
+    {
+      "n": 15,
+      "name": "维护日期排班与诊椅安排",
+      "fields": "日期、牙医、诊椅、UTC起止；动作publish/change/close、安排revision、原因及受影响预约处理",
+      "result": "已确认安排或停诊结果、变更快照、受影响办理清单",
+      "gate": "负责人核对在岗与诊椅有效区间；不同安排也检查共同资源冲突。停诊先处理有效占用，不能只改一个状态遗留预约；保留通知及未决责任。",
+      "tables": [
+        "staff",
+        "dental_chair",
+        "dated_schedule",
+        "schedule_change",
+        "resource_occupancy",
+        "appointment",
+        "appointment_change"
+      ],
+      "screen": "排班与经营",
+      "route": "schedules",
+      "permissions": [
+        {
+          "code": "uc15.schedule",
+          "usecase": 15,
+          "name": "确认排班或停诊",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 15,
+          "keys": [
+            "Schedule",
+            "Chair",
+            "Appointment",
+            "ScheduleChange"
+          ],
+          "steps": [
+            [
+              "K",
+              "Schedule",
+              "核对拟发布安排",
+              "日期、人员、诊椅"
+            ],
+            [
+              "Schedule",
+              "Chair",
+              "核对可用区间",
+              "指定日期时段"
+            ],
+            [
+              "K",
+              "Appointment",
+              "列出受影响安排",
+              "变更范围"
+            ],
+            [
+              "K",
+              "Schedule",
+              "确认日期安排",
+              "负责人、牙医确认依据"
+            ],
+            [
+              "Schedule",
+              "ScheduleChange",
+              "保留日期例外",
+              "原安排、新安排、原因"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "停诊只影响指定日期；已有预约的联系与改约见扩展图。",
+          "file": "c03-15"
+        },
+        {
+          "n": 15,
+          "keys": [
+            "Schedule",
+            "ScheduleChange",
+            "Appointment",
+            "Followup"
+          ],
+          "steps": [
+            [
+              "K",
+              "Schedule",
+              "确认指定日期停诊",
+              "日期范围和原因"
+            ],
+            [
+              "Schedule",
+              "ScheduleChange",
+              "保留日期例外",
+              "原安排及确认依据"
+            ],
+            [
+              "K",
+              "Appointment",
+              "标记受影响安排",
+              "停诊范围和责任前台"
+            ],
+            [
+              "K",
+              "Followup",
+              "保留复诊待安排",
+              "受影响预约来源"
+            ],
+            [
+              "K",
+              "Appointment",
+              "核对后续处理",
+              "通知、改约或取消结果"
+            ]
+          ],
+          "extra": "closure",
+          "title": "UC-15：临时停诊与已有预约",
+          "focus": "对应3a、5a。日期安排立即限制新预约，但原预约占用在改约或取消完成前仍保留。",
+          "file": "c03-15-closure"
+        }
+      ],
+      "control": "维护日期排班与诊椅安排控制",
+      "operation": "办理",
+      "dto": "UC15Command",
+      "http": [
+        {
+          "permission": "uc15.schedule",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/schedules/schedule"
+        }
+      ],
+      "mapper": "维护日期排班与诊椅安排映射器"
+    },
+    {
+      "n": 16,
+      "name": "查询可用接诊安排",
+      "fields": "日期范围、牙医、诊椅、预计所需时长",
+      "result": "确认安排、有效占用与可选空档及revision",
+      "gate": "仅展示当日已发布且资源有效的安排；查询空档不占用资源，最终提交UC-01或03时重新核对。",
+      "tables": [
+        "staff",
+        "dental_chair",
+        "dated_schedule",
+        "resource_occupancy"
+      ],
+      "screen": "预约与到诊",
+      "route": "schedule-availability",
+      "permissions": [
+        {
+          "code": "uc16.query",
+          "usecase": 16,
+          "name": "查询可用安排",
+          "roles": [
+            "frontdesk",
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 16,
+          "keys": [
+            "Schedule",
+            "Chair",
+            "Occupancy"
+          ],
+          "steps": [
+            [
+              "K",
+              "Schedule",
+              "提供可用组合",
+              "指定日期与时长"
+            ],
+            [
+              "Schedule",
+              "Chair",
+              "核对可用区间",
+              "日期时段"
+            ],
+            [
+              "Schedule",
+              "Occupancy",
+              "排除已有占用",
+              "患者、人员及诊椅"
+            ],
+            [
+              "Schedule",
+              "Schedule",
+              "形成可用区间",
+              "排班、停诊及占用依据"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-16"
+        }
+      ],
+      "control": "查询可用接诊安排控制",
+      "operation": "查询",
+      "dto": "UC16Query",
+      "http": [
+        {
+          "permission": "uc16.query",
+          "roles": [
+            "frontdesk",
+            "dentist"
+          ],
+          "method": "GET",
+          "path": "/api/v2/schedule-availability/query"
+        }
+      ],
+      "mapper": "查询可用接诊安排映射器"
+    },
+    {
+      "n": 17,
+      "name": "查询材料与批次库存",
+      "fields": "材料、批号、位置、状态、效期条件及分页",
+      "result": "分批分处账面数、当前可用量、追溯来源与待检隔离提示",
+      "gate": "可用量同时判断余额、批次状态与实际效期；未知效期不视为无限。负责人可查汇总，助理可查办理所需明细。",
+      "tables": [
+        "material",
+        "material_batch",
+        "stock_location",
+        "batch_stock",
+        "inventory_movement"
+      ],
+      "screen": "材料库存",
+      "route": "batch-stock",
+      "permissions": [
+        {
+          "code": "uc17.query",
+          "usecase": 17,
+          "name": "查询批次库存",
+          "roles": [
+            "assistant",
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 17,
+          "keys": [
+            "Material",
+            "Batch",
+            "Stock",
+            "Movement",
+            "Usage"
+          ],
+          "steps": [
+            [
+              "K",
+              "Material",
+              "定位材料及单位",
+              "材料筛选"
+            ],
+            [
+              "K",
+              "Batch",
+              "提供批次可用性",
+              "批号、效期及停用依据"
+            ],
+            [
+              "K",
+              "Stock",
+              "提供分处余额",
+              "批次、位置"
+            ],
+            [
+              "Stock",
+              "Movement",
+              "提供收发依据",
+              "查询期间"
+            ],
+            [
+              "Movement",
+              "Usage",
+              "提供实际使用",
+              "获准追溯范围"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-17"
+        }
+      ],
+      "control": "查询材料与批次库存控制",
+      "operation": "查询",
+      "dto": "UC17Query",
+      "http": [
+        {
+          "permission": "uc17.query",
+          "roles": [
+            "assistant",
+            "manager"
+          ],
+          "method": "GET",
+          "path": "/api/v2/batch-stock/query"
+        }
+      ],
+      "mapper": "查询材料与批次库存映射器"
+    },
+    {
+      "n": 18,
+      "name": "登记批次库存变动",
+      "fields": "动作issue/return/use/count/approveCount；批次位置、放大量、原领用/就诊、旧余额revision、原因与实点",
+      "result": "流水号、前后数量、新revision、用料追溯或盘点状态",
+      "gate": "领用检查实时可用性；用料与未用退回合计不超领用。流水触发器只扣一次库；盘点确认快照未过时，零差异不造零流水，确认与变动同事务。",
+      "tables": [
+        "material",
+        "material_batch",
+        "batch_stock",
+        "inventory_movement",
+        "material_usage",
+        "stock_count"
+      ],
+      "screen": "材料库存",
+      "route": "inventory-commands",
+      "permissions": [
+        {
+          "code": "uc18.record",
+          "usecase": 18,
+          "name": "领用退回及盘点录入",
+          "roles": [
+            "assistant"
+          ]
+        },
+        {
+          "code": "uc18.approve",
+          "usecase": 18,
+          "name": "确认盘点差异",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 18,
+          "keys": [
+            "Batch",
+            "Stock",
+            "Movement",
+            "Usage"
+          ],
+          "steps": [
+            [
+              "K",
+              "Batch",
+              "核对可领用性",
+              "效期及停用条件"
+            ],
+            [
+              "K",
+              "Stock",
+              "办理库存变动",
+              "类型、数量、原来源"
+            ],
+            [
+              "Stock",
+              "Batch",
+              "核对可领用性",
+              "提交时的批次当前条件"
+            ],
+            [
+              "Stock",
+              "Movement",
+              "保留收发经历",
+              "前后数量、经办依据"
+            ],
+            [
+              "Movement",
+              "Usage",
+              "登记实际消耗",
+              "实际使用数量、同患者就诊"
+            ],
+            [
+              "Stock",
+              "Stock",
+              "核对变动后数量",
+              "本次及并发依据"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "普通领用与实际使用；盘点差异和停用并发见扩展图。",
+          "file": "c03-18"
+        },
+        {
+          "n": 18,
+          "keys": [
+            "Stock",
+            "Count",
+            "Movement"
+          ],
+          "steps": [
+            [
+              "K",
+              "Stock",
+              "提出盘点核实",
+              "实点数和当前账面"
+            ],
+            [
+              "Stock",
+              "Count",
+              "保留实点快照",
+              "时点、原因、经办人"
+            ],
+            [
+              "K",
+              "Stock",
+              "确认盘点差异",
+              "负责人意见及快照"
+            ],
+            [
+              "Stock",
+              "Count",
+              "核对确认依据",
+              "当前流水与实点时点"
+            ],
+            [
+              "Stock",
+              "Movement",
+              "形成盘点调整",
+              "批准差额、原盘点"
+            ]
+          ],
+          "extra": "count",
+          "title": "UC-18：盘点审批、并发与停用校验",
+          "focus": "对应2a、4a、5a。盘点期间有新变动必须重新核对；停用后的普通领用拒绝，已有事实不删除。",
+          "file": "c03-18-count"
+        }
+      ],
+      "control": "登记批次库存变动控制",
+      "operation": "办理",
+      "dto": "UC18Command",
+      "http": [
+        {
+          "permission": "uc18.record",
+          "roles": [
+            "assistant"
+          ],
+          "method": "POST",
+          "path": "/api/v2/inventory-commands/record"
+        },
+        {
+          "permission": "uc18.approve",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/inventory-commands/approve"
+        }
+      ],
+      "mapper": "登记批次库存变动映射器"
+    },
+    {
+      "n": 19,
+      "name": "查询经营与资金明细",
+      "fields": "营业日期范围、渠道、患者或供应商、凭据状态、分页/汇总维度",
+      "result": "应收、欠费、实际收付、患者余额、供货收支分别汇总与可追溯原单",
+      "gate": "收费人员查办理与核对所需明细；负责人查经营范围。同一快照和统一金额口径；预付抵扣不再计收入，供应商退款不计患者收入。",
+      "tables": [
+        "bill",
+        "bill_item",
+        "patient_payment",
+        "patient_refund",
+        "supplier_payment",
+        "supplier_refund",
+        "payment_allocation",
+        "prepayment_offset"
+      ],
+      "screen": "排班与经营",
+      "route": "reports",
+      "permissions": [
+        {
+          "code": "uc19.funds",
+          "usecase": 19,
+          "name": "查询收付业务明细",
+          "roles": [
+            "cashier"
+          ]
+        },
+        {
+          "code": "uc19.management",
+          "usecase": 19,
+          "name": "查询经营及资金明细",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 19,
+          "keys": [
+            "Visit",
+            "Bill",
+            "Funds",
+            "SupplierFunds"
+          ],
+          "steps": [
+            [
+              "K",
+              "Visit",
+              "汇总诊疗发生",
+              "期间和岗位范围"
+            ],
+            [
+              "K",
+              "Bill",
+              "汇总有效应收",
+              "同一统计时点"
+            ],
+            [
+              "K",
+              "Funds",
+              "汇总患者资金",
+              "渠道、期间、确认结果"
+            ],
+            [
+              "K",
+              "SupplierFunds",
+              "汇总供货收支",
+              "同一期间及渠道"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "统计结果由各业务对象按同一时点提供；不建立无业务来源的统计实体。",
+          "file": "c03-19"
+        }
+      ],
+      "control": "查询经营与资金明细控制",
+      "operation": "查询",
+      "dto": "UC19Query",
+      "http": [
+        {
+          "permission": "uc19.funds",
+          "roles": [
+            "cashier"
+          ],
+          "method": "GET",
+          "path": "/api/v2/reports/funds"
+        },
+        {
+          "permission": "uc19.management",
+          "roles": [
+            "manager"
+          ],
+          "method": "GET",
+          "path": "/api/v2/reports/management"
+        }
+      ],
+      "mapper": "查询经营与资金明细映射器"
+    },
+    {
+      "n": 20,
+      "name": "登记收支核对与差异处理",
+      "fields": "营业日、渠道、cutoffAt、所选原单集合摘要及revision、实点分金额、开班余额、有据存取；差异责任期限",
+      "result": "不可改核对快照、原单集合、差额与跟进号",
+      "gate": "四类确认资金原单方向、渠道、时点和版本一致；核对完整集合及摘要，头与明细共同保存。差异或未决不能改数抹平，指定责任和期限。",
+      "tables": [
+        "cash_reconciliation",
+        "reconciliation_item",
+        "issue_followup",
+        "patient_payment",
+        "patient_refund",
+        "supplier_payment",
+        "supplier_refund"
+      ],
+      "screen": "排班与经营",
+      "route": "reconciliations",
+      "permissions": [
+        {
+          "code": "uc20.reconcile",
+          "usecase": 20,
+          "name": "登记收支核对",
+          "roles": [
+            "cashier"
+          ]
+        },
+        {
+          "code": "uc20.follow",
+          "usecase": 20,
+          "name": "指定与核实差异处理",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 20,
+          "keys": [
+            "Funds",
+            "SupplierFunds",
+            "Reconciliation",
+            "ReconciliationItem",
+            "FollowIssue"
+          ],
+          "steps": [
+            [
+              "K",
+              "Funds",
+              "提供核对来源",
+              "营业日、渠道"
+            ],
+            [
+              "K",
+              "SupplierFunds",
+              "提供核对来源",
+              "营业日、渠道"
+            ],
+            [
+              "K",
+              "Reconciliation",
+              "形成核对快照",
+              "原资金依据、实际核实额"
+            ],
+            [
+              "Reconciliation",
+              "ReconciliationItem",
+              "保留核对项目",
+              "原事项、计入金额及依据时点"
+            ],
+            [
+              "Reconciliation",
+              "Reconciliation",
+              "计算核对差额",
+              "开班额、流入流出、实际核实"
+            ],
+            [
+              "K",
+              "FollowIssue",
+              "登记差异责任",
+              "负责人意见、责任人、期限"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-20"
+        }
+      ],
+      "control": "登记收支核对与差异处理控制",
+      "operation": "办理",
+      "dto": "UC20Command",
+      "http": [
+        {
+          "permission": "uc20.reconcile",
+          "roles": [
+            "cashier"
+          ],
+          "method": "POST",
+          "path": "/api/v2/reconciliations/reconcile"
+        },
+        {
+          "permission": "uc20.follow",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/reconciliations/follow"
+        }
+      ],
+      "mapper": "登记收支核对与差异处理映射器"
+    },
+    {
+      "n": 21,
+      "name": "维护长期健康资料及复核",
+      "fields": "patientId、visitId、原健康版本、病史/过敏/用药条目、明确程度、报告来源及实际发生时间",
+      "result": "新健康版本及当次复核号，或无变化的新增复核",
+      "gate": "三类分别明确有、无、未知；版本与条目整体形成后冻结。当次复核同患者并保留所据版本；无变化不重复制造新健康版本。",
+      "tables": [
+        "health_version",
+        "health_item",
+        "health_review",
+        "visit"
+      ],
+      "screen": "诊疗工作台",
+      "route": "health-versions",
+      "permissions": [
+        {
+          "code": "uc21.health",
+          "usecase": 21,
+          "name": "记录及复核健康版本",
+          "roles": [
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 21,
+          "keys": [
+            "Patient",
+            "HealthVersion",
+            "HealthItem",
+            "Visit",
+            "Review"
+          ],
+          "steps": [
+            [
+              "K",
+              "Patient",
+              "核对临床访问",
+              "牙医及患者"
+            ],
+            [
+              "K",
+              "Patient",
+              "确认健康变更",
+              "病史、过敏、用药及来源"
+            ],
+            [
+              "Patient",
+              "HealthVersion",
+              "形成健康版本",
+              "原依据、原因、时间"
+            ],
+            [
+              "HealthVersion",
+              "HealthItem",
+              "保留健康结论",
+              "类别、内容、有无或未知"
+            ],
+            [
+              "K",
+              "Visit",
+              "确认当次复核",
+              "所据版本、复核结论"
+            ],
+            [
+              "Visit",
+              "Review",
+              "保留复核快照",
+              "版本、牙医、时间"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "仅复核无变化时引用原健康版本，仍新增当次复核经历。",
+          "file": "c03-21"
+        }
+      ],
+      "control": "维护长期健康资料及复核控制",
+      "operation": "办理",
+      "dto": "UC21Command",
+      "http": [
+        {
+          "permission": "uc21.health",
+          "roles": [
+            "dentist"
+          ],
+          "method": "POST",
+          "path": "/api/v2/health-versions/health"
+        }
+      ],
+      "mapper": "维护长期健康资料及复核映射器"
+    },
+    {
+      "n": 22,
+      "name": "维护持续治疗方案及确认",
+      "fields": "方案及版本、来源、逐项牙位数量估算、变更原因；决定类型、具体项目范围、代理依据及文书版本",
+      "result": "方案版本、不可覆盖的决定范围、可执行/停止范围",
+      "gate": "草稿可改，提交说明后内容固定；实质变更建新版本。所有决定指向明确项目集合，整体撤回由服务展开旧项目；新同意不得沿用旧版，历史执行不抹去。",
+      "tables": [
+        "treatment_plan",
+        "plan_version",
+        "plan_item",
+        "patient_decision",
+        "decision_plan_item",
+        "decision_file_version",
+        "patient_proxy"
+      ],
+      "screen": "方案与文书",
+      "route": "treatment-plans",
+      "permissions": [
+        {
+          "code": "uc22.plan",
+          "usecase": 22,
+          "name": "方案及患者决定",
+          "roles": [
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 22,
+          "keys": [
+            "Plan",
+            "PlanVersion",
+            "PlanItem",
+            "Decision"
+          ],
+          "steps": [
+            [
+              "K",
+              "Plan",
+              "提出方案草稿",
+              "患者、诊断来源及目标"
+            ],
+            [
+              "Plan",
+              "PlanVersion",
+              "形成待确认版本",
+              "预计安排及变更原因"
+            ],
+            [
+              "PlanVersion",
+              "PlanItem",
+              "组织计划明细",
+              "牙位牙面、数量、估算"
+            ],
+            [
+              "Plan",
+              "PlanVersion",
+              "提交方案说明",
+              "已核对项目及预计安排"
+            ],
+            [
+              "K",
+              "Plan",
+              "确认患者决定",
+              "具体版本、范围、文书依据"
+            ],
+            [
+              "Plan",
+              "PlanVersion",
+              "登记确认经历",
+              "同意、暂缓或拒绝"
+            ],
+            [
+              "PlanVersion",
+              "Decision",
+              "保留患者决定",
+              "时间、代理依据和范围"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "已执行后变更、撤回同意及多次治疗见扩展图。",
+          "file": "c03-22"
+        },
+        {
+          "n": 22,
+          "keys": [
+            "Plan",
+            "PlanVersion",
+            "PlanItem",
+            "Execution",
+            "Decision"
+          ],
+          "steps": [
+            [
+              "K",
+              "Plan",
+              "提出剩余项目改版",
+              "原确认版本、原因"
+            ],
+            [
+              "Plan",
+              "PlanVersion",
+              "保留原确认版本",
+              "原内容与决定"
+            ],
+            [
+              "PlanVersion",
+              "PlanItem",
+              "识别未执行范围",
+              "既有执行关联"
+            ],
+            [
+              "PlanItem",
+              "Execution",
+              "核对已完成事实",
+              "原项目及数量"
+            ],
+            [
+              "Plan",
+              "PlanVersion",
+              "形成待确认版本",
+              "仅后续安排"
+            ],
+            [
+              "PlanVersion",
+              "Decision",
+              "保留患者决定",
+              "新版本确认或撤回"
+            ]
+          ],
+          "extra": "revision",
+          "title": "UC-22：跨次治疗改版与撤回同意",
+          "focus": "对应1a、3a、4a。旧执行永远引用当时项目和版本；拒绝、暂缓、撤回均不重写已发生治疗。",
+          "file": "c03-22-revision"
+        }
+      ],
+      "control": "维护持续治疗方案及确认控制",
+      "operation": "办理",
+      "dto": "UC22Command",
+      "http": [
+        {
+          "permission": "uc22.plan",
+          "roles": [
+            "dentist"
+          ],
+          "method": "POST",
+          "path": "/api/v2/treatment-plans/plan"
+        }
+      ],
+      "mapper": "维护持续治疗方案及确认映射器"
+    },
+    {
+      "n": 23,
+      "name": "管理影像与诊疗文书",
+      "fields": "患者、可空就诊/方案版本、来源类型、上传文件或原版本、变更原因；牙医确认动作",
+      "result": "文件及原件版本号、大小摘要、确认/缺失状态",
+      "gate": "文件先在受控目录完成大小类型与摘要校验，短事务保存版本；上传和确认分权限。内容变更新版本，缺失恢复仅接受原摘要；授权下载不暴露磁盘路径。",
+      "tables": [
+        "clinical_document",
+        "document_version",
+        "visit",
+        "plan_version"
+      ],
+      "screen": "方案与文书",
+      "route": "clinical-documents",
+      "permissions": [
+        {
+          "code": "uc23.upload",
+          "usecase": 23,
+          "name": "上传原件及核对元数据",
+          "roles": [
+            "dentist",
+            "assistant"
+          ]
+        },
+        {
+          "code": "uc23.confirm",
+          "usecase": 23,
+          "name": "确认诊疗原件",
+          "roles": [
+            "dentist"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 23,
+          "keys": [
+            "Patient",
+            "Document",
+            "FileVersion"
+          ],
+          "steps": [
+            [
+              "K",
+              "Patient",
+              "核对临床访问",
+              "牙医或获准助理、对象范围"
+            ],
+            [
+              "K",
+              "Document",
+              "接收原件版本",
+              "患者、来源、归属、文件"
+            ],
+            [
+              "Document",
+              "FileVersion",
+              "核对原件完整性",
+              "格式、大小和校验依据"
+            ],
+            [
+              "K",
+              "Document",
+              "确认文件依据",
+              "牙医核实结果及关联对象"
+            ],
+            [
+              "Document",
+              "FileVersion",
+              "保留确认原件",
+              "人员时间、版本及代理依据"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "上传未确认不能代替患者决定；原文件保存失败不形成可用版本。",
+          "file": "c03-23"
+        }
+      ],
+      "control": "管理影像与诊疗文书控制",
+      "operation": "办理",
+      "dto": "UC23Command",
+      "http": [
+        {
+          "permission": "uc23.upload",
+          "roles": [
+            "dentist",
+            "assistant"
+          ],
+          "method": "POST",
+          "path": "/api/v2/clinical-documents/upload"
+        },
+        {
+          "permission": "uc23.confirm",
+          "roles": [
+            "dentist"
+          ],
+          "method": "POST",
+          "path": "/api/v2/clinical-documents/confirm"
+        }
+      ],
+      "mapper": "管理影像与诊疗文书映射器"
+    },
+    {
+      "n": 24,
+      "name": "申请费用调整与退费",
+      "fields": "资金归属、原账目/原付款、拟调及拟退分金额、证据、原因、原revision；动作submit/resubmit/withdraw",
+      "result": "申请号、提交版本及待审核/已撤回状态",
+      "gate": "至少一种有效金额且来源同患者；退回重提递增提交版本，原意见通过审计保留。撤回仅未批准，不能更改已执行退款。",
+      "tables": [
+        "patient_funds",
+        "bill",
+        "patient_payment",
+        "fee_request"
+      ],
+      "screen": "收费与退费",
+      "route": "fee-requests",
+      "permissions": [
+        {
+          "code": "uc24.apply",
+          "usecase": 24,
+          "name": "提交/重提/撤回申请",
+          "roles": [
+            "cashier"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 24,
+          "keys": [
+            "Bill",
+            "Funds",
+            "Request"
+          ],
+          "steps": [
+            [
+              "K",
+              "Bill",
+              "提供原费用依据",
+              "原账目及执行"
+            ],
+            [
+              "K",
+              "Funds",
+              "核对可申请范围",
+              "原付款、未决事项"
+            ],
+            [
+              "K",
+              "Request",
+              "提出费用处理",
+              "患者、原单、临床核实与拟处理额"
+            ],
+            [
+              "Request",
+              "Request",
+              "保留申请版本",
+              "提交人、原因与所据版本"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-24"
+        }
+      ],
+      "control": "申请费用调整与退费控制",
+      "operation": "办理",
+      "dto": "UC24Command",
+      "http": [
+        {
+          "permission": "uc24.apply",
+          "roles": [
+            "cashier"
+          ],
+          "method": "POST",
+          "path": "/api/v2/fee-requests/apply"
+        }
+      ],
+      "mapper": "申请费用调整与退费映射器"
+    },
+    {
+      "n": 25,
+      "name": "审核费用调整与退费",
+      "fields": "申请号、expectedRevision、审核动作、批准调整分/退款上限、逐项调整、需释放的原用途及意见",
+      "result": "审核结果、调整号、用途释放和可退款授权",
+      "gate": "同一写锁内重读原单和其他占用；批准调整、同额明细与必要用途释放共同生效。批准不是实际退款；减少已付应收先释放原分配，失败全部回滚。",
+      "tables": [
+        "fee_request",
+        "fee_adjustment",
+        "fee_adjustment_item",
+        "bill",
+        "bill_item",
+        "payment_allocation",
+        "prepayment_offset",
+        "patient_refund"
+      ],
+      "screen": "收费与退费",
+      "route": "fee-request-decisions",
+      "permissions": [
+        {
+          "code": "uc25.approve",
+          "usecase": 25,
+          "name": "审核费用及退费",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 25,
+          "keys": [
+            "Request",
+            "Funds",
+            "Bill",
+            "Adjustment",
+            "AdjustmentItem",
+            "Payment",
+            "Allocation"
+          ],
+          "steps": [
+            [
+              "K",
+              "Request",
+              "核对待审核依据",
+              "负责人资格及原版本"
+            ],
+            [
+              "K",
+              "Funds",
+              "核对可处理额度",
+              "申请、未决办理"
+            ],
+            [
+              "K",
+              "Bill",
+              "批准费用调整",
+              "同意范围及临床依据"
+            ],
+            [
+              "Bill",
+              "Adjustment",
+              "形成批准调整",
+              "原账目和申请"
+            ],
+            [
+              "Adjustment",
+              "AdjustmentItem",
+              "逐项保留调整",
+              "原应收项目及差额"
+            ],
+            [
+              "K",
+              "Funds",
+              "更正付款分配",
+              "调整后的应收及原分配"
+            ],
+            [
+              "Funds",
+              "Payment",
+              "调整已分配范围",
+              "保留原分配来源"
+            ],
+            [
+              "Payment",
+              "Allocation",
+              "追加分配更正",
+              "释放或重新分配金额"
+            ],
+            [
+              "K",
+              "Request",
+              "保存审核结论",
+              "同意及可退范围"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "调整、分配更正和批准额度共同生效；退款尚未发生。",
+          "file": "c03-25"
+        }
+      ],
+      "control": "审核费用调整与退费控制",
+      "operation": "办理",
+      "dto": "UC25Command",
+      "http": [
+        {
+          "permission": "uc25.approve",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/fee-request-decisions/approve"
+        }
+      ],
+      "mapper": "审核费用调整与退费映射器"
+    },
+    {
+      "n": 26,
+      "name": "办理与登记退款",
+      "fields": "动作initiate/markUnknown/verify；批准申请、原付款、拟退分金额；结果实际额、凭据、接收方与原失败办理",
+      "result": "唯一办理号、待办理/待核实/确认退款/失败及来源剩余额",
+      "gate": "批准剩余额和原款可用额双限额；未知继续占用，明确失败才释放；重办新编号并引用失败原单。线下实际退款在写事务外完成，不因请求超时自动再次退款。",
+      "tables": [
+        "fee_request",
+        "patient_funds",
+        "patient_payment",
+        "payment_allocation",
+        "prepayment_offset",
+        "patient_refund"
+      ],
+      "screen": "收费与退费",
+      "route": "patient-refunds",
+      "permissions": [
+        {
+          "code": "uc26.refund",
+          "usecase": 26,
+          "name": "办理及核实退款",
+          "roles": [
+            "cashier"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 26,
+          "keys": [
+            "Request",
+            "Funds",
+            "Payment",
+            "Refund"
+          ],
+          "steps": [
+            [
+              "K",
+              "Request",
+              "提供批准范围",
+              "同意版本及剩余额度"
+            ],
+            [
+              "K",
+              "Funds",
+              "开始退款办理",
+              "原付款、批准依据、拟退额"
+            ],
+            [
+              "Funds",
+              "Payment",
+              "核对来源可退额",
+              "分配、抵扣、已退和占用"
+            ],
+            [
+              "Funds",
+              "Refund",
+              "建立额度占用",
+              "唯一办理依据、拟退额"
+            ],
+            [
+              "K",
+              "Funds",
+              "确认实际退款",
+              "原办理依据、实际结果及凭据"
+            ],
+            [
+              "Funds",
+              "Refund",
+              "核实办理结果",
+              "渠道交易及实际额"
+            ],
+            [
+              "Funds",
+              "Funds",
+              "核算退款后余额",
+              "只计一次有效流出"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "步骤2与实际退款之间存在等待；线下资金动作不画为软件类操作。未知结果及重复提交见扩展图。",
+          "file": "c03-26"
+        },
+        {
+          "n": 26,
+          "keys": [
+            "Funds",
+            "Refund",
+            "Payment"
+          ],
+          "steps": [
+            [
+              "K",
+              "Funds",
+              "恢复既有办理结果",
+              "原办理依据"
+            ],
+            [
+              "Funds",
+              "Refund",
+              "提供办理进度",
+              "原请求及渠道线索"
+            ],
+            [
+              "K",
+              "Funds",
+              "登记结果待核实",
+              "原办理、说明"
+            ],
+            [
+              "Funds",
+              "Refund",
+              "保留额度占用",
+              "待核实结果"
+            ],
+            [
+              "K",
+              "Funds",
+              "确认核查结论",
+              "成功或确定失败的证据"
+            ],
+            [
+              "Funds",
+              "Refund",
+              "核实办理结果",
+              "实际金额与渠道凭据"
+            ],
+            [
+              "Funds",
+              "Payment",
+              "核对来源可退额",
+              "确认扣减或失败释放后余额"
+            ]
+          ],
+          "extra": "unknown",
+          "title": "UC-26：退款未知、失败与重复办理",
+          "focus": "对应2a、3a、3b、4a、5a。成功只扣一次；确定失败释放，结果未知仍占用；客户端超时不能直接启动新退款。",
+          "file": "c03-26-unknown"
+        }
+      ],
+      "control": "办理与登记退款控制",
+      "operation": "办理",
+      "dto": "UC26Command",
+      "http": [
+        {
+          "permission": "uc26.refund",
+          "roles": [
+            "cashier"
+          ],
+          "method": "POST",
+          "path": "/api/v2/patient-refunds/refund"
+        }
+      ],
+      "mapper": "办理与登记退款映射器"
+    },
+    {
+      "n": 27,
+      "name": "维护供应商与采购安排",
+      "fields": "供应商联系结算依据、采购条目材料、约定数量、采购单位价格换算、交付条件及负责人确认版本",
+      "result": "供应商及资金归属、采购号、确认项目和履行状态",
+      "gate": "供应商结算依据维护由负责人核实；助理提采购，负责人确认。确认采购至少一项，冻结单位换算和价格，约定本身不生成库存或实际付款。",
+      "tables": [
+        "supplier",
+        "supplier_funds",
+        "purchase_order",
+        "purchase_order_item",
+        "material"
+      ],
+      "screen": "采购与供货",
+      "route": "purchases",
+      "permissions": [
+        {
+          "code": "uc27.supplier",
+          "usecase": 27,
+          "name": "维护供应商及结算依据",
+          "roles": [
+            "manager"
+          ]
+        },
+        {
+          "code": "uc27.draft",
+          "usecase": 27,
+          "name": "录入采购需求",
+          "roles": [
+            "assistant"
+          ]
+        },
+        {
+          "code": "uc27.approve",
+          "usecase": 27,
+          "name": "确认采购约定",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 27,
+          "keys": [
+            "Supplier",
+            "Material",
+            "Purchase",
+            "PurchaseItem"
+          ],
+          "steps": [
+            [
+              "K",
+              "Supplier",
+              "核对供货资格",
+              "已核实供应商及结算依据"
+            ],
+            [
+              "K",
+              "Material",
+              "提供采购单位",
+              "材料及换算"
+            ],
+            [
+              "K",
+              "Purchase",
+              "提出采购安排",
+              "需求、供货方、交付条件"
+            ],
+            [
+              "Purchase",
+              "PurchaseItem",
+              "组织约定明细",
+              "数量、单价、单位"
+            ],
+            [
+              "K",
+              "Purchase",
+              "确认供货约定",
+              "负责人确认及供应商反馈"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-27"
+        }
+      ],
+      "control": "维护供应商与采购安排控制",
+      "operation": "办理",
+      "dto": "UC27Command",
+      "http": [
+        {
+          "permission": "uc27.supplier",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/purchases/supplier"
+        },
+        {
+          "permission": "uc27.draft",
+          "roles": [
+            "assistant"
+          ],
+          "method": "POST",
+          "path": "/api/v2/purchases/draft"
+        },
+        {
+          "permission": "uc27.approve",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/purchases/approve"
+        }
+      ],
+      "mapper": "维护供应商与采购安排映射器"
+    },
+    {
+      "n": 28,
+      "name": "登记采购验收与退换",
+      "fields": "采购及项目、本次到货、合格/拒收/待检、批号效期位置、价款依据；差异类型和确认处理",
+      "result": "验收号、分项数量、仅新增合格入库、采购差异及履行进度",
+      "gate": "到货等于三类数量和；项目同采购、批次同材料。认可合格量与最终入库相等；分批与待检转结论留旧值审计；已入库退供另留依据，不倒改合格事实。",
+      "tables": [
+        "purchase_order",
+        "purchase_order_item",
+        "purchase_receipt",
+        "purchase_receipt_item",
+        "purchase_issue",
+        "material_batch",
+        "batch_stock",
+        "inventory_movement"
+      ],
+      "screen": "采购与供货",
+      "route": "purchase-receipts",
+      "permissions": [
+        {
+          "code": "uc28.receive",
+          "usecase": 28,
+          "name": "录入验收及差异",
+          "roles": [
+            "assistant"
+          ]
+        },
+        {
+          "code": "uc28.approve",
+          "usecase": 28,
+          "name": "确认退换差异",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 28,
+          "keys": [
+            "Purchase",
+            "PurchaseItem",
+            "Receipt",
+            "ReceiptItem",
+            "Stock",
+            "Movement"
+          ],
+          "steps": [
+            [
+              "K",
+              "Purchase",
+              "核对到货依据",
+              "本次随货依据、原约定"
+            ],
+            [
+              "Purchase",
+              "PurchaseItem",
+              "核对交付及差异",
+              "累计到货与本次量"
+            ],
+            [
+              "K",
+              "Receipt",
+              "登记本次验收",
+              "到货、合格、拒收、待检"
+            ],
+            [
+              "Receipt",
+              "ReceiptItem",
+              "核对数量组成",
+              "材料、批次及位置"
+            ],
+            [
+              "K",
+              "Stock",
+              "接收合格入库",
+              "已确认验收项目"
+            ],
+            [
+              "Stock",
+              "Movement",
+              "保留验收入库",
+              "原验收来源及合格量"
+            ],
+            [
+              "K",
+              "Purchase",
+              "更新履行进度",
+              "本次验收及差异"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "验收事实、合格入库与采购进度共同核对；分批与拒收见扩展图。",
+          "file": "c03-28"
+        },
+        {
+          "n": 28,
+          "keys": [
+            "Purchase",
+            "Receipt",
+            "ReceiptItem",
+            "SupplyIssue",
+            "Stock",
+            "PurchaseItem"
+          ],
+          "steps": [
+            [
+              "K",
+              "Purchase",
+              "核对到货依据",
+              "原采购10件及本次到货"
+            ],
+            [
+              "K",
+              "Receipt",
+              "登记本次验收",
+              "首次6件、合格5件、拒收1件"
+            ],
+            [
+              "Receipt",
+              "ReceiptItem",
+              "核对数量组成",
+              "6等于5加1"
+            ],
+            [
+              "K",
+              "SupplyIssue",
+              "保留验收差异",
+              "拒收1件及补换安排"
+            ],
+            [
+              "K",
+              "Stock",
+              "接收合格入库",
+              "仅合格5件"
+            ],
+            [
+              "K",
+              "Purchase",
+              "更新履行进度",
+              "再到4件并合格后的累计"
+            ],
+            [
+              "Purchase",
+              "PurchaseItem",
+              "核对交付及差异",
+              "到货10、合格9、拒收待处理1"
+            ]
+          ],
+          "extra": "partial",
+          "title": "UC-28：分批验收及拒收处理",
+          "focus": "对应3a、4a、4b；实例T10。合同未交付0与拒收待处理1分别表达，未解决差异不能因累计到货足量而消失。",
+          "file": "c03-28-partial"
+        }
+      ],
+      "control": "登记采购验收与退换控制",
+      "operation": "办理",
+      "dto": "UC28Command",
+      "http": [
+        {
+          "permission": "uc28.receive",
+          "roles": [
+            "assistant"
+          ],
+          "method": "POST",
+          "path": "/api/v2/purchase-receipts/receive"
+        },
+        {
+          "permission": "uc28.approve",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/purchase-receipts/approve"
+        }
+      ],
+      "mapper": "登记采购验收与退换映射器"
+    },
+    {
+      "n": 29,
+      "name": "登记供应商付款与结算",
+      "fields": "动作authorize/initiate/verify/reallocate/refund；供应商、原单版本、拟付实际分金额、用途、渠道凭据与批准差异",
+      "result": "原付款办理号、预占/生效用途、预付转结算及原款退回",
+      "gate": "目标采购或验收与原款同供应商，负责人明确授权版本和金额。原单与原付款均限额；未知保留预占，预付转结算通过释放及重新分配完成，实际支付不重复形成。",
+      "tables": [
+        "supplier_funds",
+        "purchase_order",
+        "purchase_receipt",
+        "purchase_receipt_item",
+        "purchase_issue",
+        "supplier_payment",
+        "supplier_allocation",
+        "supplier_refund"
+      ],
+      "screen": "采购与供货",
+      "route": "supplier-payments",
+      "permissions": [
+        {
+          "code": "uc29.authorize",
+          "usecase": 29,
+          "name": "确认供货付款依据",
+          "roles": [
+            "manager"
+          ]
+        },
+        {
+          "code": "uc29.pay",
+          "usecase": 29,
+          "name": "办理付款分配及退回款",
+          "roles": [
+            "cashier"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 29,
+          "keys": [
+            "Purchase",
+            "Receipt",
+            "SupplierFunds",
+            "SupplyPayment",
+            "SupplyAllocation"
+          ],
+          "steps": [
+            [
+              "K",
+              "Purchase",
+              "提供预付依据",
+              "确认采购或空"
+            ],
+            [
+              "K",
+              "Receipt",
+              "提供合格结算依据",
+              "验收范围或空"
+            ],
+            [
+              "K",
+              "SupplierFunds",
+              "确认付款范围",
+              "负责人意见及结算依据"
+            ],
+            [
+              "K",
+              "SupplierFunds",
+              "开始供货付款",
+              "负责人确认范围及拟付额"
+            ],
+            [
+              "SupplierFunds",
+              "SupplyPayment",
+              "建立付款占用",
+              "唯一办理依据"
+            ],
+            [
+              "K",
+              "SupplierFunds",
+              "核实实际付款",
+              "渠道、实际结果及凭据"
+            ],
+            [
+              "SupplierFunds",
+              "SupplyPayment",
+              "确认实际支出",
+              "已核实结果"
+            ],
+            [
+              "SupplyPayment",
+              "SupplyAllocation",
+              "形成供货分配",
+              "采购预付或验收结算"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "预付和验收分配至少有一种且归属同一供应商；失败、未知和退回款见扩展图。",
+          "file": "c03-29"
+        },
+        {
+          "n": 29,
+          "keys": [
+            "SupplierFunds",
+            "SupplyPayment",
+            "SupplyIssue",
+            "SupplyRefund"
+          ],
+          "steps": [
+            [
+              "K",
+              "SupplierFunds",
+              "恢复供货办理",
+              "原付款办理及结果"
+            ],
+            [
+              "SupplierFunds",
+              "SupplyPayment",
+              "核实待定结果",
+              "渠道证据、实际金额"
+            ],
+            [
+              "K",
+              "SupplyIssue",
+              "提供确认退换",
+              "原采购或验收差异"
+            ],
+            [
+              "K",
+              "SupplierFunds",
+              "确认供货退回款",
+              "原付款、退换依据和实际到账"
+            ],
+            [
+              "SupplierFunds",
+              "SupplyRefund",
+              "保留原款退款",
+              "金额、渠道、凭据"
+            ],
+            [
+              "SupplierFunds",
+              "SupplierFunds",
+              "重算供货余额",
+              "预付、分配和退款"
+            ]
+          ],
+          "extra": "recovery",
+          "title": "UC-29：供货付款未知与退回款",
+          "focus": "对应4a、5a。结果不明的付款继续占用；供应商退款减少原往来，不计患者收入。",
+          "file": "c03-29-recovery"
+        }
+      ],
+      "control": "登记供应商付款与结算控制",
+      "operation": "办理",
+      "dto": "UC29Command",
+      "http": [
+        {
+          "permission": "uc29.authorize",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/supplier-payments/authorize"
+        },
+        {
+          "permission": "uc29.pay",
+          "roles": [
+            "cashier"
+          ],
+          "method": "POST",
+          "path": "/api/v2/supplier-payments/pay"
+        }
+      ],
+      "mapper": "登记供应商付款与结算映射器"
+    },
+    {
+      "n": 30,
+      "name": "登记器械处理与放行",
+      "fields": "处理设备、包次、清洗包装、实际起止、要求的监测项目及证据、放行或隔离责任",
+      "result": "处理轮次、包次状态、监测集合与放行/隔离结果",
+      "gate": "必检集合逐项齐全且通过、包次包装及效期有效后才放行。缺少结果不能当合格；旧失败重新处理建新轮次，事后异常保留原放行责任和追溯范围。",
+      "tables": [
+        "processing_equipment",
+        "instrument_pack",
+        "instrument_processing",
+        "instrument_pack_cycle",
+        "processing_monitor",
+        "issue_followup"
+      ],
+      "screen": "器械处理",
+      "route": "instrument-processing",
+      "permissions": [
+        {
+          "code": "uc30.process",
+          "usecase": 30,
+          "name": "记录处理监测及放行",
+          "roles": [
+            "assistant"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 30,
+          "keys": [
+            "Equipment",
+            "Process",
+            "PackCycle",
+            "Pack",
+            "Monitor"
+          ],
+          "steps": [
+            [
+              "K",
+              "Equipment",
+              "核对设备归属",
+              "实际处理设备"
+            ],
+            [
+              "K",
+              "Process",
+              "登记本轮处理",
+              "时间、设备、器械包范围"
+            ],
+            [
+              "Process",
+              "PackCycle",
+              "建立本轮包次",
+              "包、包装核对及有效期"
+            ],
+            [
+              "PackCycle",
+              "Pack",
+              "核对物理归属",
+              "本轮器械包"
+            ],
+            [
+              "Process",
+              "Monitor",
+              "保存实际监测",
+              "项目、结果及证据"
+            ],
+            [
+              "K",
+              "Process",
+              "完成处理登记",
+              "实际结束时间及已取得监测"
+            ],
+            [
+              "K",
+              "Process",
+              "确认放行或隔离",
+              "助理核对依据"
+            ],
+            [
+              "Process",
+              "Process",
+              "核对放行条件",
+              "监测完整且无未解决异常"
+            ],
+            [
+              "Process",
+              "PackCycle",
+              "接受本轮放行",
+              "处理已确认放行且本包有效"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-30"
+        }
+      ],
+      "control": "登记器械处理与放行控制",
+      "operation": "办理",
+      "dto": "UC30Command",
+      "http": [
+        {
+          "permission": "uc30.process",
+          "roles": [
+            "assistant"
+          ],
+          "method": "POST",
+          "path": "/api/v2/instrument-processing/process"
+        }
+      ],
+      "mapper": "登记器械处理与放行映射器"
+    },
+    {
+      "n": 31,
+      "name": "登记器械包使用与追溯",
+      "fields": "就诊、指定本轮包次、发放/使用/退回时刻及实物核对；异常补录与追溯条件",
+      "result": "实际使用关联、未用退回经历、受影响就诊及异常跟进",
+      "gate": "正常发放须本轮已放行、未过期且无正常占用；实际使用至多一次。异常补录如实保留，不伪造正常放行；牙医只查获准临床范围，负责人组织异常处置。",
+      "tables": [
+        "visit",
+        "instrument_processing",
+        "instrument_pack_cycle",
+        "instrument_use",
+        "issue_followup"
+      ],
+      "screen": "器械处理",
+      "route": "instrument-trace",
+      "permissions": [
+        {
+          "code": "uc31.use",
+          "usecase": 31,
+          "name": "登记实际使用及退回",
+          "roles": [
+            "assistant"
+          ]
+        },
+        {
+          "code": "uc31.clinical_trace",
+          "usecase": 31,
+          "name": "查看获准就诊使用依据",
+          "roles": [
+            "dentist"
+          ]
+        },
+        {
+          "code": "uc31.trace",
+          "usecase": 31,
+          "name": "追溯异常及处置跟进",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 31,
+          "keys": [
+            "Visit",
+            "Process",
+            "PackCycle",
+            "InstrumentUse"
+          ],
+          "steps": [
+            [
+              "K",
+              "Visit",
+              "核对使用归属",
+              "实际就诊"
+            ],
+            [
+              "K",
+              "Process",
+              "核对包次可用性",
+              "指定包次、有效期及实物依据"
+            ],
+            [
+              "Process",
+              "PackCycle",
+              "核对本轮可用性",
+              "放行结论、未使用及包装"
+            ],
+            [
+              "Process",
+              "PackCycle",
+              "登记发放",
+              "本轮包次、实物核对及就诊"
+            ],
+            [
+              "K",
+              "Process",
+              "登记本轮使用",
+              "就诊、包次和实际核对"
+            ],
+            [
+              "Process",
+              "PackCycle",
+              "登记实际使用",
+              "实际使用时间与就诊"
+            ],
+            [
+              "PackCycle",
+              "InstrumentUse",
+              "保留使用关联",
+              "本轮处理和经办人"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "助理经器械处理整体核对和登记包次使用；牙医与负责人只查询获准范围。异常追溯见扩展图。",
+          "file": "c03-31"
+        },
+        {
+          "n": 31,
+          "keys": [
+            "Process",
+            "PackCycle",
+            "InstrumentUse",
+            "Visit",
+            "FollowIssue"
+          ],
+          "steps": [
+            [
+              "K",
+              "Process",
+              "标记事后异常",
+              "异常及依据"
+            ],
+            [
+              "Process",
+              "PackCycle",
+              "停止后续正常使用",
+              "涉及本轮包次"
+            ],
+            [
+              "K",
+              "Process",
+              "提供受影响包次",
+              "已发放及已使用范围"
+            ],
+            [
+              "Process",
+              "PackCycle",
+              "提供本轮追溯",
+              "已使用和已发放范围"
+            ],
+            [
+              "PackCycle",
+              "InstrumentUse",
+              "提供实际使用依据",
+              "原发放、使用或异常补录"
+            ],
+            [
+              "K",
+              "Visit",
+              "提供获准追查信息",
+              "受影响就诊"
+            ],
+            [
+              "K",
+              "FollowIssue",
+              "登记异常追查",
+              "负责人意见、责任和期限"
+            ]
+          ],
+          "extra": "incident",
+          "title": "UC-31：事后异常与使用追溯",
+          "focus": "对应2a、5a。未放行的异常实际使用必须留痕并报告，不伪装成正常放行。",
+          "file": "c03-31-incident"
+        }
+      ],
+      "control": "登记器械包使用与追溯控制",
+      "operation": "办理",
+      "dto": "UC31Command",
+      "http": [
+        {
+          "permission": "uc31.use",
+          "roles": [
+            "assistant"
+          ],
+          "method": "POST",
+          "path": "/api/v2/instrument-trace/use"
+        },
+        {
+          "permission": "uc31.clinical_trace",
+          "roles": [
+            "dentist"
+          ],
+          "method": "GET",
+          "path": "/api/v2/instrument-trace/clinical_trace"
+        },
+        {
+          "permission": "uc31.trace",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/instrument-trace/trace"
+        }
+      ],
+      "mapper": "登记器械包使用与追溯映射器"
+    },
+    {
+      "n": 32,
+      "name": "维护材料与批次状态",
+      "fields": "材料单位换算精度与追溯要求、批号效期、状态动作、理由和负责人确认版本",
+      "result": "材料/批次号、状态变更经历、受影响存量提示",
+      "gate": "投入使用先确认单位；有流水后单位精度换算固定。助理可立即隔离，恢复或停用由负责人核实；状态变化不增减库存，当前效期另作实时判断。",
+      "tables": [
+        "material",
+        "material_batch",
+        "batch_change",
+        "batch_stock"
+      ],
+      "screen": "材料库存",
+      "route": "material-batches",
+      "permissions": [
+        {
+          "code": "uc32.record",
+          "usecase": 32,
+          "name": "录入材料批次及立即隔离",
+          "roles": [
+            "assistant"
+          ]
+        },
+        {
+          "code": "uc32.approve",
+          "usecase": 32,
+          "name": "确认配置与恢复停用",
+          "roles": [
+            "manager"
+          ]
+        }
+      ],
+      "sequences": [
+        {
+          "n": 32,
+          "keys": [
+            "Material",
+            "Batch",
+            "BatchChange",
+            "Stock"
+          ],
+          "steps": [
+            [
+              "K",
+              "Material",
+              "确认目录维护",
+              "规格、基本单位、换算及追溯要求"
+            ],
+            [
+              "K",
+              "Batch",
+              "立即隔离批次",
+              "原因及范围"
+            ],
+            [
+              "Batch",
+              "BatchChange",
+              "保留可用性变更",
+              "原值、原因、经办时间"
+            ],
+            [
+              "K",
+              "Stock",
+              "提供受影响余额",
+              "批次各位置"
+            ],
+            [
+              "K",
+              "Batch",
+              "审核恢复或停用",
+              "负责人意见、效期及异常依据"
+            ],
+            [
+              "Batch",
+              "BatchChange",
+              "保留恢复依据",
+              "确认人及当前条件"
+            ]
+          ],
+          "extra": "",
+          "title": null,
+          "focus": "",
+          "file": "c03-32"
+        }
+      ],
+      "control": "维护材料与批次状态控制",
+      "operation": "办理",
+      "dto": "UC32Command",
+      "http": [
+        {
+          "permission": "uc32.record",
+          "roles": [
+            "assistant"
+          ],
+          "method": "POST",
+          "path": "/api/v2/material-batches/record"
+        },
+        {
+          "permission": "uc32.approve",
+          "roles": [
+            "manager"
+          ],
+          "method": "POST",
+          "path": "/api/v2/material-batches/approve"
+        }
+      ],
+      "mapper": "维护材料与批次状态映射器"
+    }
+  ],
+  "entity_coverage": [
+    {
+      "entity": "Patient",
+      "name": "患者",
+      "table": "patient",
+      "operations": [
+        "核对身份",
+        "核对身份候选",
+        "确认资料维护",
+        "核对临床访问",
+        "确认健康变更"
+      ],
+      "diagram": "d2-final-class-identity"
+    },
+    {
+      "entity": "Staff",
+      "name": "职员",
+      "table": "staff",
+      "operations": [
+        "核对在岗与职责"
+      ],
+      "diagram": "d2-final-class-identity"
+    },
+    {
+      "entity": "IdentityChange",
+      "name": "患者资料变更",
+      "table": "patient_change",
+      "operations": [
+        "保留修改依据"
+      ],
+      "diagram": "d2-final-class-identity"
+    },
+    {
+      "entity": "Proxy",
+      "name": "代理关系",
+      "table": "patient_proxy",
+      "operations": [
+        "确认代理范围"
+      ],
+      "diagram": "d2-final-class-identity"
+    },
+    {
+      "entity": "Handover",
+      "name": "接诊交接",
+      "table": "clinical_handover",
+      "operations": [
+        "核对交接资格"
+      ],
+      "diagram": "d2-final-class-identity"
+    },
+    {
+      "entity": "Patient",
+      "name": "患者",
+      "table": "patient",
+      "operations": [
+        "核对身份",
+        "核对身份候选",
+        "确认资料维护",
+        "核对临床访问",
+        "确认健康变更"
+      ],
+      "diagram": "d2-final-class-reception"
+    },
+    {
+      "entity": "Staff",
+      "name": "职员",
+      "table": "staff",
+      "operations": [
+        "核对在岗与职责"
+      ],
+      "diagram": "d2-final-class-reception"
+    },
+    {
+      "entity": "Chair",
+      "name": "诊椅",
+      "table": "dental_chair",
+      "operations": [
+        "核对可用区间",
+        "确认可用范围"
+      ],
+      "diagram": "d2-final-class-reception"
+    },
+    {
+      "entity": "Schedule",
+      "name": "日期安排",
+      "table": "dated_schedule",
+      "operations": [
+        "申请预约占用",
+        "确认到诊占用",
+        "核对拟发布安排",
+        "确认日期安排",
+        "提供可用组合",
+        "形成可用区间",
+        "重新安排或释放",
+        "确认指定日期停诊"
+      ],
+      "diagram": "d2-final-class-reception"
+    },
+    {
+      "entity": "ScheduleChange",
+      "name": "安排变更",
+      "table": "schedule_change",
+      "operations": [
+        "保留日期例外"
+      ],
+      "diagram": "d2-final-class-reception"
+    },
+    {
+      "entity": "Occupancy",
+      "name": "接诊占用",
+      "table": "resource_occupancy",
+      "operations": [
+        "检查并占用",
+        "关联到诊",
+        "排除已有占用",
+        "调整有效占用"
+      ],
+      "diagram": "d2-final-class-reception"
+    },
+    {
+      "entity": "Appointment",
+      "name": "预约",
+      "table": "appointment",
+      "operations": [
+        "确认安排",
+        "提供安排及经历",
+        "核对到诊来源",
+        "关联到诊结果",
+        "核对复诊关联",
+        "列出受影响安排",
+        "核对可变更性",
+        "变更或取消安排",
+        "标记受影响安排",
+        "核对后续处理",
+        "确认未到事实"
+      ],
+      "diagram": "d2-final-class-reception"
+    },
+    {
+      "entity": "AppointmentChange",
+      "name": "预约变更",
+      "table": "appointment_change",
+      "operations": [
+        "保留变更"
+      ],
+      "diagram": "d2-final-class-reception"
+    },
+    {
+      "entity": "Visit",
+      "name": "就诊",
+      "table": "visit",
+      "operations": [
+        "登记到诊",
+        "核对接诊责任",
+        "确认实际执行",
+        "提供获准就诊",
+        "确认实际接诊",
+        "记录检查诊断",
+        "核对签署条件",
+        "结束本次诊疗",
+        "提供诊后来源",
+        "提供本次复诊依据",
+        "汇总诊疗发生",
+        "确认当次复核",
+        "核对使用归属",
+        "追加病历说明",
+        "提供获准追查信息"
+      ],
+      "diagram": "d2-final-class-reception"
+    },
+    {
+      "entity": "Patient",
+      "name": "患者",
+      "table": "patient",
+      "operations": [
+        "核对身份",
+        "核对身份候选",
+        "确认资料维护",
+        "核对临床访问",
+        "确认健康变更"
+      ],
+      "diagram": "d2-final-class-clinical"
+    },
+    {
+      "entity": "Visit",
+      "name": "就诊",
+      "table": "visit",
+      "operations": [
+        "登记到诊",
+        "核对接诊责任",
+        "确认实际执行",
+        "提供获准就诊",
+        "确认实际接诊",
+        "记录检查诊断",
+        "核对签署条件",
+        "结束本次诊疗",
+        "提供诊后来源",
+        "提供本次复诊依据",
+        "汇总诊疗发生",
+        "确认当次复核",
+        "核对使用归属",
+        "追加病历说明",
+        "提供获准追查信息"
+      ],
+      "diagram": "d2-final-class-clinical"
+    },
+    {
+      "entity": "HealthVersion",
+      "name": "健康版本",
+      "table": "health_version",
+      "operations": [
+        "形成健康版本"
+      ],
+      "diagram": "d2-final-class-clinical"
+    },
+    {
+      "entity": "HealthItem",
+      "name": "健康条目",
+      "table": "health_item",
+      "operations": [
+        "保留健康结论"
+      ],
+      "diagram": "d2-final-class-clinical"
+    },
+    {
+      "entity": "Review",
+      "name": "健康复核",
+      "table": "health_review",
+      "operations": [
+        "提供当次复核",
+        "保留复核快照"
+      ],
+      "diagram": "d2-final-class-clinical"
+    },
+    {
+      "entity": "Record",
+      "name": "病历",
+      "table": "clinical_record",
+      "operations": [
+        "建立当次草稿",
+        "提供签署及补充",
+        "更新未签署正文",
+        "签署当前正文",
+        "核对原签署",
+        "追加独立补充"
+      ],
+      "diagram": "d2-final-class-clinical"
+    },
+    {
+      "entity": "Finding",
+      "name": "检查所见",
+      "table": "clinical_finding",
+      "operations": [
+        "保留检查所见"
+      ],
+      "diagram": "d2-final-class-clinical"
+    },
+    {
+      "entity": "Addendum",
+      "name": "病历补充",
+      "table": "record_addendum",
+      "operations": [
+        "形成独立补充"
+      ],
+      "diagram": "d2-final-class-clinical"
+    },
+    {
+      "entity": "Patient",
+      "name": "患者",
+      "table": "patient",
+      "operations": [
+        "核对身份",
+        "核对身份候选",
+        "确认资料维护",
+        "核对临床访问",
+        "确认健康变更"
+      ],
+      "diagram": "d2-final-class-plan"
+    },
+    {
+      "entity": "Visit",
+      "name": "就诊",
+      "table": "visit",
+      "operations": [
+        "登记到诊",
+        "核对接诊责任",
+        "确认实际执行",
+        "提供获准就诊",
+        "确认实际接诊",
+        "记录检查诊断",
+        "核对签署条件",
+        "结束本次诊疗",
+        "提供诊后来源",
+        "提供本次复诊依据",
+        "汇总诊疗发生",
+        "确认当次复核",
+        "核对使用归属",
+        "追加病历说明",
+        "提供获准追查信息"
+      ],
+      "diagram": "d2-final-class-plan"
+    },
+    {
+      "entity": "Plan",
+      "name": "治疗方案",
+      "table": "treatment_plan",
+      "operations": [
+        "核对执行依据",
+        "提供版本及执行依据",
+        "提供诊后方案依据",
+        "提出方案草稿",
+        "确认患者决定",
+        "提出剩余项目改版",
+        "确认整体完成或终止"
+      ],
+      "diagram": "d2-final-class-plan"
+    },
+    {
+      "entity": "PlanVersion",
+      "name": "方案版本",
+      "table": "plan_version",
+      "operations": [
+        "核对确认版本",
+        "提供确认来源",
+        "形成待确认版本",
+        "提交方案说明",
+        "登记确认经历",
+        "保留原确认版本",
+        "重新说明方案",
+        "停止后续安排",
+        "核对本版完成"
+      ],
+      "diagram": "d2-final-class-plan"
+    },
+    {
+      "entity": "PlanItem",
+      "name": "方案项目",
+      "table": "plan_item",
+      "operations": [
+        "核对可执行范围",
+        "组织计划明细",
+        "识别未执行范围"
+      ],
+      "diagram": "d2-final-class-plan"
+    },
+    {
+      "entity": "Decision",
+      "name": "患者决定",
+      "table": "patient_decision",
+      "operations": [
+        "保留患者决定"
+      ],
+      "diagram": "d2-final-class-plan"
+    },
+    {
+      "entity": "Execution",
+      "name": "诊疗执行",
+      "table": "treatment_execution",
+      "operations": [
+        "保留执行依据",
+        "核对已完成事实"
+      ],
+      "diagram": "d2-final-class-plan"
+    },
+    {
+      "entity": "Service",
+      "name": "收费项目",
+      "table": "service",
+      "operations": [
+        "提出新价目",
+        "确认价目发布"
+      ],
+      "diagram": "d2-final-class-plan"
+    },
+    {
+      "entity": "Patient",
+      "name": "患者",
+      "table": "patient",
+      "operations": [
+        "核对身份",
+        "核对身份候选",
+        "确认资料维护",
+        "核对临床访问",
+        "确认健康变更"
+      ],
+      "diagram": "d2-final-class-documents"
+    },
+    {
+      "entity": "Visit",
+      "name": "就诊",
+      "table": "visit",
+      "operations": [
+        "登记到诊",
+        "核对接诊责任",
+        "确认实际执行",
+        "提供获准就诊",
+        "确认实际接诊",
+        "记录检查诊断",
+        "核对签署条件",
+        "结束本次诊疗",
+        "提供诊后来源",
+        "提供本次复诊依据",
+        "汇总诊疗发生",
+        "确认当次复核",
+        "核对使用归属",
+        "追加病历说明",
+        "提供获准追查信息"
+      ],
+      "diagram": "d2-final-class-documents"
+    },
+    {
+      "entity": "PlanVersion",
+      "name": "方案版本",
+      "table": "plan_version",
+      "operations": [
+        "核对确认版本",
+        "提供确认来源",
+        "形成待确认版本",
+        "提交方案说明",
+        "登记确认经历",
+        "保留原确认版本",
+        "重新说明方案",
+        "停止后续安排",
+        "核对本版完成"
+      ],
+      "diagram": "d2-final-class-documents"
+    },
+    {
+      "entity": "Document",
+      "name": "诊疗文件",
+      "table": "clinical_document",
+      "operations": [
+        "提供可读版本",
+        "接收原件版本",
+        "确认文件依据"
+      ],
+      "diagram": "d2-final-class-documents"
+    },
+    {
+      "entity": "FileVersion",
+      "name": "文件版本",
+      "table": "document_version",
+      "operations": [
+        "核对原件完整性",
+        "保留确认原件",
+        "退回原件核对",
+        "报告读取异常",
+        "核实恢复原件"
+      ],
+      "diagram": "d2-final-class-documents"
+    },
+    {
+      "entity": "Decision",
+      "name": "患者决定",
+      "table": "patient_decision",
+      "operations": [
+        "保留患者决定"
+      ],
+      "diagram": "d2-final-class-documents"
+    },
+    {
+      "entity": "Proxy",
+      "name": "代理关系",
+      "table": "patient_proxy",
+      "operations": [
+        "确认代理范围"
+      ],
+      "diagram": "d2-final-class-documents"
+    },
+    {
+      "entity": "PlanItem",
+      "name": "方案项目",
+      "table": "plan_item",
+      "operations": [
+        "核对可执行范围",
+        "组织计划明细",
+        "识别未执行范围"
+      ],
+      "diagram": "d2-final-class-documents"
+    },
+    {
+      "entity": "Patient",
+      "name": "患者",
+      "table": "patient",
+      "operations": [
+        "核对身份",
+        "核对身份候选",
+        "确认资料维护",
+        "核对临床访问",
+        "确认健康变更"
+      ],
+      "diagram": "d2-final-class-billing"
+    },
+    {
+      "entity": "Visit",
+      "name": "就诊",
+      "table": "visit",
+      "operations": [
+        "登记到诊",
+        "核对接诊责任",
+        "确认实际执行",
+        "提供获准就诊",
+        "确认实际接诊",
+        "记录检查诊断",
+        "核对签署条件",
+        "结束本次诊疗",
+        "提供诊后来源",
+        "提供本次复诊依据",
+        "汇总诊疗发生",
+        "确认当次复核",
+        "核对使用归属",
+        "追加病历说明",
+        "提供获准追查信息"
+      ],
+      "diagram": "d2-final-class-billing"
+    },
+    {
+      "entity": "Execution",
+      "name": "诊疗执行",
+      "table": "treatment_execution",
+      "operations": [
+        "保留执行依据",
+        "核对已完成事实"
+      ],
+      "diagram": "d2-final-class-billing"
+    },
+    {
+      "entity": "Service",
+      "name": "收费项目",
+      "table": "service",
+      "operations": [
+        "提出新价目",
+        "确认价目发布"
+      ],
+      "diagram": "d2-final-class-billing"
+    },
+    {
+      "entity": "Price",
+      "name": "价目",
+      "table": "service_price",
+      "operations": [
+        "核对区间及金额",
+        "提交确认",
+        "发布确认版本",
+        "退回修改",
+        "重新提交",
+        "停止后续适用"
+      ],
+      "diagram": "d2-final-class-billing"
+    },
+    {
+      "entity": "Bill",
+      "name": "应收账目",
+      "table": "bill",
+      "operations": [
+        "形成应收依据",
+        "提供应收依据",
+        "核对可分配额",
+        "汇总有效应收",
+        "提供原费用依据",
+        "批准费用调整",
+        "核算调整后应收"
+      ],
+      "diagram": "d2-final-class-billing"
+    },
+    {
+      "entity": "Charge",
+      "name": "应收项目",
+      "table": "bill_item",
+      "operations": [
+        "确定计价依据",
+        "核对计价完整性"
+      ],
+      "diagram": "d2-final-class-billing"
+    },
+    {
+      "entity": "Adjustment",
+      "name": "费用调整",
+      "table": "fee_adjustment",
+      "operations": [
+        "形成批准调整"
+      ],
+      "diagram": "d2-final-class-billing"
+    },
+    {
+      "entity": "AdjustmentItem",
+      "name": "调整项目",
+      "table": "fee_adjustment_item",
+      "operations": [
+        "逐项保留调整"
+      ],
+      "diagram": "d2-final-class-billing"
+    },
+    {
+      "entity": "Patient",
+      "name": "患者",
+      "table": "patient",
+      "operations": [
+        "核对身份",
+        "核对身份候选",
+        "确认资料维护",
+        "核对临床访问",
+        "确认健康变更"
+      ],
+      "diagram": "d2-final-class-funds"
+    },
+    {
+      "entity": "Funds",
+      "name": "患者资金",
+      "table": "patient_funds",
+      "operations": [
+        "核算付款及可用额",
+        "登记已核实付款",
+        "汇总患者资金",
+        "提供核对来源",
+        "核对可申请范围",
+        "核对可处理额度",
+        "更正付款分配",
+        "开始退款办理",
+        "确认实际退款",
+        "核算退款后余额",
+        "办理预付抵扣",
+        "恢复既有办理结果",
+        "登记结果待核实",
+        "确认核查结论",
+        "核对共同归属"
+      ],
+      "diagram": "d2-final-class-funds"
+    },
+    {
+      "entity": "Payment",
+      "name": "患者付款",
+      "table": "patient_payment",
+      "operations": [
+        "核算来源余额",
+        "确认到账",
+        "分配已收款",
+        "调整已分配范围",
+        "核对来源可退额",
+        "核对未分配余额",
+        "确认预付用途",
+        "提出到账核查",
+        "确认未到账"
+      ],
+      "diagram": "d2-final-class-funds"
+    },
+    {
+      "entity": "Allocation",
+      "name": "付款分配",
+      "table": "payment_allocation",
+      "operations": [
+        "形成分配",
+        "追加分配更正"
+      ],
+      "diagram": "d2-final-class-funds"
+    },
+    {
+      "entity": "Offset",
+      "name": "预付抵扣",
+      "table": "prepayment_offset",
+      "operations": [
+        "保留预付抵扣"
+      ],
+      "diagram": "d2-final-class-funds"
+    },
+    {
+      "entity": "Bill",
+      "name": "应收账目",
+      "table": "bill",
+      "operations": [
+        "形成应收依据",
+        "提供应收依据",
+        "核对可分配额",
+        "汇总有效应收",
+        "提供原费用依据",
+        "批准费用调整",
+        "核算调整后应收"
+      ],
+      "diagram": "d2-final-class-funds"
+    },
+    {
+      "entity": "Funds",
+      "name": "患者资金",
+      "table": "patient_funds",
+      "operations": [
+        "核算付款及可用额",
+        "登记已核实付款",
+        "汇总患者资金",
+        "提供核对来源",
+        "核对可申请范围",
+        "核对可处理额度",
+        "更正付款分配",
+        "开始退款办理",
+        "确认实际退款",
+        "核算退款后余额",
+        "办理预付抵扣",
+        "恢复既有办理结果",
+        "登记结果待核实",
+        "确认核查结论",
+        "核对共同归属"
+      ],
+      "diagram": "d2-final-class-refunds"
+    },
+    {
+      "entity": "Payment",
+      "name": "患者付款",
+      "table": "patient_payment",
+      "operations": [
+        "核算来源余额",
+        "确认到账",
+        "分配已收款",
+        "调整已分配范围",
+        "核对来源可退额",
+        "核对未分配余额",
+        "确认预付用途",
+        "提出到账核查",
+        "确认未到账"
+      ],
+      "diagram": "d2-final-class-refunds"
+    },
+    {
+      "entity": "Bill",
+      "name": "应收账目",
+      "table": "bill",
+      "operations": [
+        "形成应收依据",
+        "提供应收依据",
+        "核对可分配额",
+        "汇总有效应收",
+        "提供原费用依据",
+        "批准费用调整",
+        "核算调整后应收"
+      ],
+      "diagram": "d2-final-class-refunds"
+    },
+    {
+      "entity": "Request",
+      "name": "费用申请",
+      "table": "fee_request",
+      "operations": [
+        "提出费用处理",
+        "保留申请版本",
+        "核对待审核依据",
+        "保存审核结论",
+        "提供批准范围",
+        "重新提交申请",
+        "撤回申请"
+      ],
+      "diagram": "d2-final-class-refunds"
+    },
+    {
+      "entity": "Adjustment",
+      "name": "费用调整",
+      "table": "fee_adjustment",
+      "operations": [
+        "形成批准调整"
+      ],
+      "diagram": "d2-final-class-refunds"
+    },
+    {
+      "entity": "Refund",
+      "name": "退款办理",
+      "table": "patient_refund",
+      "operations": [
+        "建立额度占用",
+        "核实办理结果",
+        "提供办理进度",
+        "保留额度占用"
+      ],
+      "diagram": "d2-final-class-refunds"
+    },
+    {
+      "entity": "Patient",
+      "name": "患者",
+      "table": "patient",
+      "operations": [
+        "核对身份",
+        "核对身份候选",
+        "确认资料维护",
+        "核对临床访问",
+        "确认健康变更"
+      ],
+      "diagram": "d2-final-class-followup"
+    },
+    {
+      "entity": "Visit",
+      "name": "就诊",
+      "table": "visit",
+      "operations": [
+        "登记到诊",
+        "核对接诊责任",
+        "确认实际执行",
+        "提供获准就诊",
+        "确认实际接诊",
+        "记录检查诊断",
+        "核对签署条件",
+        "结束本次诊疗",
+        "提供诊后来源",
+        "提供本次复诊依据",
+        "汇总诊疗发生",
+        "确认当次复核",
+        "核对使用归属",
+        "追加病历说明",
+        "提供获准追查信息"
+      ],
+      "diagram": "d2-final-class-followup"
+    },
+    {
+      "entity": "PlanVersion",
+      "name": "方案版本",
+      "table": "plan_version",
+      "operations": [
+        "核对确认版本",
+        "提供确认来源",
+        "形成待确认版本",
+        "提交方案说明",
+        "登记确认经历",
+        "保留原确认版本",
+        "重新说明方案",
+        "停止后续安排",
+        "核对本版完成"
+      ],
+      "diagram": "d2-final-class-followup"
+    },
+    {
+      "entity": "Followup",
+      "name": "诊后要求",
+      "table": "followup_requirement",
+      "operations": [
+        "提出诊后要求",
+        "判断发布条件",
+        "提供待联系事项",
+        "登记联系结果",
+        "衔接后续安排",
+        "核对评估责任",
+        "确认临床评估",
+        "判断完成或继续",
+        "恢复待安排",
+        "保留复诊待安排",
+        "确认撤销要求"
+      ],
+      "diagram": "d2-final-class-followup"
+    },
+    {
+      "entity": "Contact",
+      "name": "联系经历",
+      "table": "contact_history",
+      "operations": [
+        "追加联系经历"
+      ],
+      "diagram": "d2-final-class-followup"
+    },
+    {
+      "entity": "Assessment",
+      "name": "临床评估",
+      "table": "clinical_assessment",
+      "operations": [
+        "保留评估依据"
+      ],
+      "diagram": "d2-final-class-followup"
+    },
+    {
+      "entity": "Appointment",
+      "name": "预约",
+      "table": "appointment",
+      "operations": [
+        "确认安排",
+        "提供安排及经历",
+        "核对到诊来源",
+        "关联到诊结果",
+        "核对复诊关联",
+        "列出受影响安排",
+        "核对可变更性",
+        "变更或取消安排",
+        "标记受影响安排",
+        "核对后续处理",
+        "确认未到事实"
+      ],
+      "diagram": "d2-final-class-followup"
+    },
+    {
+      "entity": "Material",
+      "name": "材料",
+      "table": "material",
+      "operations": [
+        "定位材料及单位",
+        "提供采购单位",
+        "确认目录维护"
+      ],
+      "diagram": "d2-final-class-materials"
+    },
+    {
+      "entity": "Batch",
+      "name": "材料批次",
+      "table": "material_batch",
+      "operations": [
+        "提供批次可用性",
+        "核对可领用性",
+        "立即隔离批次",
+        "审核恢复或停用",
+        "形成批次来源",
+        "确认合格范围",
+        "判断效期",
+        "核对接收归属"
+      ],
+      "diagram": "d2-final-class-materials"
+    },
+    {
+      "entity": "BatchChange",
+      "name": "批次变更",
+      "table": "batch_change",
+      "operations": [
+        "保留可用性变更",
+        "保留恢复依据"
+      ],
+      "diagram": "d2-final-class-materials"
+    },
+    {
+      "entity": "Location",
+      "name": "存放位置",
+      "table": "stock_location",
+      "operations": [
+        "核对存放范围"
+      ],
+      "diagram": "d2-final-class-materials"
+    },
+    {
+      "entity": "Stock",
+      "name": "批次存量",
+      "table": "batch_stock",
+      "operations": [
+        "提供分处余额",
+        "办理库存变动",
+        "核对变动后数量",
+        "接收合格入库",
+        "提供受影响余额",
+        "提出盘点核实",
+        "确认盘点差异"
+      ],
+      "diagram": "d2-final-class-materials"
+    },
+    {
+      "entity": "Movement",
+      "name": "库存变动",
+      "table": "inventory_movement",
+      "operations": [
+        "提供收发依据",
+        "保留收发经历",
+        "保留验收入库",
+        "形成盘点调整"
+      ],
+      "diagram": "d2-final-class-materials"
+    },
+    {
+      "entity": "Usage",
+      "name": "实际用料",
+      "table": "material_usage",
+      "operations": [
+        "提供实际使用",
+        "登记实际消耗"
+      ],
+      "diagram": "d2-final-class-materials"
+    },
+    {
+      "entity": "Count",
+      "name": "盘点核实",
+      "table": "stock_count",
+      "operations": [
+        "保留实点快照",
+        "核对确认依据",
+        "重新确认实点",
+        "拒绝差异调整"
+      ],
+      "diagram": "d2-final-class-materials"
+    },
+    {
+      "entity": "Visit",
+      "name": "就诊",
+      "table": "visit",
+      "operations": [
+        "登记到诊",
+        "核对接诊责任",
+        "确认实际执行",
+        "提供获准就诊",
+        "确认实际接诊",
+        "记录检查诊断",
+        "核对签署条件",
+        "结束本次诊疗",
+        "提供诊后来源",
+        "提供本次复诊依据",
+        "汇总诊疗发生",
+        "确认当次复核",
+        "核对使用归属",
+        "追加病历说明",
+        "提供获准追查信息"
+      ],
+      "diagram": "d2-final-class-materials"
+    },
+    {
+      "entity": "Supplier",
+      "name": "供应商",
+      "table": "supplier",
+      "operations": [
+        "核对供货资格"
+      ],
+      "diagram": "d2-final-class-purchase"
+    },
+    {
+      "entity": "Material",
+      "name": "材料",
+      "table": "material",
+      "operations": [
+        "定位材料及单位",
+        "提供采购单位",
+        "确认目录维护"
+      ],
+      "diagram": "d2-final-class-purchase"
+    },
+    {
+      "entity": "Purchase",
+      "name": "采购",
+      "table": "purchase_order",
+      "operations": [
+        "提出采购安排",
+        "确认供货约定",
+        "核对到货依据",
+        "更新履行进度",
+        "提供预付依据"
+      ],
+      "diagram": "d2-final-class-purchase"
+    },
+    {
+      "entity": "PurchaseItem",
+      "name": "采购项目",
+      "table": "purchase_order_item",
+      "operations": [
+        "组织约定明细",
+        "核对交付及差异",
+        "确认差异安排",
+        "取消未履行部分"
+      ],
+      "diagram": "d2-final-class-purchase"
+    },
+    {
+      "entity": "Receipt",
+      "name": "验收",
+      "table": "purchase_receipt",
+      "operations": [
+        "登记本次验收",
+        "提供合格结算依据"
+      ],
+      "diagram": "d2-final-class-purchase"
+    },
+    {
+      "entity": "ReceiptItem",
+      "name": "验收项目",
+      "table": "purchase_receipt_item",
+      "operations": [
+        "核对数量组成"
+      ],
+      "diagram": "d2-final-class-purchase"
+    },
+    {
+      "entity": "Batch",
+      "name": "材料批次",
+      "table": "material_batch",
+      "operations": [
+        "提供批次可用性",
+        "核对可领用性",
+        "立即隔离批次",
+        "审核恢复或停用",
+        "形成批次来源",
+        "确认合格范围",
+        "判断效期",
+        "核对接收归属"
+      ],
+      "diagram": "d2-final-class-purchase"
+    },
+    {
+      "entity": "SupplyIssue",
+      "name": "采购差异",
+      "table": "purchase_issue",
+      "operations": [
+        "保留验收差异",
+        "提供确认退换"
+      ],
+      "diagram": "d2-final-class-purchase"
+    },
+    {
+      "entity": "Movement",
+      "name": "库存变动",
+      "table": "inventory_movement",
+      "operations": [
+        "提供收发依据",
+        "保留收发经历",
+        "保留验收入库",
+        "形成盘点调整"
+      ],
+      "diagram": "d2-final-class-purchase"
+    },
+    {
+      "entity": "Supplier",
+      "name": "供应商",
+      "table": "supplier",
+      "operations": [
+        "核对供货资格"
+      ],
+      "diagram": "d2-final-class-supplier_funds"
+    },
+    {
+      "entity": "SupplierFunds",
+      "name": "供应商资金",
+      "table": "supplier_funds",
+      "operations": [
+        "汇总供货收支",
+        "提供核对来源",
+        "确认付款范围",
+        "开始供货付款",
+        "核实实际付款",
+        "恢复供货办理",
+        "确认供货退回款",
+        "重算供货余额",
+        "核对共同归属"
+      ],
+      "diagram": "d2-final-class-supplier_funds"
+    },
+    {
+      "entity": "Purchase",
+      "name": "采购",
+      "table": "purchase_order",
+      "operations": [
+        "提出采购安排",
+        "确认供货约定",
+        "核对到货依据",
+        "更新履行进度",
+        "提供预付依据"
+      ],
+      "diagram": "d2-final-class-supplier_funds"
+    },
+    {
+      "entity": "Receipt",
+      "name": "验收",
+      "table": "purchase_receipt",
+      "operations": [
+        "登记本次验收",
+        "提供合格结算依据"
+      ],
+      "diagram": "d2-final-class-supplier_funds"
+    },
+    {
+      "entity": "SupplyPayment",
+      "name": "供货付款",
+      "table": "supplier_payment",
+      "operations": [
+        "建立付款占用",
+        "确认实际支出",
+        "核实待定结果"
+      ],
+      "diagram": "d2-final-class-supplier_funds"
+    },
+    {
+      "entity": "SupplyAllocation",
+      "name": "供货分配",
+      "table": "supplier_allocation",
+      "operations": [
+        "形成供货分配"
+      ],
+      "diagram": "d2-final-class-supplier_funds"
+    },
+    {
+      "entity": "SupplyRefund",
+      "name": "供货退款",
+      "table": "supplier_refund",
+      "operations": [
+        "保留原款退款"
+      ],
+      "diagram": "d2-final-class-supplier_funds"
+    },
+    {
+      "entity": "SupplyIssue",
+      "name": "采购差异",
+      "table": "purchase_issue",
+      "operations": [
+        "保留验收差异",
+        "提供确认退换"
+      ],
+      "diagram": "d2-final-class-supplier_funds"
+    },
+    {
+      "entity": "Pack",
+      "name": "器械包",
+      "table": "instrument_pack",
+      "operations": [
+        "核对物理归属"
+      ],
+      "diagram": "d2-final-class-instruments"
+    },
+    {
+      "entity": "Equipment",
+      "name": "处理设备",
+      "table": "processing_equipment",
+      "operations": [
+        "核对设备归属"
+      ],
+      "diagram": "d2-final-class-instruments"
+    },
+    {
+      "entity": "Process",
+      "name": "器械处理",
+      "table": "instrument_processing",
+      "operations": [
+        "登记本轮处理",
+        "完成处理登记",
+        "确认放行或隔离",
+        "核对放行条件",
+        "核对包次可用性",
+        "登记本轮使用",
+        "标记事后异常",
+        "提供受影响包次"
+      ],
+      "diagram": "d2-final-class-instruments"
+    },
+    {
+      "entity": "PackCycle",
+      "name": "器械包处理",
+      "table": "instrument_pack_cycle",
+      "operations": [
+        "建立本轮包次",
+        "接受本轮放行",
+        "核对本轮可用性",
+        "登记发放",
+        "登记实际使用",
+        "停止后续正常使用",
+        "提供本轮追溯",
+        "确认未用退回",
+        "提供历史追溯"
+      ],
+      "diagram": "d2-final-class-instruments"
+    },
+    {
+      "entity": "Monitor",
+      "name": "处理监测",
+      "table": "processing_monitor",
+      "operations": [
+        "保存实际监测"
+      ],
+      "diagram": "d2-final-class-instruments"
+    },
+    {
+      "entity": "InstrumentUse",
+      "name": "器械使用",
+      "table": "instrument_use",
+      "operations": [
+        "保留使用关联",
+        "提供实际使用依据"
+      ],
+      "diagram": "d2-final-class-instruments"
+    },
+    {
+      "entity": "Visit",
+      "name": "就诊",
+      "table": "visit",
+      "operations": [
+        "登记到诊",
+        "核对接诊责任",
+        "确认实际执行",
+        "提供获准就诊",
+        "确认实际接诊",
+        "记录检查诊断",
+        "核对签署条件",
+        "结束本次诊疗",
+        "提供诊后来源",
+        "提供本次复诊依据",
+        "汇总诊疗发生",
+        "确认当次复核",
+        "核对使用归属",
+        "追加病历说明",
+        "提供获准追查信息"
+      ],
+      "diagram": "d2-final-class-instruments"
+    },
+    {
+      "entity": "FollowIssue",
+      "name": "差异跟进",
+      "table": "issue_followup",
+      "operations": [
+        "登记差异责任",
+        "登记异常追查",
+        "追加处理结论"
+      ],
+      "diagram": "d2-final-class-instruments"
+    },
+    {
+      "entity": "Payment",
+      "name": "患者付款",
+      "table": "patient_payment",
+      "operations": [
+        "核算来源余额",
+        "确认到账",
+        "分配已收款",
+        "调整已分配范围",
+        "核对来源可退额",
+        "核对未分配余额",
+        "确认预付用途",
+        "提出到账核查",
+        "确认未到账"
+      ],
+      "diagram": "d2-final-class-reconciliation"
+    },
+    {
+      "entity": "Refund",
+      "name": "退款办理",
+      "table": "patient_refund",
+      "operations": [
+        "建立额度占用",
+        "核实办理结果",
+        "提供办理进度",
+        "保留额度占用"
+      ],
+      "diagram": "d2-final-class-reconciliation"
+    },
+    {
+      "entity": "SupplyPayment",
+      "name": "供货付款",
+      "table": "supplier_payment",
+      "operations": [
+        "建立付款占用",
+        "确认实际支出",
+        "核实待定结果"
+      ],
+      "diagram": "d2-final-class-reconciliation"
+    },
+    {
+      "entity": "SupplyRefund",
+      "name": "供货退款",
+      "table": "supplier_refund",
+      "operations": [
+        "保留原款退款"
+      ],
+      "diagram": "d2-final-class-reconciliation"
+    },
+    {
+      "entity": "Reconciliation",
+      "name": "收支核对",
+      "table": "cash_reconciliation",
+      "operations": [
+        "形成核对快照",
+        "计算核对差额"
+      ],
+      "diagram": "d2-final-class-reconciliation"
+    },
+    {
+      "entity": "ReconciliationItem",
+      "name": "核对项目",
+      "table": "reconciliation_item",
+      "operations": [
+        "保留核对项目"
+      ],
+      "diagram": "d2-final-class-reconciliation"
+    },
+    {
+      "entity": "FollowIssue",
+      "name": "差异跟进",
+      "table": "issue_followup",
+      "operations": [
+        "登记差异责任",
+        "登记异常追查",
+        "追加处理结论"
+      ],
+      "diagram": "d2-final-class-reconciliation"
+    },
+    {
+      "entity": "Staff",
+      "name": "职员",
+      "table": "staff",
+      "operations": [
+        "核对在岗与职责"
+      ],
+      "diagram": "d2-final-class-reconciliation"
+    }
+  ],
+  "types": {
+    "ObjectId": "安全范围正整数",
+    "Money": "整数分",
+    "ScaledQuantity": "按材料既定quantity_scale放大的整数",
+    "Instant": "UTC ISO时刻",
+    "LocalDate": "Asia/Shanghai营业日",
+    "ObjectRef": "实体类别、主键与expectedRevision",
+    "Command": "受控动作、对象引用、用例字段、requestKey及commandVersion"
+  },
+  "status": "设计基线完成；当前应用与迁移尚未实现本版全部操作。"
+}

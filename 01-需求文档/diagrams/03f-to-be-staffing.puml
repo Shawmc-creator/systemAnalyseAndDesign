@@ -1,10 +1,11 @@
 @startuml
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -20,40 +21,22 @@ skinparam sequence {
 participant "<img:business-worker.png>\n诊所负责人" as M
 participant "<img:business-worker.png>\n牙医" as D
 participant "<img:business-worker.png>\n前台" as F
+actor "患者" as P
 participant "<img:business-entity.png>\n牙科诊所管理系统" as S
-M -> D : 收集拟安排期间的可接诊时段
-activate D
-D --> M : 提供可接诊时段
-deactivate D
-activate M
-M -> S : 查询该期间已确认安排及预约
-activate S
-S --> M : 返回已有接诊时段及预约
-deactivate S
-M -> M : 编制接诊时段草案
-M -> D : 核实接诊时段草案
-activate D
-D --> M : 确认接诊时段并提供确认时间
-deactivate D
-M -> S : 保存时段、牙医确认依据并发布安排
-activate S
-S -> S : 校验时段及人员有效性\n核对与已有预约是否一致
-alt 安排有效且无冲突
- S -> S : 保存已确认接诊时段
- S --> M : 返回发布结果
-else 安排无效或存在冲突
- S --> M : 返回具体问题，不保存新安排
+M -> D : 核实出诊时间及临时变动
+D --> M : 确认可接诊日期和时段
+M -> S : 生成并确认日期排班及诊椅安排
+S --> M : 返回安排及冲突检查结果
+opt 停诊或资源不可用
+ M -> S : 登记指定日期例外及原因
+ S --> M : 返回受影响预约和待处理事项
+ F -> S : 查询受影响患者
+ S --> F : 返回清单及联系依据
+ F -> P : 协商改约、取消或其他接诊安排
+ P --> F : 确认处理方式
+ F -> S : 保存预约处理结果
+ S --> F : 返回结果并更新资源占用
+ M -> S : 核对未处理事项及安排状态
+ S --> M : 返回当前有效安排及待办
 end
-deactivate S
-opt 接诊安排发布成功
- M -> F : 告知接诊安排已发布
- activate F
- F -> S : 查询已发布的接诊时段
- activate S
- S --> F : 返回可办理预约的接诊安排
-deactivate S
- F -> F : 依据安排办理后续预约
-deactivate F
-end
-deactivate M
 @enduml

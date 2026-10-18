@@ -1,0 +1,131 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "材料" as Material <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -specification: Text
+ -base_unit: Text
+ -purchase_unit: Text
+ +定位材料及单位(依据: 操作输入): 业务结果
+ +提供采购单位(依据: 操作输入): 业务结果
+ +确认目录维护(依据: 操作输入): 业务结果
+}
+class "材料批次" as Batch <<entity>> {
+ -id: ObjectId
+ -batch_no: Text
+ -expiry_date: Text?
+ -source_note: Text
+ -status: Text
+ +提供批次可用性(依据: 操作输入): 业务结果
+ +核对可领用性(依据: 操作输入): 业务结果
+ +立即隔离批次(依据: 操作输入): 业务结果
+ +审核恢复或停用(依据: 操作输入): 业务结果
+ +形成批次来源(依据: 操作输入): 业务结果
+ +确认合格范围(依据: 操作输入): 业务结果
+ +判断效期(依据: 操作输入): 业务结果
+ +核对接收归属(依据: 操作输入): 业务结果
+}
+class "批次变更" as BatchChange <<entity>> {
+ -id: ObjectId
+ -old_status: Text
+ -new_status: Text
+ -reason: Text
+ -confirmed_at: Text
+ +保留可用性变更(依据: 操作输入): 业务结果
+ +保留恢复依据(依据: 操作输入): 业务结果
+}
+class "存放位置" as Location <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -purpose: Text
+ -is_active: Int64
+ -record_no: Text
+ +核对存放范围(依据: 操作输入): 业务结果
+}
+class "批次存量" as Stock <<entity>> {
+ -id: ObjectId
+ -quantity_scaled: Int64
+ +提供分处余额(依据: 操作输入): 业务结果
+ +办理库存变动(依据: 操作输入): 业务结果
+ +核对变动后数量(依据: 操作输入): 业务结果
+ +接收合格入库(依据: 操作输入): 业务结果
+ +提供受影响余额(依据: 操作输入): 业务结果
+ +提出盘点核实(依据: 操作输入): 业务结果
+ +确认盘点差异(依据: 操作输入): 业务结果
+}
+class "库存变动" as Movement <<entity>> {
+ -id: ObjectId
+ -movement_type: Text
+ -delta_scaled: Int64
+ -before_scaled: Int64
+ -after_scaled: Int64
+ +提供收发依据(依据: 操作输入): 业务结果
+ +保留收发经历(依据: 操作输入): 业务结果
+ +保留验收入库(依据: 操作输入): 业务结果
+ +形成盘点调整(依据: 操作输入): 业务结果
+}
+class "实际用料" as Usage <<entity>> {
+ -id: ObjectId
+ -quantity_scaled: Int64
+ -used_at: Text
+ -note: Text
+ +提供实际使用(依据: 操作输入): 业务结果
+ +登记实际消耗(依据: 操作输入): 业务结果
+}
+class "盘点核实" as Count <<entity>> {
+ -id: ObjectId
+ -snapshot_quantity_scaled: Int64
+ -counted_quantity_scaled: Int64
+ -reason: Text
+ -confirmed_at: Text?
+ +保留实点快照(依据: 操作输入): 业务结果
+ +核对确认依据(依据: 操作输入): 业务结果
+ +重新确认实点(依据: 操作输入): 业务结果
+ +拒绝差异调整(依据: 操作输入): 业务结果
+}
+class "就诊" as Visit <<entity>> {
+ -id: ObjectId
+ -arrived_at: Text
+ -started_at: Text?
+ -ended_at: Text?
+ -arrival_source: Text
+ +登记到诊(依据: 操作输入): 业务结果
+ +核对接诊责任(依据: 操作输入): 业务结果
+ +确认实际执行(依据: 操作输入): 业务结果
+ +提供获准就诊(依据: 操作输入): 业务结果
+ +确认实际接诊(依据: 操作输入): 业务结果
+ +记录检查诊断(依据: 操作输入): 业务结果
+ +核对签署条件(依据: 操作输入): 业务结果
+ +结束本次诊疗(依据: 操作输入): 业务结果
+ +提供诊后来源(依据: 操作输入): 业务结果
+ +提供本次复诊依据(依据: 操作输入): 业务结果
+ +汇总诊疗发生(依据: 操作输入): 业务结果
+ +确认当次复核(依据: 操作输入): 业务结果
+ +核对使用归属(依据: 操作输入): 业务结果
+ +追加病历说明(依据: 操作输入): 业务结果
+ +提供获准追查信息(依据: 操作输入): 业务结果
+}
+Material "1" -- "0..*" Batch : 材料批次
+Batch "1" *-- "0..*" BatchChange : 停用与恢复
+Batch "1" -- "0..*" Stock : 分处存量
+Location "1" -- "0..*" Stock : 存放
+Stock "1" *-- "0..*" Movement : 收发经历
+Movement "0..1" -- "0..*" Movement : 原领用或更正来源
+Movement "1" *-- "0..*" Usage : 实际消耗
+Visit "1" -- "0..*" Usage : 使用就诊
+Count "0..1" -- "0..1" Movement : 批准差异调整
+Stock "1" *-- "0..*" Count : 盘点经历
+@enduml

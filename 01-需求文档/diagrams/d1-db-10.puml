@@ -1,0 +1,90 @@
+@startuml d1-db-10
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF4F4
+}
+title G10  供应商资金结算  ·  4张表
+entity "供应商资金\nsupplier_funds" as supplier_funds {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_id : INTEGER [UQ, FK, NN]  → supplier.id (G09)
+  {field} opened_at : TEXT [NN]
+  {field} opened_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "供货付款\nsupplier_payment" as supplier_payment {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_funds_id : INTEGER [FK, NN]  → supplier_funds.id
+  {field} requested_cents : INTEGER [NN]
+  {field} actual_cents : INTEGER [NULL]
+  {field} channel : TEXT [NN]
+  {field} initiated_at : TEXT [NN]
+  {field} transaction_evidence : TEXT [NULL]
+  {field} external_reference : TEXT [NULL]
+  {field} verified_at : TEXT [NULL]
+  {field} authorization_basis : TEXT [NN]
+  {field} authorized_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} previous_attempt_id : INTEGER [FK, NULL]  → supplier_payment.id
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "供货分配\nsupplier_allocation" as supplier_allocation {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_payment_id : INTEGER [FK, NN]  → supplier_payment.id
+  {field} purchase_order_id : INTEGER [FK, NULL]  → purchase_order.id (G09)
+  {field} purchase_receipt_id : INTEGER [FK, NULL]  → purchase_receipt.id (G09)
+  {field} amount_cents : INTEGER [NN]
+  {field} effective_at : TEXT [NULL]
+  {field} allocation_state : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} original_allocation_id : INTEGER [FK, NULL]  → supplier_allocation.id
+  {field} purchase_issue_id : INTEGER [FK, NULL]  → purchase_issue.id (G09)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "供货退款\nsupplier_refund" as supplier_refund {
+  {field} id : INTEGER [PK, NN]
+  {field} supplier_payment_id : INTEGER [FK, NN]  → supplier_payment.id
+  {field} purchase_issue_id : INTEGER [FK, NN]  → purchase_issue.id (G09)
+  {field} supplier_funds_id : INTEGER [FK, NN]  → supplier_funds.id
+  {field} received_cents : INTEGER [NN]
+  {field} channel : TEXT [NN]
+  {field} received_at : TEXT [NN]
+  {field} transaction_evidence : TEXT [NN]
+  {field} external_reference : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+supplier_allocation --> supplier_payment
+supplier_payment --> supplier_funds
+supplier_refund --> supplier_funds
+supplier_refund --> supplier_payment
+@enduml

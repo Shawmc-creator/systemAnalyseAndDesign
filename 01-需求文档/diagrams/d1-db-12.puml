@@ -1,0 +1,75 @@
+@startuml d1-db-12
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EFF5ED
+}
+title G12  收支核对与差异跟进  ·  3张表
+entity "收支核对\ncash_reconciliation" as cash_reconciliation {
+  {field} id : INTEGER [PK, NN]
+  {field} business_date : TEXT [NN]
+  {field} channel : TEXT [NN]
+  {field} cutoff_at : TEXT [NN]
+  {field} actual_cents : INTEGER [NN]
+  {field} opening_cash_cents : INTEGER [NULL]
+  {field} cash_transfer_evidence : TEXT [NULL]
+  {field} cash_transfer_cents : INTEGER [NN]
+  {field} reconciliation_basis : TEXT [NN]
+  {field} source_digest : TEXT [NN]
+  {field} expected_cents : INTEGER [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "核对项目\nreconciliation_item" as reconciliation_item {
+  {field} id : INTEGER [PK, NN]
+  {field} cash_reconciliation_id : INTEGER [FK, NN]  → cash_reconciliation.id
+  {field} patient_payment_id : INTEGER [FK, NULL]  → patient_payment.id (G06)
+  {field} patient_refund_id : INTEGER [FK, NULL]  → patient_refund.id (G06)
+  {field} supplier_payment_id : INTEGER [FK, NULL]  → supplier_payment.id (G10)
+  {field} supplier_refund_id : INTEGER [FK, NULL]  → supplier_refund.id (G10)
+  {field} source_type : TEXT [NN]
+  {field} included_cents : INTEGER [NN]
+  {field} source_at : TEXT [NN]
+  {field} source_revision : INTEGER [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "差异跟进\nissue_followup" as issue_followup {
+  {field} id : INTEGER [PK, NN]
+  {field} cash_reconciliation_id : INTEGER [FK, NULL]  → cash_reconciliation.id
+  {field} instrument_processing_id : INTEGER [FK, NULL]  → instrument_processing.id (G11)
+  {field} assigned_to : INTEGER [FK, NN]  → staff.id (G01)
+  {field} reason : TEXT [NN]
+  {field} due_date : TEXT [NN]
+  {field} action_note : TEXT [NN]
+  {field} completed_at : TEXT [NULL]
+  {field} status : TEXT [NN]
+  {field} result_basis : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} completed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+issue_followup --> cash_reconciliation
+reconciliation_item --> cash_reconciliation
+@enduml

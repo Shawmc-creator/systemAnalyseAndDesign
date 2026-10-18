@@ -1,10 +1,11 @@
 @startuml
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -21,42 +22,32 @@ actor "患者" as P
 participant "<img:business-worker.png>\n前台" as F
 participant "<img:business-worker.png>\n牙医" as D
 participant "<img:business-entity.png>\n牙科诊所管理系统" as S
-P -> F : 提出预约就诊需求
+P -> F : 提出预约或变更需求
 activate F
-F -> P : 询问姓名、联系电话及就诊需求
-P --> F : 提供联系信息与期望时间
-F -> S : 查询并选定患者资料
-activate S
-S --> F : 返回选定患者编号或待建档结果
-deactivate S
-opt 患者尚无档案
- F -> F : 按UC-08建立患者档案并取得编号
+F -> S : 查询患者及指定日期可用安排
+S --> F : 返回牙医、诊椅及可用时间
+opt 需调整接诊条件
+ F -> D : 核实临时接诊安排
+ D --> F : 给出已协调的安排依据
 end
-F -> S : 查询已发布且经牙医确认的可约时段
+F -> P : 提供可选时间和接诊说明
+P --> F : 确认选择
+F -> S : 提交预约或变更及确认依据
 activate S
-S -> S : 对照接诊排班与有效预约
-S --> F : 返回可约时段、牙医及确认依据
-deactivate S
-opt 拟调整已确认接诊时段
- F -> D : 核实接诊安排
- activate D
- D --> F : 确认变更意见
- deactivate D
- F -> F : 协调负责人按UC-15更新有效接诊安排
-end
-F -> P : 提供可约时段及接诊牙医
-P --> F : 选择并确认预约安排
-F -> S : 提交患者编号、预约及牙医确认依据
-activate S
-S -> S : 检查最新排班与时段冲突
-alt 所选时段仍可预约
- S -> S : 保存预约记录
- S --> F : 返回预约确认信息
- F -> P : 回告预约时间、牙医及到诊要求
-else 时段已被占用或不可接诊
- S --> F : 返回冲突结果及可选时段
- F -> P : 说明冲突并重新协商预约安排
+S -> S : 核对日期安排、资源占用\n保留原预约和变更历史
+alt 符合安排
+ S --> F : 返回有效预约及变更结果
+ F --> P : 告知确认结果
+else 冲突或安排已变化
+ S --> F : 返回原因，保留原有效安排
+ F -> P : 重新协商时间
 end
 deactivate S
+opt 患者取消已有预约
+ P -> F : 提出取消
+ F -> S : 登记取消原因并释放占用
+ S --> F : 返回取消结果
+ F --> P : 确认取消
+end
 deactivate F
 @enduml

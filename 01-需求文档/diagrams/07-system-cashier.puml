@@ -5,8 +5,8 @@ skinparam defaultFontName SimSun
 skinparam defaultFontSize 18
 skinparam dpi 220
 skinparam ArrowColor black
-skinparam nodesep 24
-skinparam ranksep 65
+skinparam nodesep 22
+skinparam ranksep 48
 skinparam actor {
  BorderColor black
  BackgroundColor white
@@ -23,19 +23,28 @@ left to right direction
 actor "收费人员" as A
 rectangle "牙科诊所管理系统" {
  usecase "UC-05\n维护收费价目" as U5
- usecase "UC-06\n查询待结算费用" as U6
- usecase "UC-07\n登记现金收款" as U7
- usecase "UC-19\n查询日常业务与收款" as U19
- usecase "UC-20\n登记收款核对" as U20
+ usecase "UC-06\n查询账单与待结算费用" as U6
+ usecase "UC-07\n登记患者付款与预付抵扣" as U7
+ usecase "UC-19\n查询经营与资金明细" as U19
+ usecase "UC-20\n登记收支核对与差异处理" as U20
+ usecase "UC-24\n申请费用调整与退费" as U24
+ usecase "UC-26\n办理与登记退款" as U26
+ usecase "UC-29\n登记供应商付款与结算" as U29
 }
 A -- U5
 A -- U6
 A -- U7
 A -- U19
 A -- U20
-U5 -[hidden]left-> U6
-U6 -[hidden]left-> U7
-U7 -[hidden]left-> U19
-U19 -[hidden]left-> U20
+A -- U24
+A -- U26
+A -- U29
+U6 -[hidden]right-> U5
+U7 -[hidden]right-> U6
+U19 -[hidden]right-> U7
+U20 -[hidden]right-> U19
+U24 -[hidden]right-> U20
+U26 -[hidden]right-> U24
+U29 -[hidden]right-> U26
 
 @enduml

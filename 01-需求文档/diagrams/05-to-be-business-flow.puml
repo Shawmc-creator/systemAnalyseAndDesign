@@ -1,0 +1,54 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam activity {
+  BackgroundColor #F7FBFD
+  BorderColor #35546B
+  DiamondBackgroundColor #FFF6D8
+  DiamondBorderColor #9A6B16
+}
+title 改进后业务流程图
+
+|患者|
+start
+:提出预约或改期需求;
+|前台|
+:检索或建立患者档案;
+:选择牙医、牙椅和时段;
+|诊所管理系统|
+:校验营业时间、排班、请假和资源冲突;
+if (预约可建立？) then (是)
+  :生成预约号并保存状态历史;
+else (否)
+  :返回冲突原因和可调整条件;
+  |前台|
+  :重新选择时段;
+  |诊所管理系统|
+  :再次校验资源冲突;
+  :生成预约号并保存状态历史;
+endif
+|患者|
+:到店就诊;
+|前台|
+:办理签到与候诊;
+|牙医|
+:问诊、检查并记录诊断;
+:制定并说明治疗方案;
+|诊疗助理|
+:登记治疗执行与附件索引;
+|牙医|
+:签署病历;
+|诊所管理系统|
+:形成待结算治疗项目;
+|收费人员|
+:生成账单并登记支付;
+|牙医|
+:确定复诊要求;
+|诊所管理系统|
+:创建复诊任务和提醒;
+|前台|
+:执行复诊联系并记录结果;
+stop
+@enduml

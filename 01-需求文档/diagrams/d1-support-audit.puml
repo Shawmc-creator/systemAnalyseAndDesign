@@ -1,0 +1,45 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 16
+skinparam dpi 160
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 65
+skinparam ranksep 85
+hide circle
+top to bottom direction
+class "操作提交" as request_submission {
+  id : INTEGER
+  account_id : INTEGER
+  permission_id : INTEGER
+  request_key : TEXT
+  status : TEXT
+  --
+  识别重复命令()
+  返回原阶段结果()
+}
+class "操作审计" as operation_audit {
+  id : INTEGER
+  account_id : INTEGER
+  staff_id : INTEGER
+  session_id : INTEGER
+  submission_id : INTEGER
+  permission_id : INTEGER
+  --
+  追加事件()
+  定位历史依据()
+}
+class "审计字段变化" as audit_change {
+  id : INTEGER
+  audit_id : INTEGER
+  field_name : TEXT
+  before_value : TEXT
+  after_value : TEXT
+  --
+  保留字段前后值()
+}
+request_submission "0..1" -- "0..*" operation_audit : 成功命令归属
+operation_audit "1" -- "0..*" audit_change : 字段变化
+@enduml

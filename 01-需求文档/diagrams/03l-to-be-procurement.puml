@@ -1,0 +1,47 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+participant "<img:business-worker.png>\n诊疗助理" as A
+participant "<img:business-worker.png>\n诊所负责人" as M
+actor "供应商" as V
+participant "<img:business-worker.png>\n收费人员" as C
+participant "<img:business-entity.png>\n牙科诊所管理系统" as S
+A -> S : 提交材料补充需求
+M -> S : 核对需求并确认供应商和采购明细
+S --> M : 返回采购记录
+M -> V : 确认采购及交付条件
+V --> M : 确认供货安排
+loop 每次到货
+ V -> A : 交付材料及随货单据
+ A -> A : 核对数量、批号、效期和实物
+ A -> V : 告知合格、拒收及差异
+ V --> A : 确认补货或退换处理
+ A -> S : 登记验收明细、批次和拒收原因
+ S -> S : 合格数量入库\n保留采购未到量及差异
+ S --> A : 返回验收及库存结果
+end
+M -> S : 确认供货结算依据
+C -> S : 查询应付、已付及差异
+S --> C : 返回核对明细
+C -> V : 核对货款并按约定付款
+V --> C : 确认款项及凭据
+C -> S : 登记实际付款及凭据
+S --> C : 返回结算结果及余额
+@enduml

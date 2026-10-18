@@ -1,0 +1,30 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "候诊" as Waiting
+state "接诊中" as Active
+state "诊疗结束" as Ended
+[*] --> Waiting : 登记到诊\n[患者与安排已核实]\n/ 建立病历草稿
+Waiting --> Active : 确认实际接诊\n[具备接诊或交接资格]\n/ 记接诊开始
+Active : 确认实际执行 [依据有效]\n/ 保留执行及后续安排
+Active --> Ended : 结束本次诊疗\n[病历已签署]\n/ 保留独立收费与诊后状态
+
+@enduml

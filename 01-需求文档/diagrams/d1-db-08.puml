@@ -1,0 +1,143 @@
+@startuml d1-db-08
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F7F0E6
+}
+title G08  材料批次与库存  ·  8张表
+entity "材料\nmaterial" as material {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} specification : TEXT [NN]
+  {field} base_unit : TEXT [NN]
+  {field} purchase_unit : TEXT [NN]
+  {field} conversion_numerator : INTEGER [NN]
+  {field} conversion_denominator : INTEGER [NN]
+  {field} quantity_scale : INTEGER [NN]
+  {field} requires_trace : INTEGER [NN]
+  {field} requires_expiry : INTEGER [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "材料批次\nmaterial_batch" as material_batch {
+  {field} id : INTEGER [PK, NN]
+  {field} material_id : INTEGER [FK, NN]  → material.id
+  {field} batch_no : TEXT [NN]
+  {field} expiry_date : TEXT [NULL]
+  {field} source_note : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "批次变更\nbatch_change" as batch_change {
+  {field} id : INTEGER [PK, NN]
+  {field} material_batch_id : INTEGER [FK, NN]  → material_batch.id
+  {field} old_status : TEXT [NN]
+  {field} new_status : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} confirmed_at : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "存放位置\nstock_location" as stock_location {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} purpose : TEXT [NN]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "批次存量\nbatch_stock" as batch_stock {
+  {field} id : INTEGER [PK, NN]
+  {field} material_batch_id : INTEGER [FK, NN]  → material_batch.id
+  {field} stock_location_id : INTEGER [FK, NN]  → stock_location.id
+  {field} quantity_scaled : INTEGER [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "库存变动\ninventory_movement" as inventory_movement {
+  {field} id : INTEGER [PK, NN]
+  {field} batch_stock_id : INTEGER [FK, NN]  → batch_stock.id
+  {field} original_movement_id : INTEGER [FK, NULL]  → inventory_movement.id
+  {field} stock_count_id : INTEGER [UQ, FK, NULL]  → stock_count.id
+  {field} purchase_receipt_item_id : INTEGER [FK, NULL]  → purchase_receipt_item.id (G09)
+  {field} movement_type : TEXT [NN]
+  {field} delta_scaled : INTEGER [NN]
+  {field} before_scaled : INTEGER [NN]
+  {field} after_scaled : INTEGER [NN]
+  {field} reason : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} purchase_issue_id : INTEGER [FK, NULL]  → purchase_issue.id (G09)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "实际用料\nmaterial_usage" as material_usage {
+  {field} id : INTEGER [PK, NN]
+  {field} inventory_movement_id : INTEGER [FK, NN]  → inventory_movement.id
+  {field} visit_id : INTEGER [FK, NN]  → visit.id (G02)
+  {field} quantity_scaled : INTEGER [NN]
+  {field} used_at : TEXT [NN]
+  {field} note : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "盘点核实\nstock_count" as stock_count {
+  {field} id : INTEGER [PK, NN]
+  {field} batch_stock_id : INTEGER [FK, NN]  → batch_stock.id
+  {field} snapshot_quantity_scaled : INTEGER [NN]
+  {field} counted_quantity_scaled : INTEGER [NN]
+  {field} reason : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} stock_revision : INTEGER [NN]
+  {field} counted_at : TEXT [NN]
+  {field} review_note : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+batch_change --> material_batch
+batch_stock --> material_batch
+batch_stock --> stock_location
+inventory_movement --> batch_stock
+inventory_movement --> stock_count
+material_batch --> material
+material_usage --> inventory_movement
+stock_count --> batch_stock
+@enduml

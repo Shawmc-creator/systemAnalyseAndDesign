@@ -1,0 +1,39 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "待发布" as Draft
+state "待联系" as Contact
+state "待到诊或评估" as Attend
+state "已完成" as Done
+state "已撤销" as Cancel
+[*] --> Draft : 提出诊后要求\n[来源尚未确认]\n/ 保留草稿
+[*] --> Contact : 提出诊后要求\n[来源已签署或已确认]\n/ 交责任前台
+Draft --> Contact : 判断发布条件\n[来源已签署或已确认]\n/ 交责任前台
+Contact : 登记联系结果 [未联系上或需再联系]\n/ 追加经历及日期
+Contact --> Attend : 衔接后续安排\n[预约已关联或等待牙医评估]\n/ 保留待办
+Attend --> Contact : 恢复待安排\n[复诊取消或需重新联系]\n/ 保留历史预约
+Attend --> Done : 判断完成或继续\n[牙医确认评估完成]\n/ 保留评估依据
+Contact --> Done : 判断完成或继续\n[无需临床评估且联系目标达成]\n/ 保留完成依据
+Attend --> Contact : 判断完成或继续\n[仍需跟进]\n/ 指定日期与责任
+Contact --> Cancel : 确认撤销要求\n[牙医确认理由]\n/ 保留原要求
+Attend --> Cancel : 确认撤销要求\n[牙医确认理由]\n/ 保留原要求
+
+@enduml

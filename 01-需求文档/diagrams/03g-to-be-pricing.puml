@@ -1,10 +1,11 @@
 @startuml
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -17,35 +18,27 @@ skinparam sequence {
  ActivationBorderColor black
  ActivationBackgroundColor white
 }
-participant "<img:business-worker.png>\n收费人员" as C
 participant "<img:business-worker.png>\n诊所负责人" as M
+participant "<img:business-worker.png>\n收费人员" as C
+participant "<img:business-worker.png>\n牙医" as D
 participant "<img:business-entity.png>\n牙科诊所管理系统" as S
-C -> M : 提交项目、单位、价格及适用区间
-activate M
-M -> M : 核实项目和价格调整内容
-M --> C : 确认价格及区间衔接安排
-deactivate M
+M -> C : 确认项目、价格及适用时间
 activate C
-C -> S : 查询该项目现有及历史价目
-activate S
-S --> C : 返回价目版本与适用区间
-deactivate S
-C -> C : 核对维护内容与负责人确认一致
-C -> S : 提交价目及负责人确认信息
-activate S
-S -> S : 校验价格、区间及确认信息\n检查同一项目适用区间重叠
-alt 价目方案有效
- S -> S : 保存新版本及区间衔接\n保留历史价目和既有结算依据
- S --> C : 返回保存结果
-else 价目方案无效
- S --> C : 返回具体问题，不覆盖已有价目
+C -> S : 提交价目版本及确认依据
+S -> S : 核对完整性及适用区间
+alt 价目有效
+ S --> C : 返回有效版本
+ C -> D : 告知价目变化
+ D -> S : 查询适用价目
+ S --> D : 返回项目价格及适用时间
+else 内容有误或区间重叠
+ S --> C : 返回原因并保留原价目
 end
-deactivate S
-opt 价目维护成功
- C -> M : 提供保存结果及价目版本明细
- activate M
- M -> M : 核对确认内容与生效安排
-deactivate M
+opt 个别费用需要调整
+ C -> M : 提交调整原因及依据
+ M --> C : 确认处理意见
+ C -> S : 登记调整并关联原费用
+ S --> C : 返回调整结果，原依据保留
 end
 deactivate C
 @enduml

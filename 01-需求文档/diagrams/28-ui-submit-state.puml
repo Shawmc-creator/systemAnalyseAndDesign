@@ -1,0 +1,39 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam dpi 160
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+state "可编辑" as Edit
+state "校验中" as Validate
+state "提交中" as Sending
+state "已确认保存" as Saved
+state "结果待核实" as Unknown
+state "查询原结果" as Lookup
+state "冲突待核对" as Conflict
+state "登录失效" as Expired
+[*] --> Edit
+Edit --> Validate : 点击提交
+Validate --> Edit : 字段不完整／定位错误
+Validate --> Sending : 校验通过／\n冻结输入与请求键
+Sending --> Saved : 服务端确认已提交
+Sending --> Edit : 明确拒绝或已回滚／\n保留输入
+Sending --> Conflict : 版本或依据变化
+Sending --> Unknown : 超时或连接断开
+Unknown --> Lookup : 使用原请求键查询
+Lookup --> Saved : 查到本人的已提交结果
+Lookup --> Unknown : 仍无法确认／\n等待后重查
+Lookup --> Sending : 未查到且用户重试／\n原键原输入
+Conflict --> Edit : 重读并核对／\n生成新提交
+Sending --> Expired : 身份失效
+Expired --> Lookup : 重新登录原账号／\n核实原提交
+Saved --> Edit : 下一笔操作
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+left to right direction
+rectangle "登录 / 当前岗位工作台" as HOME
+rectangle "前台\n预约与到诊 / 患者资料 / 随访联系" as F
+rectangle "牙医\n诊疗工作台 / 方案文书 / 临床评估" as D
+rectangle "收费人员\n应收付款 / 费用申请 / 退款 / 收支核对" as C
+rectangle "诊疗助理\n材料库存 / 验收到货 / 器械处理与使用" as A
+rectangle "负责人\n排班经营 / 价目费用审核 / 采购授权 / 运行管理" as M
+HOME --> F
+HOME --> D
+HOME --> C
+HOME --> A
+HOME --> M
+F --> D : 同患者就诊号
+D --> C : 已执行项目与应收依据
+C --> F : 费用独立；保留诊后待办
+A --> D : 批次及包次使用依据
+M --> A : 确认与异常处置
+@enduml

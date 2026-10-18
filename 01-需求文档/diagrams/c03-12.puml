@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "牙医" as A0
+boundary "<u>:牙医接口</u>" as B0
+control "<u>:提出复诊随访要</u>\n<u>求控制</u>" as K
+participant "<u>:就诊</u>" as Visit
+participant "<u>:治疗方案</u>" as Plan
+participant "<u>:方案版本</u>" as PlanVersion
+participant "<u>:诊后要求</u>" as Followup
+A0 -> B0 : 提交UC-12办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-12办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+opt 要求来源包含就诊
+K -> Visit : 提供诊后来源(患者、签署依据或草稿)
+activate Visit
+Visit --> K : 处理结果或拒绝原因
+deactivate Visit
+end
+opt 要求来源包含持续方案
+K -> Plan : 提供诊后方案依据(持续方案或空)
+activate Plan
+Plan -> PlanVersion : 提供确认来源(具体版本)
+activate PlanVersion
+PlanVersion --> Plan : 处理结果或拒绝原因
+deactivate PlanVersion
+Plan --> K : 处理结果或拒绝原因
+deactivate Plan
+end
+K -> Followup : 提出诊后要求(有效来源、目的、目标日期、责\n任人)
+activate Followup
+Followup -> Followup : 判断发布条件(来源已签署或已确认)
+Followup --> K : 处理结果或拒绝原因
+deactivate Followup
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Followup
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

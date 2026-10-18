@@ -1,0 +1,49 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+top to bottom direction
+class "岗位页面接口" as UI <<boundary>> {
+ +检查格式(输入): 输入错误列表
+ +展示(结果): 页面状态
+}
+class "用例控制类（32个）" as K <<control>> {
+ +办理(ctx: 操作上下文, cmd: 用例命令): 办理结果
+ +查询(ctx: 操作上下文, query: 查询条件): 查询结果
+}
+class "领域实体（67个）" as E <<entity>> {
+ +执行业务操作(依据): 业务决定及变更集合
+}
+class "数据映射器" as M {
+ +装载(对象引用): 实体及依据版本
+ +保存(变更集合, 连接): 影响行数
+}
+class "工作单元" as W {
+ +开始写事务(): 同一连接
+ +开始读事务(): 同一读取快照
+ +核对提交(ctx, cmd): 新命令或原结果
+ +校验集合与来源(): 校验结果
+ +保存结果与审计并提交(): 办理结果
+ +结束读事务(): void
+ +回滚(): void
+}
+class "权限与会话服务" as A {
+ +核对岗位及对象(ctx, 引用): 授权依据
+}
+class "SQLite数据层（85表）" as DB
+UI --> K
+K --> A
+K --> W
+K --> M
+K --> E
+M --> DB
+M ..> W : 共用连接
+E ..> E : 沿既有关联协作
+@enduml

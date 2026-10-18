@@ -1,0 +1,3106 @@
+{
+  "version": "2026-10-18-D1-state-collections",
+  "groups": 281,
+  "rows": [
+    {
+      "table": "patient",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "staff",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_change",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_change",
+      "group": 1,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_proxy",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "verified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_proxy",
+      "group": 1,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_handover",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "handover_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_handover",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "receiving_dentist_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_handover",
+      "group": 2,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "dental_chair",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "dated_schedule",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "confirmed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "dated_schedule",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "dated_schedule",
+      "group": 2,
+      "sequence": 0,
+      "parent": "dental_chair",
+      "column": "dental_chair_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "dated_schedule",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "dentist_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "schedule_change",
+      "group": 0,
+      "sequence": 0,
+      "parent": "dental_chair",
+      "column": "new_chair_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "schedule_change",
+      "group": 1,
+      "sequence": 0,
+      "parent": "dental_chair",
+      "column": "old_chair_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "schedule_change",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "new_dentist_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "schedule_change",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "old_dentist_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "schedule_change",
+      "group": 4,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "schedule_change",
+      "group": 5,
+      "sequence": 0,
+      "parent": "dated_schedule",
+      "column": "dated_schedule_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "resource_occupancy",
+      "group": 0,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "resource_occupancy",
+      "group": 0,
+      "sequence": 1,
+      "parent": "visit",
+      "column": "appointment_id",
+      "parent_column": "appointment_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "resource_occupancy",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "released_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "resource_occupancy",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "resource_occupancy",
+      "group": 3,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "resource_occupancy",
+      "group": 4,
+      "sequence": 0,
+      "parent": "appointment",
+      "column": "appointment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "resource_occupancy",
+      "group": 5,
+      "sequence": 0,
+      "parent": "dated_schedule",
+      "column": "dated_schedule_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "appointment",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "notified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "appointment",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "appointment",
+      "group": 2,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "appointment_change",
+      "group": 0,
+      "sequence": 0,
+      "parent": "dated_schedule",
+      "column": "new_schedule_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "appointment_change",
+      "group": 1,
+      "sequence": 0,
+      "parent": "dated_schedule",
+      "column": "old_schedule_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "appointment_change",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "appointment_change",
+      "group": 3,
+      "sequence": 0,
+      "parent": "appointment",
+      "column": "appointment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "visit",
+      "group": 0,
+      "sequence": 0,
+      "parent": "appointment",
+      "column": "appointment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "visit",
+      "group": 0,
+      "sequence": 1,
+      "parent": "appointment",
+      "column": "patient_id",
+      "parent_column": "patient_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "visit",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "registered_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "visit",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "dentist_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "visit",
+      "group": 3,
+      "sequence": 0,
+      "parent": "appointment",
+      "column": "appointment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "visit",
+      "group": 4,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "health_version",
+      "group": 0,
+      "sequence": 0,
+      "parent": "health_version",
+      "column": "previous_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "health_version",
+      "group": 0,
+      "sequence": 1,
+      "parent": "health_version",
+      "column": "patient_id",
+      "parent_column": "patient_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "health_version",
+      "group": 1,
+      "sequence": 0,
+      "parent": "health_version",
+      "column": "previous_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "health_version",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "health_version",
+      "group": 3,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "health_item",
+      "group": 0,
+      "sequence": 0,
+      "parent": "health_version",
+      "column": "health_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "health_review",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "reviewed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "health_review",
+      "group": 1,
+      "sequence": 0,
+      "parent": "health_version",
+      "column": "health_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "health_review",
+      "group": 2,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_record",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "signed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_record",
+      "group": 1,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_finding",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "recorded_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_finding",
+      "group": 1,
+      "sequence": 0,
+      "parent": "clinical_record",
+      "column": "clinical_record_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "record_addendum",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "signed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "record_addendum",
+      "group": 1,
+      "sequence": 0,
+      "parent": "clinical_record",
+      "column": "clinical_record_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_document",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_document",
+      "group": 1,
+      "sequence": 0,
+      "parent": "plan_version",
+      "column": "plan_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_document",
+      "group": 2,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_document",
+      "group": 3,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "document_version",
+      "group": 0,
+      "sequence": 0,
+      "parent": "document_version",
+      "column": "previous_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "document_version",
+      "group": 0,
+      "sequence": 1,
+      "parent": "document_version",
+      "column": "clinical_document_id",
+      "parent_column": "clinical_document_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "document_version",
+      "group": 1,
+      "sequence": 0,
+      "parent": "document_version",
+      "column": "previous_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "document_version",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "confirmed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "document_version",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "uploaded_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "document_version",
+      "group": 4,
+      "sequence": 0,
+      "parent": "clinical_document",
+      "column": "clinical_document_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "treatment_plan",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "closed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "treatment_plan",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "treatment_plan",
+      "group": 2,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "plan_version",
+      "group": 0,
+      "sequence": 0,
+      "parent": "plan_version",
+      "column": "previous_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "plan_version",
+      "group": 0,
+      "sequence": 1,
+      "parent": "plan_version",
+      "column": "treatment_plan_id",
+      "parent_column": "treatment_plan_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "plan_version",
+      "group": 1,
+      "sequence": 0,
+      "parent": "plan_version",
+      "column": "previous_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "plan_version",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "explained_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "plan_version",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "plan_version",
+      "group": 4,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "source_visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "plan_version",
+      "group": 5,
+      "sequence": 0,
+      "parent": "treatment_plan",
+      "column": "treatment_plan_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "plan_item",
+      "group": 0,
+      "sequence": 0,
+      "parent": "plan_version",
+      "column": "plan_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_decision",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "recorded_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_decision",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "explained_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_decision",
+      "group": 2,
+      "sequence": 0,
+      "parent": "patient_proxy",
+      "column": "patient_proxy_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_decision",
+      "group": 3,
+      "sequence": 0,
+      "parent": "plan_version",
+      "column": "plan_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "treatment_execution",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "performed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "treatment_execution",
+      "group": 1,
+      "sequence": 0,
+      "parent": "treatment_execution",
+      "column": "original_execution_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "treatment_execution",
+      "group": 2,
+      "sequence": 0,
+      "parent": "service",
+      "column": "service_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "treatment_execution",
+      "group": 3,
+      "sequence": 0,
+      "parent": "plan_item",
+      "column": "plan_item_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "treatment_execution",
+      "group": 4,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "service",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "service_price",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "confirmed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "service_price",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "service_price",
+      "group": 2,
+      "sequence": 0,
+      "parent": "service",
+      "column": "service_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "bill",
+      "group": 0,
+      "sequence": 0,
+      "parent": "patient_funds",
+      "column": "patient_funds_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "bill",
+      "group": 0,
+      "sequence": 1,
+      "parent": "patient_funds",
+      "column": "patient_id",
+      "parent_column": "patient_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "bill",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "bill",
+      "group": 2,
+      "sequence": 0,
+      "parent": "patient_funds",
+      "column": "patient_funds_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "bill",
+      "group": 3,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "bill_item",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "priced_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "bill_item",
+      "group": 1,
+      "sequence": 0,
+      "parent": "service_price",
+      "column": "service_price_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "bill_item",
+      "group": 2,
+      "sequence": 0,
+      "parent": "treatment_execution",
+      "column": "treatment_execution_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "bill_item",
+      "group": 3,
+      "sequence": 0,
+      "parent": "bill",
+      "column": "bill_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_funds",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "opened_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_funds",
+      "group": 1,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_payment",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "verified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_payment",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_payment",
+      "group": 2,
+      "sequence": 0,
+      "parent": "patient_funds",
+      "column": "patient_funds_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "payment_allocation",
+      "group": 0,
+      "sequence": 0,
+      "parent": "payment_allocation",
+      "column": "original_allocation_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "payment_allocation",
+      "group": 0,
+      "sequence": 1,
+      "parent": "payment_allocation",
+      "column": "patient_payment_id",
+      "parent_column": "patient_payment_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "payment_allocation",
+      "group": 0,
+      "sequence": 2,
+      "parent": "payment_allocation",
+      "column": "bill_id",
+      "parent_column": "bill_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "payment_allocation",
+      "group": 1,
+      "sequence": 0,
+      "parent": "fee_request",
+      "column": "fee_request_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "payment_allocation",
+      "group": 2,
+      "sequence": 0,
+      "parent": "payment_allocation",
+      "column": "original_allocation_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "payment_allocation",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "payment_allocation",
+      "group": 4,
+      "sequence": 0,
+      "parent": "bill",
+      "column": "bill_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "payment_allocation",
+      "group": 5,
+      "sequence": 0,
+      "parent": "patient_payment",
+      "column": "patient_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "prepayment_offset",
+      "group": 0,
+      "sequence": 0,
+      "parent": "prepayment_offset",
+      "column": "original_offset_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "prepayment_offset",
+      "group": 0,
+      "sequence": 1,
+      "parent": "prepayment_offset",
+      "column": "patient_payment_id",
+      "parent_column": "patient_payment_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "prepayment_offset",
+      "group": 0,
+      "sequence": 2,
+      "parent": "prepayment_offset",
+      "column": "bill_id",
+      "parent_column": "bill_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "prepayment_offset",
+      "group": 1,
+      "sequence": 0,
+      "parent": "fee_request",
+      "column": "fee_request_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "prepayment_offset",
+      "group": 2,
+      "sequence": 0,
+      "parent": "prepayment_offset",
+      "column": "original_offset_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "prepayment_offset",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "prepayment_offset",
+      "group": 4,
+      "sequence": 0,
+      "parent": "bill",
+      "column": "bill_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "prepayment_offset",
+      "group": 5,
+      "sequence": 0,
+      "parent": "patient_payment",
+      "column": "patient_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_request",
+      "group": 0,
+      "sequence": 0,
+      "parent": "patient_payment",
+      "column": "patient_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_request",
+      "group": 0,
+      "sequence": 1,
+      "parent": "patient_payment",
+      "column": "patient_funds_id",
+      "parent_column": "patient_funds_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_request",
+      "group": 1,
+      "sequence": 0,
+      "parent": "bill",
+      "column": "bill_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_request",
+      "group": 1,
+      "sequence": 1,
+      "parent": "bill",
+      "column": "patient_funds_id",
+      "parent_column": "patient_funds_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_request",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "reviewed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_request",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_request",
+      "group": 4,
+      "sequence": 0,
+      "parent": "patient_payment",
+      "column": "patient_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_request",
+      "group": 5,
+      "sequence": 0,
+      "parent": "bill",
+      "column": "bill_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_request",
+      "group": 6,
+      "sequence": 0,
+      "parent": "patient_funds",
+      "column": "patient_funds_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_adjustment",
+      "group": 0,
+      "sequence": 0,
+      "parent": "fee_request",
+      "column": "fee_request_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_adjustment",
+      "group": 0,
+      "sequence": 1,
+      "parent": "fee_request",
+      "column": "bill_id",
+      "parent_column": "bill_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_adjustment",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "approved_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_adjustment",
+      "group": 2,
+      "sequence": 0,
+      "parent": "bill",
+      "column": "bill_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_adjustment",
+      "group": 3,
+      "sequence": 0,
+      "parent": "fee_request",
+      "column": "fee_request_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_adjustment_item",
+      "group": 0,
+      "sequence": 0,
+      "parent": "bill_item",
+      "column": "bill_item_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "fee_adjustment_item",
+      "group": 1,
+      "sequence": 0,
+      "parent": "fee_adjustment",
+      "column": "fee_adjustment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 0,
+      "sequence": 0,
+      "parent": "patient_refund",
+      "column": "previous_attempt_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 0,
+      "sequence": 1,
+      "parent": "patient_refund",
+      "column": "patient_funds_id",
+      "parent_column": "patient_funds_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 1,
+      "sequence": 0,
+      "parent": "patient_payment",
+      "column": "patient_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 1,
+      "sequence": 1,
+      "parent": "patient_payment",
+      "column": "patient_funds_id",
+      "parent_column": "patient_funds_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 2,
+      "sequence": 0,
+      "parent": "fee_request",
+      "column": "fee_request_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 2,
+      "sequence": 1,
+      "parent": "fee_request",
+      "column": "patient_funds_id",
+      "parent_column": "patient_funds_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 3,
+      "sequence": 0,
+      "parent": "patient_refund",
+      "column": "previous_attempt_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 4,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "verified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 5,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 6,
+      "sequence": 0,
+      "parent": "patient_funds",
+      "column": "patient_funds_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 7,
+      "sequence": 0,
+      "parent": "patient_payment",
+      "column": "patient_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "patient_refund",
+      "group": 8,
+      "sequence": 0,
+      "parent": "fee_request",
+      "column": "fee_request_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "followup_requirement",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "closed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "followup_requirement",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "responsible_frontdesk_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "followup_requirement",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "followup_requirement",
+      "group": 3,
+      "sequence": 0,
+      "parent": "plan_version",
+      "column": "source_plan_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "followup_requirement",
+      "group": 4,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "source_visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "followup_requirement",
+      "group": 5,
+      "sequence": 0,
+      "parent": "patient",
+      "column": "patient_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "contact_history",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "contact_history",
+      "group": 1,
+      "sequence": 0,
+      "parent": "appointment",
+      "column": "appointment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "contact_history",
+      "group": 2,
+      "sequence": 0,
+      "parent": "followup_requirement",
+      "column": "followup_requirement_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_assessment",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "responsible_staff_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_assessment",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "assessed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_assessment",
+      "group": 2,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "clinical_assessment",
+      "group": 3,
+      "sequence": 0,
+      "parent": "followup_requirement",
+      "column": "followup_requirement_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "material",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "confirmed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "material",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "material_batch",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "material_batch",
+      "group": 1,
+      "sequence": 0,
+      "parent": "material",
+      "column": "material_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "batch_change",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "confirmed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "batch_change",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "batch_change",
+      "group": 2,
+      "sequence": 0,
+      "parent": "material_batch",
+      "column": "material_batch_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "stock_location",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "batch_stock",
+      "group": 0,
+      "sequence": 0,
+      "parent": "stock_location",
+      "column": "stock_location_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "batch_stock",
+      "group": 1,
+      "sequence": 0,
+      "parent": "material_batch",
+      "column": "material_batch_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 0,
+      "sequence": 0,
+      "parent": "stock_count",
+      "column": "stock_count_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 0,
+      "sequence": 1,
+      "parent": "stock_count",
+      "column": "batch_stock_id",
+      "parent_column": "batch_stock_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 1,
+      "sequence": 0,
+      "parent": "inventory_movement",
+      "column": "original_movement_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 1,
+      "sequence": 1,
+      "parent": "inventory_movement",
+      "column": "batch_stock_id",
+      "parent_column": "batch_stock_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 2,
+      "sequence": 0,
+      "parent": "purchase_issue",
+      "column": "purchase_issue_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 4,
+      "sequence": 0,
+      "parent": "purchase_receipt_item",
+      "column": "purchase_receipt_item_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 5,
+      "sequence": 0,
+      "parent": "stock_count",
+      "column": "stock_count_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 6,
+      "sequence": 0,
+      "parent": "inventory_movement",
+      "column": "original_movement_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "inventory_movement",
+      "group": 7,
+      "sequence": 0,
+      "parent": "batch_stock",
+      "column": "batch_stock_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "material_usage",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "material_usage",
+      "group": 1,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "material_usage",
+      "group": 2,
+      "sequence": 0,
+      "parent": "inventory_movement",
+      "column": "inventory_movement_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "stock_count",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "confirmed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "stock_count",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "stock_count",
+      "group": 2,
+      "sequence": 0,
+      "parent": "batch_stock",
+      "column": "batch_stock_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "verified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_order",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "confirmed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_order",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_order",
+      "group": 2,
+      "sequence": 0,
+      "parent": "supplier",
+      "column": "supplier_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_order_item",
+      "group": 0,
+      "sequence": 0,
+      "parent": "material",
+      "column": "material_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_order_item",
+      "group": 1,
+      "sequence": 0,
+      "parent": "purchase_order",
+      "column": "purchase_order_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_receipt",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "confirmed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_receipt",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_receipt",
+      "group": 2,
+      "sequence": 0,
+      "parent": "purchase_order",
+      "column": "purchase_order_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_receipt_item",
+      "group": 0,
+      "sequence": 0,
+      "parent": "stock_location",
+      "column": "stock_location_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_receipt_item",
+      "group": 1,
+      "sequence": 0,
+      "parent": "material_batch",
+      "column": "material_batch_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_receipt_item",
+      "group": 2,
+      "sequence": 0,
+      "parent": "purchase_order_item",
+      "column": "purchase_order_item_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_receipt_item",
+      "group": 3,
+      "sequence": 0,
+      "parent": "purchase_receipt",
+      "column": "purchase_receipt_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_issue",
+      "group": 0,
+      "sequence": 0,
+      "parent": "purchase_receipt_item",
+      "column": "purchase_receipt_item_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_issue",
+      "group": 0,
+      "sequence": 1,
+      "parent": "purchase_receipt_item",
+      "column": "purchase_order_item_id",
+      "parent_column": "purchase_order_item_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_issue",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "confirmed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_issue",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_issue",
+      "group": 3,
+      "sequence": 0,
+      "parent": "purchase_receipt_item",
+      "column": "purchase_receipt_item_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "purchase_issue",
+      "group": 4,
+      "sequence": 0,
+      "parent": "purchase_order_item",
+      "column": "purchase_order_item_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_funds",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "opened_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_funds",
+      "group": 1,
+      "sequence": 0,
+      "parent": "supplier",
+      "column": "supplier_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_payment",
+      "group": 0,
+      "sequence": 0,
+      "parent": "supplier_payment",
+      "column": "previous_attempt_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_payment",
+      "group": 0,
+      "sequence": 1,
+      "parent": "supplier_payment",
+      "column": "supplier_funds_id",
+      "parent_column": "supplier_funds_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_payment",
+      "group": 1,
+      "sequence": 0,
+      "parent": "supplier_payment",
+      "column": "previous_attempt_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_payment",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "verified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_payment",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_payment",
+      "group": 4,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "authorized_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_payment",
+      "group": 5,
+      "sequence": 0,
+      "parent": "supplier_funds",
+      "column": "supplier_funds_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_allocation",
+      "group": 0,
+      "sequence": 0,
+      "parent": "supplier_allocation",
+      "column": "original_allocation_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_allocation",
+      "group": 0,
+      "sequence": 1,
+      "parent": "supplier_allocation",
+      "column": "supplier_payment_id",
+      "parent_column": "supplier_payment_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_allocation",
+      "group": 1,
+      "sequence": 0,
+      "parent": "purchase_issue",
+      "column": "purchase_issue_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_allocation",
+      "group": 2,
+      "sequence": 0,
+      "parent": "supplier_allocation",
+      "column": "original_allocation_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_allocation",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_allocation",
+      "group": 4,
+      "sequence": 0,
+      "parent": "purchase_receipt",
+      "column": "purchase_receipt_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_allocation",
+      "group": 5,
+      "sequence": 0,
+      "parent": "purchase_order",
+      "column": "purchase_order_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_allocation",
+      "group": 6,
+      "sequence": 0,
+      "parent": "supplier_payment",
+      "column": "supplier_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_refund",
+      "group": 0,
+      "sequence": 0,
+      "parent": "supplier_payment",
+      "column": "supplier_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_refund",
+      "group": 0,
+      "sequence": 1,
+      "parent": "supplier_payment",
+      "column": "supplier_funds_id",
+      "parent_column": "supplier_funds_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_refund",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "verified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_refund",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_refund",
+      "group": 3,
+      "sequence": 0,
+      "parent": "supplier_funds",
+      "column": "supplier_funds_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_refund",
+      "group": 4,
+      "sequence": 0,
+      "parent": "purchase_issue",
+      "column": "purchase_issue_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "supplier_refund",
+      "group": 5,
+      "sequence": 0,
+      "parent": "supplier_payment",
+      "column": "supplier_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_pack",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "processing_equipment",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_processing",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "isolated_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_processing",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "released_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_processing",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_processing",
+      "group": 3,
+      "sequence": 0,
+      "parent": "instrument_processing",
+      "column": "previous_processing_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_processing",
+      "group": 4,
+      "sequence": 0,
+      "parent": "processing_equipment",
+      "column": "processing_equipment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "checked_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "group": 1,
+      "sequence": 0,
+      "parent": "instrument_pack",
+      "column": "instrument_pack_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "group": 2,
+      "sequence": 0,
+      "parent": "instrument_processing",
+      "column": "instrument_processing_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "processing_monitor",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "recorded_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "processing_monitor",
+      "group": 1,
+      "sequence": 0,
+      "parent": "instrument_processing",
+      "column": "instrument_processing_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_use",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "used_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_use",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_use",
+      "group": 2,
+      "sequence": 0,
+      "parent": "instrument_pack_cycle",
+      "column": "instrument_pack_cycle_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "instrument_use",
+      "group": 3,
+      "sequence": 0,
+      "parent": "visit",
+      "column": "visit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "cash_reconciliation",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "operator_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "reconciliation_item",
+      "group": 0,
+      "sequence": 0,
+      "parent": "supplier_refund",
+      "column": "supplier_refund_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "reconciliation_item",
+      "group": 1,
+      "sequence": 0,
+      "parent": "supplier_payment",
+      "column": "supplier_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "reconciliation_item",
+      "group": 2,
+      "sequence": 0,
+      "parent": "patient_refund",
+      "column": "patient_refund_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "reconciliation_item",
+      "group": 3,
+      "sequence": 0,
+      "parent": "patient_payment",
+      "column": "patient_payment_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "reconciliation_item",
+      "group": 4,
+      "sequence": 0,
+      "parent": "cash_reconciliation",
+      "column": "cash_reconciliation_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "issue_followup",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "completed_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "issue_followup",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "created_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "issue_followup",
+      "group": 2,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "assigned_to",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "issue_followup",
+      "group": 3,
+      "sequence": 0,
+      "parent": "instrument_processing",
+      "column": "instrument_processing_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "issue_followup",
+      "group": 4,
+      "sequence": 0,
+      "parent": "cash_reconciliation",
+      "column": "cash_reconciliation_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "decision_plan_item",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "linked_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "decision_plan_item",
+      "group": 1,
+      "sequence": 0,
+      "parent": "plan_item",
+      "column": "plan_item_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "decision_plan_item",
+      "group": 2,
+      "sequence": 0,
+      "parent": "patient_decision",
+      "column": "decision_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "decision_file_version",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "linked_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "decision_file_version",
+      "group": 1,
+      "sequence": 0,
+      "parent": "document_version",
+      "column": "document_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "decision_file_version",
+      "group": 2,
+      "sequence": 0,
+      "parent": "patient_decision",
+      "column": "decision_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "user_account",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "staff_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "staff_role_qualification",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "revoked_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "staff_role_qualification",
+      "group": 1,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "verified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "staff_role_qualification",
+      "group": 2,
+      "sequence": 0,
+      "parent": "access_role",
+      "column": "role_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "staff_role_qualification",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "staff_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "account_role",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff_role_qualification",
+      "column": "qualification_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "account_role",
+      "group": 0,
+      "sequence": 1,
+      "parent": "staff_role_qualification",
+      "column": "role_id",
+      "parent_column": "role_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "account_role",
+      "group": 1,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "revoked_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "account_role",
+      "group": 2,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "granted_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "account_role",
+      "group": 3,
+      "sequence": 0,
+      "parent": "staff_role_qualification",
+      "column": "qualification_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "account_role",
+      "group": 4,
+      "sequence": 0,
+      "parent": "access_role",
+      "column": "role_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "account_role",
+      "group": 5,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "account_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "role_permission",
+      "group": 0,
+      "sequence": 0,
+      "parent": "access_permission",
+      "column": "permission_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "role_permission",
+      "group": 1,
+      "sequence": 0,
+      "parent": "access_role",
+      "column": "role_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "login_session",
+      "group": 0,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "account_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "authentication_event",
+      "group": 0,
+      "sequence": 0,
+      "parent": "login_session",
+      "column": "session_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "authentication_event",
+      "group": 0,
+      "sequence": 1,
+      "parent": "login_session",
+      "column": "account_id",
+      "parent_column": "account_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "authentication_event",
+      "group": 1,
+      "sequence": 0,
+      "parent": "login_session",
+      "column": "session_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "authentication_event",
+      "group": 2,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "account_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "request_submission",
+      "group": 0,
+      "sequence": 0,
+      "parent": "access_permission",
+      "column": "permission_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "request_submission",
+      "group": 1,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "account_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 0,
+      "sequence": 0,
+      "parent": "request_submission",
+      "column": "submission_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 0,
+      "sequence": 1,
+      "parent": "request_submission",
+      "column": "permission_id",
+      "parent_column": "permission_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 1,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "account_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 1,
+      "sequence": 1,
+      "parent": "user_account",
+      "column": "staff_id",
+      "parent_column": "staff_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 2,
+      "sequence": 0,
+      "parent": "request_submission",
+      "column": "submission_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 2,
+      "sequence": 1,
+      "parent": "request_submission",
+      "column": "account_id",
+      "parent_column": "account_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 3,
+      "sequence": 0,
+      "parent": "login_session",
+      "column": "session_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 3,
+      "sequence": 1,
+      "parent": "login_session",
+      "column": "account_id",
+      "parent_column": "account_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 4,
+      "sequence": 0,
+      "parent": "access_permission",
+      "column": "permission_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 5,
+      "sequence": 0,
+      "parent": "request_submission",
+      "column": "submission_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 6,
+      "sequence": 0,
+      "parent": "login_session",
+      "column": "session_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 7,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "staff_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "operation_audit",
+      "group": 8,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "account_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "audit_change",
+      "group": 0,
+      "sequence": 0,
+      "parent": "operation_audit",
+      "column": "audit_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "backup_run",
+      "group": 0,
+      "sequence": 0,
+      "parent": "staff",
+      "column": "responsible_staff_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "backup_run",
+      "group": 1,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "requested_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "backup_artifact",
+      "group": 0,
+      "sequence": 0,
+      "parent": "document_version",
+      "column": "document_version_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "backup_artifact",
+      "group": 1,
+      "sequence": 0,
+      "parent": "backup_run",
+      "column": "backup_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "backup_copy",
+      "group": 0,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "verified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "backup_copy",
+      "group": 1,
+      "sequence": 0,
+      "parent": "backup_run",
+      "column": "backup_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "restore_verification",
+      "group": 0,
+      "sequence": 0,
+      "parent": "backup_copy",
+      "column": "copy_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "restore_verification",
+      "group": 0,
+      "sequence": 1,
+      "parent": "backup_copy",
+      "column": "backup_id",
+      "parent_column": "backup_id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "restore_verification",
+      "group": 1,
+      "sequence": 0,
+      "parent": "user_account",
+      "column": "verified_by",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "restore_verification",
+      "group": 2,
+      "sequence": 0,
+      "parent": "backup_copy",
+      "column": "copy_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "restore_verification",
+      "group": 3,
+      "sequence": 0,
+      "parent": "backup_run",
+      "column": "backup_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    },
+    {
+      "table": "restore_check",
+      "group": 0,
+      "sequence": 0,
+      "parent": "restore_verification",
+      "column": "restore_id",
+      "parent_column": "id",
+      "on_update": "RESTRICT",
+      "on_delete": "RESTRICT"
+    }
+  ]
+}

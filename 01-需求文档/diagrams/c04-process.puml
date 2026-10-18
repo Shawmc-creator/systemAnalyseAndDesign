@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "处理中" as Working
+state "待核对放行" as Pending
+state "已放行" as Released
+state "隔离停用" as Isolated
+[*] --> Working : 登记本轮处理\n[设备与包范围已核实]\n/ 保留处理经历
+Working --> Pending : 完成处理登记\n[实际处理完成]\n/ 等待监测与核对
+Pending --> Released : 确认放行或隔离\n[依据齐全且无未解决异常]\n/ 保留放行责任与时间
+Pending --> Isolated : 确认放行或隔离\n[监测异常或未能确认]\n/ 不得正常使用
+Released --> Isolated : 标记事后异常\n[后续发现问题]\n/ 停用并追溯相关就诊
+
+@enduml

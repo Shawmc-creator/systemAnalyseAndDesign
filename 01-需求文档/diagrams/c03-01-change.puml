@@ -1,0 +1,75 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "前台" as A0
+boundary "<u>:前台接口</u>" as B0
+control "<u>:维护预约及接诊</u>\n<u>安排控制</u>" as K
+participant "<u>:预约</u>" as Appointment
+participant "<u>:日期安排</u>" as Schedule
+participant "<u>:接诊占用</u>" as Occupancy
+participant "<u>:预约变更</u>" as AppointmentChange
+participant "<u>:诊后要求</u>" as Followup
+A0 -> B0 : 提交UC-01办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-01办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Appointment : 核对可变更性(预约及当前版本)
+activate Appointment
+Appointment --> K : 处理结果或拒绝原因
+deactivate Appointment
+K -> Schedule : 重新安排或释放(改约目标或取消)
+activate Schedule
+Schedule -> Occupancy : 调整有效占用(患者、牙医、诊椅)
+activate Occupancy
+Occupancy --> Schedule : 处理结果或拒绝原因
+deactivate Occupancy
+Schedule --> K : 处理结果或拒绝原因
+deactivate Schedule
+K -> Appointment : 变更或取消安排(原因及新占用)
+activate Appointment
+Appointment -> AppointmentChange : 保留变更(原安排与办理依据)
+activate AppointmentChange
+AppointmentChange --> Appointment : 处理结果或拒绝原因
+deactivate AppointmentChange
+Appointment --> K : 处理结果或拒绝原因
+deactivate Appointment
+opt 取消的预约关联诊后要求
+K -> Followup : 恢复待安排(取消的复诊预约)
+activate Followup
+Followup --> K : 处理结果或拒绝原因
+deactivate Followup
+end
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Followup
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

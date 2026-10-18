@@ -1,0 +1,52 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+left to right direction
+skinparam nodesep 24
+skinparam ranksep 50
+actor "牙医" as A
+boundary "牙医接口" as B
+A -- B
+control "确认诊疗项目与执行控制\nUC-04" as K4
+B ..> K4
+control "查询患者诊疗资料控制\nUC-09" as K9
+B ..> K9
+control "记录检查与诊断控制\nUC-10" as K10
+B ..> K10
+control "签署及补充病历控制\nUC-11" as K11
+B ..> K11
+control "提出复诊随访要求控制\nUC-12" as K12
+B ..> K12
+control "记录复诊随访评估控制\nUC-14" as K14
+B ..> K14
+control "查询可用接诊安排控制\nUC-16" as K16
+B ..> K16
+control "维护长期健康资料及复核控制\nUC-21" as K21
+B ..> K21
+control "维护持续治疗方案及确认控制\nUC-22" as K22
+B ..> K22
+control "管理影像与诊疗文书控制\nUC-23" as K23
+B ..> K23
+control "登记器械包使用与追溯控制\nUC-31" as K31
+B ..> K31
+K4 -[hidden]right-> K9
+K9 -[hidden]right-> K10
+K10 -[hidden]right-> K11
+K11 -[hidden]right-> K12
+K12 -[hidden]right-> K14
+K14 -[hidden]right-> K16
+K16 -[hidden]right-> K21
+K21 -[hidden]right-> K22
+K22 -[hidden]right-> K23
+K23 -[hidden]right-> K31
+
+@enduml

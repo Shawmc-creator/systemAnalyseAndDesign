@@ -1,0 +1,43 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+left to right direction
+skinparam nodesep 24
+skinparam ranksep 50
+actor "诊疗助理" as A
+boundary "诊疗助理接口" as B
+A -- B
+control "查询材料与批次库存控制\nUC-17" as K17
+B ..> K17
+control "登记批次库存变动控制\nUC-18" as K18
+B ..> K18
+control "管理影像与诊疗文书控制\nUC-23" as K23
+B ..> K23
+control "维护供应商与采购安排控制\nUC-27" as K27
+B ..> K27
+control "登记采购验收与退换控制\nUC-28" as K28
+B ..> K28
+control "登记器械处理与放行控制\nUC-30" as K30
+B ..> K30
+control "登记器械包使用与追溯控制\nUC-31" as K31
+B ..> K31
+control "维护材料与批次状态控制\nUC-32" as K32
+B ..> K32
+K17 -[hidden]right-> K18
+K18 -[hidden]right-> K23
+K23 -[hidden]right-> K27
+K27 -[hidden]right-> K28
+K28 -[hidden]right-> K30
+K30 -[hidden]right-> K31
+K31 -[hidden]right-> K32
+
+@enduml

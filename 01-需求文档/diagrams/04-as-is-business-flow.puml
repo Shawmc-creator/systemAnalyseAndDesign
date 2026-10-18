@@ -1,0 +1,44 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam activity {
+  BackgroundColor #F7FBFD
+  BorderColor #35546B
+  DiamondBackgroundColor #FFF6D8
+  DiamondBorderColor #9A6B16
+}
+title 现状业务流程图
+
+|患者|
+start
+:电话或到店咨询;
+|前台|
+:翻查纸质预约本;
+if (有合适时段？) then (是)
+  :手写预约信息;
+  |患者|
+  :按约到店;
+else (否)
+  :协商其他时间;
+  |前台|
+  :再次翻查预约本;
+  |患者|
+  :按约到店;
+endif
+|前台|
+:登记到店并安排候诊;
+|牙医|
+:问诊和检查;
+:确定诊断与治疗;
+|诊疗助理|
+:手写病历与治疗项目;
+|前台|
+:按收费单人工核价;
+|患者|
+:支付费用;
+|前台|
+:登记收款并口头提醒复诊;
+stop
+@enduml

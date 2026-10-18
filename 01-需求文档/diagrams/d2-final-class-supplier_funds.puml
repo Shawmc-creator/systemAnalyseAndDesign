@@ -1,0 +1,103 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "供应商" as Supplier <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -contact_name: Text
+ -phone: Text
+ -address: Text?
+ +核对供货资格(依据: 操作输入): 业务结果
+}
+class "供应商资金" as SupplierFunds <<entity>> {
+ -id: ObjectId
+ -opened_at: Text
+ +汇总供货收支(依据: 操作输入): 业务结果
+ +提供核对来源(依据: 操作输入): 业务结果
+ +确认付款范围(依据: 操作输入): 业务结果
+ +开始供货付款(依据: 操作输入): 业务结果
+ +核实实际付款(依据: 操作输入): 业务结果
+ +恢复供货办理(依据: 操作输入): 业务结果
+ +确认供货退回款(依据: 操作输入): 业务结果
+ +重算供货余额(依据: 操作输入): 业务结果
+ +核对共同归属(依据: 操作输入): 业务结果
+}
+class "采购" as Purchase <<entity>> {
+ -id: ObjectId
+ -agreed_at: Text
+ -delivery_terms: Text
+ -confirmed_at: Text?
+ -request_reason: Text
+ +提出采购安排(依据: 操作输入): 业务结果
+ +确认供货约定(依据: 操作输入): 业务结果
+ +核对到货依据(依据: 操作输入): 业务结果
+ +更新履行进度(依据: 操作输入): 业务结果
+ +提供预付依据(依据: 操作输入): 业务结果
+}
+class "验收" as Receipt <<entity>> {
+ -id: ObjectId
+ -arrived_at: Text
+ -delivery_evidence: Text
+ -accepted_at: Text?
+ -status: Text
+ +登记本次验收(依据: 操作输入): 业务结果
+ +提供合格结算依据(依据: 操作输入): 业务结果
+}
+class "供货付款" as SupplyPayment <<entity>> {
+ -id: ObjectId
+ -requested_cents: Int64
+ -actual_cents: Int64?
+ -channel: Text
+ -initiated_at: Text
+ +建立付款占用(依据: 操作输入): 业务结果
+ +确认实际支出(依据: 操作输入): 业务结果
+ +核实待定结果(依据: 操作输入): 业务结果
+}
+class "供货分配" as SupplyAllocation <<entity>> {
+ -id: ObjectId
+ -amount_cents: Int64
+ -effective_at: Text?
+ -allocation_state: Text
+ -reason: Text
+ +形成供货分配(依据: 操作输入): 业务结果
+}
+class "供货退款" as SupplyRefund <<entity>> {
+ -id: ObjectId
+ -received_cents: Int64
+ -channel: Text
+ -received_at: Text
+ -transaction_evidence: Text
+ +保留原款退款(依据: 操作输入): 业务结果
+}
+class "采购差异" as SupplyIssue <<entity>> {
+ -id: ObjectId
+ -quantity_scaled: Int64
+ -reason: Text
+ -resolution: Text
+ -confirmed_at: Text?
+ +保留验收差异(依据: 操作输入): 业务结果
+ +提供确认退换(依据: 操作输入): 业务结果
+}
+Supplier "1" -- "0..*" Purchase : 供货方
+Purchase "1" -- "0..*" Receipt : 分批验收
+Supplier "1" -- "1" SupplierFunds : 资金归属
+SupplierFunds "1" *-- "0..*" SupplyPayment : 付款办理
+SupplyPayment "1" *-- "0..*" SupplyAllocation : 用途分配
+Purchase "0..1" -- "0..*" SupplyAllocation : 采购预付
+Receipt "0..1" -- "0..*" SupplyAllocation : 验收结算
+SupplyPayment "1" -- "0..*" SupplyRefund : 原付款
+SupplyIssue "1" -- "0..*" SupplyRefund : 退回依据
+SupplierFunds "1" *-- "0..*" SupplyRefund : 供货退回款
+@enduml

@@ -1,0 +1,45 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam dpi 160
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+hide footbox
+skinparam maxMessageSize 110
+actor 职员 as A
+boundary 岗位页面 as P
+control 访问入口 as G
+entity 会话与授权 as S
+control 用例控制 as C
+entity 操作提交 as R
+A -> P : 核对表单并提交
+P -> G : 输入、原版本、请求键、CSRF令牌
+G -> S : 验证会话、角色、职员资格
+S --> G : 可信职员上下文或拒绝
+alt 验证通过
+ G -> C : 调用既有用例操作
+ C -> R : 同事务辨认原提交
+ R --> C : 原结果或新提交
+ alt 原提交已完成
+  C -> C : 核验本人请求与当前对象权限
+  C --> G : 原结果；不重复执行业务
+ else 首次办理
+  C -> C : 核验对象范围、执行业务、保存审计并提交
+  C --> G : 已提交结果／业务拒绝／结果待核实
+ end
+ G --> P : 结构化结果与字段问题
+ P --> A : 更新状态及可用动作
+else 验证失败
+ G --> P : 未登录／无权操作
+ P --> A : 重新登录或显示无权办理
+end
+
+@enduml
+

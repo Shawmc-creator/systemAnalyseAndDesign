@@ -1,0 +1,34 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "价目草稿" as Draft
+state "待负责人确认" as Pending
+state "已确认可适用" as Valid
+state "已退回" as Returned
+state "不再用于新计费" as Stopped
+[*] --> Draft : 核对区间及金额\n[金额与项目有效]\n/ 保存草稿
+Draft --> Pending : 提交确认\n[区间候选无冲突]\n/ 等待负责人
+Pending --> Valid : 发布确认版本\n[负责人同意且仍无冲突]\n/ 保留确认区间
+Pending --> Returned : 退回修改\n[有处理意见]\n/ 保留原草稿
+Returned --> Pending : 重新提交\n[修改后重新校验]\n/ 保留变更
+Valid --> Stopped : 停止后续适用\n[到达截止或新版本替代]\n/ 原费用快照保持
+
+@enduml

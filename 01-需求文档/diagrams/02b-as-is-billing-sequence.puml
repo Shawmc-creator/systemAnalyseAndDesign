@@ -1,11 +1,11 @@
 @startuml
-' Business symbols extracted from course PPT PDF pages 86-87.
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -21,17 +21,19 @@ skinparam sequence {
 actor "患者" as P
 participant "<img:business-worker.png>\n收费人员" as C
 participant "<img:business-worker.png>\n牙医" as D
-P -> C : 提交诊疗单，请求结算
+P -> C : 提出缴费或预付费用
 activate C
-C -> C : 核对患者与本次诊疗单（c）
-C -> D : 核实诊疗项目及数量
-activate D
-D --> C : 确认已完成的项目及数量
-deactivate D
-C -> C : 查阅价目表，计算本次应收费用
-C -> P : 说明收费项目及应付金额
-P --> C : 确认费用并交付现金
-C -> C : 清点款项，登记实收与找零
-C -> P : 交付收据及找零，确认结清（d）
+alt 结算实际诊疗费用
+ C -> D : 核实实际项目、数量及更正情况
+ D --> C : 确认费用依据
+ C -> C : 查价并计算应收、已付和预付余额
+else 预付后续费用
+ C -> C : 核对患者及预付款用途
+end
+C -> P : 说明金额、支付方式及余额
+P --> C : 确认并付款
+C -> C : 清点现金或核实非现金到账
+C -> C : 登记支付渠道、金额和分配\n注明预付余额或未付金额
+C --> P : 交付凭据、找零及余额说明
 deactivate C
 @enduml

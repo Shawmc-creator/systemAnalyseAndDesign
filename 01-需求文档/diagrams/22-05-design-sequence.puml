@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+hide footbox
+skinparam maxMessageSize 155
+skinparam sequence {
+ ParticipantBackgroundColor #EAF1F7
+ ParticipantBorderColor #34495E
+ LifeLineBorderColor #708090
+ GroupBackgroundColor white
+ GroupBorderColor #708090
+ MessageAlign left
+}
+autonumber
+boundary ":岗位接口" as B
+control ":UC-05控制" as K
+participant ":收费项目" as E
+participant ":价目" as P
+participant ":诊疗明细" as I
+participant ":就诊" as V
+participant ":领域映射器" as M
+participant ":工作单元" as W
+B -> K : 维护价目(上下文, 命令)
+activate K
+K -> K : 职员.核验资格()；校验输入
+K -> W : 开启写事务()
+activate W
+K -> M : 载入当前依据及操作提交(同一连接)
+M --> K : 实体及当前持久化状态
+alt 已办理且与本次请求一致
+K -> K : 校验本人请求摘要；历史记录另核验原业务依据
+K -> W : 结束事务()
+K --> B : 原结果标识及当前状态
+else 首次办理或合法变更
+K -> M : 插入pending操作提交(原请求键, 摘要)
+group 业务条件不满足即进入统一失败出口
+K -> E : 安排价目版本(命令, 已引用明细)
+E -> P : 核验区间(原区间, 新区间, 计价时点)
+P --> E : 允许的区间调整与新版本
+E --> K : 价目变更集合
+K -> I : 补齐缺价(按原时点匹配的价目)
+I --> K : 当前缺价明细变更集
+K -> V : 标记计价变更(原版本)
+V --> K : 需递增版本的就诊集合
+end
+K -> M : 保存变更集(原版本条件, 同一连接)
+M --> K : 标识及影响行数
+K -> K : 核验全部写入结果
+K -> M : 保存committed提交结果及成功审计(同一连接)
+M --> K : 支撑记录保存完成
+K -> W : 提交写事务()
+K --> B : 已提交结果及新版本
+end
+deactivate W
+deactivate K
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "原件待确认" as Pending
+state "原件已确认" as Valid
+state "退回核对" as Returned
+state "缺失或不可读" as Missing
+[*] --> Pending : 核对原件完整性\n[文件实际保存且校验通过]\n/ 保留来源和归属
+Pending --> Valid : 保留确认原件\n[牙医核对内容及归属]\n/ 保留确认人和时间
+Pending --> Returned : 退回原件核对\n[关联或内容不符]\n/ 保留原件与原因
+Valid --> Missing : 报告读取异常\n[文件缺失或校验不符]\n/ 保留原业务关联
+Missing --> Valid : 核实恢复原件\n[恢复文件与原校验一致]\n/ 保留恢复依据
+
+@enduml

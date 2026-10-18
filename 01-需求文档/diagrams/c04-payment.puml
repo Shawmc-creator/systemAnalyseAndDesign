@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "待核实" as Pending
+state "到账已确认" as Confirmed
+state "未到账已核实" as Failed
+[*] --> Pending : 提出到账核查\n[有患者与交易线索]\n/ 不计可用余额
+[*] --> Confirmed : 确认到账\n[登记时已取得到账证据]\n/ 形成可分配来源
+Pending --> Confirmed : 确认到账\n[已核实金额与渠道]\n/ 形成可分配来源
+Pending --> Failed : 确认未到账\n[有明确失败依据]\n/ 保留核查结论
+Confirmed : 分配已收款 [有未分配余额且账目同患者]\n/ 保留分配
+Confirmed : 确认预付用途 [可用余额足够]\n/ 保留抵扣
+
+@enduml

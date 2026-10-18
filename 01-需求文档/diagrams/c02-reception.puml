@@ -1,0 +1,112 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者" as Patient <<entity>> {
+ 姓名
+ 出生日期
+ 联系电话
+ 电话归属
+ 联系地址
+ 联系偏好
+ --
+ 核对身份()
+ 核对身份候选()
+ 确认资料维护()
+}
+class "职员" as Staff <<entity>> {
+ 姓名
+ 在岗起止
+ --
+ 核对在岗与职责()
+}
+class "诊椅" as Chair <<entity>> {
+ 名称
+ 可用起止
+ --
+ 核对可用区间()
+ 确认可用范围()
+}
+class "日期安排" as Schedule <<entity>> {
+ 营业日期
+ 起止时间
+ 确认时间
+ 停诊原因
+ --
+ 申请预约占用()
+ 确认到诊占用()
+ 核对拟发布安排()
+}
+class "安排变更" as ScheduleChange <<entity>> {
+ 原日期时段
+ 新日期时段
+ 原因
+ 发生时间
+ --
+ 保留日期例外()
+}
+class "接诊占用" as Occupancy <<entity>> {
+ 起止时间
+ 释放时间
+ --
+ 检查并占用()
+ 关联到诊()
+ 排除已有占用()
+}
+class "预约" as Appointment <<entity>> {
+ 计划起止
+ 就诊原因
+ 到期时间
+ --
+ 确认安排()
+ 提供安排及经历()
+ 核对到诊来源()
+}
+class "预约变更" as AppointmentChange <<entity>> {
+ 原安排
+ 新安排
+ 原因
+ 发生时间
+ --
+ 保留变更()
+}
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ 接诊开始
+ 诊疗结束
+ 到诊来源
+ --
+ 登记到诊()
+ 核对接诊责任()
+ 确认实际执行()
+}
+Staff "1" -- "0..*" Schedule : 接诊牙医
+Chair "1" -- "0..*" Schedule : 使用诊椅
+Schedule "1" *-- "0..*" ScheduleChange : 安排经历
+Schedule "1" -- "0..*" Occupancy : 支持日期
+Appointment "0..1" -- "0..*" Occupancy : 预约来源
+Visit "0..1" -- "0..*" Occupancy : 现场或到诊关联
+Patient "1" -- "0..*" Appointment : 预约者
+Appointment "1" *-- "0..*" AppointmentChange : 变更经历
+Patient "1" -- "0..*" Visit : 就诊者
+Appointment "0..1" -- "0..1" Visit : 来源预约
+Staff "1" -- "0..*" Visit : 责任牙医
+
+@enduml

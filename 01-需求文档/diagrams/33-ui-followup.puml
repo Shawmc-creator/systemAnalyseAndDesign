@@ -1,0 +1,19 @@
+@startsalt
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 16
+skinparam dpi 180
+{
+<b>复诊随访联系</b>
+{ 要求 | F001 | 患者 | P001 陈悦 | 状态 | 待联系 }
+{ 目标日期 | 2026-10-22
+ 类型 | 复诊
+ 目的 | 复查既有治疗情况
+ 联系结果 | ^已接通^
+ 患者反馈 | "同意预约下周复查             "
+ 关联预约 | "A015                        "
+ 下次联系日期 | "                            " }
+{ [保存联系记录] | [选择复诊预约] | [取消要求] }
+{# 时间 | 经办人 | 联系结果
+ 10-15 14:00 | 前台周宁 | 未接通，约下次联系 }
+}
+@endsalt

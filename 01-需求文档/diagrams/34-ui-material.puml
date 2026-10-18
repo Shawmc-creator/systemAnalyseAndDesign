@@ -1,0 +1,17 @@
+@startsalt
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 16
+skinparam dpi 180
+{
+<b>材料库存与变动</b>
+{ 材料 | M001 诊疗材料A | 单位 | 盒 | 账面数量 | 12.00 }
+{ 变动类型 | ^领用^
+ 数量 | "2.00"
+ 用途 | "当日诊疗使用                 "
+ 实盘数量 | "仅盘点时填写                 "
+ 负责人确认依据 | "仅盘点时填写                 " }
+{ [核对并保存] | [刷新库存] }
+{# 时间 | 类型 | 数量 | 变动后
+ 10-15 08:00 | 入库 | 5.00 | 12.00 }
+}
+@endsalt

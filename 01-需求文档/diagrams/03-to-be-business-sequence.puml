@@ -1,11 +1,11 @@
 @startuml
-' Business symbols extracted from course PPT PDF pages 86-87. System uses the business entity symbol.
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -20,21 +20,27 @@ skinparam sequence {
 }
 actor "患者" as P
 participant "<img:business-worker.png>\n前台" as F
+participant "<img:business-worker.png>\n牙医" as D
 participant "<img:business-entity.png>\n牙科诊所管理系统" as S
-P -> F : 请求办理到诊接待
+P -> F : 到诊并提供身份及联系方式
 activate F
-F -> P : 核实姓名及预约信息（a）
-P --> F : 提供姓名、联系电话及预约时间
-F -> S : 查询本次预约及接诊安排
-activate S
-S --> F : 返回预约记录及已确认的安排
-deactivate S
-F -> F : 核对患者与预约记录一致
-F -> S : 登记本次到诊
-activate S
-S -> S : 关联预约信息\n记录到诊状态
-S --> F : 返回登记结果及候诊安排
-deactivate S
-F -> P : 告知接诊牙医及候诊安排（b）
+F -> S : 查找患者档案及预约
+S --> F : 返回资料、历史编号及预约
+opt 资料重复、变更或需代理办理
+ F -> P : 核实身份、联系信息及办理依据
+ P --> F : 补充或确认资料
+ F -> S : 保存变更或经核实的合并依据
+ S --> F : 返回保留历史的档案结果
+end
+alt 已有预约
+ F -> S : 关联预约并登记到诊
+else 现场到诊
+ F -> D : 协调当日接诊安排
+ D --> F : 确认可接诊条件
+ F -> S : 登记现场接诊来源及到诊
+end
+S --> F : 返回独立就诊及候诊安排
+F -> D : 告知待接诊患者
+F --> P : 告知候诊安排
 deactivate F
 @enduml

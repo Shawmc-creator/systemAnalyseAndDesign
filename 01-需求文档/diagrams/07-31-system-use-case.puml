@@ -1,0 +1,33 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+skinparam nodesep 22
+skinparam ranksep 48
+skinparam actor {
+ BorderColor black
+ BackgroundColor white
+}
+skinparam usecase {
+ BorderColor black
+ BackgroundColor white
+}
+skinparam rectangle {
+ BorderColor black
+ BackgroundColor white
+}
+left to right direction
+actor "诊疗助理" as A0
+actor "牙医" as A1
+actor "诊所负责人" as A2
+rectangle "牙科诊所管理系统" {
+ usecase "UC-31\n登记器械包使用与追溯" as U
+}
+A0 -- U
+U -- A1
+U -- A2
+
+@enduml

@@ -1,0 +1,65 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "前台" as A0
+boundary "<u>:前台接口</u>" as B0
+control "<u>:维护患者资料控</u>\n<u>制</u>" as K
+participant "<u>:患者</u>" as Patient
+participant "<u>:患者资料变更</u>" as IdentityChange
+participant "<u>:代理关系</u>" as Proxy
+A0 -> B0 : 提交UC-08办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-08办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Patient : 核对身份候选(身份线索)
+activate Patient
+Patient --> K : 处理结果或拒绝原因
+deactivate Patient
+K -> Patient : 确认资料维护(新值、原因、核实结论)
+activate Patient
+Patient -> IdentityChange : 保留修改依据(原值、新值、人员时间)
+activate IdentityChange
+IdentityChange --> Patient : 处理结果或拒绝原因
+deactivate IdentityChange
+opt 需要登记或变更代理关系
+Patient -> Proxy : 确认代理范围(关系、有效期及核实依据)
+activate Proxy
+Proxy --> Patient : 处理结果或拒绝原因
+deactivate Proxy
+end
+Patient --> K : 处理结果或拒绝原因
+deactivate Patient
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Proxy
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

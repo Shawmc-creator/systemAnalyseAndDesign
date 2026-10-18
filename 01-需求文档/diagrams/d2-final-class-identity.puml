@@ -1,0 +1,65 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "患者" as Patient <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -birth_date: Text?
+ -phone: Text?
+ -phone_owner: Text?
+ +核对身份(依据: 操作输入): 业务结果
+ +核对身份候选(依据: 操作输入): 业务结果
+ +确认资料维护(依据: 操作输入): 业务结果
+ +核对临床访问(依据: 操作输入): 业务结果
+ +确认健康变更(依据: 操作输入): 业务结果
+}
+class "职员" as Staff <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -employed_from: Text
+ -employed_until: Text?
+ -record_no: Text
+ +核对在岗与职责(依据: 操作输入): 业务结果
+}
+class "患者资料变更" as IdentityChange <<entity>> {
+ -id: ObjectId
+ -old_value: Text?
+ -new_value: Text?
+ -reason: Text
+ -occurred_at: Text
+ +保留修改依据(依据: 操作输入): 业务结果
+}
+class "代理关系" as Proxy <<entity>> {
+ -id: ObjectId
+ -proxy_name: Text
+ -relationship: Text
+ -scope: Text
+ -valid_from: Text
+ +确认代理范围(依据: 操作输入): 业务结果
+}
+class "接诊交接" as Handover <<entity>> {
+ -id: ObjectId
+ -scope: Text
+ -valid_from: Text
+ -valid_until: Text?
+ -reason: Text
+ +核对交接资格(依据: 操作输入): 业务结果
+}
+Patient "1" *-- "0..*" IdentityChange : 资料经历
+Patient "1" *-- "0..*" Proxy : 代理依据
+Patient "1" -- "0..*" Handover : 访问范围
+Staff "1" -- "0..*" Handover : 接收牙医
+Staff "1" -- "0..*" Handover : 交接人
+@enduml

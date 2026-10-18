@@ -1,10 +1,11 @@
 @startuml
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -18,35 +19,23 @@ skinparam sequence {
  ActivationBackgroundColor white
 }
 participant "<img:business-worker.png>\n收费人员" as C
-participant "<img:business-worker.png>\n诊所负责人" as M
 participant "<img:business-worker.png>\n前台" as F
-activate C
-C -> C : 清点当日现金，核对开班现金
-C -> C : 整理当日收款台账及收据
-C -> C : 汇总有效收款和现金净收
-C -> C : 对照实际现金及台账，确定差异
-C -> M : 报告核对结果及差异
+participant "<img:business-worker.png>\n诊疗助理" as A
+participant "<img:business-worker.png>\n诊所负责人" as M
+C -> C : 分渠道核对付款、退款和供货支出\n比对原单据与实际款项
+F -> F : 核对未到诊、改约和待联系事项
+A -> A : 核对批次库存及器械处理异常
+C -> M : 提交收支和差异清单
+F -> M : 提交患者服务待办
+A -> M : 提交物资及器械异常
 activate M
-alt 存在差异
-M -> C : 要求复核差异对应收据和现金
-C -> C : 复查原始凭据及现金清点结果
-C --> M : 反馈复核结果与原因
-M -> M : 确定差异处理意见
-M --> C : 告知核实后的处理意见
-else 核对一致
-M --> C : 确认现金与收款台账一致
+M -> M : 逐项核查来源及责任
+alt 差异已查明
+ M -> C : 确认必要的更正或后续处理
+ C -> C : 保留原单据及更正依据
+else 需要跨日处理
+ M -> M : 记录来源、责任人及期限
 end
+M -> M : 确认当日核对结果
 deactivate M
-C -> C : 填写日终核对结果及差异说明
-C -> M : 提交当日收款汇总
-activate M
-M -> F : 请求同一期间的就诊汇总
-activate F
-F -> F : 查阅到诊和预约本，统计就诊人次
-F --> M : 提供就诊人次及接诊情况
-deactivate F
-M -> M : 核对就诊与收款汇总，记录经营情况
-M --> C : 确认当日核对完成
-deactivate M
-deactivate C
 @enduml

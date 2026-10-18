@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "收费人员" as A0
+boundary "<u>:收费人员接口</u>" as B0
+control "<u>:登记供应商付款</u>\n<u>与结算控制</u>" as K
+participant "<u>:供应商资金</u>" as SupplierFunds
+participant "<u>:供货付款</u>" as SupplyPayment
+participant "<u>:采购差异</u>" as SupplyIssue
+participant "<u>:供货退款</u>" as SupplyRefund
+A0 -> B0 : 提交UC-29办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-29办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> SupplierFunds : 恢复供货办理(原付款办理及结果)
+activate SupplierFunds
+SupplierFunds -> SupplyPayment : 核实待定结果(渠道证据、实际金额)
+activate SupplyPayment
+SupplyPayment --> SupplierFunds : 处理结果或拒绝原因
+deactivate SupplyPayment
+SupplierFunds --> K : 处理结果或拒绝原因
+deactivate SupplierFunds
+K -> SupplyIssue : 提供确认退换(原采购或验收差异)
+activate SupplyIssue
+SupplyIssue --> K : 处理结果或拒绝原因
+deactivate SupplyIssue
+K -> SupplierFunds : 确认供货退回款(原付款、退换依据和实际到账)
+activate SupplierFunds
+SupplierFunds -> SupplyRefund : 保留原款退款(金额、渠道、凭据)
+activate SupplyRefund
+SupplyRefund --> SupplierFunds : 处理结果或拒绝原因
+deactivate SupplyRefund
+SupplierFunds -> SupplierFunds : 重算供货余额(预付、分配和退款)
+SupplierFunds --> K : 处理结果或拒绝原因
+deactivate SupplierFunds
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,SupplyRefund
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "草稿" as Draft
+state "已签署" as Signed
+[*] --> Draft : 建立当次草稿\n[有效就诊]\n/ 形成当次正文
+Draft : 更新未签署正文 [当前版本一致]\n/ 保留检查诊断
+Draft --> Signed : 签署当前正文\n[必填完整且责任有效]\n/ 冻结正文和签署依据
+Signed : 追加独立补充 [原签署存在且有原因]\n/ 生成病历补充
+
+@enduml

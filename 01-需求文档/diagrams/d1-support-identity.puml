@@ -1,0 +1,87 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 16
+skinparam dpi 160
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+skinparam nodesep 65
+skinparam ranksep 85
+hide circle
+top to bottom direction
+class "职员账号" as user_account {
+  id : INTEGER
+  staff_id : INTEGER
+  status : TEXT
+  --
+  核验身份()
+  停用并失效会话()
+}
+class "访问角色" as access_role {
+  id : INTEGER
+  code : TEXT
+  --
+  取得岗位定义()
+}
+class "操作权限" as access_permission {
+  id : INTEGER
+  code : TEXT
+  --
+  匹配具体操作()
+  取得对象规则()
+}
+class "职员岗位资格" as staff_role_qualification {
+  id : INTEGER
+  staff_id : INTEGER
+  role_id : INTEGER
+  valid_from : TEXT
+  valid_until : TEXT
+  verified_by : INTEGER
+  --
+  核实岗位资格()
+  撤销资格()
+}
+class "账号角色授权" as account_role {
+  id : INTEGER
+  account_id : INTEGER
+  role_id : INTEGER
+  qualification_id : INTEGER
+  granted_by : INTEGER
+  valid_until : TEXT
+  --
+  授予角色()
+  撤销角色()
+}
+class "角色操作授权" as role_permission {
+  id : INTEGER
+  role_id : INTEGER
+  permission_id : INTEGER
+  --
+  判断岗位可执行操作()
+}
+class "登录会话" as login_session {
+  id : INTEGER
+  account_id : INTEGER
+  token_hash : TEXT
+  --
+  核验会话()
+  撤销会话()
+}
+class "身份验证事件" as authentication_event {
+  id : INTEGER
+  account_id : INTEGER
+  session_id : INTEGER
+  --
+  追加验证结果()
+}
+user_account "1" -- "0..*" login_session : 登录
+user_account "1" -- "0..*" account_role : 获授
+access_role "1" -- "0..*" account_role : 角色
+access_role "1" -- "0..*" staff_role_qualification : 资格
+staff_role_qualification "1" -- "0..*" account_role : 授权依据
+access_role "1" -- "0..*" role_permission : 岗位操作
+access_permission "1" -- "0..*" role_permission : 操作
+user_account "0..1" -- "0..*" authentication_event : 验证身份
+login_session "0..1" -- "0..*" authentication_event : 关联会话
+@enduml

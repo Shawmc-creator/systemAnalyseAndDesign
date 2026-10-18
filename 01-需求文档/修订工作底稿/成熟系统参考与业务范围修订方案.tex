@@ -1,0 +1,248 @@
+% !TeX program = xelatex
+\documentclass[UTF8,a4paper,zihao=-4,fontset=none]{ctexart}
+\setmainfont{Times New Roman}
+\setmonofont{Consolas}
+\setCJKmainfont{SimSun}[BoldFont=SimHei,ItalicFont=KaiTi]
+\setCJKsansfont{SimHei}
+\setCJKmonofont{SimSun}
+\usepackage[margin=2.2cm,headheight=15pt]{geometry}
+\usepackage{booktabs,longtable,array,fancyhdr,enumitem}
+\usepackage[hidelinks]{hyperref}
+\def\UrlBreaks{\do\/\do\-\do\_\do\.\do\=}
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.25em}
+\setlength{\LTpre}{4pt}\setlength{\LTpost}{4pt}
+\setlist{itemsep=4pt,topsep=5pt,leftmargin=2em}
+\linespread{1.12}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small 青禾牙科诊所}\fancyhead[R]{\small 需求修订工作底稿}
+\fancyfoot[C]{\small\thepage}
+\ctexset{section={format=\Large\bfseries},subsection={format=\normalsize\bfseries}}
+\hypersetup{pdftitle={成熟系统参考与业务范围修订方案},pdfauthor={青禾牙科诊所}}
+\begin{document}
+\begin{center}
+{\Large\bfseries 成熟系统参考与业务范围修订方案}\par
+\vspace{0.4em}{\small 第一步：参考核对与范围修订\qquad 2026年10月15日}
+\end{center}
+\section{本轮结论与方案边界}
+现有38张表包含27张业务表和11张运行支撑表，能够表达原20个用例中被简化的业务，但跨次治疗、收款退费、日期排班、批次材料和诊疗文书尚不完整。本轮形成业务范围修订基线；主需求文档、建表脚本、应用代码和运行数据库尚未按此修订。
+
+\subsection{采用的参考层次}
+\begin{enumerate}
+\item 课程PPT决定ABCD工作流和UML表达。论文与KADA案例用于检查需求、类设计、数据字典和验收的对应关系。
+\item Open Dental作为牙科业务的主要参照。已完整读取官方26.2.0.0数据库说明，解析出430张表；核对患者、治疗、费用、排班、文书和复诊相关对象。
+\item ERPNext用于采购验收和批次库存。已读取GitHub version-15分支的Batch及Purchase Receipt Item完整模型。OpenEMR作为患者与就诊分离的辅助参照。
+\item QuickBooks和Shopify大图用于借鉴总图组织、单据与明细、主数据与流水的分离。最终保留适用于单店诊所的对象；源系统特有保险、税务和电商功能不自动进入本系统。
+\end{enumerate}
+\subsection{本轮推荐范围}
+面向单店、6名工作人员，延续前台、牙医、诊疗助理、收费人员和负责人五种业务角色。患者参与预约沟通、方案确认、付款和复诊；本轮不据此直接增加患者自助门户。系统覆盖普通门诊从建档到复诊，以及价目、排班、材料采购库存、器械处理记录和基础经营核对。
+
+继续使用SQLite。客户端通过后端服务办理业务，数据库文件保存在服务端本地；后续用并发预约、付款和库存操作验证事务能力。资金按人民币分保存，材料数量沿用定点精度。此为设计与验证目标，不能以表数或本轮参考阅读替代上线验证。
+
+\subsection{需要明确的业务边界}
+本轮纳入上传影像／文书、线下支付登记、批次库存和人工录入器械处理结果。在线支付接口、影像设备接口、医保结算、完整总账薪资、连锁管理另列扩展。义齿外加工、处方与发药、种植和正畸专科记录须按诊所开展的服务确定；若纳入相应服务，必须同步纳入其完整业务流程。
+
+\clearpage\section{成熟系统证据与采用方式}
+“源模型事实”来自已读取资料；“本系统采用方式”是面向当前诊所的裁剪决定。参考表名用于定位来源，不等同于本系统最终表名。
+
+{\small
+\begin{longtable}{@{}p{2.0cm}p{6.0cm}p{7.5cm}@{}}
+\toprule
+业务 & 源模型事实 & 本系统采用方式 \\ \midrule
+\endfirsthead
+\toprule
+业务 & 源模型事实 & 本系统采用方式 \\ \midrule
+\endhead
+\raggedright\arraybackslash 治疗计划 & \raggedright\arraybackslash R01：treatplan以PatNum关联患者；treatplanattach关联诊疗项目，proctp保存方案项目副本。 & \raggedright\arraybackslash 采用持续计划与确认版本；保留跨次执行历史，不照搬源系统删除已完成计划关联的做法。 \\[4pt]
+\raggedright\arraybackslash 口腔治疗 & \raggedright\arraybackslash R01：procedurelog具有患者、预约、牙位、牙面及执行状态；toothinitial记录牙齿初始状态。 & \raggedright\arraybackslash 将牙位牙面结构化；临床执行与费用、病历相关联，保留本系统的就诊实体。 \\[4pt]
+\raggedright\arraybackslash 健康资料 & \raggedright\arraybackslash R01：allergy、disease、medicationpat归属患者，并分别记录反应、状态或起止信息。 & \raggedright\arraybackslash 长期健康资料与当次复核分开；“无”“未知”“未询问”不能用同一个空值表达。 \\[4pt]
+\raggedright\arraybackslash 费用支付 & \raggedright\arraybackslash R01：payment与paysplit分开；分配可关联诊疗项目、调整等。R04支持预付款及退款。 & \raggedright\arraybackslash 账单、支付、分配、退款分开；线下扫码或银行卡付款可以先登记渠道和凭据。 \\[4pt]
+\raggedright\arraybackslash 排班资源 & \raggedright\arraybackslash R01：schedule包含日期及起止时间，operatory表示诊疗单元；R05说明阻断预约时段。 & \raggedright\arraybackslash 采用日期排班与诊椅占用；周模板用于生成，不作为所有日期的唯一依据。 \\[4pt]
+\raggedright\arraybackslash 文书资料 & \raggedright\arraybackslash R01：document保存患者文件信息；sheet及sheetfield支持填写和签署；procnote保留过程。 & \raggedright\arraybackslash 附件元数据、文书版本、签署人与时间分别记录；签名图片本身不等于可靠签署流程。 \\[4pt]
+\raggedright\arraybackslash 复诊随访 & \raggedright\arraybackslash R01：recall及recalltype表达患者复查安排。 & \raggedright\arraybackslash 保留诊后要求、联系历史和临床评估；继续治疗与周期复查分别跟踪。 \\[4pt]
+\raggedright\arraybackslash 批次采购 & \raggedright\arraybackslash R02含物料、批号、供应商、生产／失效日期。R03含采购行引用、合格／拒收数量及批次关联。 & \raggedright\arraybackslash 采用采购单及明细、收货验收及明细、批次、库存流水；仅对需要追溯的材料要求关联患者。 \\[4pt]
+\raggedright\arraybackslash 器械追溯 & \raggedright\arraybackslash R06说明处理批次、包装标识与监测记录的重要性；现有业务已包含器械处理。 & \raggedright\arraybackslash 拟建器械包、处理批次、结果及使用关联；属于本项目业务补全，不能声称已从上述软件直接复制。 \\[4pt]
+\bottomrule
+\end{longtable}
+}
+\clearpage\section{业务覆盖清单}
+下列M编号仅用于修订追踪，不替代正式BUC／UC编号。“优先”表示会阻断核心业务，应先补需求；“同步”表示随相关模块一起完成。
+
+{\small
+\begin{longtable}{@{}p{2.6cm}p{8.1cm}p{4.8cm}@{}}
+\toprule
+业务／优先级 & 应完成的工作 & 岗位与依据 \\ \midrule
+\endfirsthead
+\toprule
+业务／优先级 & 应完成的工作 & 岗位与依据 \\ \midrule
+\endhead
+\raggedright\arraybackslash M01 患者档案
+优先 & \raggedright\arraybackslash 身份核对、联系人／监护关系、重复档案合并、长期健康信息与就诊复核。 & \raggedright\arraybackslash 前台、牙医；R01、R07 \\[4pt]
+\raggedright\arraybackslash M02 预约与接诊
+优先 & \raggedright\arraybackslash 日期排班、诊椅、改约取消、停诊、临时到诊和爽约；记录实际候诊及接诊状态。 & \raggedright\arraybackslash 前台、牙医、负责人；R01、R05 \\[4pt]
+\raggedright\arraybackslash M03 检查与病历
+优先 & \raggedright\arraybackslash 牙位牙面、诊断明细、影像附件、病历签署与补充；咨询结束不强迫生成治疗收费。 & \raggedright\arraybackslash 牙医、助理；R01 \\[4pt]
+\raggedright\arraybackslash M04 持续治疗
+优先 & \raggedright\arraybackslash 跨次方案、方案变更、患者确认、当次执行和剩余项目；取消项目保留原计划。 & \raggedright\arraybackslash 牙医、患者；R01 \\[4pt]
+\raggedright\arraybackslash M05 文书与同意
+同步 & \raggedright\arraybackslash 模板版本、实际告知内容、患者或授权人确认及附件归档；签署后修改生成新版本。 & \raggedright\arraybackslash 牙医、患者；R01 \\[4pt]
+\raggedright\arraybackslash M06 收费与退费
+优先 & \raggedright\arraybackslash 应收明细、优惠调整、部分收款、组合支付、预付款抵扣、退款及凭据；保留操作依据。 & \raggedright\arraybackslash 收费人员、负责人；R01、R04、L03 \\[4pt]
+\raggedright\arraybackslash M07 复诊随访
+同步 & \raggedright\arraybackslash 继续治疗预约、定期复查、术后联系、未联系成功和临床评估；闭环须有明确结果。 & \raggedright\arraybackslash 前台、牙医；R01 \\[4pt]
+\raggedright\arraybackslash M08 采购库存
+优先 & \raggedright\arraybackslash 供应商、采购、分批收货、拒收、批次效期、领用／退回／报损、盘点及追溯。 & \raggedright\arraybackslash 助理、负责人；R02、R03、L03 \\[4pt]
+\raggedright\arraybackslash M09 器械处理
+同步 & \raggedright\arraybackslash 器械包标识、处理批次、监测结果、放行、使用和异常追查；不控制设备运行。 & \raggedright\arraybackslash 助理、负责人；R06、现有业务职责 \\[4pt]
+\raggedright\arraybackslash M10 运营核对
+同步 & \raggedright\arraybackslash 按支付渠道核对收支及退款；查看预约、工作量、待复诊、欠费和库存预警。 & \raggedright\arraybackslash 负责人、收费人员；R01、L03 \\[4pt]
+\raggedright\arraybackslash M11 权限与历史
+同步 & \raggedright\arraybackslash 岗位兼任、账号停用、业务授权、签署更正、退款审核与操作历史；保留职责边界。 & \raggedright\arraybackslash 各岗位；既有支撑设计 \\[4pt]
+\raggedright\arraybackslash M12 备份恢复
+同步 & \raggedright\arraybackslash 数据库、影像附件及配置的一致备份；恢复抽查患者、病历、账目和附件可读性。 & \raggedright\arraybackslash 指定维护人员；既有支撑设计 \\[4pt]
+\bottomrule
+\end{longtable}
+}
+\clearpage\section{现有38张表的逐组处理意见}
+以下清单覆盖全部现有表，没有遗漏或重复。保留不表示无需变更字段；重构也不表示删除历史数据。实际迁移方案在需求与模型定稿之后另行设计。
+
+{\small
+\begin{longtable}{@{}p{6.0cm}p{9.8cm}@{}}
+\toprule
+分组／现有表 & 处理意见 \\ \midrule
+\endfirsthead
+\toprule
+分组／现有表 & 处理意见 \\ \midrule
+\endhead
+\raggedright\arraybackslash 岗位（1）
+staff & \raggedright\arraybackslash 保留；岗位资格与账号权限分别管理。 \\[4pt]
+\raggedright\arraybackslash 患者（2）
+patient, patient\_\allowbreak{}change & \raggedright\arraybackslash 扩展；补联系人、监护关系、长期健康资料与合并档案的历史依据。 \\[4pt]
+\raggedright\arraybackslash 预约排班（5）
+appointment, appointment\_\allowbreak{}change, appointment\_\allowbreak{}slot, reception\_\allowbreak{}slot, slot\_\allowbreak{}change & \raggedright\arraybackslash 重构关联；周模板生成日期安排，补停诊例外、诊椅占用和临时到诊来源。 \\[4pt]
+\raggedright\arraybackslash 就诊（1）
+visit & \raggedright\arraybackslash 扩展；区分候诊、接诊、诊疗结束与财务结清，允许检查咨询结束而无收费治疗明细。 \\[4pt]
+\raggedright\arraybackslash 临床记录（3）
+clinical\_\allowbreak{}record, clinical\_\allowbreak{}finding, record\_\allowbreak{}addendum & \raggedright\arraybackslash 保留签署及补充机制；扩展牙位牙面、诊断明细、影像和当次健康复核。 \\[4pt]
+\raggedright\arraybackslash 治疗计划（2）
+treatment\_\allowbreak{}plan, plan\_\allowbreak{}item & \raggedright\arraybackslash 重构；改为患者层面的持续方案，保留版本、确认及跨次执行关联。 \\[4pt]
+\raggedright\arraybackslash 实际治疗（2）
+treatment\_\allowbreak{}confirmation, treatment\_\allowbreak{}item & \raggedright\arraybackslash 保留执行事实和更正历史；解除方案只能属于同次就诊的限制。 \\[4pt]
+\raggedright\arraybackslash 项目价目（2）
+service, service\_\allowbreak{}price & \raggedright\arraybackslash 保留；计费明细保留实际采用的价格依据，价目变更不反改历史账单。 \\[4pt]
+\raggedright\arraybackslash 收费核对（3）
+cash\_\allowbreak{}receipt, cash\_\allowbreak{}reconciliation, reconciliation\_\allowbreak{}receipt & \raggedright\arraybackslash 重构；分离账单、支付、分配和退款，核对范围扩展到支付渠道。原历史收款须可追溯。 \\[4pt]
+\raggedright\arraybackslash 诊后服务（3）
+followup\_\allowbreak{}requirement, contact\_\allowbreak{}history, clinical\_\allowbreak{}assessment & \raggedright\arraybackslash 保留并扩展；区分继续治疗、定期复查和术后随访，取消预约不丢失待办。 \\[4pt]
+\raggedright\arraybackslash 材料（3）
+material, material\_\allowbreak{}movement, stocktake\_\allowbreak{}adjustment & \raggedright\arraybackslash 重构库存粒度；补采购验收、批次效期、领用明细及实际使用关联。 \\[4pt]
+\raggedright\arraybackslash 账户授权（5）
+user\_\allowbreak{}account, access\_\allowbreak{}role, access\_\allowbreak{}permission, account\_\allowbreak{}role, role\_\allowbreak{}permission & \raggedright\arraybackslash 保留结构；随新增用例调整权限矩阵，负责人不自动获得全部临床编辑权限。 \\[4pt]
+\raggedright\arraybackslash 登录（2）
+login\_\allowbreak{}session, authentication\_\allowbreak{}event & \raggedright\arraybackslash 保留；验证离职停用、会话失效与登录事件的关联。 \\[4pt]
+\raggedright\arraybackslash 提交审计（2）
+request\_\allowbreak{}submission, operation\_\allowbreak{}audit & \raggedright\arraybackslash 保留并扩展覆盖；记录退款、档案合并、文书签署等操作，不能代替业务历史。 \\[4pt]
+\raggedright\arraybackslash 备份恢复（2）
+backup\_\allowbreak{}run, restore\_\allowbreak{}verification & \raggedright\arraybackslash 保留；备份对象扩展至附件和配置，恢复后核对数据库与文件的一致性。 \\[4pt]
+\bottomrule
+\end{longtable}
+}
+\clearpage\section{应先在分析模型中建立的关系}
+{\small
+\begin{longtable}{@{}p{2.3cm}p{10.0cm}p{3.2cm}@{}}
+\toprule
+关系 & 建模决定 & 来源 \\ \midrule
+\endfirsthead
+\toprule
+关系 & 建模决定 & 来源 \\ \midrule
+\endhead
+\raggedright\arraybackslash 患者与就诊 & \raggedright\arraybackslash 一个患者可有多次就诊；就诊可来源于预约或现场接诊。接诊结束和财务结清是不同事实。 & \raggedright\arraybackslash M01—03；R01、R07 \\[4pt]
+\raggedright\arraybackslash 计划与执行 & \raggedright\arraybackslash 患者可有多个历史方案；一项方案有多个版本和项目；项目可由多次就诊执行。执行记录保留来源版本，已签署版本不随计划变更。 & \raggedright\arraybackslash M04；R01 \\[4pt]
+\raggedright\arraybackslash 健康与复核 & \raggedright\arraybackslash 患者的过敏／疾病／用药记录有状态及历史；当次就诊记录牙医复核结果和采用的版本。 & \raggedright\arraybackslash M01、03；R01 \\[4pt]
+\raggedright\arraybackslash 账单与付款 & \raggedright\arraybackslash 账单包含计费明细；一次支付可分配到多个应收项，同一应收项可有多次付款。未分配预付款通过余额流水保留，退款引用原付款及分配依据。 & \raggedright\arraybackslash M06；R01、R04 \\[4pt]
+\raggedright\arraybackslash 排班与占用 & \raggedright\arraybackslash 周模板形成日期安排；停诊覆盖指定日期；预约同时检查牙医和诊椅可用性。调整已占用安排时处理受影响预约。 & \raggedright\arraybackslash M02；R01、R05 \\[4pt]
+\raggedright\arraybackslash 文书与附件 & \raggedright\arraybackslash 一个业务对象可有多个附件；同意文书保存内容版本、签署身份与时间。文件保存位置和校验值进入元数据，文件删除受业务保留规则限制。 & \raggedright\arraybackslash M03、05；R01 \\[4pt]
+\raggedright\arraybackslash 采购与批次 & \raggedright\arraybackslash 采购明细允许分次验收；一项收货明细可涉及多个批次。每条库存变动有材料、批次、数量、原因和经办人；诊疗使用通过明细关联就诊。 & \raggedright\arraybackslash M08；R02、R03 \\[4pt]
+\raggedright\arraybackslash 器械与使用 & \raggedright\arraybackslash 一处理批次包含多个器械包；记录监测结果和放行。使用记录指向该次包装处理实例，器械再次处理后不得覆盖上次使用依据。 & \raggedright\arraybackslash M09；R06及本项目推导 \\[4pt]
+\raggedright\arraybackslash 核对与历史 & \raggedright\arraybackslash 现金、银行卡／扫码等渠道分别核对；退款不反改原付款。审计记录辅助追责，业务流水、签署版本和调整单独保存。 & \raggedright\arraybackslash M06、10—12；既有设计扩展 \\[4pt]
+\bottomrule
+\end{longtable}
+}
+这些是候选实体与关系，尚未转成新的物理表清单。C阶段先确定实体职责、组合／关联和多重性，再按PPT将实体映射为表，将多对多关系映射为关联表；边界类、控制类和查询结果不按数量一律建表。
+
+\clearpage\section{用业务实例验收方案}
+以下均为拟定验收场景，尚未通过新版系统执行。每项必须覆盖用例规约、分析模型、数据库约束与后续页面操作。
+
+{\small
+\begin{longtable}{@{}p{2.3cm}p{5.3cm}p{7.9cm}@{}}
+\toprule
+场景 & 操作实例 & 通过标准 \\ \midrule
+\endfirsthead
+\toprule
+场景 & 操作实例 & 通过标准 \\ \midrule
+\endhead
+\raggedright\arraybackslash T01 连续治疗 & \raggedright\arraybackslash 同一患者同一方案分三次执行；第二次修改剩余项目。 & \raggedright\arraybackslash 三次病历独立可查；执行能追溯当时方案版本；原确认和已完成项目不被改写。 \\[4pt]
+\raggedright\arraybackslash T02 部分及组合付款 & \raggedright\arraybackslash 账单1000元，先付现金300元，再付扫码700元。 & \raggedright\arraybackslash 两笔付款各有凭据；应收余额依次为700元和0元；金额及渠道核对一致。 \\[4pt]
+\raggedright\arraybackslash T03 预付款与退款 & \raggedright\arraybackslash 预付500元，实际抵扣300元，退回剩余200元。 & \raggedright\arraybackslash 预付款余额为0；付款、抵扣、退款相互关联；重复退款请求不产生第二笔有效退款。 \\[4pt]
+\raggedright\arraybackslash T04 已付款项目纠错 & \raggedright\arraybackslash 已付1000元的项目经核实应收800元。 & \raggedright\arraybackslash 保留原账单和收款；授权调整形成200元退款依据，已退款金额不能超过可退金额。 \\[4pt]
+\raggedright\arraybackslash T05 临时停诊 & \raggedright\arraybackslash 牙医周三下午停诊，已有两名预约患者。 & \raggedright\arraybackslash 生成受影响预约清单；改约／取消保留原因；下一周同一时段不被误停。 \\[4pt]
+\raggedright\arraybackslash T06 诊椅冲突 & \raggedright\arraybackslash 两个牙医在同一时间提交同一诊椅预约。 & \raggedright\arraybackslash 只允许符合资源安排的一项成功；拒绝结果明确；不留下半条占用记录。 \\[4pt]
+\raggedright\arraybackslash T07 无治疗结束 & \raggedright\arraybackslash 患者完成检查咨询，未接受治疗方案。 & \raggedright\arraybackslash 允许结束诊疗并保留病历；如有检查收费按真实项目计费，不虚构治疗明细。 \\[4pt]
+\raggedright\arraybackslash T08 健康资料变更 & \raggedright\arraybackslash 患者新报告过敏史，随后复诊并由牙医复核。 & \raggedright\arraybackslash 长期记录和当次复核均可查；既往签署病历不被反改；未知信息不自动标为无。 \\[4pt]
+\raggedright\arraybackslash T09 批次材料追溯 & \raggedright\arraybackslash 同一材料两个批次，分别入库和使用；一个批次停用。 & \raggedright\arraybackslash 批次库存独立；停用批次不得再领用；能查其来源与有追溯要求的实际使用记录。 \\[4pt]
+\raggedright\arraybackslash T10 分批收货 & \raggedright\arraybackslash 订购10件，先到6件，其中1件拒收，后到4件。 & \raggedright\arraybackslash 累计收到10件、合格9件、拒收1件；采购余量与验收差异分开，拒收不计入可用库存。 \\[4pt]
+\raggedright\arraybackslash T11 器械异常 & \raggedright\arraybackslash 一批次器械未放行；另一已使用批次后续发现异常。 & \raggedright\arraybackslash 未放行批次不能登记可用；已使用批次可查相关器械包、就诊和处理人。 \\[4pt]
+\raggedright\arraybackslash T12 恢复与历史 & \raggedright\arraybackslash 恢复数据库及附件，抽查已签署病历、退款和停用账户。 & \raggedright\arraybackslash 附件可读且关联正确；签署版本、资金余额和权限状态一致，缺失文件明确报出。 \\[4pt]
+\bottomrule
+\end{longtable}
+}
+\clearpage\section{分步实施顺序与交付标准}
+{\small
+\begin{longtable}{@{}p{2.6cm}p{6.5cm}p{6.4cm}@{}}
+\toprule
+阶段 & 工作 & 交付及通过条件 \\ \midrule
+\endfirsthead
+\toprule
+阶段 & 工作 & 交付及通过条件 \\ \midrule
+\endhead
+\raggedright\arraybackslash 1 参考与范围
+本轮完成 & \raggedright\arraybackslash 核对官方模型、保存来源快照，列出覆盖范围、38表处理意见和12个验收场景。 & \raggedright\arraybackslash 本工作底稿及来源清单；新增要求均标明依据或项目裁剪决定。 \\[4pt]
+\raggedright\arraybackslash 2 A业务建模
+下一步 & \raggedright\arraybackslash 修订1.1.1、愿景表、岗位职责和业务用例；补跨次治疗、收费退费、采购验收、器械处理的现状／改进序列。 & \raggedright\arraybackslash LaTeX正文与PlantUML图；患者、前台、牙医、助理、收费人员、负责人职责连贯，异常路径有归属。 \\[4pt]
+\raggedright\arraybackslash 3 B需求
+随后 & \raggedright\arraybackslash 保留原UC编号的追踪关系；拆分或新增用例，补前后置条件、主流程、异常、权限及规则。 & \raggedright\arraybackslash 系统总用例图、单用例图和规约；T01—T12均有用例负责。 \\[4pt]
+\raggedright\arraybackslash 4 C分析
+随后 & \raggedright\arraybackslash 建立候选实体、边界和控制类；补充序列图、状态机图及多重性。 & \raggedright\arraybackslash 每个新增业务实体有用例来源；资金、方案、就诊、批次状态能解释正常及更正路径。 \\[4pt]
+\raggedright\arraybackslash 5 D设计
+随后 & \raggedright\arraybackslash 确定类表映射、字段字典、键与约束、事务；再精化业务层与表示层。 & \raggedright\arraybackslash SQLite目标DDL、PlantUML数据库总图及分区图；字段、外键、类和规约一致。 \\[4pt]
+\raggedright\arraybackslash 6 验证后实现
+文档对齐之后 & \raggedright\arraybackslash 先用业务实例验证空库，再设计迁移与前后端改造；补新版验收。 & \raggedright\arraybackslash 通过一致性检查和业务场景；不把设计DDL直接当作现有库迁移脚本。 \\[4pt]
+\bottomrule
+\end{longtable}
+}
+\subsection{下一步A部分的具体改动}
+\begin{enumerate}
+\item 1.1.1以“患者连续诊疗＋诊所日常运营”为业务全貌，明确同一患者可跨次治疗，接诊可来源于提前预约或现场安排。
+\item 愿景同时覆盖诊疗连续性、收支可核对、物资和器械可追溯；暂不填写没有依据的效率提升百分比。
+\item 业务用例按岗位提供的业务服务划分，覆盖接待、诊断与方案、治疗、结算与退费、诊后服务、接诊资源、物资采购库存、器械处理及经营核对；数量由服务目标决定。
+\item 先梳理每条业务的输入、输出、经办岗位和异常，再画现状与改进序列图。业务序列图人物使用标准圆形头部；图中不另加通用符号解释。
+\item 使用现有PlantUML工具和LaTeX工具。主文档仍保持ABCD四部分，不把本工作底稿中的研究过程文字大量搬进商业愿景。
+\end{enumerate}
+\clearpage\section{来源登记与核验说明}
+本轮读取日期为2026年10月15日。完整源文件及SHA-256保存于06-参考资料／成熟系统参考。公开分支可能变化；本轮保存的是读取日快照，没有取得提交号时明确标注，不能称为固定提交。
+
+\noindent\textbf{R01} Open Dental数据库说明，26.2.0.0。完整XML已下载并解析；430个table元素。重点核对本稿第2节所列对象。\par{\footnotesize\noindent \url{https://www.opendental.com/OpenDentalDocumentation26-2.xml}}\par\medskip
+\noindent\textbf{R02} ERPNext Batch，version-15分支。完整JSON已读取；核对批号、物料、供应商、生产及失效日期。\par{\footnotesize\noindent \url{https://github.com/frappe/erpnext/blob/version-15/erpnext/stock/doctype/batch/batch.json}}\par\medskip
+\noindent\textbf{R03} ERPNext Purchase Receipt Item，version-15分支。完整JSON已读取；核对采购来源、验收数量及批次。\par{\footnotesize\noindent \href{https://github.com/frappe/erpnext/blob/version-15/erpnext/stock/doctype/purchase_receipt_item/purchase_receipt_item.json}{\nolinkurl{https://github.com/frappe/erpnext/blob/version-15/erpnext/stock/doctype/}}\par\noindent\href{https://github.com/frappe/erpnext/blob/version-15/erpnext/stock/doctype/purchase_receipt_item/purchase_receipt_item.json}{\nolinkurl{purchase_receipt_item/purchase_receipt_item.json}}}\par\medskip
+\noindent\textbf{R04} Open Dental Payment官方说明。参考付款分配、预付款与退款业务；美国保险和税务规则不引入本项目。\par{\footnotesize\noindent \url{https://www.opendental.com/manual/payment.html}}\par\medskip
+\noindent\textbf{R05} Open Dental Blockouts官方说明。参考日期、起止时间、诊疗单元及阻断预约。\par{\footnotesize\noindent \url{https://www.opendental.com/manual/blockouts.html}}\par\medskip
+\noindent\textbf{R06} CDC牙科器械处理记录说明。仅支持批次、标识和监测记录的数据需求，不据此声称满足本地法规或规定具体临床操作参数。\par{\footnotesize\noindent \url{https://www.cdc.gov/dental-infection-control/hcp/summary/sterilization-disinfection.html}}\par\medskip
+\noindent\textbf{R07} OpenEMR官方GitHub项目及API文档检索结果：区分患者与就诊资源，Encounter对应form\_\allowbreak{}encounter。辅助对照；未完整取得v7\_\allowbreak{}0\_\allowbreak{}2数据库SQL，不作为字段级依据。\par{\footnotesize\noindent \url{https://github.com/openemr/openemr/blob/master/Documentation/api/STANDARD_API.md}}\par\medskip
+\noindent\textbf{R08} Open Dental公开仓库与当前源码说明。已核对仓库入口和开放条件；未完成历史分支源码审计。\par{\footnotesize\noindent \url{https://opendental.com/site/sourcecode.html}}\par\medskip
+\subsection{本地参考资料}
+\begin{enumerate}
+\item L01：课程PPT的建模工作流及PDF第398—400页结构映射。保持A业务建模、B需求、C分析、D设计；按类、属性、关联映射表、列及外键。
+\item L02：B企业实习生管理系统论文第3章需求、第4章设计；KADA的SRS、SDD、STD。用于核对岗位需求、规约、类与数据字典、测试之间的衔接，不移植其业务内容。
+\item L03：QuickBooks 1.0 ERD、Shopify ERD。核对供应商、采购／明细、付款、退款／明细和库存对象；借鉴总图布局及业务拆分。
+\end{enumerate}
+\end{document}

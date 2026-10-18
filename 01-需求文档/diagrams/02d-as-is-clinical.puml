@@ -1,10 +1,11 @@
 @startuml
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -18,33 +19,24 @@ skinparam sequence {
  ActivationBackgroundColor white
 }
 actor "患者" as P
-participant "<img:business-worker.png>\n前台" as F
 participant "<img:business-worker.png>\n牙医" as D
-participant "<img:business-worker.png>\n诊疗助理" as A
-group 患者已完成到诊接待
- F -> D : 交接患者到诊信息与纸质病历
- activate D
- D -> P : 询问主诉、病史及相关情况
- P --> D : 陈述症状并补充病史
- D -> D : 查阅既往记录，检查并形成诊断
- D -> P : 说明检查结果、治疗方案及预计费用
- P --> D : 表达治疗选择与方案确认情况
- D -> D : 记录检查、诊断及患者确认情况
+P -> D : 说明主诉及相关情况
+activate D
+D -> D : 查阅既往病历、影像及健康记录
+D -> P : 询问病史、过敏和用药并核实变化
+P --> D : 补充或确认情况
+D -> P : 进行口腔检查
+D -> D : 记录牙位、检查所见及诊断\n整理影像和相关资料
+D -> P : 说明治疗选择、分次安排及预计费用
+P --> D : 同意、暂缓或拒绝方案
+D -> D : 记录方案、患者决定及日期
+alt 患者决定接受治疗
+ D --> P : 约定本次或后续治疗
+else 仅检查咨询或暂缓治疗
+ D --> P : 给出后续意见并结束当次诊疗
 end
-opt 患者确认方案并接受本次治疗
- D -> A : 交代本次治疗的准备及协助要求
- activate A
- A -> A : 准备所需器械、材料及诊疗环境
- A --> D : 告知准备完成
- D -> P : 实施已确认的治疗
- A -> D : 配合诊疗操作
- D -> D : 记录实际治疗情况
- A -> A : 登记本次材料领用\n并移交使用后的器械
- deactivate A
+opt 当次诊疗在检查咨询后结束
+ D -> D : 签署病历并归档
 end
-D -> D : 填写本次实际完成的收费项目与数量
-D -> P : 说明诊后注意事项及后续诊疗要求
-D -> F : 交接病历、收费项目及随访／复诊要求
 deactivate D
-F -> F : 归档纸质病历，转交收费单\n记录需联系患者的事项
 @enduml

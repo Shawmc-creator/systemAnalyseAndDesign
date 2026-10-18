@@ -5,8 +5,8 @@ skinparam defaultFontName SimSun
 skinparam defaultFontSize 18
 skinparam dpi 220
 skinparam ArrowColor black
-skinparam nodesep 24
-skinparam ranksep 65
+skinparam nodesep 22
+skinparam ranksep 48
 skinparam actor {
  BorderColor black
  BackgroundColor white

@@ -1,10 +1,11 @@
 @startuml
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -17,50 +18,33 @@ skinparam sequence {
  ActivationBorderColor black
  ActivationBackgroundColor white
 }
+participant "<img:business-worker.png>\n牙医" as D
 participant "<img:business-worker.png>\n诊疗助理" as A
 participant "<img:business-worker.png>\n诊所负责人" as M
 participant "<img:business-entity.png>\n牙科诊所管理系统" as S
-activate A
-alt 材料入库
- A -> A : 核对实际到货材料、单位及数量
- A -> S : 提交材料入库数量及经办信息
-else 材料领用
- A -> S : 查询该材料可用库存
- activate S
- S --> A : 返回可用数量
-deactivate S
- A -> A : 核对本次领用数量及用途
- A -> S : 提交本次领用数量及用途
-else 材料盘点
- A -> A : 清点实际库存
- A -> S : 查询该材料账面库存
- activate S
- S --> A : 返回账面数量
-deactivate S
- A -> M : 报告盘点差异及核实情况
- activate M
- M -> M : 核实差异原因及处理方式
- M --> A : 确认库存调整及原因
-deactivate M
- A -> S : 提交已确认的盘点调整
+alt 领用及实际使用
+ D -> A : 提出材料及用量需求
+ A -> S : 查询可用批次、效期和库存
+ S --> A : 返回批次及状态
+ A -> A : 核对拟发放实物
+ A -> S : 登记批次领用及用途
+ S -> S : 检查可用状态和数量\n保存批次变动及余额
+ S --> A : 返回结果；不通过则保留原库存
+ opt 登记成功
+  A -> D : 发放经核对材料
+  D --> A : 确认实际使用及需退回数量
+  A -> S : 关联实际使用及相关就诊
+ end
+else 退回、报损或盘点
+ A -> A : 核对实物及原操作依据
+ A -> M : 提交差异及处理原因
+ M --> A : 确认处理意见
+ A -> S : 保存确认的退回、报损或调整
+ S --> A : 返回变动及余额，保留原流水
 end
-activate S
-S -> S : 校验材料、单位、数量及变动依据\n领用数量不得超过可用库存
-alt 变动内容有效
- S -> S : 保存库存变动并更新余额
- S --> A : 返回变动结果及当前库存
-else 变动内容无效
- S --> A : 返回具体问题，保留原有效库存
+opt 发现异常批次
+ A -> S : 登记批次停用及原因
+ M -> S : 查询来源、去向及相关就诊
+ S --> M : 返回追溯清单及剩余库存
 end
-deactivate S
-opt 登记成功且为材料领用
- A -> A : 发放材料并核实实际领用数量
-end
-opt 库存不足以满足后续使用
- A -> M : 报告需要补充的材料及数量
- activate M
- M --> A : 确认补充数量及时间安排
-deactivate M
-end
-deactivate A
 @enduml

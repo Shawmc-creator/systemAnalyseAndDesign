@@ -1,0 +1,72 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "收费人员" as A0
+boundary "<u>:收费人员接口</u>" as B0
+control "<u>:登记患者付款与</u>\n<u>预付抵扣控制</u>" as K
+participant "<u>:患者资金</u>" as Funds
+participant "<u>:患者付款</u>" as Payment
+participant "<u>:应收账目</u>" as Bill
+participant "<u>:预付抵扣</u>" as Offset
+A0 -> B0 : 提交UC-07办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-07办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Funds : 办理预付抵扣(原付款、账目及拟抵扣额)
+activate Funds
+Funds -> Payment : 核对未分配余额(已分配、已抵扣、退款与占用)
+activate Payment
+Payment --> Funds : 处理结果或拒绝原因
+deactivate Payment
+Funds -> Bill : 核对可分配额(当前未付及版本)
+activate Bill
+Bill --> Funds : 处理结果或拒绝原因
+deactivate Bill
+Funds -> Payment : 确认预付用途(本次抵扣金额)
+activate Payment
+Payment -> Offset : 保留预付抵扣(账目、金额与原款)
+activate Offset
+Offset --> Payment : 处理结果或拒绝原因
+deactivate Offset
+Payment --> Funds : 处理结果或拒绝原因
+deactivate Payment
+Funds --> K : 处理结果或拒绝原因
+deactivate Funds
+K -> Funds : 恢复既有办理结果(原请求及交易依据)
+activate Funds
+Funds --> K : 处理结果或拒绝原因
+deactivate Funds
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Offset
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

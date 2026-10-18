@@ -1,11 +1,12 @@
 @startuml
-left to right direction
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
 skinparam defaultFontSize 18
-skinparam dpi 240
+skinparam dpi 220
 skinparam ArrowColor black
+skinparam nodesep 22
+skinparam ranksep 48
 skinparam actor {
  BorderColor black
  BackgroundColor white
@@ -18,9 +19,11 @@ skinparam rectangle {
  BorderColor black
  BackgroundColor white
 }
-actor "前台" as A
+left to right direction
+actor "前台" as A0
 rectangle "牙科诊所管理系统" {
  usecase "UC-02\n查询预约及接诊安排" as U
 }
-A --> U
+A0 -- U
+
 @enduml

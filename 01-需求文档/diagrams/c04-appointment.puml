@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "已预约" as Booked
+state "已取消" as Cancelled
+state "已到诊" as Arrived
+state "未到" as Missed
+[*] --> Booked : 确认安排\n[日期资源有效且无冲突]\n/ 关联有效占用
+Booked : 变更或取消安排 [选择改约且新资源有效]\n/ 保留原安排并调整占用
+Booked --> Cancelled : 变更或取消安排\n[选择取消且未到诊]\n/ 释放占用并保留原因
+Booked --> Arrived : 关联到诊结果\n[当日且无已有就诊]\n/ 关联唯一就诊
+Booked --> Missed : 确认未到事实\n[已过计划且人工核实未到]\n/ 保留未到依据
+
+@enduml

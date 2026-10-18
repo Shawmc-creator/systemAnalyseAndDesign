@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+actor "患者" as P
+participant "<img:business-worker.png>\n牙医" as D
+participant "<img:business-worker.png>\n诊疗助理" as A
+participant "<img:business-entity.png>\n牙科诊所管理系统" as S
+D -> S : 查询患者方案、确认版本及前次执行
+S --> D : 返回计划、历史记录与剩余项目
+activate D
+D -> P : 复核本次情况并说明拟进行的治疗
+opt 方案发生变化
+ D -> P : 说明变更内容、费用及后续安排
+ P --> D : 表达决定
+ D -> S : 保存新版本及决定，保留原确认
+ S --> D : 返回变更结果
+end
+D -> P : 告知本次治疗事项并办理相应确认
+P --> D : 表达同意、暂缓或拒绝并确认相关文书
+D -> S : 保存决定并关联方案版本和相关文书
+opt 同意本次治疗
+ D -> A : 交代所需材料和器械
+ A -> S : 查询可用批次及器械包状态
+ S --> A : 返回库存与已放行器械包
+ A -> A : 核对实物并完成准备
+ A --> D : 确认准备结果
+ D -> P : 实施已确认的本次治疗
+ A -> S : 登记实际材料和器械包使用
+ D -> S : 记录当次执行、完成项目\n剩余安排并签署病历
+ S --> D : 返回结果，保留方案与执行关联
+ D -> P : 交代诊后注意事项及复诊要求
+end
+deactivate D
+@enduml

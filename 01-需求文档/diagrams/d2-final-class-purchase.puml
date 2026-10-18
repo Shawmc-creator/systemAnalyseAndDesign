@@ -1,0 +1,121 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "供应商" as Supplier <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -contact_name: Text
+ -phone: Text
+ -address: Text?
+ +核对供货资格(依据: 操作输入): 业务结果
+}
+class "材料" as Material <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -specification: Text
+ -base_unit: Text
+ -purchase_unit: Text
+ +定位材料及单位(依据: 操作输入): 业务结果
+ +提供采购单位(依据: 操作输入): 业务结果
+ +确认目录维护(依据: 操作输入): 业务结果
+}
+class "采购" as Purchase <<entity>> {
+ -id: ObjectId
+ -agreed_at: Text
+ -delivery_terms: Text
+ -confirmed_at: Text?
+ -request_reason: Text
+ +提出采购安排(依据: 操作输入): 业务结果
+ +确认供货约定(依据: 操作输入): 业务结果
+ +核对到货依据(依据: 操作输入): 业务结果
+ +更新履行进度(依据: 操作输入): 业务结果
+ +提供预付依据(依据: 操作输入): 业务结果
+}
+class "采购项目" as PurchaseItem <<entity>> {
+ -id: ObjectId
+ -ordered_quantity_scaled: Int64
+ -unit_price_cents: Int64
+ -purchase_unit: Text
+ -conversion_numerator: Int64
+ +组织约定明细(依据: 操作输入): 业务结果
+ +核对交付及差异(依据: 操作输入): 业务结果
+ +确认差异安排(依据: 操作输入): 业务结果
+ +取消未履行部分(依据: 操作输入): 业务结果
+}
+class "验收" as Receipt <<entity>> {
+ -id: ObjectId
+ -arrived_at: Text
+ -delivery_evidence: Text
+ -accepted_at: Text?
+ -status: Text
+ +登记本次验收(依据: 操作输入): 业务结果
+ +提供合格结算依据(依据: 操作输入): 业务结果
+}
+class "验收项目" as ReceiptItem <<entity>> {
+ -id: ObjectId
+ -arrived_quantity_scaled: Int64
+ -accepted_quantity_scaled: Int64
+ -rejected_quantity_scaled: Int64
+ -pending_quantity_scaled: Int64
+ +核对数量组成(依据: 操作输入): 业务结果
+}
+class "材料批次" as Batch <<entity>> {
+ -id: ObjectId
+ -batch_no: Text
+ -expiry_date: Text?
+ -source_note: Text
+ -status: Text
+ +提供批次可用性(依据: 操作输入): 业务结果
+ +核对可领用性(依据: 操作输入): 业务结果
+ +立即隔离批次(依据: 操作输入): 业务结果
+ +审核恢复或停用(依据: 操作输入): 业务结果
+ +形成批次来源(依据: 操作输入): 业务结果
+ +确认合格范围(依据: 操作输入): 业务结果
+ +判断效期(依据: 操作输入): 业务结果
+ +核对接收归属(依据: 操作输入): 业务结果
+}
+class "采购差异" as SupplyIssue <<entity>> {
+ -id: ObjectId
+ -quantity_scaled: Int64
+ -reason: Text
+ -resolution: Text
+ -confirmed_at: Text?
+ +保留验收差异(依据: 操作输入): 业务结果
+ +提供确认退换(依据: 操作输入): 业务结果
+}
+class "库存变动" as Movement <<entity>> {
+ -id: ObjectId
+ -movement_type: Text
+ -delta_scaled: Int64
+ -before_scaled: Int64
+ -after_scaled: Int64
+ +提供收发依据(依据: 操作输入): 业务结果
+ +保留收发经历(依据: 操作输入): 业务结果
+ +保留验收入库(依据: 操作输入): 业务结果
+ +形成盘点调整(依据: 操作输入): 业务结果
+}
+Material "1" -- "0..*" Batch : 材料批次
+Movement "0..1" -- "0..*" Movement : 原领用或更正来源
+Supplier "1" -- "0..*" Purchase : 供货方
+Purchase "1" *-- "1..*" PurchaseItem : 约定明细
+Material "1" -- "0..*" PurchaseItem : 采购材料
+Purchase "1" -- "0..*" Receipt : 分批验收
+Receipt "1" *-- "1..*" ReceiptItem : 本次验收
+PurchaseItem "1" -- "0..*" ReceiptItem : 所据采购
+Batch "0..1" -- "0..*" ReceiptItem : 到货批次
+ReceiptItem "0..1" -- "0..*" Movement : 验收入库依据
+PurchaseItem "1" -- "0..*" SupplyIssue : 交付与拒收差异
+ReceiptItem "0..1" -- "0..*" SupplyIssue : 原验收
+@enduml

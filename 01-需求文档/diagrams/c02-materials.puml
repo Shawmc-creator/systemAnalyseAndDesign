@@ -1,0 +1,114 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "材料" as Material <<entity>> {
+ 名称
+ 规格
+ 基本单位
+ 换算规则
+ 追溯要求
+ --
+ 定位材料及单位()
+ 提供采购单位()
+ 确认目录维护()
+}
+class "材料批次" as Batch <<entity>> {
+ 批号
+ 效期
+ 来源说明
+ --
+ 提供批次可用性()
+ 核对可领用性()
+ 立即隔离批次()
+}
+class "批次变更" as BatchChange <<entity>> {
+ 原可用性
+ 新可用性
+ 原因
+ 确认时间
+ --
+ 保留可用性变更()
+ 保留恢复依据()
+}
+class "存放位置" as Location <<entity>> {
+ 名称
+ 用途
+ --
+ 核对存放范围()
+}
+class "批次存量" as Stock <<entity>> {
+ 基本单位数量
+ --
+ 提供分处余额()
+ 办理库存变动()
+ 核对变动后数量()
+}
+class "库存变动" as Movement <<entity>> {
+ 类型
+ 数量
+ 前后数量
+ 原因
+ 发生时间
+ --
+ 提供收发依据()
+ 保留收发经历()
+ 保留验收入库()
+}
+class "实际用料" as Usage <<entity>> {
+ 使用数量
+ 使用时间
+ 说明
+ --
+ 提供实际使用()
+ 登记实际消耗()
+}
+class "盘点核实" as Count <<entity>> {
+ 账面快照
+ 实点数量
+ 原因
+ 确认时间
+ --
+ 保留实点快照()
+ 核对确认依据()
+ 重新确认实点()
+}
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ 接诊开始
+ 诊疗结束
+ 到诊来源
+ --
+ 登记到诊()
+ 核对接诊责任()
+ 确认实际执行()
+}
+Material "1" -- "0..*" Batch : 材料批次
+Batch "1" *-- "0..*" BatchChange : 停用与恢复
+Batch "1" -- "0..*" Stock : 分处存量
+Location "1" -- "0..*" Stock : 存放
+Stock "1" *-- "0..*" Movement : 收发经历
+Movement "0..1" -- "0..*" Movement : 原领用或更正来源
+Movement "1" *-- "0..*" Usage : 实际消耗
+Visit "1" -- "0..*" Usage : 使用就诊
+Count "0..1" -- "0..1" Movement : 批准差异调整
+Stock "1" *-- "0..*" Count : 盘点经历
+
+@enduml

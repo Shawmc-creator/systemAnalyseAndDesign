@@ -1,0 +1,109 @@
+@startuml d1-db-11
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EDF5FA
+}
+title G11  器械处理与使用  ·  6张表
+entity "器械包\ninstrument_pack" as instrument_pack {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} composition_note : TEXT [NN]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "处理设备\nprocessing_equipment" as processing_equipment {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} available_from : TEXT [NN]
+  {field} available_until : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "器械处理\ninstrument_processing" as instrument_processing {
+  {field} id : INTEGER [PK, NN]
+  {field} processing_equipment_id : INTEGER [FK, NN]  → processing_equipment.id
+  {field} previous_processing_id : INTEGER [FK, NULL]  → instrument_processing.id
+  {field} preparation_note : TEXT [NN]
+  {field} started_at : TEXT [NN]
+  {field} ended_at : TEXT [NULL]
+  {field} released_at : TEXT [NULL]
+  {field} release_basis : TEXT [NULL]
+  {field} exception_reason : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} released_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} isolated_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "器械包处理\ninstrument_pack_cycle" as instrument_pack_cycle {
+  {field} id : INTEGER [PK, NN]
+  {field} instrument_processing_id : INTEGER [FK, NN]  → instrument_processing.id
+  {field} instrument_pack_id : INTEGER [FK, NN]  → instrument_pack.id
+  {field} packaging_check : TEXT [NN]
+  {field} expires_at : TEXT [NN]
+  {field} checked_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "处理监测\nprocessing_monitor" as processing_monitor {
+  {field} id : INTEGER [PK, NN]
+  {field} instrument_processing_id : INTEGER [FK, NN]  → instrument_processing.id
+  {field} monitor_item : TEXT [NN]
+  {field} result : TEXT [NN]
+  {field} obtained_at : TEXT [NULL]
+  {field} evidence : TEXT [NN]
+  {field} recorded_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "器械使用\ninstrument_use" as instrument_use {
+  {field} id : INTEGER [PK, NN]
+  {field} visit_id : INTEGER [FK, NN]  → visit.id (G02)
+  {field} instrument_pack_cycle_id : INTEGER [FK, NN]  → instrument_pack_cycle.id
+  {field} issued_at : TEXT [NN]
+  {field} used_at : TEXT [NULL]
+  {field} physical_check : TEXT [NN]
+  {field} exception_note : TEXT [NULL]
+  {field} use_status : TEXT [NN]
+  {field} returned_at : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} used_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+instrument_pack_cycle --> instrument_pack
+instrument_pack_cycle --> instrument_processing
+instrument_processing --> processing_equipment
+instrument_use --> instrument_pack_cycle
+processing_monitor --> instrument_processing
+@enduml

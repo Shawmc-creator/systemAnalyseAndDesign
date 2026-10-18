@@ -1,0 +1,104 @@
+@startuml d1-db-03
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F7F0E6
+}
+title G03  健康资料与病历  ·  6张表
+entity "健康版本\nhealth_version" as health_version {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} formed_at : TEXT [NN]
+  {field} change_reason : TEXT [NN]
+  {field} version_no : INTEGER [NN]
+  {field} effective_at : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} previous_version_id : INTEGER [FK, NULL]  → health_version.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "健康条目\nhealth_item" as health_item {
+  {field} id : INTEGER [PK, NN]
+  {field} health_version_id : INTEGER [FK, NN]  → health_version.id
+  {field} category : TEXT [NN]
+  {field} content : TEXT [NN]
+  {field} certainty : TEXT [NN]
+  {field} reported_at : TEXT [NN]
+  {field} source : TEXT [NN]
+  {field} occurred_at : TEXT [NULL]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "健康复核\nhealth_review" as health_review {
+  {field} id : INTEGER [PK, NN]
+  {field} visit_id : INTEGER [FK, NN]  → visit.id (G02)
+  {field} health_version_id : INTEGER [FK, NN]  → health_version.id
+  {field} reviewed_at : TEXT [NN]
+  {field} conclusion : TEXT [NN]
+  {field} reviewed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "病历\nclinical_record" as clinical_record {
+  {field} id : INTEGER [PK, NN]
+  {field} visit_id : INTEGER [UQ, FK, NN]  → visit.id (G02)
+  {field} chief_complaint : TEXT [NULL]
+  {field} diagnosis : TEXT [NULL]
+  {field} treatment_advice : TEXT [NULL]
+  {field} signed_at : TEXT [NULL]
+  {field} signed_revision : INTEGER [NULL]
+  {field} content_hash : TEXT [NULL]
+  {field} signed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "检查所见\nclinical_finding" as clinical_finding {
+  {field} id : INTEGER [PK, NN]
+  {field} clinical_record_id : INTEGER [FK, NN]  → clinical_record.id
+  {field} tooth_code : TEXT [NULL]
+  {field} surface_code : TEXT [NULL]
+  {field} finding_text : TEXT [NN]
+  {field} sequence_no : INTEGER [NN]
+  {field} recorded_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "病历补充\nrecord_addendum" as record_addendum {
+  {field} id : INTEGER [PK, NN]
+  {field} clinical_record_id : INTEGER [FK, NN]  → clinical_record.id
+  {field} content : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} added_at : TEXT [NN]
+  {field} content_hash : TEXT [NN]
+  {field} signed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+clinical_finding --> clinical_record
+health_item --> health_version
+health_review --> health_version
+record_addendum --> clinical_record
+@enduml

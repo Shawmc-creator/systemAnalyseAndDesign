@@ -1,0 +1,37 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+top to bottom direction
+class "收款核对" as E0 <<entity>> {
+- business_date : 当地日期
+- system_net_cents : 整数分
+- counted_net_cents : 整数分
+--
++ 建立核对(收据, 依据, 实盘, 差异) : 核对
++ 计算差额() : 整数分
+}
+class "现金收款" as E1 <<entity>> {
+- visit_id : 标识
+- confirmation_id : 标识
+- received_at : 时刻
+--
++ 建立收款(应收, 实收, 确认, 经办人) : 收款
++ 计算找零() : 整数分
++ 计算净收() : 整数分
++ 汇总净收(日期区间) : 原收据及金额
+}
+E0 "0..*" -- "0..*" E1
+@enduml

@@ -1,0 +1,84 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者" as Patient <<entity>> {
+ 姓名
+ 出生日期
+ 联系电话
+ 电话归属
+ 联系地址
+ 联系偏好
+ --
+ 核对身份()
+ 核对身份候选()
+ 确认资料维护()
+}
+class "患者资金" as Funds <<entity>> {
+ 开户时间
+ --
+ 核算付款及可用额()
+ 登记已核实付款()
+ 汇总患者资金()
+}
+class "患者付款" as Payment <<entity>> {
+ 净额
+ 实收
+ 找零
+ 渠道
+ 到账时间
+ 交易依据
+ --
+ 核算来源余额()
+ 确认到账()
+ 分配已收款()
+}
+class "付款分配" as Allocation <<entity>> {
+ 分配金额
+ 生效时间
+ 变更原因
+ --
+ 形成分配()
+ 追加分配更正()
+}
+class "预付抵扣" as Offset <<entity>> {
+ 抵扣金额
+ 抵扣时间
+ --
+ 保留预付抵扣()
+}
+class "应收账目" as Bill <<entity>> {
+ 形成时间
+ 计费期间
+ --
+ 形成应收依据()
+ 提供应收依据()
+ 核对可分配额()
+}
+Patient "1" -- "0..*" Bill : 账目归属
+Patient "1" -- "1" Funds : 款项归属
+Funds "1" *-- "0..*" Payment : 实际到账
+Payment "1" *-- "0..*" Allocation : 到账分配
+Bill "1" -- "0..*" Allocation : 被分配账目
+Payment "1" *-- "0..*" Offset : 未分配来源
+Bill "1" -- "0..*" Offset : 抵扣账目
+Funds "1" -- "0..*" Bill : 同患者结算范围
+
+@enduml

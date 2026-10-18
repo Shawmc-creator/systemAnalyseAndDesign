@@ -1,0 +1,40 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
+skinparam sequenceMessageAlign center
+skinparam ActorBorderColor black
+skinparam ActorBackgroundColor white
+skinparam sequence {
+ ParticipantBorderColor transparent
+ ParticipantBackgroundColor white
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ ActivationBorderColor black
+ ActivationBackgroundColor white
+}
+participant "<img:business-worker.png>\n诊疗助理" as A
+participant "<img:business-worker.png>\n牙医" as D
+participant "<img:business-worker.png>\n诊所负责人" as M
+D -> A : 交回使用后的器械及就诊信息
+activate A
+A -> A : 回收、清洁、检查及包装
+A -> A : 按操作要求完成处理\n登记设备、批次、器械包和监测结果
+alt 核对结果满足放行条件
+ A -> A : 记录放行依据及责任人\n标识待用器械包
+ D -> A : 提出本次治疗器械需求
+ A -> A : 核对包装及有效状态
+ A -> D : 发放器械包
+ A -> A : 登记器械包与本次就诊
+else 异常或结果未确认
+ A -> M : 报告问题并隔离相关器械包
+ M --> A : 确认后续处理与追查安排
+ A -> A : 保留原处理记录及异常结果
+end
+deactivate A
+@enduml

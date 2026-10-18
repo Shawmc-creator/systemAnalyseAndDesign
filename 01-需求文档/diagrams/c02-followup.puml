@@ -1,0 +1,102 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者" as Patient <<entity>> {
+ 姓名
+ 出生日期
+ 联系电话
+ 电话归属
+ 联系地址
+ 联系偏好
+ --
+ 核对身份()
+ 核对身份候选()
+ 确认资料维护()
+}
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ 接诊开始
+ 诊疗结束
+ 到诊来源
+ --
+ 登记到诊()
+ 核对接诊责任()
+ 确认实际执行()
+}
+class "方案版本" as PlanVersion <<entity>> {
+ 诊断依据说明
+ 说明时间
+ 变更原因
+ 预计安排
+ --
+ 核对确认版本()
+ 提供确认来源()
+ 形成待确认版本()
+}
+class "诊后要求" as Followup <<entity>> {
+ 目的
+ 类型
+ 目标日期
+ 是否需评估
+ 撤销原因
+ --
+ 提出诊后要求()
+ 判断发布条件()
+ 提供待联系事项()
+}
+class "联系经历" as Contact <<entity>> {
+ 方式
+ 联系时间
+ 结果
+ 下次日期
+ --
+ 追加联系经历()
+}
+class "临床评估" as Assessment <<entity>> {
+ 方式
+ 评估时间
+ 结果
+ 处理意见
+ --
+ 保留评估依据()
+}
+class "预约" as Appointment <<entity>> {
+ 计划起止
+ 就诊原因
+ 到期时间
+ --
+ 确认安排()
+ 提供安排及经历()
+ 核对到诊来源()
+}
+Patient "1" -- "0..*" Appointment : 预约者
+Patient "1" -- "0..*" Visit : 就诊者
+Appointment "0..1" -- "0..1" Visit : 来源预约
+Patient "1" -- "0..*" Followup : 患者
+Visit "0..1" -- "0..*" Followup : 来源就诊
+PlanVersion "0..1" -- "0..*" Followup : 来源方案
+Followup "1" *-- "0..*" Contact : 联系尝试
+Followup "1" *-- "0..*" Assessment : 评估经历
+Contact "0..*" -- "0..1" Appointment : 复诊安排
+Assessment "0..*" -- "0..1" Visit : 实际复诊
+Visit "0..1" -- "0..*" PlanVersion : 内部诊断来源
+
+@enduml

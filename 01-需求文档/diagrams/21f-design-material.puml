@@ -1,0 +1,44 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+top to bottom direction
+class "材料" as E0 <<entity>> {
+- id : 标识
+- quantity_scale : 精度
+- stock_units : 整数数量
+- revision : 版本
+--
++ 形成库存视图(材料, 精度) : 库存视图
++ 登记变动(类型, 数量, 版本, 依据) : 变更集
+}
+class "材料变动" as E1 <<entity>> {
+- material_id : 标识
+- delta_units : 整数数量
+- before_units : 整数数量
+- after_units : 整数数量
+--
++ 建立流水(前数, 差量, 后数, 用途) : 变动
++ 形成流水视图(流水, 盘点) : 流水视图
+}
+class "盘点调整" as E2 <<entity>> {
+- movement_id : 标识
+- counted_units : 整数数量
+--
++ 建立盘点(共用主键, 实盘, 确认) : 盘点
+}
+E0 "1" *-- "0..*" E1
+E1 <|-- E2
+@enduml

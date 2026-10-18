@@ -1,0 +1,85 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "收费人员" as A0
+boundary "<u>:收费人员接口</u>" as B0
+actor "诊所负责人" as A1
+boundary "<u>:诊所负责人接口</u>" as B1
+control "<u>:登记收支核对与</u>\n<u>差异处理控制</u>" as K
+participant "<u>:患者资金</u>" as Funds
+participant "<u>:供应商资金</u>" as SupplierFunds
+participant "<u>:收支核对</u>" as Reconciliation
+participant "<u>:核对项目</u>" as ReconciliationItem
+participant "<u>:差异跟进</u>" as FollowIssue
+A0 -> B0 : 提交UC-20办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-20办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Funds : 提供核对来源(营业日、渠道)
+activate Funds
+Funds --> K : 处理结果或拒绝原因
+deactivate Funds
+K -> SupplierFunds : 提供核对来源(营业日、渠道)
+activate SupplierFunds
+SupplierFunds --> K : 处理结果或拒绝原因
+deactivate SupplierFunds
+K -> Reconciliation : 形成核对快照(原资金依据、实际核实额)
+activate Reconciliation
+Reconciliation -> ReconciliationItem : 保留核对项目(原事项、计入金额及依据时点)
+activate ReconciliationItem
+ReconciliationItem --> Reconciliation : 处理结果或拒绝原因
+deactivate ReconciliationItem
+Reconciliation -> Reconciliation : 计算核对差额(开班额、流入流出、实际核实)
+Reconciliation --> K : 处理结果或拒绝原因
+deactivate Reconciliation
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A1 -> B1 : 指定差异处理责任及期限
+activate B1
+B1 -> B1 : 检查输入格式()
+B1 -> K : 协调UC-20办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+opt 核对存在差异
+K -> FollowIssue : 登记差异责任(负责人意见、责任人、期限)
+activate FollowIssue
+FollowIssue --> K : 处理结果或拒绝原因
+deactivate FollowIssue
+end
+end
+K --> B1 : 本阶段结果及下一步依据
+deactivate K
+B1 --> A1 : 展示结果、状态和原因
+deactivate B1
+note over K,FollowIssue
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

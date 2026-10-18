@@ -1,0 +1,128 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "患者" as Patient <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -birth_date: Text?
+ -phone: Text?
+ -phone_owner: Text?
+ +核对身份(依据: 操作输入): 业务结果
+ +核对身份候选(依据: 操作输入): 业务结果
+ +确认资料维护(依据: 操作输入): 业务结果
+ +核对临床访问(依据: 操作输入): 业务结果
+ +确认健康变更(依据: 操作输入): 业务结果
+}
+class "就诊" as Visit <<entity>> {
+ -id: ObjectId
+ -arrived_at: Text
+ -started_at: Text?
+ -ended_at: Text?
+ -arrival_source: Text
+ +登记到诊(依据: 操作输入): 业务结果
+ +核对接诊责任(依据: 操作输入): 业务结果
+ +确认实际执行(依据: 操作输入): 业务结果
+ +提供获准就诊(依据: 操作输入): 业务结果
+ +确认实际接诊(依据: 操作输入): 业务结果
+ +记录检查诊断(依据: 操作输入): 业务结果
+ +核对签署条件(依据: 操作输入): 业务结果
+ +结束本次诊疗(依据: 操作输入): 业务结果
+ +提供诊后来源(依据: 操作输入): 业务结果
+ +提供本次复诊依据(依据: 操作输入): 业务结果
+ +汇总诊疗发生(依据: 操作输入): 业务结果
+ +确认当次复核(依据: 操作输入): 业务结果
+ +核对使用归属(依据: 操作输入): 业务结果
+ +追加病历说明(依据: 操作输入): 业务结果
+ +提供获准追查信息(依据: 操作输入): 业务结果
+}
+class "诊疗执行" as Execution <<entity>> {
+ -id: ObjectId
+ -tooth_code: Text?
+ -surface_code: Text?
+ -completed_quantity: Int64
+ -procedure_note: Text
+ +保留执行依据(依据: 操作输入): 业务结果
+ +核对已完成事实(依据: 操作输入): 业务结果
+}
+class "收费项目" as Service <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -billing_unit: Text
+ -is_active: Int64
+ -record_no: Text
+ +提出新价目(依据: 操作输入): 业务结果
+ +确认价目发布(依据: 操作输入): 业务结果
+}
+class "价目" as Price <<entity>> {
+ -id: ObjectId
+ -unit_price_cents: Int64
+ -valid_from: Text
+ -valid_until: Text?
+ -change_reason: Text
+ +核对区间及金额(依据: 操作输入): 业务结果
+ +提交确认(依据: 操作输入): 业务结果
+ +发布确认版本(依据: 操作输入): 业务结果
+ +退回修改(依据: 操作输入): 业务结果
+ +重新提交(依据: 操作输入): 业务结果
+ +停止后续适用(依据: 操作输入): 业务结果
+}
+class "应收账目" as Bill <<entity>> {
+ -id: ObjectId
+ -formed_at: Text
+ -period_start: Text
+ -period_end: Text
+ -record_no: Text
+ +形成应收依据(依据: 操作输入): 业务结果
+ +提供应收依据(依据: 操作输入): 业务结果
+ +核对可分配额(依据: 操作输入): 业务结果
+ +汇总有效应收(依据: 操作输入): 业务结果
+ +提供原费用依据(依据: 操作输入): 业务结果
+ +批准费用调整(依据: 操作输入): 业务结果
+ +核算调整后应收(依据: 操作输入): 业务结果
+}
+class "应收项目" as Charge <<entity>> {
+ -id: ObjectId
+ -quantity: Int64
+ -unit_price_cents: Int64?
+ -priced_at: Text
+ -pricing_note: Text?
+ +确定计价依据(依据: 操作输入): 业务结果
+ +核对计价完整性(依据: 操作输入): 业务结果
+}
+class "费用调整" as Adjustment <<entity>> {
+ -id: ObjectId
+ -reason: Text
+ -effective_at: Text
+ +形成批准调整(依据: 操作输入): 业务结果
+}
+class "调整项目" as AdjustmentItem <<entity>> {
+ -id: ObjectId
+ -amount_cents: Int64
+ -note: Text
+ +逐项保留调整(依据: 操作输入): 业务结果
+}
+Patient "1" -- "0..*" Visit : 就诊者
+Visit "1" *-- "0..*" Execution : 实际完成
+Service "1" -- "0..*" Execution : 实际项目
+Execution "0..1" -- "0..*" Execution : 原执行与更正
+Service "1" *-- "0..*" Price : 适用价目
+Patient "1" -- "0..*" Bill : 账目归属
+Bill "1" *-- "1..*" Charge : 应收明细
+Execution "1" -- "0..*" Charge : 计费依据
+Price "0..1" -- "0..*" Charge : 适用价目
+Bill "1" -- "0..*" Adjustment : 所属账目
+Adjustment "1" *-- "1..*" AdjustmentItem : 调整明细
+Charge "1" -- "0..*" AdjustmentItem : 原应收项目
+@enduml

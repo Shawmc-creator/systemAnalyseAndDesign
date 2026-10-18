@@ -1,0 +1,789 @@
+{
+  "version": "2026-10-18-D1-state-collections-tests",
+  "sqlite_version": "3.53.1",
+  "sql_sha256": "6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d",
+  "passed": 126,
+  "failed": 0,
+  "cases": [
+    {
+      "name": "85表1048列281组外键与目标元数据一致",
+      "result": "通过"
+    },
+    {
+      "name": "85表INSERT及UPDATE全部准备成功，无无效字段和外键错配",
+      "result": "通过"
+    },
+    {
+      "name": "五岗位50权限与源矩阵一致",
+      "result": "通过"
+    },
+    {
+      "name": "经营查询及临床追溯按查询权限初始化",
+      "result": "通过"
+    },
+    {
+      "name": "患者同名同电话合法，稳定业务号不同",
+      "result": "通过"
+    },
+    {
+      "name": "没有联系方式且未说明原因",
+      "result": "通过",
+      "rejected_by": "CHECK constraint failed: (phone IS NOT NULL AND phone_owner IS NOT NULL) OR (phone IS NULL AND contact_unavailable_reason IS NOT NULL)"
+    },
+    {
+      "name": "非法日历日期",
+      "result": "通过",
+      "rejected_by": "CHECK constraint failed: birth_date"
+    },
+    {
+      "name": "整数超过安全上界",
+      "result": "通过",
+      "rejected_by": "CHECK constraint failed: revision"
+    },
+    {
+      "name": "历史患者物理删除",
+      "result": "通过",
+      "rejected_by": "delete_forbidden"
+    },
+    {
+      "name": "跨患者预约登记到诊",
+      "result": "通过",
+      "rejected_by": "FOREIGN KEY constraint failed"
+    },
+    {
+      "name": "不同安排同牙医时段重叠",
+      "result": "通过",
+      "rejected_by": "schedule_overlap"
+    },
+    {
+      "name": "半开安排区间首尾相接",
+      "result": "通过"
+    },
+    {
+      "name": "过时安排版本占用",
+      "result": "通过",
+      "rejected_by": "occupancy_schedule"
+    },
+    {
+      "name": "患者跨牙医跨诊椅重复占用",
+      "result": "通过",
+      "rejected_by": "occupancy_overlap"
+    },
+    {
+      "name": "有占用直接停诊",
+      "result": "通过",
+      "rejected_by": "schedule_has_active_occupancy"
+    },
+    {
+      "name": "先释放旧占用再建立新占用",
+      "result": "通过"
+    },
+    {
+      "name": "已释放占用复活",
+      "result": "通过",
+      "rejected_by": "released_occupancy_frozen"
+    },
+    {
+      "name": "健康复核引用另一患者版本",
+      "result": "通过",
+      "rejected_by": "health_patient"
+    },
+    {
+      "name": "没有检查与健康复核不能签署",
+      "result": "通过",
+      "rejected_by": "sign_missing_evidence"
+    },
+    {
+      "name": "资料完整后签署并结束就诊",
+      "result": "通过"
+    },
+    {
+      "name": "签署正文不可覆盖",
+      "result": "通过",
+      "rejected_by": "terminal_frozen"
+    },
+    {
+      "name": "签署所见不可覆盖",
+      "result": "通过",
+      "rejected_by": "signed_findings_move"
+    },
+    {
+      "name": "签后独立补充保留原文",
+      "result": "通过"
+    },
+    {
+      "name": "诊疗文件不能挂另一患者就诊",
+      "result": "通过",
+      "rejected_by": "context_patient"
+    },
+    {
+      "name": "决定关联同版本项目",
+      "result": "通过"
+    },
+    {
+      "name": "决定关联其他版本项目",
+      "result": "通过",
+      "rejected_by": "decision_wrong_version"
+    },
+    {
+      "name": "有效价目区间重叠",
+      "result": "通过",
+      "rejected_by": "price_overlap"
+    },
+    {
+      "name": "账目计入另一患者执行",
+      "result": "通过",
+      "rejected_by": "bill_execution_patient"
+    },
+    {
+      "name": "已引用价目改写历史金额",
+      "result": "通过",
+      "rejected_by": "referenced_price_frozen"
+    },
+    {
+      "name": "现金实收减找零自动生成净额",
+      "result": "通过"
+    },
+    {
+      "name": "原款分配另一患者账目",
+      "result": "通过",
+      "rejected_by": "allocation_owner"
+    },
+    {
+      "name": "两用途入口共同限制余额",
+      "result": "通过",
+      "rejected_by": "payment_budget"
+    },
+    {
+      "name": "未知退款占用不能再分配",
+      "result": "通过",
+      "rejected_by": "payment_budget"
+    },
+    {
+      "name": "同批准不能重复退款占用",
+      "result": "通过",
+      "rejected_by": "refund_budget"
+    },
+    {
+      "name": "未知退款不能作为失败原单重办",
+      "result": "通过",
+      "rejected_by": "refund_retry_not_failed"
+    },
+    {
+      "name": "明确失败释放占用，新编号重办",
+      "result": "通过"
+    },
+    {
+      "name": "成功收款不能覆盖为失败",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "负向用途超过原额",
+      "result": "通过",
+      "rejected_by": "release_budget"
+    },
+    {
+      "name": "审批释放追加负向事实",
+      "result": "通过"
+    },
+    {
+      "name": "已生效用途不能原位改金额",
+      "result": "通过",
+      "rejected_by": "immutable_fact"
+    },
+    {
+      "name": "退款确认按实际额占用，多余拟退释放",
+      "result": "通过"
+    },
+    {
+      "name": "已确认退款不能改回待核实",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "库存无流水带初始余额",
+      "result": "通过",
+      "rejected_by": "stock_starts_zero"
+    },
+    {
+      "name": "无明细采购不能确认",
+      "result": "通过",
+      "rejected_by": "order_without_items"
+    },
+    {
+      "name": "合格60入库同步余额及版本",
+      "result": "通过"
+    },
+    {
+      "name": "同一合格量重复入库",
+      "result": "通过",
+      "rejected_by": "receipt_stock_context"
+    },
+    {
+      "name": "待检40转合格只追加40入库",
+      "result": "通过"
+    },
+    {
+      "name": "旧库存快照覆盖新余额",
+      "result": "通过",
+      "rejected_by": "stock_stale"
+    },
+    {
+      "name": "实际使用不重复扣库",
+      "result": "通过"
+    },
+    {
+      "name": "使用加退回超过领用",
+      "result": "通过",
+      "rejected_by": "usage_over_issue"
+    },
+    {
+      "name": "未用退回重复超量",
+      "result": "通过",
+      "rejected_by": "return_over_issue"
+    },
+    {
+      "name": "应用直接再扣库存",
+      "result": "通过",
+      "rejected_by": "stock_ledger_mismatch"
+    },
+    {
+      "name": "已有流水改材料精度",
+      "result": "通过",
+      "rejected_by": "material_units_frozen"
+    },
+    {
+      "name": "入库后直接减少合格量",
+      "result": "通过",
+      "rejected_by": "accepted_below_stocked"
+    },
+    {
+      "name": "隔离批次不能正常领用",
+      "result": "通过",
+      "rejected_by": "issue_batch_unavailable"
+    },
+    {
+      "name": "供货未确认实付不能生效用途",
+      "result": "通过",
+      "rejected_by": "supplier_payment_budget"
+    },
+    {
+      "name": "供货确认实际付款后原预占用途生效",
+      "result": "通过"
+    },
+    {
+      "name": "供货用途不能重复花费实付金额",
+      "result": "通过",
+      "rejected_by": "supplier_payment_budget"
+    },
+    {
+      "name": "供货释放不能超过原分配",
+      "result": "通过",
+      "rejected_by": "supplier_release"
+    },
+    {
+      "name": "采购预付转验收结算只变用途，不新增实际付款",
+      "result": "通过"
+    },
+    {
+      "name": "供货原款不能关联另一供应商采购",
+      "result": "通过",
+      "rejected_by": "supplier_allocation_owner"
+    },
+    {
+      "name": "联系成功不能代替临床评估关闭",
+      "result": "通过",
+      "rejected_by": "assessment_required"
+    },
+    {
+      "name": "完成临床评估后关闭要求",
+      "result": "通过"
+    },
+    {
+      "name": "无监测结果不能放行",
+      "result": "通过",
+      "rejected_by": "release_missing_checks"
+    },
+    {
+      "name": "器械包次重复正常占用",
+      "result": "通过",
+      "rejected_by": "UNIQUE constraint failed: instrument_use.instrument_pack_cycle_id"
+    },
+    {
+      "name": "未用退回后再次发放",
+      "result": "通过"
+    },
+    {
+      "name": "核对不能人工修改原款金额",
+      "result": "通过",
+      "rejected_by": "reconcile_patient_payment"
+    },
+    {
+      "name": "同次核对重复选择原款",
+      "result": "通过",
+      "rejected_by": "UNIQUE constraint failed: reconciliation_item.cash_reconciliation_id, reconciliation_item.patient_payment_id"
+    },
+    {
+      "name": "岗位资格区间重叠",
+      "result": "通过",
+      "rejected_by": "qualification_overlap"
+    },
+    {
+      "name": "账号岗位授权有效区间重叠",
+      "result": "通过",
+      "rejected_by": "grant_overlap"
+    },
+    {
+      "name": "业务事实和幂等结果共同回滚",
+      "result": "通过"
+    },
+    {
+      "name": "同账号同命令键重复提交",
+      "result": "通过",
+      "rejected_by": "UNIQUE constraint failed: request_submission.account_id, request_submission.request_key"
+    },
+    {
+      "name": "处理中本地命令落库",
+      "result": "通过",
+      "rejected_by": "CHECK constraint failed: status='已提交'"
+    },
+    {
+      "name": "无完整清单及异机副本不能备份成功",
+      "result": "通过",
+      "rejected_by": "backup_success_gate"
+    },
+    {
+      "name": "预约终态不能回到已预约",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：visit",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：clinical_record",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：plan_version",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：followup_requirement",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：service_price",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：patient_payment",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：fee_request",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：patient_refund",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：supplier_payment",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：material_batch",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：instrument_processing",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "C状态方向拒绝：instrument_pack_cycle",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "盘点待重核不能跳过新快照直接批准",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "盘点重核可重新提交后拒绝调整",
+      "result": "通过"
+    },
+    {
+      "name": "采购项目一次全部合格可直接完成",
+      "result": "通过"
+    },
+    {
+      "name": "采购完成不能复活为履行中",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "文件待确认不能直接标缺失",
+      "result": "通过",
+      "rejected_by": "state_transition"
+    },
+    {
+      "name": "文件确认后缺失可按原摘要恢复",
+      "result": "通过"
+    },
+    {
+      "name": "新预约不能直接使用已到诊初态",
+      "result": "通过",
+      "rejected_by": "state_initial"
+    },
+    {
+      "name": "发布后方案不得后补项目",
+      "result": "通过",
+      "rejected_by": "plan_scope_frozen"
+    },
+    {
+      "name": "空方案不能发布待确认",
+      "result": "通过",
+      "rejected_by": "plan_publish_empty"
+    },
+    {
+      "name": "放行后不能补进新的监测结果",
+      "result": "通过",
+      "rejected_by": "processing_scope_frozen"
+    },
+    {
+      "name": "放行后不能修改包装效期",
+      "result": "通过",
+      "rejected_by": "released_pack_identity_frozen"
+    },
+    {
+      "name": "健康完整快照缺少用药类别时整笔回滚",
+      "result": "通过",
+      "rejected_by": "health_snapshot_incomplete",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "健康快照允许三类明确未知并整体提交",
+      "result": "通过"
+    },
+    {
+      "name": "未被复核引用的已提交健康版本也不能后补条目",
+      "result": "通过",
+      "rejected_by": "sealed_collection:health_item",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "同意决定没有具体范围时主记录共同回滚",
+      "result": "通过",
+      "rejected_by": "consent_scope_empty",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "同意与具体项目在同一事务形成",
+      "result": "通过"
+    },
+    {
+      "name": "已提交同意不能悄悄扩大范围",
+      "result": "通过",
+      "rejected_by": "sealed_collection:decision_plan_item",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "已提交同意不能后补另一份确认文件",
+      "result": "通过",
+      "rejected_by": "sealed_collection:decision_file_version",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "批准应收调整却缺少调整记录时回滚审批",
+      "result": "通过",
+      "rejected_by": "approved_adjustment_missing",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "调整明细99分不等于批准100分时整体回滚",
+      "result": "通过",
+      "rejected_by": "adjustment_sum_mismatch",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "批准100分与100分调整明细共同提交",
+      "result": "通过"
+    },
+    {
+      "name": "核对头10000分而无来源集合时整体回滚",
+      "result": "通过",
+      "rejected_by": "reconciliation_sum_mismatch",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "核对存在差异却未指定跟进时整体回滚",
+      "result": "通过",
+      "rejected_by": "reconciliation_followup_missing",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "核对头与原款集合一致可提交",
+      "result": "通过"
+    },
+    {
+      "name": "已提交核对快照不能后补供货支出",
+      "result": "通过",
+      "rejected_by": "sealed_collection:reconciliation_item",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "后改验收价款与精确换算结果不符时回滚",
+      "result": "通过",
+      "rejected_by": "receipt_amount_mismatch",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "合格验收已保存但未入库时整体回滚",
+      "result": "通过",
+      "rejected_by": "receipt_stock_unbalanced",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "供货付款主记录缺少待生效用途时回滚",
+      "result": "通过",
+      "rejected_by": "supplier_reservation_unbalanced",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "拟付1000分与1000分待生效用途整体保存",
+      "result": "通过"
+    },
+    {
+      "name": "实际付款确认但用途未生效时整笔回滚",
+      "result": "通过",
+      "rejected_by": "supplier_effective_unbalanced",
+      "whole_transaction_rolled_back": true
+    },
+    {
+      "name": "实际付款与全部用途确认在同一事务提交",
+      "result": "通过"
+    },
+    {
+      "name": "已放行时间与责任证据不能覆盖",
+      "result": "通过",
+      "rejected_by": "release_evidence_frozen"
+    },
+    {
+      "name": "放行后发现异常可隔离并保留原放行时间",
+      "result": "通过"
+    },
+    {
+      "name": "两独立连接写竞争，第二连接返回SQLITE_BUSY",
+      "result": "通过"
+    },
+    {
+      "name": "竞争后重读余额20，旧80快照再次领用被拒绝",
+      "result": "通过"
+    },
+    {
+      "name": "两连接同时使用同一原付款，第二连接等待写锁",
+      "result": "通过"
+    },
+    {
+      "name": "首笔抵扣提交后剩余500分，竞争的1000分抵扣被拒绝",
+      "result": "通过"
+    },
+    {
+      "name": "并发拒绝后资金事实保持6500用途与3000实际退款",
+      "result": "通过"
+    },
+    {
+      "name": "有业务数据时外键为空及完整性ok",
+      "result": "通过"
+    }
+  ],
+  "fixture_rows": {
+    "patient": 2,
+    "staff": 2,
+    "patient_change": 0,
+    "patient_proxy": 0,
+    "clinical_handover": 0,
+    "dental_chair": 2,
+    "dated_schedule": 3,
+    "schedule_change": 0,
+    "resource_occupancy": 2,
+    "appointment": 1,
+    "appointment_change": 0,
+    "visit": 2,
+    "health_version": 3,
+    "health_item": 3,
+    "health_review": 1,
+    "clinical_record": 1,
+    "clinical_finding": 1,
+    "record_addendum": 1,
+    "clinical_document": 1,
+    "document_version": 1,
+    "treatment_plan": 1,
+    "plan_version": 2,
+    "plan_item": 3,
+    "patient_decision": 2,
+    "treatment_execution": 2,
+    "service": 1,
+    "service_price": 1,
+    "bill": 2,
+    "bill_item": 2,
+    "patient_funds": 2,
+    "patient_payment": 1,
+    "payment_allocation": 2,
+    "prepayment_offset": 1,
+    "fee_request": 2,
+    "fee_adjustment": 1,
+    "fee_adjustment_item": 1,
+    "patient_refund": 2,
+    "followup_requirement": 1,
+    "contact_history": 0,
+    "clinical_assessment": 1,
+    "material": 1,
+    "material_batch": 1,
+    "batch_change": 0,
+    "stock_location": 1,
+    "batch_stock": 1,
+    "inventory_movement": 5,
+    "material_usage": 1,
+    "stock_count": 1,
+    "supplier": 2,
+    "purchase_order": 2,
+    "purchase_order_item": 1,
+    "purchase_receipt": 1,
+    "purchase_receipt_item": 1,
+    "purchase_issue": 0,
+    "supplier_funds": 1,
+    "supplier_payment": 3,
+    "supplier_allocation": 4,
+    "supplier_refund": 0,
+    "instrument_pack": 1,
+    "processing_equipment": 1,
+    "instrument_processing": 1,
+    "instrument_pack_cycle": 1,
+    "processing_monitor": 1,
+    "instrument_use": 2,
+    "cash_reconciliation": 2,
+    "reconciliation_item": 2,
+    "issue_followup": 0,
+    "decision_plan_item": 2,
+    "decision_file_version": 0,
+    "user_account": 1,
+    "access_role": 5,
+    "access_permission": 50,
+    "staff_role_qualification": 1,
+    "account_role": 1,
+    "role_permission": 57,
+    "login_session": 0,
+    "authentication_event": 0,
+    "request_submission": 1,
+    "operation_audit": 0,
+    "audit_change": 0,
+    "backup_run": 1,
+    "backup_artifact": 0,
+    "backup_copy": 0,
+    "restore_verification": 0,
+    "restore_check": 0
+  },
+  "query_plan_checks": [
+    {
+      "name": "患者电话",
+      "sql": "SELECT id FROM patient WHERE phone=?",
+      "plan": [
+        "SEARCH patient USING COVERING INDEX ix_patient_q2 (phone=?)"
+      ],
+      "result": "使用索引SEARCH"
+    },
+    {
+      "name": "患者预约",
+      "sql": "SELECT id FROM appointment WHERE patient_id=? AND status=? AND planned_start>=?",
+      "plan": [
+        "SEARCH appointment USING COVERING INDEX ix_appointment_q2 (patient_id=? AND status=? AND planned_start>?)"
+      ],
+      "result": "使用索引SEARCH"
+    },
+    {
+      "name": "牙医日期安排",
+      "sql": "SELECT id FROM dated_schedule WHERE dentist_id=? AND status=? AND starts_at>=?",
+      "plan": [
+        "SEARCH dated_schedule USING COVERING INDEX ix_dated_schedule_q1 (dentist_id=? AND status=? AND starts_at>?)"
+      ],
+      "result": "使用索引SEARCH"
+    },
+    {
+      "name": "原付款用途",
+      "sql": "SELECT sum(amount_cents) FROM payment_allocation WHERE patient_payment_id=?",
+      "plan": [
+        "SEARCH payment_allocation USING INDEX ix_fk_payment_allocation_patient_payment_id (patient_payment_id=?)"
+      ],
+      "result": "使用索引SEARCH"
+    },
+    {
+      "name": "批次流水",
+      "sql": "SELECT id FROM inventory_movement WHERE batch_stock_id=?",
+      "plan": [
+        "SEARCH inventory_movement USING COVERING INDEX ix_inventory_movement_q1 (batch_stock_id=?)"
+      ],
+      "result": "使用索引SEARCH"
+    },
+    {
+      "name": "供应商用途",
+      "sql": "SELECT amount_cents FROM supplier_allocation WHERE supplier_payment_id=?",
+      "plan": [
+        "SEARCH supplier_allocation USING INDEX ix_fk_supplier_allocation_supplier_payment_id (supplier_payment_id=?)"
+      ],
+      "result": "使用索引SEARCH"
+    },
+    {
+      "name": "文件版本",
+      "sql": "SELECT id FROM document_version WHERE clinical_document_id=? ORDER BY version_no",
+      "plan": [
+        "SEARCH document_version USING COVERING INDEX sqlite_autoindex_document_version_1 (clinical_document_id=?)"
+      ],
+      "result": "使用索引SEARCH"
+    }
+  ],
+  "state_source_sha256": {
+    "appointment": "9cfd8145c1b3f7d0dc5fd492841951a2a25c0ecc9d5c39aff8a5ee7d8fcd592c",
+    "visit": "8e212938472bb32a4024b5472e6e810ac6e6ce29f19ec8f28bb7c4817bc73037",
+    "clinical_record": "078391df9c1c15767194c939b312df69db898cccb58c0a6e63fbb4974bff159a",
+    "plan_version": "75529ffff4e2574551e07e09bf91397c50c092f7d56b2acc52f528713e0f0d82",
+    "followup_requirement": "eb79f24929b91f17623d4ecbf18494a7d73f267dcdf1dd70d8993b4af87bf7d8",
+    "service_price": "8c59d90b4a2a3539bf04e5cfee3fe829111ec65ba12e8e671f410d1b2b8f5df0",
+    "patient_payment": "cecaea98c8defb9b93f1a8f740114bb0d3a09938062324e993ca9969104b5c0f",
+    "fee_request": "ef5cc8c8afad36e7af0724a653158565455797969b0b30b178dba32c02d3113f",
+    "patient_refund": "97ddd4eace398c45efe015616bf7ba90dc5c6bcae1e04594bb80526625dcc93a",
+    "supplier_payment": "e20f0b7d863c9d72db49491240de43c78c41d43077f0b46ad6eec97acebad6b1",
+    "material_batch": "f917ea1abd5fbaff696d74b6eff2e1b861ca62e5b8695c589df52bbc13f5497b",
+    "stock_count": "050ac5b1f1173aef35b694199cb8f737792bb6d8aff7037db940d3613ed78b34",
+    "instrument_processing": "22678a5324cccd6f2466cf46dc2f313e30ea3415f24cafe4bd12b5b83aed28f4",
+    "instrument_pack_cycle": "a173d59636677d5005a774102a5c1c31cffaeb3857bc2974463311f3a6d479b5",
+    "purchase_order_item": "b7b3b1596f95ee6cbbec1b5841943415edc0b99e90c53571dfafe3da3504c93c",
+    "document_version": "9a39baeece6a170cc09c80dd1d138b1b2eabf6257d615422faedc75b1b9065f2"
+  },
+  "scope": "真实85表上的指定正反例、16类代表性非法方向、聚合工作单元提交门禁及两个连接竞争；另有7类索引入口核对，不是容量性能测量；未穷举全部事件警戒条件或应用入口。",
+  "remaining": [
+    "全部32用例的授权、接诊范围、实时钟/营业日期、乐观revision及审计原子性；16类转移方向已生成SQL保护，事件警戒条件仍需服务验证。",
+    "临床签署摘要计算、同意/撤回时间线与有效执行链数量；集合提交门禁已形成隔离设计样例，须由D2各写入口强制调用，不能仅依赖直接SQL。",
+    "资金安全整数逐步运算；批准调整明细总和与审批额一致；供应商各原单预占上限及批准退换上限；部分实付后用途重分配；原授权版本核验。",
+    "采购累计交付/取消剩余和精确换算取整；确认合格量与入库量最终相等；批次实时效期、退供依据和已用材料核验。",
+    "器械完整必检项目集合、当前时钟与实物；收支核对完整来源集合、摘要、营业日期和差异跟进。",
+    "资格撤销的反向授权处理、auth_version与会话失效；固定权限对象规则、审计字段白名单及敏感数据屏蔽。",
+    "备份快照附件集合完整性、真实文件摘要/异机副本、恢复必检集合与RPO/RTO；不能由SQL登记状态自证。",
+    "16类状态集与转移来源逐一核对，代表性非法方向与新增业务反例已验证；全部事件警戒、反向修改与故障注入继续验收；旧库迁移、旧数据清洗、应用衔接及回退另做。"
+  ]
+}

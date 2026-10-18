@@ -1,11 +1,11 @@
 @startuml
-' Business symbols extracted from course PPT PDF pages 86-87. System uses the business entity symbol.
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -20,24 +20,29 @@ skinparam sequence {
 }
 actor "患者" as P
 participant "<img:business-worker.png>\n收费人员" as C
+participant "<img:business-worker.png>\n牙医" as D
 participant "<img:business-entity.png>\n牙科诊所管理系统" as S
-P -> C : 请求结算本次诊疗费用
+P -> C : 提出缴费或预付费用
 activate C
-C -> P : 核实患者与本次就诊（c）
-P --> C : 提供姓名及本次就诊信息
-C -> S : 查询本次待结算费用
+alt 结算实际诊疗费用
+ C -> S : 查询已确认项目、账单及预付余额
+ S --> C : 返回费用依据和应收余额
+ opt 项目或价目有疑问
+  C -> D : 核实实际项目及费用依据
+  D --> C : 提供确认或更正依据
+ end
+else 预付后续费用
+ C -> S : 查询患者及预付款余额
+ S --> C : 返回余额和既有记录
+end
+C -> P : 核对本次金额、渠道及抵扣安排
+P --> C : 确认并付款
+C -> C : 清点现金或核实非现金到账
+C -> S : 登记已核实付款及分配／预付用途
 activate S
-S -> S : 读取已确认项目及数量\n按适用单价计算应收
-S --> C : 返回项目明细及应收金额
+S -> S : 核对金额、余额与重复登记\n保存支付、抵扣及凭据关联
+S --> C : 返回收款结果、未付及预付余额
 deactivate S
-C -> P : 核对收费项目及应付金额
-P --> C : 确认费用并交付现金
-C -> C : 清点实际收到的款项
-C -> S : 登记本次现金收款及实收金额
-activate S
-S -> S : 保存本次收款\n计算找零并标记结清
-S --> C : 返回结算结果、找零金额及收据
-deactivate S
-C -> P : 交付收据及找零，确认结清（d）
+C --> P : 交付凭据、找零及余额说明
 deactivate C
 @enduml

@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "前台" as A0
+boundary "<u>:前台接口</u>" as B0
+control "<u>:办理复诊随访联</u>\n<u>系控制</u>" as K
+participant "<u>:诊后要求</u>" as Followup
+participant "<u>:联系经历</u>" as Contact
+participant "<u>:预约</u>" as Appointment
+A0 -> B0 : 提交UC-13办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-13办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Followup : 提供待联系事项(负责前台、日期)
+activate Followup
+Followup --> K : 处理结果或拒绝原因
+deactivate Followup
+K -> Followup : 登记联系结果(实际结果、下次日期)
+activate Followup
+Followup -> Contact : 追加联系经历(方式、时间、患者反馈)
+activate Contact
+Contact --> Followup : 处理结果或拒绝原因
+deactivate Contact
+Followup --> K : 处理结果或拒绝原因
+deactivate Followup
+opt 联系结果关联复诊预约
+K -> Appointment : 核对复诊关联(同患者有效预约)
+activate Appointment
+Appointment --> K : 处理结果或拒绝原因
+deactivate Appointment
+end
+K -> Followup : 衔接后续安排(预约或待评估)
+activate Followup
+Followup --> K : 处理结果或拒绝原因
+deactivate Followup
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Appointment
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

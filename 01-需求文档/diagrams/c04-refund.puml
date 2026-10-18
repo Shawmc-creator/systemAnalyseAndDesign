@@ -1,0 +1,35 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "待办理" as Ready
+state "待核实" as Unknown
+state "已确认退款" as Confirmed
+state "已失败" as Failed
+[*] --> Ready : 建立额度占用\n[原款与批准额度足够]\n/ 生成唯一办理依据
+Ready --> Unknown : 保留额度占用\n[实际结果不明]\n/ 继续占用并待核查
+Ready --> Confirmed : 核实办理结果\n[实际退款已确认且金额相符]\n/ 一次确认有效流出
+Ready --> Failed : 核实办理结果\n[明确失败且有证据]\n/ 释放未执行额度
+Unknown --> Confirmed : 核实办理结果\n[渠道证实成功]\n/ 确认原办理的流出
+Unknown --> Failed : 核实办理结果\n[渠道证实失败]\n/ 释放原占用
+Unknown : 提供办理进度 [仍无明确结论]\n/ 继续核查
+Confirmed : 提供办理进度 [同一请求重试]\n/ 返回原凭据
+
+@enduml

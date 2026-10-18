@@ -1,0 +1,77 @@
+@startuml d1-db-07
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EFF5ED
+}
+title G07  复诊与随访  ·  3张表
+entity "诊后要求\nfollowup_requirement" as followup_requirement {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} source_visit_id : INTEGER [FK, NULL]  → visit.id (G02)
+  {field} source_plan_version_id : INTEGER [FK, NULL]  → plan_version.id (G04)
+  {field} purpose : TEXT [NN]
+  {field} followup_type : TEXT [NN]
+  {field} target_start : TEXT [NN]
+  {field} target_end : TEXT [NN]
+  {field} requires_assessment : INTEGER [NN]
+  {field} cancellation_reason : TEXT [NULL]
+  {field} next_contact_date : TEXT [NULL]
+  {field} closed_at : TEXT [NULL]
+  {field} closure_basis : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} responsible_frontdesk_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} closed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "联系经历\ncontact_history" as contact_history {
+  {field} id : INTEGER [PK, NN]
+  {field} followup_requirement_id : INTEGER [FK, NN]  → followup_requirement.id
+  {field} appointment_id : INTEGER [FK, NULL]  → appointment.id (G02)
+  {field} method : TEXT [NN]
+  {field} contacted_at : TEXT [NN]
+  {field} result : TEXT [NN]
+  {field} next_contact_date : TEXT [NULL]
+  {field} note : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "临床评估\nclinical_assessment" as clinical_assessment {
+  {field} id : INTEGER [PK, NN]
+  {field} followup_requirement_id : INTEGER [FK, NN]  → followup_requirement.id
+  {field} visit_id : INTEGER [FK, NULL]  → visit.id (G02)
+  {field} method : TEXT [NN]
+  {field} assessed_at : TEXT [NN]
+  {field} result : TEXT [NN]
+  {field} advice : TEXT [NN]
+  {field} next_date : TEXT [NULL]
+  {field} assessed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} responsible_staff_id : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+clinical_assessment --> followup_requirement
+contact_history --> followup_requirement
+@enduml

@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 40
+skinparam ranksep 55
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+state "待确认差异" as Draft
+state "待重新核对" as Refresh
+state "差异已确认" as Approved
+state "不予调整" as Rejected
+[*] --> Draft : 保留实点快照\n[有批次位置与盘点时点]\n/ 暂不改变库存
+Draft --> Refresh : 核对确认依据\n[快照后有新变动]\n/ 要求重核差异
+Refresh --> Draft : 重新确认实点\n[新快照及原因完整]\n/ 保留原核实经历
+Draft --> Approved : 核对确认依据\n[负责人同意且依据一致]\n/ 形成唯一差异变动
+Draft --> Rejected : 拒绝差异调整\n[负责人说明原因]\n/ 库存不变
+
+@enduml

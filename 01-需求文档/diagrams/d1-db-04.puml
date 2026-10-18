@@ -1,0 +1,160 @@
+@startuml d1-db-04
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #F0ECF7
+}
+title G04  方案、文件与执行  ·  9张表
+entity "诊疗文件\nclinical_document" as clinical_document {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} visit_id : INTEGER [FK, NULL]  → visit.id (G02)
+  {field} plan_version_id : INTEGER [FK, NULL]  → plan_version.id
+  {field} document_type : TEXT [NN]
+  {field} source : TEXT [NN]
+  {field} ownership_note : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "文件版本\ndocument_version" as document_version {
+  {field} id : INTEGER [PK, NN]
+  {field} clinical_document_id : INTEGER [FK, NN]  → clinical_document.id
+  {field} original_name : TEXT [NN]
+  {field} size_bytes : INTEGER [NN]
+  {field} sha256 : TEXT [NN]
+  {field} captured_at : TEXT [NULL]
+  {field} confirmed_at : TEXT [NULL]
+  {field} change_reason : TEXT [NN]
+  {field} version_no : INTEGER [NN]
+  {field} storage_key : TEXT [NN]
+  {field} media_type : TEXT [NN]
+  {field} verification_note : TEXT [NULL]
+  {field} uploaded_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} previous_version_id : INTEGER [FK, NULL]  → document_version.id
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "治疗方案\ntreatment_plan" as treatment_plan {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} goal : TEXT [NN]
+  {field} established_at : TEXT [NN]
+  {field} termination_reason : TEXT [NULL]
+  {field} closed_at : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} closed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "方案版本\nplan_version" as plan_version {
+  {field} id : INTEGER [PK, NN]
+  {field} treatment_plan_id : INTEGER [FK, NN]  → treatment_plan.id
+  {field} source_visit_id : INTEGER [FK, NULL]  → visit.id (G02)
+  {field} diagnostic_basis : TEXT [NN]
+  {field} explained_at : TEXT [NULL]
+  {field} change_reason : TEXT [NN]
+  {field} planned_schedule : TEXT [NN]
+  {field} version_no : INTEGER [NN]
+  {field} stopped_at : TEXT [NULL]
+  {field} stop_reason : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} explained_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} previous_version_id : INTEGER [FK, NULL]  → plan_version.id
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "方案项目\nplan_item" as plan_item {
+  {field} id : INTEGER [PK, NN]
+  {field} plan_version_id : INTEGER [FK, NN]  → plan_version.id
+  {field} item_description : TEXT [NN]
+  {field} tooth_code : TEXT [NULL]
+  {field} surface_code : TEXT [NULL]
+  {field} planned_quantity : INTEGER [NN]
+  {field} sequence_no : INTEGER [NN]
+  {field} estimated_cents : INTEGER [NULL]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "患者决定\npatient_decision" as patient_decision {
+  {field} id : INTEGER [PK, NN]
+  {field} plan_version_id : INTEGER [FK, NN]  → plan_version.id
+  {field} patient_proxy_id : INTEGER [FK, NULL]  → patient_proxy.id (G01)
+  {field} decision : TEXT [NN]
+  {field} decided_at : TEXT [NN]
+  {field} explanation_basis : TEXT [NN]
+  {field} scope_note : TEXT [NN]
+  {field} explained_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} recorded_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "诊疗执行\ntreatment_execution" as treatment_execution {
+  {field} id : INTEGER [PK, NN]
+  {field} visit_id : INTEGER [FK, NN]  → visit.id (G02)
+  {field} plan_item_id : INTEGER [FK, NULL]  → plan_item.id
+  {field} service_id : INTEGER [FK, NN]  → service.id (G05)
+  {field} original_execution_id : INTEGER [FK, NULL]  → treatment_execution.id
+  {field} tooth_code : TEXT [NULL]
+  {field} surface_code : TEXT [NULL]
+  {field} completed_quantity : INTEGER [NN]
+  {field} procedure_note : TEXT [NN]
+  {field} completed_at : TEXT [NN]
+  {field} correction_reason : TEXT [NULL]
+  {field} execution_kind : TEXT [NN]
+  {field} performed_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "患者决定—方案项目\ndecision_plan_item" as decision_plan_item {
+  {field} decision_id : INTEGER [PK, FK, NN]  → patient_decision.id
+  {field} plan_item_id : INTEGER [PK, FK, NN]  → plan_item.id
+  {field} linked_at : TEXT [NN]
+  {field} linked_by : INTEGER [FK, NN]  → staff.id (G01)
+}
+entity "患者决定—确认原件\ndecision_file_version" as decision_file_version {
+  {field} decision_id : INTEGER [PK, FK, NN]  → patient_decision.id
+  {field} document_version_id : INTEGER [PK, FK, NN]  → document_version.id
+  {field} linked_at : TEXT [NN]
+  {field} linked_by : INTEGER [FK, NN]  → staff.id (G01)
+}
+clinical_document --> plan_version
+decision_file_version --> document_version
+decision_file_version --> patient_decision
+decision_plan_item --> patient_decision
+decision_plan_item --> plan_item
+document_version --> clinical_document
+patient_decision --> plan_version
+plan_item --> plan_version
+plan_version --> treatment_plan
+treatment_execution --> plan_item
+@enduml

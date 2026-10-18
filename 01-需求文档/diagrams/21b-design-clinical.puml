@@ -1,0 +1,61 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+top to bottom direction
+class "病历" as E0 <<entity>> {
+- visit_id : 标识
+- status : 草稿或已签署
+- revision : 版本
+--
++ 建立草稿() : 病历
++ 编辑草稿(命令, 版本) : 临床变更集
++ 签署(版本, 正文, 牙医, 时刻) : 签署事实
++ 追加补充(内容, 原因, 牙医, 时刻) : 补充
++ 形成诊疗历史(原文, 方案, 补充, 项目) : 历史
+}
+class "检查所见" as E1 <<entity>> {
+- record_id : 标识
+- tooth_position : 牙位
+--
++ 核验所见(牙位, 描述) : 校验结果
+}
+class "病历补充" as E2 <<entity>> {
+- record_id : 标识
+- author_id : 标识
+- added_at : 时刻
+--
++ 建立补充(原病历, 内容, 原因) : 补充
+}
+class "诊疗方案" as E3 <<entity>> {
+- record_id : 标识
+- explained_at : 时刻
+--
++ 维护方案(项目集, 说明) : 方案
+}
+class "方案项目" as E4 <<entity>> {
+- plan_id : 标识
+- planned_quantity : 正整数
+- patient_decision : 决定
+--
++ 记录决定(说明, 方案, 实际集) : 决定
++ 核验实际(就诊, 牙位, 拟生效集合) : 校验结果
+}
+E0 "1" *-- "0..*" E1
+E0 "1" *-- "0..*" E2
+E0 "1" *-- "0..*" E3
+E3 "1" *-- "1..*" E4
+E1 -[hidden]right-> E2
+@enduml

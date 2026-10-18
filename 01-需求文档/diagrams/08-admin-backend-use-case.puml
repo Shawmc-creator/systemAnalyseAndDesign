@@ -1,0 +1,37 @@
+@startuml
+!theme plain
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam ArrowColor #35546B
+skinparam actorBorderColor #35546B
+skinparam usecase {
+  BackgroundColor #F7FBFD
+  BorderColor #35546B
+  FontColor #20333F
+}
+left to right direction
+title 管理后台系统用例图
+
+actor "诊所负责人" as Manager
+
+rectangle "管理后台" {
+  usecase "维护员工账号与岗位权限" as A01
+  usecase "维护牙椅、诊疗项目与价格" as A02
+  usecase "维护营业时间、排班与请假" as A03
+  usecase "审批折扣与退款申请" as A04
+  usecase "查看预约与财务汇总" as A05
+  usecase "查看操作审计" as A06
+}
+
+Manager --> A01
+Manager --> A02
+Manager --> A03
+Manager --> A04
+Manager --> A05
+Manager --> A06
+A01 -[hidden]down- A02
+A02 -[hidden]down- A03
+A04 -[hidden]down- A05
+A05 -[hidden]down- A06
+@enduml

@@ -1,0 +1,91 @@
+@startuml d1-db-05
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF4F4
+}
+title G05  价目、应收与患者账户  ·  5张表
+entity "收费项目\nservice" as service {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} billing_unit : TEXT [NN]
+  {field} is_active : INTEGER [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "价目\nservice_price" as service_price {
+  {field} id : INTEGER [PK, NN]
+  {field} service_id : INTEGER [FK, NN]  → service.id
+  {field} unit_price_cents : INTEGER [NN]
+  {field} valid_from : TEXT [NN]
+  {field} valid_until : TEXT [NULL]
+  {field} change_reason : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} review_note : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "应收账目\nbill" as bill {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} patient_funds_id : INTEGER [FK, NN]  → patient_funds.id
+  {field} formed_at : TEXT [NN]
+  {field} period_start : TEXT [NN]
+  {field} period_end : TEXT [NN]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "应收项目\nbill_item" as bill_item {
+  {field} id : INTEGER [PK, NN]
+  {field} bill_id : INTEGER [FK, NN]  → bill.id
+  {field} treatment_execution_id : INTEGER [FK, NN]  → treatment_execution.id (G04)
+  {field} service_price_id : INTEGER [FK, NULL]  → service_price.id
+  {field} quantity : INTEGER [NN]
+  {field} unit_price_cents : INTEGER [NULL]
+  {field} priced_at : TEXT [NN]
+  {field} pricing_note : TEXT [NULL]
+  {field} pricing_status : TEXT [NN]
+  {field} priced_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "患者资金\npatient_funds" as patient_funds {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [UQ, FK, NN]  → patient.id (G01)
+  {field} opened_at : TEXT [NN]
+  {field} opened_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+bill --> patient_funds
+bill_item --> bill
+bill_item --> service_price
+service_price --> service
+@enduml

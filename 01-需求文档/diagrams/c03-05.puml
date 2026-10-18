@@ -1,0 +1,79 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "收费人员" as A0
+boundary "<u>:收费人员接口</u>" as B0
+actor "诊所负责人" as A1
+boundary "<u>:诊所负责人接口</u>" as B1
+control "<u>:维护收费价目控</u>\n<u>制</u>" as K
+participant "<u>:收费项目</u>" as Service
+participant "<u>:价目</u>" as Price
+A0 -> B0 : 提交UC-05办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-05办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Service : 提出新价目(金额、区间、原因)
+activate Service
+Service -> Price : 核对区间及金额(已有适用区间)
+activate Price
+Price --> Service : 处理结果或拒绝原因
+deactivate Price
+Service -> Price : 提交确认(已核对价目草稿)
+activate Price
+Price --> Service : 处理结果或拒绝原因
+deactivate Price
+Service --> K : 处理结果或拒绝原因
+deactivate Service
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A1 -> B1 : 核对草稿并确认发布
+activate B1
+B1 -> B1 : 检查输入格式()
+B1 -> K : 协调UC-05办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Service : 确认价目发布(负责人意见)
+activate Service
+Service -> Price : 发布确认版本(确认人、确认时间)
+activate Price
+Price --> Service : 处理结果或拒绝原因
+deactivate Price
+Service --> K : 处理结果或拒绝原因
+deactivate Service
+end
+K --> B1 : 本阶段结果及下一步依据
+deactivate K
+B1 --> A1 : 展示结果、状态和原因
+deactivate B1
+note over K,Price
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

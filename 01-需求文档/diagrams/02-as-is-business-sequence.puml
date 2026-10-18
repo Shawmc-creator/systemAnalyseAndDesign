@@ -1,11 +1,11 @@
 @startuml
-' Business symbols extracted from course PPT PDF pages 86-87.
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -21,16 +21,22 @@ skinparam sequence {
 actor "患者" as P
 participant "<img:business-worker.png>\n前台" as F
 participant "<img:business-worker.png>\n牙医" as D
-P -> F : 请求办理到诊接待
+P -> F : 到诊并提供身份及联系方式
 activate F
-F -> P : 核实姓名及预约信息（a）
-P --> F : 提供姓名、联系电话及预约时间
-F -> F : 查阅纸质预约本，核对预约记录
-F -> D : 核实本次接诊安排
-activate D
-D --> F : 确认接诊牙医及候诊安排
-deactivate D
-F -> F : 抄录患者与预约信息，登记到诊
-F -> P : 告知接诊牙医及候诊安排（b）
+F -> F : 查找纸质患者档案及预约
+alt 已有预约
+ F -> F : 核对预约、患者和接诊安排
+else 现场到诊
+ F -> D : 协调接诊牙医、时间及诊椅
+ D --> F : 返回接诊安排
+end
+opt 资料重复、变更或需代理办理
+ F -> P : 核实身份、联系信息及办理依据
+ P --> F : 补充或确认资料
+ F -> F : 订正档案并注明原记录来源
+end
+F -> F : 登记本次到诊和候诊安排
+F -> D : 交接患者及本次就诊资料
+F --> P : 告知候诊安排
 deactivate F
 @enduml

@@ -5,8 +5,8 @@ skinparam defaultFontName SimSun
 skinparam defaultFontSize 18
 skinparam dpi 220
 skinparam ArrowColor black
-skinparam nodesep 24
-skinparam ranksep 65
+skinparam nodesep 22
+skinparam ranksep 48
 skinparam actor {
  BorderColor black
  BackgroundColor white
@@ -22,11 +22,29 @@ skinparam rectangle {
 left to right direction
 actor "诊疗助理" as A
 rectangle "牙科诊所管理系统" {
- usecase "UC-17\n查询材料库存" as U17
- usecase "UC-18\n登记材料变动" as U18
+ usecase "UC-17\n查询材料与批次库存" as U17
+ usecase "UC-18\n登记批次库存变动" as U18
+ usecase "UC-23\n管理影像与诊疗文书" as U23
+ usecase "UC-27\n维护供应商与采购安排" as U27
+ usecase "UC-28\n登记采购验收与退换" as U28
+ usecase "UC-30\n登记器械处理与放行" as U30
+ usecase "UC-31\n登记器械包使用与追溯" as U31
+ usecase "UC-32\n维护材料与批次状态" as U32
 }
 A -- U17
 A -- U18
-U17 -[hidden]left-> U18
+A -- U23
+A -- U27
+A -- U28
+A -- U30
+A -- U31
+A -- U32
+U18 -[hidden]right-> U17
+U23 -[hidden]right-> U18
+U27 -[hidden]right-> U23
+U28 -[hidden]right-> U27
+U30 -[hidden]right-> U28
+U31 -[hidden]right-> U30
+U32 -[hidden]right-> U31
 
 @enduml

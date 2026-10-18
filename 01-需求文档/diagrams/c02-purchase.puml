@@ -1,0 +1,116 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "供应商" as Supplier <<entity>> {
+ 名称
+ 联系资料
+ 结算依据
+ --
+ 核对供货资格()
+}
+class "材料" as Material <<entity>> {
+ 名称
+ 规格
+ 基本单位
+ 换算规则
+ 追溯要求
+ --
+ 定位材料及单位()
+ 提供采购单位()
+ 确认目录维护()
+}
+class "采购" as Purchase <<entity>> {
+ 约定时间
+ 交付条件
+ 确认时间
+ --
+ 提出采购安排()
+ 确认供货约定()
+ 核对到货依据()
+}
+class "采购项目" as PurchaseItem <<entity>> {
+ 约定数量
+ 约定单价
+ 计量单位
+ --
+ 组织约定明细()
+ 核对交付及差异()
+ 确认差异安排()
+}
+class "验收" as Receipt <<entity>> {
+ 到货时间
+ 随货依据
+ 验收时间
+ --
+ 登记本次验收()
+ 提供合格结算依据()
+}
+class "验收项目" as ReceiptItem <<entity>> {
+ 到货量
+ 合格量
+ 拒收量
+ 待检量
+ --
+ 核对数量组成()
+}
+class "材料批次" as Batch <<entity>> {
+ 批号
+ 效期
+ 来源说明
+ --
+ 提供批次可用性()
+ 核对可领用性()
+ 立即隔离批次()
+}
+class "采购差异" as SupplyIssue <<entity>> {
+ 差异数量
+ 原因
+ 约定处理
+ 确认时间
+ --
+ 保留验收差异()
+ 提供确认退换()
+}
+class "库存变动" as Movement <<entity>> {
+ 类型
+ 数量
+ 前后数量
+ 原因
+ 发生时间
+ --
+ 提供收发依据()
+ 保留收发经历()
+ 保留验收入库()
+}
+Material "1" -- "0..*" Batch : 材料批次
+Movement "0..1" -- "0..*" Movement : 原领用或更正来源
+Supplier "1" -- "0..*" Purchase : 供货方
+Purchase "1" *-- "1..*" PurchaseItem : 约定明细
+Material "1" -- "0..*" PurchaseItem : 采购材料
+Purchase "1" -- "0..*" Receipt : 分批验收
+Receipt "1" *-- "1..*" ReceiptItem : 本次验收
+PurchaseItem "1" -- "0..*" ReceiptItem : 所据采购
+Batch "0..1" -- "0..*" ReceiptItem : 到货批次
+ReceiptItem "0..1" -- "0..*" Movement : 验收入库依据
+PurchaseItem "1" -- "0..*" SupplyIssue : 交付与拒收差异
+ReceiptItem "0..1" -- "0..*" SupplyIssue : 原验收
+
+@enduml

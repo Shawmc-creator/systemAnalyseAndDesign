@@ -1,0 +1,413 @@
+{
+  "version": "2026-10-18-design",
+  "status": "目标接口，应用实现待按基线改造",
+  "operations": [
+    {
+      "permission": "uc01.maintain",
+      "roles": [
+        "frontdesk"
+      ],
+      "method": "POST",
+      "path": "/api/v2/appointments/maintain"
+    },
+    {
+      "permission": "uc02.query",
+      "roles": [
+        "frontdesk"
+      ],
+      "method": "GET",
+      "path": "/api/v2/appointments/query"
+    },
+    {
+      "permission": "uc03.register",
+      "roles": [
+        "frontdesk"
+      ],
+      "method": "POST",
+      "path": "/api/v2/visits/register"
+    },
+    {
+      "permission": "uc04.execute",
+      "roles": [
+        "dentist"
+      ],
+      "method": "POST",
+      "path": "/api/v2/executions/execute"
+    },
+    {
+      "permission": "uc05.draft",
+      "roles": [
+        "cashier"
+      ],
+      "method": "POST",
+      "path": "/api/v2/service-prices/draft"
+    },
+    {
+      "permission": "uc05.approve",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/service-prices/approve"
+    },
+    {
+      "permission": "uc06.query",
+      "roles": [
+        "cashier"
+      ],
+      "method": "GET",
+      "path": "/api/v2/patient-bills/query"
+    },
+    {
+      "permission": "uc07.receive",
+      "roles": [
+        "cashier"
+      ],
+      "method": "POST",
+      "path": "/api/v2/patient-payments/receive"
+    },
+    {
+      "permission": "uc07.allocate",
+      "roles": [
+        "cashier"
+      ],
+      "method": "POST",
+      "path": "/api/v2/patient-payments/allocate"
+    },
+    {
+      "permission": "uc08.maintain",
+      "roles": [
+        "frontdesk"
+      ],
+      "method": "POST",
+      "path": "/api/v2/patients/maintain"
+    },
+    {
+      "permission": "uc09.query",
+      "roles": [
+        "dentist"
+      ],
+      "method": "GET",
+      "path": "/api/v2/patient-clinical-data/query"
+    },
+    {
+      "permission": "uc10.record",
+      "roles": [
+        "dentist"
+      ],
+      "method": "POST",
+      "path": "/api/v2/clinical-records/record"
+    },
+    {
+      "permission": "uc11.sign",
+      "roles": [
+        "dentist"
+      ],
+      "method": "POST",
+      "path": "/api/v2/clinical-record-signatures/sign"
+    },
+    {
+      "permission": "uc12.propose",
+      "roles": [
+        "dentist"
+      ],
+      "method": "POST",
+      "path": "/api/v2/followup-requirements/propose"
+    },
+    {
+      "permission": "uc13.contact",
+      "roles": [
+        "frontdesk"
+      ],
+      "method": "POST",
+      "path": "/api/v2/followup-contacts/contact"
+    },
+    {
+      "permission": "uc14.assess",
+      "roles": [
+        "dentist"
+      ],
+      "method": "POST",
+      "path": "/api/v2/followup-assessments/assess"
+    },
+    {
+      "permission": "uc15.schedule",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/schedules/schedule"
+    },
+    {
+      "permission": "uc16.query",
+      "roles": [
+        "frontdesk",
+        "dentist"
+      ],
+      "method": "GET",
+      "path": "/api/v2/schedule-availability/query"
+    },
+    {
+      "permission": "uc17.query",
+      "roles": [
+        "assistant",
+        "manager"
+      ],
+      "method": "GET",
+      "path": "/api/v2/batch-stock/query"
+    },
+    {
+      "permission": "uc18.record",
+      "roles": [
+        "assistant"
+      ],
+      "method": "POST",
+      "path": "/api/v2/inventory-commands/record"
+    },
+    {
+      "permission": "uc18.approve",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/inventory-commands/approve"
+    },
+    {
+      "permission": "uc19.funds",
+      "roles": [
+        "cashier"
+      ],
+      "method": "GET",
+      "path": "/api/v2/reports/funds"
+    },
+    {
+      "permission": "uc19.management",
+      "roles": [
+        "manager"
+      ],
+      "method": "GET",
+      "path": "/api/v2/reports/management"
+    },
+    {
+      "permission": "uc20.reconcile",
+      "roles": [
+        "cashier"
+      ],
+      "method": "POST",
+      "path": "/api/v2/reconciliations/reconcile"
+    },
+    {
+      "permission": "uc20.follow",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/reconciliations/follow"
+    },
+    {
+      "permission": "uc21.health",
+      "roles": [
+        "dentist"
+      ],
+      "method": "POST",
+      "path": "/api/v2/health-versions/health"
+    },
+    {
+      "permission": "uc22.plan",
+      "roles": [
+        "dentist"
+      ],
+      "method": "POST",
+      "path": "/api/v2/treatment-plans/plan"
+    },
+    {
+      "permission": "uc23.upload",
+      "roles": [
+        "dentist",
+        "assistant"
+      ],
+      "method": "POST",
+      "path": "/api/v2/clinical-documents/upload"
+    },
+    {
+      "permission": "uc23.confirm",
+      "roles": [
+        "dentist"
+      ],
+      "method": "POST",
+      "path": "/api/v2/clinical-documents/confirm"
+    },
+    {
+      "permission": "uc24.apply",
+      "roles": [
+        "cashier"
+      ],
+      "method": "POST",
+      "path": "/api/v2/fee-requests/apply"
+    },
+    {
+      "permission": "uc25.approve",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/fee-request-decisions/approve"
+    },
+    {
+      "permission": "uc26.refund",
+      "roles": [
+        "cashier"
+      ],
+      "method": "POST",
+      "path": "/api/v2/patient-refunds/refund"
+    },
+    {
+      "permission": "uc27.supplier",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/purchases/supplier"
+    },
+    {
+      "permission": "uc27.draft",
+      "roles": [
+        "assistant"
+      ],
+      "method": "POST",
+      "path": "/api/v2/purchases/draft"
+    },
+    {
+      "permission": "uc27.approve",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/purchases/approve"
+    },
+    {
+      "permission": "uc28.receive",
+      "roles": [
+        "assistant"
+      ],
+      "method": "POST",
+      "path": "/api/v2/purchase-receipts/receive"
+    },
+    {
+      "permission": "uc28.approve",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/purchase-receipts/approve"
+    },
+    {
+      "permission": "uc29.authorize",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/supplier-payments/authorize"
+    },
+    {
+      "permission": "uc29.pay",
+      "roles": [
+        "cashier"
+      ],
+      "method": "POST",
+      "path": "/api/v2/supplier-payments/pay"
+    },
+    {
+      "permission": "uc30.process",
+      "roles": [
+        "assistant"
+      ],
+      "method": "POST",
+      "path": "/api/v2/instrument-processing/process"
+    },
+    {
+      "permission": "uc31.use",
+      "roles": [
+        "assistant"
+      ],
+      "method": "POST",
+      "path": "/api/v2/instrument-trace/use"
+    },
+    {
+      "permission": "uc31.clinical_trace",
+      "roles": [
+        "dentist"
+      ],
+      "method": "GET",
+      "path": "/api/v2/instrument-trace/clinical_trace"
+    },
+    {
+      "permission": "uc31.trace",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/instrument-trace/trace"
+    },
+    {
+      "permission": "uc32.record",
+      "roles": [
+        "assistant"
+      ],
+      "method": "POST",
+      "path": "/api/v2/material-batches/record"
+    },
+    {
+      "permission": "uc32.approve",
+      "roles": [
+        "manager"
+      ],
+      "method": "POST",
+      "path": "/api/v2/material-batches/approve"
+    },
+    {
+      "permission": "ops.identity.manage",
+      "method": "POST",
+      "path": "/api/v2/operations/identity-changes",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "permission": "ops.audit.query",
+      "method": "GET",
+      "path": "/api/v2/operations/audit-history",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "permission": "ops.backup.manage",
+      "method": "POST",
+      "path": "/api/v2/operations/backups",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "permission": "ops.restore.verify",
+      "method": "POST",
+      "path": "/api/v2/operations/restore-checks",
+      "roles": [
+        "manager"
+      ]
+    },
+    {
+      "permission": "ops.request.query",
+      "method": "GET",
+      "path": "/api/v2/submissions/{requestKey}",
+      "roles": [
+        "frontdesk",
+        "dentist",
+        "cashier",
+        "assistant",
+        "manager"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "患者" as Patient <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -birth_date: Text?
+ -phone: Text?
+ -phone_owner: Text?
+ +核对身份(依据: 操作输入): 业务结果
+ +核对身份候选(依据: 操作输入): 业务结果
+ +确认资料维护(依据: 操作输入): 业务结果
+ +核对临床访问(依据: 操作输入): 业务结果
+ +确认健康变更(依据: 操作输入): 业务结果
+}
+class "患者资金" as Funds <<entity>> {
+ -id: ObjectId
+ -opened_at: Text
+ +核算付款及可用额(依据: 操作输入): 业务结果
+ +登记已核实付款(依据: 操作输入): 业务结果
+ +汇总患者资金(依据: 操作输入): 业务结果
+ +提供核对来源(依据: 操作输入): 业务结果
+ +核对可申请范围(依据: 操作输入): 业务结果
+ +核对可处理额度(依据: 操作输入): 业务结果
+ +更正付款分配(依据: 操作输入): 业务结果
+ +开始退款办理(依据: 操作输入): 业务结果
+ +确认实际退款(依据: 操作输入): 业务结果
+ +核算退款后余额(依据: 操作输入): 业务结果
+ +办理预付抵扣(依据: 操作输入): 业务结果
+ +恢复既有办理结果(依据: 操作输入): 业务结果
+ +登记结果待核实(依据: 操作输入): 业务结果
+ +确认核查结论(依据: 操作输入): 业务结果
+ +核对共同归属(依据: 操作输入): 业务结果
+}
+class "患者付款" as Payment <<entity>> {
+ -id: ObjectId
+ -net_cents: Int64
+ -received_cents: Int64
+ -change_cents: Int64
+ -channel: Text
+ +核算来源余额(依据: 操作输入): 业务结果
+ +确认到账(依据: 操作输入): 业务结果
+ +分配已收款(依据: 操作输入): 业务结果
+ +调整已分配范围(依据: 操作输入): 业务结果
+ +核对来源可退额(依据: 操作输入): 业务结果
+ +核对未分配余额(依据: 操作输入): 业务结果
+ +确认预付用途(依据: 操作输入): 业务结果
+ +提出到账核查(依据: 操作输入): 业务结果
+ +确认未到账(依据: 操作输入): 业务结果
+}
+class "付款分配" as Allocation <<entity>> {
+ -id: ObjectId
+ -amount_cents: Int64
+ -effective_at: Text
+ -reason: Text
+ +形成分配(依据: 操作输入): 业务结果
+ +追加分配更正(依据: 操作输入): 业务结果
+}
+class "预付抵扣" as Offset <<entity>> {
+ -id: ObjectId
+ -amount_cents: Int64
+ -effective_at: Text
+ -reason: Text
+ +保留预付抵扣(依据: 操作输入): 业务结果
+}
+class "应收账目" as Bill <<entity>> {
+ -id: ObjectId
+ -formed_at: Text
+ -period_start: Text
+ -period_end: Text
+ -record_no: Text
+ +形成应收依据(依据: 操作输入): 业务结果
+ +提供应收依据(依据: 操作输入): 业务结果
+ +核对可分配额(依据: 操作输入): 业务结果
+ +汇总有效应收(依据: 操作输入): 业务结果
+ +提供原费用依据(依据: 操作输入): 业务结果
+ +批准费用调整(依据: 操作输入): 业务结果
+ +核算调整后应收(依据: 操作输入): 业务结果
+}
+Patient "1" -- "0..*" Bill : 账目归属
+Patient "1" -- "1" Funds : 款项归属
+Funds "1" *-- "0..*" Payment : 实际到账
+Payment "1" *-- "0..*" Allocation : 到账分配
+Bill "1" -- "0..*" Allocation : 被分配账目
+Payment "1" *-- "0..*" Offset : 未分配来源
+Bill "1" -- "0..*" Offset : 抵扣账目
+Funds "1" -- "0..*" Bill : 同患者结算范围
+@enduml

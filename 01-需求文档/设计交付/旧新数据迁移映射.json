@@ -1,0 +1,896 @@
+{
+  "version": "2026-10-18-design",
+  "source": "当前运行库只读结构清单（41应用表）",
+  "mapping": [
+    {
+      "source": "users",
+      "targets": [
+        "staff",
+        "user_account",
+        "staff_role_qualification",
+        "account_role"
+      ],
+      "policy": "职员身份与个人账号分开；核实真实在岗与任职区间，固定岗位角色按批准资格授予；不能按现角色倒造历史资格。旧口令编码先识别，不能兼容时强制重设。",
+      "source_columns": [
+        "id",
+        "username",
+        "password_hash",
+        "display_name",
+        "roles",
+        "active",
+        "created_at"
+      ],
+      "source_rows": 6
+    },
+    {
+      "source": "sessions",
+      "targets": [],
+      "policy": "会话不迁移；切换时全部失效，启动新runtime_epoch，保留受控旧库快照，不复活旧Cookie。",
+      "source_columns": [
+        "token_hash",
+        "user_id",
+        "csrf_token",
+        "expires_at",
+        "created_at"
+      ],
+      "source_rows": 43
+    },
+    {
+      "source": "patient_sessions",
+      "targets": [],
+      "policy": "会话不迁移；切换时全部失效，启动新runtime_epoch，保留受控旧库快照，不复活旧Cookie。",
+      "source_columns": [
+        "token_hash",
+        "patient_id",
+        "csrf_token",
+        "expires_at",
+        "created_at"
+      ],
+      "source_rows": 1
+    },
+    {
+      "source": "patients",
+      "targets": [
+        "patient",
+        "patient_funds"
+      ],
+      "policy": "患者号作稳定候选；不按姓名电话合并。未知生日电话保持未知并核实联系原因。旧性别及自由备注等未进入新模型的资料只在受控旧库保留，不擅加列。",
+      "source_columns": [
+        "id",
+        "patient_no",
+        "full_name",
+        "sex",
+        "birth_date",
+        "phone",
+        "emergency_contact",
+        "contact_preference",
+        "notes",
+        "active",
+        "created_at",
+        "updated_at",
+        "version"
+      ],
+      "source_rows": 13
+    },
+    {
+      "source": "health_alerts",
+      "targets": [
+        "health_version",
+        "health_item",
+        "health_review"
+      ],
+      "policy": "既有健康提示保留来源；病史过敏用药分别明确，缺项未知，不能填无。需牙医确认新快照及本次复核；不倒造过去的复核。",
+      "source_columns": [
+        "id",
+        "patient_id",
+        "alert_type",
+        "description",
+        "severity",
+        "active",
+        "created_at"
+      ],
+      "source_rows": 2
+    },
+    {
+      "source": "chairs",
+      "targets": [
+        "dental_chair"
+      ],
+      "policy": "保留诊椅稳定标识；可用起止由负责人核实，不用当前active推算所有历史日期。",
+      "source_columns": [
+        "id",
+        "code",
+        "name",
+        "active"
+      ],
+      "source_rows": 2
+    },
+    {
+      "source": "services",
+      "targets": [
+        "service"
+      ],
+      "policy": "项目号与计价单位对应；current_price不是已确认价目版本。",
+      "source_columns": [
+        "id",
+        "code",
+        "name",
+        "default_duration",
+        "current_price",
+        "active",
+        "unit"
+      ],
+      "source_rows": 5
+    },
+    {
+      "source": "service_price_history",
+      "targets": [
+        "service_price"
+      ],
+      "policy": "优先核对已确认版本；相同来源证据可对应同一新价目。重叠区间、缺确认人时刻或不同价冲突进入待核清单，不按名称自动合并。",
+      "source_columns": [
+        "id",
+        "service_id",
+        "price",
+        "effective_from",
+        "changed_by",
+        "reason"
+      ],
+      "source_rows": 5
+    },
+    {
+      "source": "service_price_versions",
+      "targets": [
+        "service_price"
+      ],
+      "policy": "优先核对已确认版本；相同来源证据可对应同一新价目。重叠区间、缺确认人时刻或不同价冲突进入待核清单，不按名称自动合并。",
+      "source_columns": [
+        "id",
+        "service_id",
+        "unit_price",
+        "effective_from",
+        "effective_to",
+        "confirmed_by",
+        "confirmed_at",
+        "confirmation_note",
+        "recorded_by",
+        "version",
+        "created_at"
+      ],
+      "source_rows": 5
+    },
+    {
+      "source": "clinic_hours",
+      "targets": [
+        "dated_schedule",
+        "schedule_change"
+      ],
+      "policy": "周模板仅供生成明确日期的候选，逐日确认后发布。已有预约按实际日期还原；无法还原的停诊与模板变更保留旧快照，不编造过去日期安排。",
+      "source_columns": [
+        "weekday",
+        "open_time",
+        "close_time",
+        "active"
+      ],
+      "source_rows": 7
+    },
+    {
+      "source": "dentist_schedules",
+      "targets": [
+        "dated_schedule",
+        "schedule_change"
+      ],
+      "policy": "周模板仅供生成明确日期的候选，逐日确认后发布。已有预约按实际日期还原；无法还原的停诊与模板变更保留旧快照，不编造过去日期安排。",
+      "source_columns": [
+        "id",
+        "dentist_id",
+        "weekday",
+        "start_time",
+        "end_time",
+        "active",
+        "created_by",
+        "version",
+        "confirmed_by",
+        "confirmed_at",
+        "confirmation_note"
+      ],
+      "source_rows": 12
+    },
+    {
+      "source": "staff_leaves",
+      "targets": [
+        "dated_schedule",
+        "schedule_change"
+      ],
+      "policy": "周模板仅供生成明确日期的候选，逐日确认后发布。已有预约按实际日期还原；无法还原的停诊与模板变更保留旧快照，不编造过去日期安排。",
+      "source_columns": [
+        "id",
+        "user_id",
+        "start_at",
+        "end_at",
+        "reason",
+        "status",
+        "created_by",
+        "created_at"
+      ],
+      "source_rows": 0
+    },
+    {
+      "source": "schedule_changes",
+      "targets": [
+        "dated_schedule",
+        "schedule_change"
+      ],
+      "policy": "周模板仅供生成明确日期的候选，逐日确认后发布。已有预约按实际日期还原；无法还原的停诊与模板变更保留旧快照，不编造过去日期安排。",
+      "source_columns": [
+        "id",
+        "dentist_id",
+        "weekday",
+        "old_json",
+        "new_json",
+        "reason",
+        "changed_by",
+        "changed_at"
+      ],
+      "source_rows": 0
+    },
+    {
+      "source": "appointments",
+      "targets": [
+        "appointment",
+        "appointment_change",
+        "resource_occupancy"
+      ],
+      "policy": "预约状态作显式映射；时段对应确认日期资源，重叠与重复到诊先解决。旧历史缺少前后资源时保留原依据，不补造完整历史。",
+      "source_columns": [
+        "id",
+        "appointment_no",
+        "patient_id",
+        "dentist_id",
+        "chair_id",
+        "service_id",
+        "start_at",
+        "end_at",
+        "status",
+        "source",
+        "patient_note",
+        "internal_note",
+        "exception_reason",
+        "rescheduled_from_id",
+        "created_by",
+        "created_at",
+        "version",
+        "arrangement_confirmed_by",
+        "arrangement_confirmed_at"
+      ],
+      "source_rows": 11
+    },
+    {
+      "source": "appointment_history",
+      "targets": [
+        "appointment",
+        "appointment_change",
+        "resource_occupancy"
+      ],
+      "policy": "预约状态作显式映射；时段对应确认日期资源，重叠与重复到诊先解决。旧历史缺少前后资源时保留原依据，不补造完整历史。",
+      "source_columns": [
+        "id",
+        "appointment_id",
+        "from_status",
+        "to_status",
+        "reason",
+        "changed_by",
+        "changed_at"
+      ],
+      "source_rows": 11
+    },
+    {
+      "source": "encounters",
+      "targets": [
+        "visit",
+        "clinical_record",
+        "clinical_finding",
+        "record_addendum"
+      ],
+      "policy": "一次就诊拆出病历与所见；签署人、时刻和正文保留。已有签署缺失关键证据时留待核，不重签冒充原签署；摘要是导入内容校验，不当作历史电子证书。",
+      "source_columns": [
+        "id",
+        "encounter_no",
+        "patient_id",
+        "appointment_id",
+        "dentist_id",
+        "status",
+        "chief_complaint",
+        "relevant_history",
+        "diagnosis",
+        "clinical_notes",
+        "instructions",
+        "started_at",
+        "ended_at",
+        "signed_at",
+        "signed_by",
+        "created_at",
+        "updated_at",
+        "confirmation_version",
+        "version",
+        "signed_version"
+      ],
+      "source_rows": 9
+    },
+    {
+      "source": "tooth_findings",
+      "targets": [
+        "visit",
+        "clinical_record",
+        "clinical_finding",
+        "record_addendum"
+      ],
+      "policy": "一次就诊拆出病历与所见；签署人、时刻和正文保留。已有签署缺失关键证据时留待核，不重签冒充原签署；摘要是导入内容校验，不当作历史电子证书。",
+      "source_columns": [
+        "id",
+        "encounter_id",
+        "tooth_code",
+        "finding",
+        "created_by",
+        "created_at"
+      ],
+      "source_rows": 7
+    },
+    {
+      "source": "record_amendments",
+      "targets": [
+        "visit",
+        "clinical_record",
+        "clinical_finding",
+        "record_addendum"
+      ],
+      "policy": "一次就诊拆出病历与所见；签署人、时刻和正文保留。已有签署缺失关键证据时留待核，不重签冒充原签署；摘要是导入内容校验，不当作历史电子证书。",
+      "source_columns": [
+        "id",
+        "encounter_id",
+        "amendment_text",
+        "reason",
+        "signed_by",
+        "signed_at"
+      ],
+      "source_rows": 0
+    },
+    {
+      "source": "clinical_attachments",
+      "targets": [
+        "clinical_document",
+        "document_version"
+      ],
+      "policy": "原BLOB逐份导出受控文件，保存原字节大小和SHA-256，建立版本来源。未有牙医确认的保持原件待确认，原文件名不作路径。",
+      "source_columns": [
+        "id",
+        "patient_id",
+        "encounter_id",
+        "category",
+        "original_name",
+        "mime_type",
+        "file_size",
+        "file_data",
+        "description",
+        "active",
+        "uploaded_by",
+        "created_at"
+      ],
+      "source_rows": 0
+    },
+    {
+      "source": "treatment_plans",
+      "targets": [
+        "treatment_plan",
+        "plan_version",
+        "plan_item",
+        "patient_decision",
+        "decision_plan_item"
+      ],
+      "policy": "按患者方案与版本重组；既有decision文本只能作为旧证据，缺决定时刻范围责任时不生成有效同意；须重新取得可执行的确认。",
+      "source_columns": [
+        "id",
+        "plan_no",
+        "patient_id",
+        "encounter_id",
+        "version_no",
+        "status",
+        "summary",
+        "explained_at",
+        "created_by",
+        "created_at"
+      ],
+      "source_rows": 3
+    },
+    {
+      "source": "plan_items",
+      "targets": [
+        "treatment_plan",
+        "plan_version",
+        "plan_item",
+        "patient_decision",
+        "decision_plan_item"
+      ],
+      "policy": "按患者方案与版本重组；既有decision文本只能作为旧证据，缺决定时刻范围责任时不生成有效同意；须重新取得可执行的确认。",
+      "source_columns": [
+        "id",
+        "plan_id",
+        "service_id",
+        "tooth_code",
+        "planned_quantity",
+        "estimated_price",
+        "decision",
+        "completed_quantity"
+      ],
+      "source_rows": 3
+    },
+    {
+      "source": "treatments",
+      "targets": [
+        "treatment_execution",
+        "bill_item"
+      ],
+      "policy": "实际执行与原确认快照对照；已完成数量从来源事实核对，不把计划数量当执行；旧更正和取消记录保留链，不直接删旧执行。",
+      "source_columns": [
+        "id",
+        "encounter_id",
+        "plan_item_id",
+        "service_id",
+        "tooth_code",
+        "quantity",
+        "unit_price_snapshot",
+        "performed_by",
+        "outcome",
+        "outside_plan_reason",
+        "performed_at",
+        "status",
+        "price_version_id",
+        "price_missing",
+        "confirmed_at",
+        "patient_confirmed"
+      ],
+      "source_rows": 6
+    },
+    {
+      "source": "treatment_confirmation_versions",
+      "targets": [
+        "treatment_execution",
+        "bill_item"
+      ],
+      "policy": "实际执行与原确认快照对照；已完成数量从来源事实核对，不把计划数量当执行；旧更正和取消记录保留链，不直接删旧执行。",
+      "source_columns": [
+        "id",
+        "encounter_id",
+        "version",
+        "confirmed_by",
+        "confirmed_at",
+        "reason",
+        "items_json"
+      ],
+      "source_rows": 3
+    },
+    {
+      "source": "invoices",
+      "targets": [
+        "bill",
+        "bill_item",
+        "fee_adjustment",
+        "fee_adjustment_item"
+      ],
+      "policy": "拆出实际应收和有批准依据的更正；gross/paid/balance等旧汇总不直接作新余额，逐笔原单重算并与旧汇总核对。",
+      "source_columns": [
+        "id",
+        "invoice_no",
+        "patient_id",
+        "encounter_id",
+        "status",
+        "gross_amount",
+        "discount_amount",
+        "credited_amount",
+        "paid_amount",
+        "refunded_amount",
+        "balance",
+        "created_by",
+        "created_at",
+        "version",
+        "confirmation_version"
+      ],
+      "source_rows": 5
+    },
+    {
+      "source": "invoice_lines",
+      "targets": [
+        "bill",
+        "bill_item",
+        "fee_adjustment",
+        "fee_adjustment_item"
+      ],
+      "policy": "拆出实际应收和有批准依据的更正；gross/paid/balance等旧汇总不直接作新余额，逐笔原单重算并与旧汇总核对。",
+      "source_columns": [
+        "id",
+        "invoice_id",
+        "treatment_id",
+        "service_name",
+        "unit_price",
+        "quantity",
+        "line_amount",
+        "unit"
+      ],
+      "source_rows": 5
+    },
+    {
+      "source": "payments",
+      "targets": [
+        "patient_payment",
+        "payment_allocation",
+        "prepayment_offset"
+      ],
+      "policy": "核对同一现金事实是否在两张旧表重复表达；仅有明确原凭据映射才合并，歧义人工核实。实收、找零和净额分别保留，旧REAL金额与票据核对后转换整数分。",
+      "source_columns": [
+        "id",
+        "invoice_id",
+        "amount",
+        "method",
+        "reference_no",
+        "received_by",
+        "paid_at"
+      ],
+      "source_rows": 4
+    },
+    {
+      "source": "cash_receipts",
+      "targets": [
+        "patient_payment",
+        "payment_allocation",
+        "prepayment_offset"
+      ],
+      "policy": "核对同一现金事实是否在两张旧表重复表达；仅有明确原凭据映射才合并，歧义人工核实。实收、找零和净额分别保留，旧REAL金额与票据核对后转换整数分。",
+      "source_columns": [
+        "id",
+        "invoice_id",
+        "receipt_no",
+        "due_amount",
+        "tendered_amount",
+        "change_amount",
+        "received_by",
+        "paid_at"
+      ],
+      "source_rows": 2
+    },
+    {
+      "source": "refunds",
+      "targets": [
+        "fee_request",
+        "fee_adjustment",
+        "fee_adjustment_item",
+        "patient_refund"
+      ],
+      "policy": "申请审核与实际退款分别迁移；仅有批准不算已退款。必须追溯原付款、批准范围与实际凭据，缺来源不得填造有效退款。",
+      "source_columns": [
+        "id",
+        "invoice_id",
+        "payment_id",
+        "amount",
+        "reason",
+        "approved_by",
+        "processed_by",
+        "processed_at"
+      ],
+      "source_rows": 0
+    },
+    {
+      "source": "approval_requests",
+      "targets": [
+        "fee_request",
+        "fee_adjustment",
+        "fee_adjustment_item",
+        "patient_refund"
+      ],
+      "policy": "申请审核与实际退款分别迁移；仅有批准不算已退款。必须追溯原付款、批准范围与实际凭据，缺来源不得填造有效退款。",
+      "source_columns": [
+        "id",
+        "invoice_id",
+        "request_type",
+        "amount",
+        "reason",
+        "status",
+        "requested_by",
+        "reviewed_by",
+        "review_note",
+        "created_at",
+        "reviewed_at",
+        "applied_at"
+      ],
+      "source_rows": 0
+    },
+    {
+      "source": "followups",
+      "targets": [
+        "followup_requirement",
+        "contact_history",
+        "clinical_assessment"
+      ],
+      "policy": "长期要求、前台联系与牙医评估分开；历史末状态不能替代过去每次联系，无法还原只保存现有证据并明确待核。",
+      "source_columns": [
+        "id",
+        "patient_id",
+        "encounter_id",
+        "reason",
+        "due_date",
+        "status",
+        "result",
+        "assigned_to",
+        "created_by",
+        "created_at",
+        "appointment_id",
+        "next_contact_date",
+        "last_contact_by",
+        "last_contact_at",
+        "completed_at",
+        "completed_by",
+        "clinical_result",
+        "version",
+        "type",
+        "recovery",
+        "conclusion",
+        "opinion"
+      ],
+      "source_rows": 7
+    },
+    {
+      "source": "followup_history",
+      "targets": [
+        "followup_requirement",
+        "contact_history",
+        "clinical_assessment"
+      ],
+      "policy": "长期要求、前台联系与牙医评估分开；历史末状态不能替代过去每次联系，无法还原只保存现有证据并明确待核。",
+      "source_columns": [
+        "id",
+        "followup_id",
+        "status",
+        "result",
+        "appointment_id",
+        "next_contact_date",
+        "changed_by",
+        "changed_at",
+        "contacted_at"
+      ],
+      "source_rows": 9
+    },
+    {
+      "source": "daily_reconciliations",
+      "targets": [
+        "cash_reconciliation",
+        "reconciliation_item",
+        "issue_followup"
+      ],
+      "policy": "从basis_json还原明确原款集合并核对basis_hash；旧合计不是新核对明细。缺集合或差异处理证据保留只读旧核对，重新做新截点核对。",
+      "source_columns": [
+        "id",
+        "date",
+        "expected_cash",
+        "counted_cash",
+        "difference",
+        "difference_reason",
+        "resolution_note",
+        "recorded_by",
+        "created_at",
+        "confirmed_by",
+        "confirmed_at",
+        "confirmation_note",
+        "basis_json",
+        "basis_hash"
+      ],
+      "source_rows": 2
+    },
+    {
+      "source": "materials",
+      "targets": [
+        "material",
+        "material_batch",
+        "stock_location",
+        "batch_stock",
+        "inventory_movement",
+        "stock_count"
+      ],
+      "policy": "核实材料计量、实物批次与位置；未知批次/效期待检。新存量先为0，凭切换实盘的批准盘点形成有依据期初，不伪造采购验收；旧总量流水作为来源快照。",
+      "source_columns": [
+        "id",
+        "code",
+        "name",
+        "unit",
+        "stock_quantity",
+        "active",
+        "created_by",
+        "created_at",
+        "updated_at",
+        "version"
+      ],
+      "source_rows": 2
+    },
+    {
+      "source": "material_movements",
+      "targets": [
+        "material",
+        "material_batch",
+        "stock_location",
+        "batch_stock",
+        "inventory_movement",
+        "stock_count"
+      ],
+      "policy": "核实材料计量、实物批次与位置；未知批次/效期待检。新存量先为0，凭切换实盘的批准盘点形成有依据期初，不伪造采购验收；旧总量流水作为来源快照。",
+      "source_columns": [
+        "id",
+        "material_id",
+        "type",
+        "quantity",
+        "before_quantity",
+        "after_quantity",
+        "reason",
+        "actor",
+        "confirmed_by",
+        "confirmed_at",
+        "created_at",
+        "confirmation_note"
+      ],
+      "source_rows": 5
+    },
+    {
+      "source": "patient_changes",
+      "targets": [
+        "patient_change"
+      ],
+      "policy": "按资料白名单逐字段拆原值与新值，保留原JSON摘要及经办时刻；禁止把临床正文混入身份变化。",
+      "source_columns": [
+        "id",
+        "patient_id",
+        "old_json",
+        "new_json",
+        "reason",
+        "changed_by",
+        "changed_at"
+      ],
+      "source_rows": 1
+    },
+    {
+      "source": "audit_events",
+      "targets": [
+        "operation_audit",
+        "audit_change",
+        "request_submission"
+      ],
+      "policy": "旧审计和幂等记录保留原格式快照；仅当账号、权限、对象和参数版本都可可靠映射时转换，不为凑字段虚构成功提交或历史授权。新命令启用新命名空间。",
+      "source_columns": [
+        "id",
+        "user_id",
+        "action",
+        "target_type",
+        "target_id",
+        "patient_id",
+        "result",
+        "details",
+        "occurred_at"
+      ],
+      "source_rows": 123
+    },
+    {
+      "source": "mutation_requests",
+      "targets": [
+        "operation_audit",
+        "audit_change",
+        "request_submission"
+      ],
+      "policy": "旧审计和幂等记录保留原格式快照；仅当账号、权限、对象和参数版本都可可靠映射时转换，不为凑字段虚构成功提交或历史授权。新命令启用新命名空间。",
+      "source_columns": [
+        "scope",
+        "actor",
+        "request_id",
+        "input_hash",
+        "result_json",
+        "created_at"
+      ],
+      "source_rows": 5
+    },
+    {
+      "source": "notifications",
+      "targets": [],
+      "policy": "患者自助登录、预约申请及旧通知/迁移内部记录不属于本版办理范围；保留只读归档，由职员核对未决申请并在新系统实际办理，旧会话和口令不复制。",
+      "source_columns": [
+        "id",
+        "patient_id",
+        "notification_type",
+        "reference_type",
+        "reference_id",
+        "channel",
+        "recipient",
+        "content",
+        "scheduled_at",
+        "status",
+        "attempts",
+        "last_error",
+        "sent_at",
+        "created_by",
+        "created_at"
+      ],
+      "source_rows": 0
+    },
+    {
+      "source": "appointment_change_requests",
+      "targets": [],
+      "policy": "患者自助登录、预约申请及旧通知/迁移内部记录不属于本版办理范围；保留只读归档，由职员核对未决申请并在新系统实际办理，旧会话和口令不复制。",
+      "source_columns": [
+        "id",
+        "appointment_id",
+        "patient_id",
+        "preferred_date",
+        "preferred_period",
+        "reason",
+        "status",
+        "staff_note",
+        "reviewed_by",
+        "new_appointment_id",
+        "created_at",
+        "reviewed_at"
+      ],
+      "source_rows": 0
+    },
+    {
+      "source": "patient_accounts",
+      "targets": [],
+      "policy": "患者自助登录、预约申请及旧通知/迁移内部记录不属于本版办理范围；保留只读归档，由职员核对未决申请并在新系统实际办理，旧会话和口令不复制。",
+      "source_columns": [
+        "patient_id",
+        "password_hash",
+        "active",
+        "created_at",
+        "updated_at"
+      ],
+      "source_rows": 2
+    },
+    {
+      "source": "requirements_migrations",
+      "targets": [],
+      "policy": "患者自助登录、预约申请及旧通知/迁移内部记录不属于本版办理范围；保留只读归档，由职员核对未决申请并在新系统实际办理，旧会话和口令不复制。",
+      "source_columns": [
+        "name",
+        "applied_at"
+      ],
+      "source_rows": 1
+    }
+  ],
+  "without_direct_source": [
+    "access_permission",
+    "access_role",
+    "authentication_event",
+    "backup_artifact",
+    "backup_copy",
+    "backup_run",
+    "batch_change",
+    "clinical_handover",
+    "decision_file_version",
+    "instrument_pack",
+    "instrument_pack_cycle",
+    "instrument_processing",
+    "instrument_use",
+    "login_session",
+    "material_usage",
+    "patient_proxy",
+    "processing_equipment",
+    "processing_monitor",
+    "purchase_issue",
+    "purchase_order",
+    "purchase_order_item",
+    "purchase_receipt",
+    "purchase_receipt_item",
+    "restore_check",
+    "restore_verification",
+    "role_permission",
+    "supplier",
+    "supplier_allocation",
+    "supplier_funds",
+    "supplier_payment",
+    "supplier_refund"
+  ],
+  "status": "仅设计，未执行迁移；所有85目标表由空库脚本建立，未有可靠来源的业务从启用后的真实办理形成。"
+}

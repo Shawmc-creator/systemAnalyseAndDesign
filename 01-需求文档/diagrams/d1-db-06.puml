@@ -1,0 +1,146 @@
+@startuml d1-db-06
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EDF5FA
+}
+title G06  患者付款、调整与退款  ·  7张表
+entity "患者付款\npatient_payment" as patient_payment {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_funds_id : INTEGER [FK, NN]  → patient_funds.id (G05)
+  {field} net_cents : INTEGER [NN]
+  {field} received_cents : INTEGER [NN]
+  {field} change_cents : INTEGER [NN]
+  {field} channel : TEXT [NN]
+  {field} received_at : TEXT [NULL]
+  {field} transaction_evidence : TEXT [NN]
+  {field} external_reference : TEXT [NULL]
+  {field} verified_at : TEXT [NULL]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "付款分配\npayment_allocation" as payment_allocation {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_payment_id : INTEGER [FK, NN]  → patient_payment.id
+  {field} bill_id : INTEGER [FK, NN]  → bill.id (G05)
+  {field} amount_cents : INTEGER [NN]
+  {field} effective_at : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} original_allocation_id : INTEGER [FK, NULL]  → payment_allocation.id
+  {field} fee_request_id : INTEGER [FK, NULL]  → fee_request.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "预付抵扣\nprepayment_offset" as prepayment_offset {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_payment_id : INTEGER [FK, NN]  → patient_payment.id
+  {field} bill_id : INTEGER [FK, NN]  → bill.id (G05)
+  {field} amount_cents : INTEGER [NN]
+  {field} effective_at : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} original_offset_id : INTEGER [FK, NULL]  → prepayment_offset.id
+  {field} fee_request_id : INTEGER [FK, NULL]  → fee_request.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "费用申请\nfee_request" as fee_request {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_funds_id : INTEGER [FK, NN]  → patient_funds.id (G05)
+  {field} bill_id : INTEGER [FK, NULL]  → bill.id (G05)
+  {field} patient_payment_id : INTEGER [FK, NULL]  → patient_payment.id
+  {field} reason : TEXT [NN]
+  {field} proposed_adjustment_cents : INTEGER [NN]
+  {field} proposed_refund_cents : INTEGER [NN]
+  {field} evidence : TEXT [NN]
+  {field} submitted_at : TEXT [NN]
+  {field} review_note : TEXT [NULL]
+  {field} submission_no : INTEGER [NN]
+  {field} approved_adjustment_cents : INTEGER [NULL]
+  {field} approved_refund_cents : INTEGER [NULL]
+  {field} reviewed_at : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} reviewed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "费用调整\nfee_adjustment" as fee_adjustment {
+  {field} id : INTEGER [PK, NN]
+  {field} fee_request_id : INTEGER [UQ, FK, NN]  → fee_request.id
+  {field} bill_id : INTEGER [FK, NN]  → bill.id (G05)
+  {field} reason : TEXT [NN]
+  {field} effective_at : TEXT [NN]
+  {field} approved_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "调整项目\nfee_adjustment_item" as fee_adjustment_item {
+  {field} id : INTEGER [PK, NN]
+  {field} fee_adjustment_id : INTEGER [FK, NN]  → fee_adjustment.id
+  {field} bill_item_id : INTEGER [FK, NN]  → bill_item.id (G05)
+  {field} amount_cents : INTEGER [NN]
+  {field} note : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "退款办理\npatient_refund" as patient_refund {
+  {field} id : INTEGER [PK, NN]
+  {field} fee_request_id : INTEGER [FK, NN]  → fee_request.id
+  {field} patient_payment_id : INTEGER [FK, NN]  → patient_payment.id
+  {field} patient_funds_id : INTEGER [FK, NN]  → patient_funds.id (G05)
+  {field} requested_cents : INTEGER [NN]
+  {field} actual_cents : INTEGER [NULL]
+  {field} initiated_at : TEXT [NN]
+  {field} channel : TEXT [NN]
+  {field} transaction_evidence : TEXT [NULL]
+  {field} verification_note : TEXT [NULL]
+  {field} external_reference : TEXT [NULL]
+  {field} verified_at : TEXT [NULL]
+  {field} recipient_verification : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} verified_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} previous_attempt_id : INTEGER [FK, NULL]  → patient_refund.id
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+fee_adjustment --> fee_request
+fee_adjustment_item --> fee_adjustment
+fee_request --> patient_payment
+patient_refund --> fee_request
+patient_refund --> patient_payment
+payment_allocation --> fee_request
+payment_allocation --> patient_payment
+prepayment_offset --> fee_request
+prepayment_offset --> patient_payment
+@enduml

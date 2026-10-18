@@ -1,0 +1,99 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者" as Patient <<entity>> {
+ 姓名
+ 出生日期
+ 联系电话
+ 电话归属
+ 联系地址
+ 联系偏好
+ --
+ 核对身份()
+ 核对身份候选()
+ 确认资料维护()
+}
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ 接诊开始
+ 诊疗结束
+ 到诊来源
+ --
+ 登记到诊()
+ 核对接诊责任()
+ 确认实际执行()
+}
+class "健康版本" as HealthVersion <<entity>> {
+ 形成时间
+ 变更原因
+ --
+ 形成健康版本()
+}
+class "健康条目" as HealthItem <<entity>> {
+ 类别
+ 内容
+ 确认程度
+ 报告时间
+ 来源
+ --
+ 保留健康结论()
+}
+class "健康复核" as Review <<entity>> {
+ 复核时间
+ 复核结论
+ --
+ 提供当次复核()
+ 保留复核快照()
+}
+class "病历" as Record <<entity>> {
+ 主诉
+ 诊断
+ 处理意见
+ 签署时间
+ --
+ 建立当次草稿()
+ 提供签署及补充()
+ 更新未签署正文()
+}
+class "检查所见" as Finding <<entity>> {
+ 牙位
+ 牙面
+ 所见内容
+ --
+ 保留检查所见()
+}
+class "病历补充" as Addendum <<entity>> {
+ 内容
+ 原因
+ 补充时间
+ --
+ 形成独立补充()
+}
+Patient "1" -- "0..*" Visit : 就诊者
+Patient "1" *-- "0..*" HealthVersion : 长期健康
+HealthVersion "1" *-- "0..*" HealthItem : 条目
+Visit "1" *-- "0..*" Review : 当次复核
+HealthVersion "1" -- "0..*" Review : 所据版本
+Visit "1" *-- "1" Record : 临床正文
+Record "1" *-- "0..*" Finding : 检查所见
+Record "1" *-- "0..*" Addendum : 签署后补充
+
+@enduml

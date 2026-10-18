@@ -1,0 +1,84 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "收费人员" as A0
+boundary "<u>:收费人员接口</u>" as B0
+control "<u>:办理与登记退款</u>\n<u>控制</u>" as K
+participant "<u>:费用申请</u>" as Request
+participant "<u>:患者资金</u>" as Funds
+participant "<u>:患者付款</u>" as Payment
+participant "<u>:退款办理</u>" as Refund
+A0 -> B0 : 提交UC-26办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-26办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Request : 提供批准范围(同意版本及剩余额度)
+activate Request
+Request --> K : 处理结果或拒绝原因
+deactivate Request
+K -> Funds : 开始退款办理(原付款、批准依据、拟退额)
+activate Funds
+Funds -> Payment : 核对来源可退额(分配、抵扣、已退和占用)
+activate Payment
+Payment --> Funds : 处理结果或拒绝原因
+deactivate Payment
+Funds -> Refund : 建立额度占用(唯一办理依据、拟退额)
+activate Refund
+Refund --> Funds : 处理结果或拒绝原因
+deactivate Refund
+Funds --> K : 处理结果或拒绝原因
+deactivate Funds
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A0 -> B0 : 提交线下实际退款结果
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-26办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Funds : 确认实际退款(原办理依据、实际结果及凭据)
+activate Funds
+Funds -> Refund : 核实办理结果(渠道交易及实际额)
+activate Refund
+Refund --> Funds : 处理结果或拒绝原因
+deactivate Refund
+Funds -> Funds : 核算退款后余额(只计一次有效流出)
+Funds --> K : 处理结果或拒绝原因
+deactivate Funds
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+note over K,Refund
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

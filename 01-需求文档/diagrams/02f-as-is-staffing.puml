@@ -1,10 +1,11 @@
 @startuml
-hide footbox
 skinparam backgroundColor white
 skinparam shadowing false
 skinparam defaultFontName SimSun
-skinparam defaultFontSize 17
+skinparam defaultFontSize 18
 skinparam dpi 220
+skinparam ArrowColor black
+hide footbox
 skinparam sequenceMessageAlign center
 skinparam ActorBorderColor black
 skinparam ActorBackgroundColor white
@@ -20,27 +21,17 @@ skinparam sequence {
 participant "<img:business-worker.png>\n诊所负责人" as M
 participant "<img:business-worker.png>\n牙医" as D
 participant "<img:business-worker.png>\n前台" as F
-M -> D : 收集拟安排期间的可接诊时段
-activate D
-D -> D : 核对个人出勤及工作安排
-D --> M : 提供可接诊时段
-deactivate D
-activate M
-M -> F : 核实该期间已有预约
-activate F
-F -> F : 查阅纸质预约本
-F --> M : 提供已约定的牙医与时段
-deactivate F
-M -> M : 编制接诊时段草案\n避开已有预约冲突
-M -> D : 核实接诊时段草案
-activate D
-D --> M : 确认可按草案接诊
-deactivate D
-M -> M : 确认并保存纸质接诊安排
-M -> F : 发布已确认的接诊安排
-activate F
-F -> F : 抄录接诊时段，供后续预约使用
-F --> M : 确认收到安排
-deactivate F
-deactivate M
+actor "患者" as P
+M -> D : 核实出诊时间及临时变动
+D --> M : 确认可接诊日期和时段
+M -> M : 核对诊椅及已有预约\n形成纸质日期安排
+M -> F : 发布接诊安排
+opt 停诊或资源不可用
+ M -> F : 通知受影响日期和时段
+ F -> F : 从预约本找出受影响患者
+ F -> P : 协商改约、取消或其他接诊安排
+ P --> F : 确认处理方式
+ F -> F : 修改预约并标记处理结果
+ F -> M : 反馈未处理事项
+end
 @enduml

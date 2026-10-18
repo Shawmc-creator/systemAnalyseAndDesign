@@ -1,0 +1,85 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+hide footbox
+skinparam maxMessageSize 200
+skinparam sequenceMessageAlign center
+skinparam sequence {
+ ParticipantBackgroundColor white
+ ParticipantBorderColor black
+ LifeLineBorderColor black
+ LifeLineBackgroundColor white
+ ArrowColor black
+ GroupBackgroundColor white
+ GroupBorderColor black
+}
+actor "诊疗助理" as A0
+boundary "<u>:诊疗助理接口</u>" as B0
+actor "诊所负责人" as A1
+boundary "<u>:诊所负责人接口</u>" as B1
+control "<u>:维护材料与批次</u>\n<u>状态控制</u>" as K
+participant "<u>:材料</u>" as Material
+participant "<u>:材料批次</u>" as Batch
+participant "<u>:批次变更</u>" as BatchChange
+participant "<u>:批次存量</u>" as Stock
+A0 -> B0 : 提交UC-32办理依据
+activate B0
+B0 -> B0 : 检查输入格式()
+B0 -> K : 协调UC-32办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Material : 确认目录维护(规格、基本单位、换算及追溯要\n求)
+activate Material
+Material --> K : 处理结果或拒绝原因
+deactivate Material
+K -> Batch : 立即隔离批次(原因及范围)
+activate Batch
+Batch -> BatchChange : 保留可用性变更(原值、原因、经办时间)
+activate BatchChange
+BatchChange --> Batch : 处理结果或拒绝原因
+deactivate BatchChange
+Batch --> K : 处理结果或拒绝原因
+deactivate Batch
+K -> Stock : 提供受影响余额(批次各位置)
+activate Stock
+Stock --> K : 处理结果或拒绝原因
+deactivate Stock
+end
+K --> B0 : 本阶段结果及下一步依据
+deactivate K
+B0 --> A0 : 展示结果、状态和原因
+deactivate B0
+A1 -> B1 : 审核恢复或继续停用
+activate B1
+B1 -> B1 : 检查输入格式()
+B1 -> K : 协调UC-32办理(对象、依据)
+activate K
+critical 本阶段关联结果共同生效
+K -> Batch : 审核恢复或停用(负责人意见、效期及异常依据)
+activate Batch
+Batch -> BatchChange : 保留恢复依据(确认人及当前条件)
+activate BatchChange
+BatchChange --> Batch : 处理结果或拒绝原因
+deactivate BatchChange
+Batch --> K : 处理结果或拒绝原因
+deactivate Batch
+end
+K --> B1 : 本阶段结果及下一步依据
+deactivate K
+B1 --> A1 : 展示结果、状态和原因
+deactivate B1
+note over K,Stock
+校验不通过时返回规约中的原因；
+本阶段不留下部分有效结果。
+end note
+
+@enduml

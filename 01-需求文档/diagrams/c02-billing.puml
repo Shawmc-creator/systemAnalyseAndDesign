@@ -1,0 +1,114 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+top to bottom direction
+skinparam nodesep 45
+skinparam ranksep 65
+skinparam classAttributeIconSize 0
+hide circle
+skinparam class {
+ BackgroundColor white
+ BorderColor black
+}
+class "患者" as Patient <<entity>> {
+ 姓名
+ 出生日期
+ 联系电话
+ 电话归属
+ 联系地址
+ 联系偏好
+ --
+ 核对身份()
+ 核对身份候选()
+ 确认资料维护()
+}
+class "就诊" as Visit <<entity>> {
+ 到诊时间
+ 接诊开始
+ 诊疗结束
+ 到诊来源
+ --
+ 登记到诊()
+ 核对接诊责任()
+ 确认实际执行()
+}
+class "诊疗执行" as Execution <<entity>> {
+ 牙位
+ 牙面
+ 完成数量
+ 操作经过
+ 完成时间
+ 更正原因
+ --
+ 保留执行依据()
+ 核对已完成事实()
+}
+class "收费项目" as Service <<entity>> {
+ 名称
+ 计价单位
+ --
+ 提出新价目()
+ 确认价目发布()
+}
+class "价目" as Price <<entity>> {
+ 单价
+ 生效起止
+ 变更原因
+ 确认时间
+ --
+ 核对区间及金额()
+ 提交确认()
+ 发布确认版本()
+}
+class "应收账目" as Bill <<entity>> {
+ 形成时间
+ 计费期间
+ --
+ 形成应收依据()
+ 提供应收依据()
+ 核对可分配额()
+}
+class "应收项目" as Charge <<entity>> {
+ 数量
+ 单价快照
+ 计费时点
+ 核价说明
+ --
+ 确定计价依据()
+ 核对计价完整性()
+}
+class "费用调整" as Adjustment <<entity>> {
+ 调整原因
+ 生效时间
+ --
+ 形成批准调整()
+}
+class "调整项目" as AdjustmentItem <<entity>> {
+ 调整金额
+ 说明
+ --
+ 逐项保留调整()
+}
+Patient "1" -- "0..*" Visit : 就诊者
+Visit "1" *-- "0..*" Execution : 实际完成
+Service "1" -- "0..*" Execution : 实际项目
+Execution "0..1" -- "0..*" Execution : 原执行与更正
+Service "1" *-- "0..*" Price : 适用价目
+Patient "1" -- "0..*" Bill : 账目归属
+Bill "1" *-- "1..*" Charge : 应收明细
+Execution "1" -- "0..*" Charge : 计费依据
+Price "0..1" -- "0..*" Charge : 适用价目
+Bill "1" -- "0..*" Adjustment : 所属账目
+Adjustment "1" *-- "1..*" AdjustmentItem : 调整明细
+Charge "1" -- "0..*" AdjustmentItem : 原应收项目
+
+@enduml

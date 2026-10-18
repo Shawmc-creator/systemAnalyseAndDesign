@@ -1,0 +1,45 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+top to bottom direction
+class "诊后要求" as E0 <<entity>> {
+- source_visit_id : 标识
+- current_appointment_id : 可空标识
+- status : 诊后状态
+- revision : 版本
+--
++ 提出要求(来源, 类型, 目标, 前台) : 要求
++ 办理联系(动作, 反馈, 预约, 版本) : 变更集
++ 解除取消预约(原预约, 原因) : 变更集
++ 完成评估(牙医, 版本, 签署依据) : 变更集
+}
+class "联系经历" as E1 <<entity>> {
+- requirement_id : 标识
+- appointment_id : 可空标识
+- action : 联系动作
+--
++ 记录联系(反馈, 原因, 后续日期) : 联系
+}
+class "临床评估" as E2 <<entity>> {
+- requirement_id : 标识
+- assessed_by : 标识
+- completed_at : 时刻
+--
++ 建立评估(恢复, 结论, 意见, 时刻) : 评估
+}
+E0 "1" *-- "0..*" E1
+E0 "1" *-- "0..1" E2
+@enduml

@@ -1,0 +1,110 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam classBackgroundColor white
+skinparam classBorderColor black
+skinparam classAttributeIconSize 0
+skinparam linetype polyline
+hide empty members
+
+left to right direction
+skinparam nodesep 65
+skinparam ranksep 95
+class "患者" as Patient <<entity>> {
+ -id: ObjectId
+ -name: Text
+ -birth_date: Text?
+ -phone: Text?
+ -phone_owner: Text?
+ +核对身份(依据: 操作输入): 业务结果
+ +核对身份候选(依据: 操作输入): 业务结果
+ +确认资料维护(依据: 操作输入): 业务结果
+ +核对临床访问(依据: 操作输入): 业务结果
+ +确认健康变更(依据: 操作输入): 业务结果
+}
+class "就诊" as Visit <<entity>> {
+ -id: ObjectId
+ -arrived_at: Text
+ -started_at: Text?
+ -ended_at: Text?
+ -arrival_source: Text
+ +登记到诊(依据: 操作输入): 业务结果
+ +核对接诊责任(依据: 操作输入): 业务结果
+ +确认实际执行(依据: 操作输入): 业务结果
+ +提供获准就诊(依据: 操作输入): 业务结果
+ +确认实际接诊(依据: 操作输入): 业务结果
+ +记录检查诊断(依据: 操作输入): 业务结果
+ +核对签署条件(依据: 操作输入): 业务结果
+ +结束本次诊疗(依据: 操作输入): 业务结果
+ +提供诊后来源(依据: 操作输入): 业务结果
+ +提供本次复诊依据(依据: 操作输入): 业务结果
+ +汇总诊疗发生(依据: 操作输入): 业务结果
+ +确认当次复核(依据: 操作输入): 业务结果
+ +核对使用归属(依据: 操作输入): 业务结果
+ +追加病历说明(依据: 操作输入): 业务结果
+ +提供获准追查信息(依据: 操作输入): 业务结果
+}
+class "健康版本" as HealthVersion <<entity>> {
+ -id: ObjectId
+ -formed_at: Text
+ -change_reason: Text
+ -version_no: Int64
+ -effective_at: Text
+ +形成健康版本(依据: 操作输入): 业务结果
+}
+class "健康条目" as HealthItem <<entity>> {
+ -id: ObjectId
+ -category: Text
+ -content: Text
+ -certainty: Text
+ -reported_at: Text
+ +保留健康结论(依据: 操作输入): 业务结果
+}
+class "健康复核" as Review <<entity>> {
+ -id: ObjectId
+ -reviewed_at: Text
+ -conclusion: Text
+ +提供当次复核(依据: 操作输入): 业务结果
+ +保留复核快照(依据: 操作输入): 业务结果
+}
+class "病历" as Record <<entity>> {
+ -id: ObjectId
+ -chief_complaint: Text?
+ -diagnosis: Text?
+ -treatment_advice: Text?
+ -signed_at: Text?
+ +建立当次草稿(依据: 操作输入): 业务结果
+ +提供签署及补充(依据: 操作输入): 业务结果
+ +更新未签署正文(依据: 操作输入): 业务结果
+ +签署当前正文(依据: 操作输入): 业务结果
+ +核对原签署(依据: 操作输入): 业务结果
+ +追加独立补充(依据: 操作输入): 业务结果
+}
+class "检查所见" as Finding <<entity>> {
+ -id: ObjectId
+ -tooth_code: Text?
+ -surface_code: Text?
+ -finding_text: Text
+ -sequence_no: Int64
+ +保留检查所见(依据: 操作输入): 业务结果
+}
+class "病历补充" as Addendum <<entity>> {
+ -id: ObjectId
+ -content: Text
+ -reason: Text
+ -added_at: Text
+ -content_hash: Text
+ +形成独立补充(依据: 操作输入): 业务结果
+}
+Patient "1" -- "0..*" Visit : 就诊者
+Patient "1" *-- "0..*" HealthVersion : 长期健康
+HealthVersion "1" *-- "0..*" HealthItem : 条目
+Visit "1" *-- "0..*" Review : 当次复核
+HealthVersion "1" -- "0..*" Review : 所据版本
+Visit "1" *-- "1" Record : 临床正文
+Record "1" *-- "0..*" Finding : 检查所见
+Record "1" *-- "0..*" Addendum : 签署后补充
+@enduml

@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam dpi 200
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+left to right direction
+skinparam nodesep 24
+skinparam ranksep 50
+actor "诊所负责人" as A
+boundary "诊所负责人接口" as B
+A -- B
+control "维护收费价目控制\nUC-05" as K5
+B ..> K5
+control "维护日期排班与诊椅安排控制\nUC-15" as K15
+B ..> K15
+control "查询材料与批次库存控制\nUC-17" as K17
+B ..> K17
+control "登记批次库存变动控制\nUC-18" as K18
+B ..> K18
+control "查询经营与资金明细控制\nUC-19" as K19
+B ..> K19
+control "登记收支核对与差异处理控制\nUC-20" as K20
+B ..> K20
+control "审核费用调整与退费控制\nUC-25" as K25
+B ..> K25
+control "维护供应商与采购安排控制\nUC-27" as K27
+B ..> K27
+control "登记采购验收与退换控制\nUC-28" as K28
+B ..> K28
+control "登记供应商付款与结算控制\nUC-29" as K29
+B ..> K29
+control "登记器械包使用与追溯控制\nUC-31" as K31
+B ..> K31
+control "维护材料与批次状态控制\nUC-32" as K32
+B ..> K32
+K5 -[hidden]right-> K15
+K15 -[hidden]right-> K17
+K17 -[hidden]right-> K18
+K18 -[hidden]right-> K19
+K19 -[hidden]right-> K20
+K20 -[hidden]right-> K25
+K25 -[hidden]right-> K27
+K27 -[hidden]right-> K28
+K28 -[hidden]right-> K29
+K29 -[hidden]right-> K31
+K31 -[hidden]right-> K32
+
+@enduml

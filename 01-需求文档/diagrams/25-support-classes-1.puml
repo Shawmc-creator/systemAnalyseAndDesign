@@ -1,0 +1,76 @@
+@startuml
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam dpi 160
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+left to right direction
+skinparam linetype ortho
+class "职员账号" as user_account {
+ id : INTEGER
+ staff_id : INTEGER
+ status : TEXT
+ --
+ 验证身份()
+ 停用()
+ 更新凭据()
+}
+class "访问角色" as access_role {
+ id : INTEGER
+ code : TEXT
+ --
+ 取得权限集合()
+}
+class "操作权限" as access_permission {
+ id : INTEGER
+ code : TEXT
+ --
+ 匹配操作()
+}
+class "账号角色授权" as account_role {
+ id : INTEGER
+ account_id : INTEGER
+ role_id : INTEGER
+ granted_by : INTEGER
+ --
+ 授予()
+ 撤销()
+}
+class "角色操作授权" as role_permission {
+ id : INTEGER
+ role_id : INTEGER
+ permission_id : INTEGER
+ --
+ 允许操作()
+}
+class "登录会话" as login_session {
+ id : INTEGER
+ account_id : INTEGER
+ --
+ 验证有效期()
+ 撤销()
+}
+class "身份验证事件" as authentication_event {
+ id : INTEGER
+ account_id : INTEGER
+ session_id : INTEGER
+ --
+ 记录验证结果()
+}
+account_role --> user_account
+account_role --> access_role
+account_role --> user_account
+role_permission --> access_permission
+role_permission --> access_role
+login_session --> user_account
+authentication_event --> login_session
+authentication_event --> user_account
+
+@enduml

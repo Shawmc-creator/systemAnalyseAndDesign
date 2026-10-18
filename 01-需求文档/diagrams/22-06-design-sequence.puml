@@ -1,0 +1,58 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam dpi 180
+skinparam ArrowColor #34495E
+skinparam classAttributeIconSize 0
+skinparam class {
+ BackgroundColor white
+ BorderColor #34495E
+ HeaderBackgroundColor #EAF1F7
+}
+hide circle
+skinparam nodesep 35
+skinparam ranksep 45
+hide footbox
+skinparam maxMessageSize 155
+skinparam sequence {
+ ParticipantBackgroundColor #EAF1F7
+ ParticipantBorderColor #34495E
+ LifeLineBorderColor #708090
+ GroupBackgroundColor white
+ GroupBorderColor #708090
+ MessageAlign left
+}
+autonumber
+boundary ":岗位接口" as B
+control ":UC-06控制" as K
+participant ":就诊" as E
+participant ":诊疗确认" as P
+participant ":领域映射器" as M
+participant ":工作单元" as W
+B -> K : 查询费用(上下文, 条件)
+activate K
+K -> K : 职员.核验资格()；校验输入
+K -> W : 开启读快照()
+activate W
+K -> M : 载入授权查询依据(同一连接)
+M --> K : 实体及当前持久化状态
+group 业务条件不满足即进入统一失败出口
+K -> E : 结算状态(当前确认, 收款)
+E --> K : 未确认／缺价／可结算／已结清
+alt 可结算且当前确认存在
+K -> P : 合计费用(明细及固定价目)
+P --> K : 当前费用合计
+K -> K : 形成费用核对依据(确认, 版本, 金额)
+else 已结清
+K -> K : 组装已载入的原收款及费用
+else 未确认或缺价
+K -> K : 返回未确认原因或缺价明细
+end
+end
+K -> W : 提交读事务()
+K --> B : 查询结果
+deactivate W
+deactivate K
+@enduml

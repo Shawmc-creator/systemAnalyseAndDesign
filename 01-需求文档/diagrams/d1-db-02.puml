@@ -1,0 +1,150 @@
+@startuml d1-db-02
+skinparam defaultFontName Microsoft YaHei
+skinparam defaultFontSize 15
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide circle
+hide empty methods
+skinparam classFontSize 17
+skinparam classAttributeFontSize 15
+skinparam ArrowColor #667788
+skinparam ArrowThickness 1
+skinparam nodesep 55
+skinparam ranksep 75
+skinparam linetype polyline
+top to bottom direction
+skinparam class {
+ BackgroundColor white
+ BorderColor #526575
+ HeaderBackgroundColor #EFF5ED
+}
+title G02  预约、排班与到诊  ·  7张表
+entity "诊椅\ndental_chair" as dental_chair {
+  {field} id : INTEGER [PK, NN]
+  {field} name : TEXT [NN]
+  {field} available_from : TEXT [NN]
+  {field} available_until : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "日期安排\ndated_schedule" as dated_schedule {
+  {field} id : INTEGER [PK, NN]
+  {field} dentist_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} dental_chair_id : INTEGER [FK, NN]  → dental_chair.id
+  {field} business_date : TEXT [NN]
+  {field} starts_at : TEXT [NN]
+  {field} ends_at : TEXT [NN]
+  {field} confirmed_at : TEXT [NULL]
+  {field} closure_reason : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} confirmed_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "安排变更\nschedule_change" as schedule_change {
+  {field} id : INTEGER [PK, NN]
+  {field} dated_schedule_id : INTEGER [FK, NN]  → dated_schedule.id
+  {field} old_business_date : TEXT [NN]
+  {field} old_starts_at : TEXT [NN]
+  {field} old_ends_at : TEXT [NN]
+  {field} new_business_date : TEXT [NN]
+  {field} new_starts_at : TEXT [NN]
+  {field} new_ends_at : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} change_kind : TEXT [NN]
+  {field} affected_handling : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} old_dentist_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} new_dentist_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} old_chair_id : INTEGER [FK, NN]  → dental_chair.id
+  {field} new_chair_id : INTEGER [FK, NN]  → dental_chair.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "接诊占用\nresource_occupancy" as resource_occupancy {
+  {field} id : INTEGER [PK, NN]
+  {field} dated_schedule_id : INTEGER [FK, NN]  → dated_schedule.id
+  {field} appointment_id : INTEGER [FK, NULL]  → appointment.id
+  {field} visit_id : INTEGER [FK, NULL]  → visit.id
+  {field} starts_at : TEXT [NN]
+  {field} ends_at : TEXT [NN]
+  {field} released_at : TEXT [NULL]
+  {field} arrangement_revision : INTEGER [NN]
+  {field} release_reason : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} released_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "预约\nappointment" as appointment {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} planned_start : TEXT [NN]
+  {field} planned_end : TEXT [NN]
+  {field} reason : TEXT [NN]
+  {field} due_at : TEXT [NN]
+  {field} arrangement_revision : INTEGER [NN]
+  {field} status_reason : TEXT [NULL]
+  {field} notified_at : TEXT [NULL]
+  {field} created_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} notified_by : INTEGER [FK, NULL]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "预约变更\nappointment_change" as appointment_change {
+  {field} id : INTEGER [PK, NN]
+  {field} appointment_id : INTEGER [FK, NN]  → appointment.id
+  {field} old_start : TEXT [NN]
+  {field} old_end : TEXT [NN]
+  {field} old_revision : INTEGER [NN]
+  {field} new_start : TEXT [NULL]
+  {field} new_end : TEXT [NULL]
+  {field} new_revision : INTEGER [NN]
+  {field} reason : TEXT [NN]
+  {field} occurred_at : TEXT [NN]
+  {field} change_kind : TEXT [NN]
+  {field} operator_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} old_schedule_id : INTEGER [FK, NN]  → dated_schedule.id
+  {field} new_schedule_id : INTEGER [FK, NULL]  → dated_schedule.id
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+entity "就诊\nvisit" as visit {
+  {field} id : INTEGER [PK, NN]
+  {field} patient_id : INTEGER [FK, NN]  → patient.id (G01)
+  {field} appointment_id : INTEGER [UQ, FK, NULL]  → appointment.id
+  {field} dentist_id : INTEGER [FK, NN]  → staff.id (G01)
+  {field} arrived_at : TEXT [NN]
+  {field} started_at : TEXT [NULL]
+  {field} ended_at : TEXT [NULL]
+  {field} arrival_source : TEXT [NN]
+  {field} registered_by : INTEGER [FK, NN]  → staff.id (G01)
+  {field} status : TEXT [NN]
+  {field} record_no : TEXT [UQ, NN]
+  {field} created_at : TEXT [NN]
+  {field} updated_at : TEXT [NN]
+  {field} revision : INTEGER [NN]
+}
+appointment_change --> appointment
+appointment_change --> dated_schedule
+dated_schedule --> dental_chair
+resource_occupancy --> appointment
+resource_occupancy --> dated_schedule
+resource_occupancy --> visit
+schedule_change --> dated_schedule
+schedule_change --> dental_chair
+visit --> appointment
+@enduml
