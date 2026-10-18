@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-18",
+  "test_total": 121,
+  "passed": 121,
+  "failed": 0,
+  "new_tests": 37,
+  "v2_total": 64,
+  "legacy_regression": 57,
+  "backend_scope": ["UC-04", "UC-05", "UC-06", "UC-07", "UC-22"],
+  "frontend_changed": false,
+  "figma_paused_by_user": true,
+  "schema_changed": false,
+  "legacy_migrated": false,
+  "requirements_pdf_sha256": "6ee9e5f1f16114102ed8574f375112577328173ed58fd65534c89dd6962d67ab",
+  "schema_sql_sha256": "6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d",
+  "evidence": "完整自动化检查.txt",
+  "demo": "方案执行计费-演示.json",
+  "demo_uses_live_data": false,
+  "remaining": ["新版页面接入", "费用申请批准和退费", "复诊随访", "材料采购和器械", "运行管理及迁移演练"]
+}

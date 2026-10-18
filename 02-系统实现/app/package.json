@@ -5,6 +5,10 @@
   "description": "A dependency-free dental clinic web system built with Node.js and SQLite.",
   "scripts": {
     "start": "node src/server.js",
+    "start:v2": "node src/v2/server.js",
+    "demo:v2": "node src/v2/server.js --demo",
+    "demo:treatment:v2": "node scripts/demo-v2-treatment.js",
+    "test:v2": "node --test tests/v2-*.test.js",
     "backup": "node scripts/backup.js",
     "demo": "node scripts/seed-demo.js",
     "workflow": "node scripts/run-demo-workflow.js",

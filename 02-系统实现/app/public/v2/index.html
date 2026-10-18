@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>青禾牙科 · 接诊工作台</title><link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script></head>
+<body>
+<section id="login-view" class="login-shell">
+  <div class="intro"><span class="brand-mark">青</span><h1>青禾牙科</h1><p>从一次预约，到有序接诊。</p><div class="intro-rule"></div><p class="quiet">患者资料、接诊安排与到诊登记<br>在同一个工作台办理。</p></div>
+  <form id="login-form" class="login-form"><h2>工作人员登录</h2><p class="muted">使用个人账号，进入当前岗位。</p><label>账号<input name="username" autocomplete="username" required></label><label>密码<input name="password" type="password" autocomplete="current-password" required></label><button type="submit" class="primary">登录工作台</button><p id="login-error" role="alert"></p><div id="demo-login" hidden><p>演示密码：Clinic123!</p><button type="button" data-login="frontdesk">前台演示</button><button type="button" data-login="manager">负责人演示</button></div></form>
+</section>
+<div id="workspace" hidden>
+  <aside class="sidebar"><div class="brand"><span class="brand-mark">青</span><div>青禾牙科<small>诊所工作台</small></div></div><nav aria-label="功能导航"><button data-page="appointments">预约与到诊</button><button data-page="patients">患者资料</button><button data-page="schedules">日期排班</button></nav><div class="sidebar-bottom"><span id="staff-name"></span><label>当前岗位<select id="role"></select></label><button id="logout">退出登录</button></div></aside>
+  <main><header class="topbar"><span id="clinic-date"></span><span>青禾牙科诊所</span></header><div class="page-heading"><div><p class="muted" id="page-hint">核对患者、时段和接诊安排</p><h1 id="page-title">预约与到诊</h1></div><div id="page-actions"></div></div>
+    <div id="notice" class="notice" role="status" hidden></div><div id="receipt" class="receipt" hidden></div>
+    <div id="filters" class="filters"></div><div id="content" aria-live="polite"></div>
+  </main>
+</div>
+<dialog id="editor"><form id="edit-form"><div class="dialog-heading"><h2 id="dialog-title"></h2><button type="button" id="close-dialog" aria-label="关闭">×</button></div><div id="dialog-fields"></div><p id="form-error" role="alert"></p><footer><button type="button" id="verify-last" hidden>核实上次提交</button><button type="button" id="cancel-dialog">返回</button><button class="primary" type="submit">确认保存</button></footer></form></dialog>
+</body></html>

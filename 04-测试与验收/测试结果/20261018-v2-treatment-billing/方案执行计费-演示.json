@@ -1,0 +1,195 @@
+{
+  "scenario": "方案—同意—执行—核价—更正—收款—抵扣",
+  "isolatedInMemory": true,
+  "moneyUnit": "整数分",
+  "simulatedBusinessDate": "2026-10-19",
+  "touchesLiveData": false,
+  "steps": [
+    {
+      "name": "前台登记到诊并建立病历草稿",
+      "result": {
+        "kind": "visit",
+        "id": 1,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "example-3",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "牙医确认实际开始接诊",
+      "result": {
+        "kind": "visit",
+        "id": 1,
+        "revision": 2,
+        "code": "COMMITTED",
+        "requestKey": "example-4",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "负责人确认200元整数分价目",
+      "result": {
+        "kind": "service_price",
+        "id": 1,
+        "revision": 3,
+        "code": "COMMITTED",
+        "requestKey": "example-8",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "提出含估算的三次方案；尚不形成收费",
+      "result": {
+        "kind": "plan_version",
+        "id": 1,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "example-9",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "方案未执行时应收为0",
+      "result": {
+        "receivableCents": 0,
+        "allocatedCents": 0,
+        "offsetCents": 0,
+        "unpaidCents": 0,
+        "pendingPricingCount": 0
+      }
+    },
+    {
+      "name": "登记患者对明确范围的同意",
+      "result": {
+        "kind": "patient_decision",
+        "id": 1,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "example-11",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "实际执行2次，形成400元应收",
+      "result": {
+        "kind": "treatment_execution",
+        "id": 1,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "example-12",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "同一提交重试不增加执行或收费",
+      "result": {
+        "kind": "treatment_execution",
+        "id": 1,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "example-12",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": true
+      }
+    },
+    {
+      "name": "原收费快照",
+      "result": {
+        "receivableCents": 40000,
+        "allocatedCents": 0,
+        "offsetCents": 0,
+        "unpaidCents": 40000,
+        "pendingPricingCount": 0
+      }
+    },
+    {
+      "name": "追加更正：有效数量改为1，原收费等待独立费用申请",
+      "result": {
+        "kind": "treatment_execution",
+        "id": 2,
+        "revision": 1,
+        "code": "EXECUTION_CORRECTED_FEE_REVIEW",
+        "requestKey": "example-13",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "更正后有效完成量",
+      "result": {
+        "quantity": 1
+      }
+    },
+    {
+      "name": "更正后原应收仍为400元",
+      "result": {
+        "receivableCents": 40000,
+        "allocatedCents": 0,
+        "offsetCents": 0,
+        "unpaidCents": 40000,
+        "pendingPricingCount": 0
+      }
+    },
+    {
+      "name": "核实收到500元，200元分配到原账目，余款明确为预付",
+      "result": {
+        "kind": "patient_payment",
+        "id": 1,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "example-14",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "从同一原款再抵扣200元，不新增第二次收款",
+      "result": {
+        "kind": "patient_funds",
+        "id": 1,
+        "revision": 3,
+        "code": "COMMITTED",
+        "requestKey": "example-15",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "核对已收500元、用途400元、可用预付100元",
+      "result": {
+        "receivableCents": 40000,
+        "allocatedCents": 20000,
+        "offsetCents": 20000,
+        "unpaidCents": 0,
+        "pendingPricingCount": 0,
+        "confirmedReceivedCents": 50000,
+        "availableCents": 10000
+      }
+    },
+    {
+      "name": "缺价仍保存执行，待核价不等于零元结清",
+      "result": {
+        "receivableCents": 40000,
+        "allocatedCents": 20000,
+        "offsetCents": 20000,
+        "unpaidCents": 0,
+        "pendingPricingCount": 1,
+        "settled": false
+      }
+    },
+    {
+      "name": "外键及完整性核对",
+      "result": {
+        "foreignKeyErrors": [],
+        "integrity": "ok"
+      }
+    }
+  ]
+}

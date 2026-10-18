@@ -1,0 +1,34 @@
+{
+  "runtime": {
+    "target_tables": 85,
+    "url": "http://127.0.0.1:3001/",
+    "database": "app/data/clinic-v2.db"
+  },
+  "limitations": [
+    "新版32用例尚未全量实施",
+    "本批仅为前台与排班主流程",
+    "未进行旧库迁移",
+    "未读取或写入Figma设计文件"
+  ],
+  "browser": {
+    "javascript_errors": 0,
+    "passed": true,
+    "scope": "独立内存库，负责人排班→前台建档→预约→改约→到诊及草稿，手机布局"
+  },
+  "legacy_preflight": {
+    "migration_executed": false,
+    "integrity": "ok",
+    "missing_columns": 0,
+    "tables": 41,
+    "unknown_tables": 0,
+    "mapped": 41
+  },
+  "automated": {
+    "total": 73,
+    "new_v2_checks": 16,
+    "failed": 0,
+    "passed": 73,
+    "command": "node --test tests/*.test.js"
+  },
+  "date": "2026-10-18"
+}

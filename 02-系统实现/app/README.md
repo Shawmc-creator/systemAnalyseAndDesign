@@ -1,12 +1,32 @@
 # 青禾牙科诊所管理系统
 
-Node.js内置HTTP与SQLite实现，前后端无第三方依赖。功能以当前需求文档的业务流程和UC-01至UC-20为标准。
+Node.js内置HTTP与SQLite实现，前后端无第三方依赖。旧版20用例程序和按最新32用例设计逐步实现的新版程序分别运行；业务以当前需求文档为准。
 
-## 启动
+## 新版进度与GitHub启动方式
+
+新版按定稿85表SQLite结构运行，使用独立`data/clinic-v2.db`，默认端口3001。已接入患者、排班、预约到诊页面，以及临床、方案与决定、实际执行、价目、账单、付款分配和预付抵扣后端。后端新增功能尚未全部接入网页；Figma及界面改版由用户暂停。费用申请批准与退费、复诊随访、材料采购器械和运行管理等仍在后续计划中。
+
+从GitHub克隆后先安装Node.js 24或以上版本，在本目录运行：
+
+```powershell
+npm run demo:v2
+# 浏览器打开 http://127.0.0.1:3001/
+```
+
+也可双击作业根目录`04-启动新版预约工作台.cmd`，启动脚本优先使用作业附带运行时，没有便携运行时时使用PATH中的Node。演示初始化只在新库首次建立账号；旧数据库不会自动转换。
+
+```powershell
+npm test
+npm run demo:treatment:v2
+```
+
+完整自动化检查121项通过，其中新版64项、旧版回归57项。第二条命令在内存库演示方案、同意、执行、核价、更正、收款和抵扣，不改运行数据。具体接口和边界见上级`方案执行与计费后端验收.md`。
+
+## 旧版启动
 
 双击作业根目录的`01-一键启动系统.cmd`，浏览器打开`http://127.0.0.1:3000/`。网页需后端运行，直接打开`public/index.html`会跳转该地址。
 
-在本app目录也可使用作业附带的便携Node运行：`node src/server.js`。
+在本app目录也可使用作业附带的便携Node运行：`../runtime/node.exe src/server.js`。
 
 ## 六名演示工作人员
 
@@ -29,13 +49,13 @@ Node.js内置HTTP与SQLite实现，前后端无第三方依赖。功能以当前
 ## 演示与验证
 
 ```powershell
-node scripts/seed-demo.js
-node --test tests/*.test.js
-node scripts/smoke-http.js
-node scripts/run-demo-workflow.js
-node scripts/export-demo.js
+../runtime/node.exe scripts/seed-demo.js
+../runtime/node.exe --test tests/*.test.js
+../runtime/node.exe scripts/smoke-http.js
+../runtime/node.exe scripts/run-demo-workflow.js
+../runtime/node.exe scripts/export-demo.js
 ```
 
-本仓库不附带本机运行数据库；首次运行按初始化脚本生成。种子脚本仅新增带当前规则标记的虚构案例，重复执行不重复创建；HTTP脚本须先启动系统。导出保存到作业目录`03-数据/示例导出`。
+种子脚本仅新增带当前规则标记的虚构案例，重复执行不重复创建；HTTP脚本须先启动系统。导出保存到作业目录`03-数据/示例导出`。
 
-详细差异与验证见上级目录`文档与代码对齐检查.md`。新版代码验收共57项通过（含1个父测试容器）。运行`node scripts/acceptance.js`可生成本次TXT／JSON证据；逐用例与实际页面记录见`04-测试与验收/测试与验收.md`第7节。D阶段暂不开展。
+旧版差异与验证见上级目录`文档与代码对齐检查.md`。旧版回归共57项通过（含1个父测试容器）。运行`node scripts/acceptance.js`可生成旧版TXT／JSON证据；逐用例与页面记录见`04-测试与验收/测试与验收.md`第7节。需求文档ABCD已完成，新版实现进度以上方及根目录README为准。
