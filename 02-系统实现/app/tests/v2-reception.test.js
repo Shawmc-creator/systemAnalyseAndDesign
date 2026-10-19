@@ -24,14 +24,14 @@ function book(a, s, overrides = {}) {
   return cmd({ action: 'create', patientId: 1, scheduleId: s.id, scheduleRevision: s.revision,
     startsAt: '2026-10-19T10:30:00+08:00', endsAt: '2026-10-19T11:00:00+08:00', reason: '口腔检查', ...overrides });
 }
-test('v2 DDL creates exactly 85 tables; refuses an existing legacy database without modifying it', t => {
+test('v2 retains 85 implementation tables and adds 3 documented resource tables; refuses an existing legacy database without modifying it', t => {
   const folder = fs.mkdtempSync(path.join(os.tmpdir(), 'clinic-v2-'));
   t.after(() => fs.rmSync(folder, { recursive: true, force: true }));
   const file = path.join(folder, 'legacy.db'), old = new DatabaseSync(file); old.exec('CREATE TABLE users(id INTEGER); INSERT INTO users VALUES(42)'); old.close();
   const before = fs.readFileSync(file);
   assert.throws(() => openDatabase(file), /拒绝/); assert.deepEqual(fs.readFileSync(file), before);
   const a = setup(t);
-  assert.equal(a.db.prepare("SELECT count(*) n FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get().n, 85);
+  assert.equal(a.db.prepare("SELECT count(*) n FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get().n, 88);
   assert.deepEqual(a.db.prepare('PRAGMA foreign_key_check').all(), []);
 });
 test('one request yields one receipt; changed payload with same key is refused; revoked privilege prevents replay', t => {

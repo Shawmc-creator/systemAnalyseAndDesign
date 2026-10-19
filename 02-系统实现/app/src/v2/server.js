@@ -10,6 +10,13 @@ const { Clinical } = require('./clinical');
 const { Billing } = require('./billing');
 const { Treatment } = require('./treatment');
 const { Payments } = require('./payments');
+const { Fees } = require('./fees');
+const { Followups } = require('./followups');
+const { Inventory } = require('./inventory');
+const { Purchases } = require('./purchases');
+const { PurchaseIssues } = require('./purchase-issues');
+const { SupplierPayments } = require('./supplier-payments');
+const { Resources }=require('./resources');
 const { seedDemo } = require('./demo');
 const { fail, utc, day, dateOnly } = require('./common');
 const PUBLIC = path.resolve(__dirname, '../../public/v2');
@@ -28,6 +35,12 @@ function createApplication({ filename = ':memory:', demo = false, clock } = {}) 
   const db = openDatabase(filename), auth = new Auth(db, clock), unit = new UnitOfWork(db, auth), reception = new Reception(db, unit), clinical = new Clinical(db, unit);
   const billing = new Billing(db, unit), treatment = new Treatment(db, unit, clinical, billing);
   const payments = new Payments(db, unit, billing);
+  const fees = new Fees(db, unit, billing, payments);
+  const followups = new Followups(db, unit, clinical);
+  const inventory = new Inventory(db, unit), purchases = new Purchases(db, unit, inventory);
+  const purchaseIssues = new PurchaseIssues(db,unit,inventory,purchases), supplierPayments = new SupplierPayments(db,unit);
+  purchases.issues = purchaseIssues;
+  const resources=new Resources(db,unit,clinical);
   if (demo) seedDemo(db, auth, reception);
   const cookie = token => `clinic_v2_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${token ? 28800 : 0}`;
   const handler = async (req, res) => {
@@ -42,7 +55,7 @@ function createApplication({ filename = ':memory:', demo = false, clock } = {}) 
       }
       const token = String(req.headers.cookie || '').split(';').map(x => x.trim()).find(x => x.startsWith('clinic_v2_session='))?.slice('clinic_v2_session='.length);
       const credentials = { token, role: req.headers['x-clinic-role'], csrf: req.headers['x-csrf-token'] };
-      if (p === '/api/v2/status' && req.method === 'GET') return json(res, 200, { application: 'qinghe-dental-v2', schemaVersion: VERSION, ready: true, demo, businessDate: day(auth.now()), now: auth.now(), implemented: ['UC-01', 'UC-02', 'UC-03', 'UC-08', 'UC-15'], clinicalApi: ['UC-09', 'UC-10', 'UC-11', 'UC-21'], treatmentBillingApi: ['UC-04', 'UC-05', 'UC-06', 'UC-07', 'UC-22'] });
+      if (p === '/api/v2/status' && req.method === 'GET') return json(res, 200, { application: 'qinghe-dental-v2', schemaVersion: VERSION, ready: true, demo, businessDate: day(auth.now()), now: auth.now(), implemented: ['UC-01', 'UC-02', 'UC-03', 'UC-08', 'UC-15'], clinicalApi: ['UC-09', 'UC-10', 'UC-11', 'UC-21'], treatmentBillingApi: ['UC-04', 'UC-05', 'UC-06', 'UC-07', 'UC-22'], feeRefundApi: ['UC-24','UC-25','UC-26'], followupApi: ['UC-12','UC-13','UC-14'], inventoryApi:['UC-17','UC-18','UC-27','UC-32'], purchaseReceiptApi:{usecase:'UC-28',implemented:['receive','inspectPending','proposeIssue','approve','returnGoods','replacement','cancelRemainder','adjust'],pending:['formalSupplementAgreement']}, supplierPaymentApi:['UC-29'], resourceApi:{usecase:'现行UC-24',implemented:['equipment','block','restore','physicalEnd','equipmentReservation','readinessCheck']} });
       if (p === '/api/v2/auth/login' && req.method === 'POST') {
         // Reject cross-origin requests even before login; do not trust forwarded IP headers.
         if (req.headers.origin && req.headers.origin !== `http://${req.headers.host}`) fail(403, 'ORIGIN_FORBIDDEN', '请求来源无效');
@@ -61,6 +74,9 @@ function createApplication({ filename = ':memory:', demo = false, clock } = {}) 
         '/api/v2/patients/maintain': 'patient', '/api/v2/schedules/schedule': 'schedule', '/api/v2/appointments/maintain': 'appointment', '/api/v2/visits/register': 'arrive'
       };
       if (commands[p] && req.method === 'POST') return json(res, 200, reception[commands[p]](credentials, await body(req)));
+      const resourceCommands={'/api/v2/resources/equipment':'equipment','/api/v2/resources/blocks':'block','/api/v2/resources/finish':'finish'};
+      if(resourceCommands[p]&&req.method==='POST')return json(res,200,resources[resourceCommands[p]](credentials,await body(req)));
+      if(p==='/api/v2/resources/query'&&req.method==='GET')return json(res,200,resources.query(credentials,Object.fromEntries(url.searchParams)));
       const clinicalCommands = { '/api/v2/health-versions/health': 'health', '/api/v2/clinical-records/record': 'record', '/api/v2/clinical-record-signatures/sign': 'sign' };
       if (clinicalCommands[p] && req.method === 'POST') return json(res, 200, clinical[clinicalCommands[p]](credentials, await body(req)));
       const treatmentCommands = { '/api/v2/treatment-plans/plan': 'plan', '/api/v2/executions/execute': 'execute' };
@@ -69,7 +85,24 @@ function createApplication({ filename = ':memory:', demo = false, clock } = {}) 
       if (priceCommands[p] && req.method === 'POST') return json(res, 200, billing[priceCommands[p]](credentials, await body(req)));
       const paymentCommands = { '/api/v2/patient-payments/receive': 'receive', '/api/v2/patient-payments/allocate': 'allocate' };
       if (paymentCommands[p] && req.method === 'POST') return json(res, 200, payments[paymentCommands[p]](credentials, await body(req)));
+      const feeCommands = { '/api/v2/fee-requests/apply': 'apply', '/api/v2/fee-request-decisions/approve': 'approve', '/api/v2/patient-refunds/refund': 'refund' };
+      if (feeCommands[p] && req.method === 'POST') return json(res, 200, fees[feeCommands[p]](credentials, await body(req)));
+      const followupCommands = { '/api/v2/followup-requirements/propose': 'propose', '/api/v2/followup-contacts/contact': 'contact', '/api/v2/followup-assessments/assess': 'assess' };
+      if (followupCommands[p] && req.method === 'POST') return json(res, 200, followups[followupCommands[p]](credentials, await body(req)));
       const filters = Object.fromEntries(url.searchParams);
+      if(p==='/api/v2/purchase-receipts/approve'&&req.method==='POST')return json(res,200,purchaseIssues.approve(credentials,await body(req)));
+      if(p==='/api/v2/supplier-payments/authorize'&&req.method==='POST')return json(res,200,supplierPayments.authorize(credentials,await body(req)));
+      if(p==='/api/v2/supplier-payments/pay'&&req.method==='POST')return json(res,200,supplierPayments.pay(credentials,await body(req)));
+      if(p==='/api/v2/supplier-payments/query'&&req.method==='GET')return json(res,200,supplierPayments.query(credentials,filters));
+      const inventoryCommands = { '/api/v2/material-batches/record':'record', '/api/v2/material-batches/approve':'approve', '/api/v2/inventory-commands/record':'recordMovement', '/api/v2/inventory-commands/approve':'approveCount' };
+      if (inventoryCommands[p] && req.method === 'POST') return json(res,200,inventory[inventoryCommands[p]](credentials,await body(req)));
+      const purchaseCommands = { '/api/v2/purchases/supplier':'supplier', '/api/v2/purchases/draft':'draft', '/api/v2/purchases/approve':'approve', '/api/v2/purchase-receipts/receive':'receive' };
+      if (purchaseCommands[p] && req.method === 'POST') return json(res,200,purchases[purchaseCommands[p]](credentials,await body(req)));
+      if (p === '/api/v2/batch-stock/query' && req.method === 'GET') return json(res,200,inventory.query(credentials,filters));
+      if (p === '/api/v2/purchases/query' && req.method === 'GET') return json(res,200,purchases.query(credentials,filters));
+      if (p === '/api/v2/followup-requirements/query' && req.method === 'GET') return json(res, 200, followups.query(credentials, filters));
+      if (p === '/api/v2/followups/options' && req.method === 'GET') return json(res, 200, followups.options(credentials));
+      if (p === '/api/v2/fee-requests/query' && req.method === 'GET') return json(res, 200, fees.query(credentials, filters));
       if (p === '/api/v2/treatment-plans/query' && req.method === 'GET') return json(res, 200, treatment.detail(credentials, filters));
       if (p === '/api/v2/services/options' && req.method === 'GET') return json(res, 200, billing.catalog(credentials));
       if (p === '/api/v2/patient-bills/query' && req.method === 'GET') return json(res, 200, billing.query(credentials, filters));
@@ -89,7 +122,7 @@ function createApplication({ filename = ':memory:', demo = false, clock } = {}) 
         const dentists = db.prepare(`SELECT DISTINCT s.id,s.name FROM staff s JOIN staff_role_qualification q ON q.staff_id=s.id JOIN access_role r ON r.id=q.role_id
           WHERE r.code='dentist' AND s.employed_from<=? AND (s.employed_until IS NULL OR s.employed_until>=?)
           AND q.valid_from<=? AND (q.valid_until IS NULL OR q.valid_until>?) AND (q.revoked_at IS NULL OR q.revoked_at>?)`).all(selectedDay, selectedDay, auth.now(), auth.now(), auth.now());
-        return { schedules, dentists, chairs: db.prepare('SELECT id,name FROM dental_chair ORDER BY id').all() };
+        return { schedules, dentists, chairs: db.prepare('SELECT id,name FROM dental_chair ORDER BY id').all(),equipment:db.prepare('SELECT id,name,status,dental_chair_id FROM clinical_equipment ORDER BY id').all() };
       }));
       if (p === '/api/v2/visits/waiting' && req.method === 'GET') return json(res, 200, unit.query(credentials, 'uc03.register', () => ({ items: db.prepare(`SELECT v.id,v.record_no,v.status,v.arrived_at,p.name patient_name,d.name dentist_name
         FROM visit v JOIN patient p ON p.id=v.patient_id JOIN staff d ON d.id=v.dentist_id WHERE v.arrived_at>=? AND v.arrived_at<? ORDER BY v.arrived_at`).all(utc(day(auth.now()) + 'T00:00:00+08:00'), utc(Date.parse(day(auth.now()) + 'T00:00:00+08:00') + 86400_000)) })));
@@ -108,7 +141,7 @@ function createApplication({ filename = ':memory:', demo = false, clock } = {}) 
     }
   };
   const server = http.createServer(handler);
-  return { db, auth, unit, reception, clinical, billing, treatment, payments, server };
+  return { db, auth, unit, reception, clinical, billing, treatment, payments, fees, followups, inventory, purchases, purchaseIssues, supplierPayments, resources, server };
 }
 if (require.main === module) {
   const filename = process.env.CLINIC_V2_DB || path.resolve(__dirname, '../../data/clinic-v2.db');

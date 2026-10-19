@@ -30,7 +30,7 @@ test('clinical flow starts actual contact, retains unknown health facts, signs c
   assert.equal(record.status, '已签署'); assert.equal(record.signed_revision, 2); assert.equal(record.revision, 3);
   assert.equal(record.content_hash, hash(canonical(signaturePayload(a.db, record))));
   assert.equal(a.db.prepare('SELECT status FROM visit WHERE id=?').get(a.v.id).status, '诊疗结束');
-  assert.equal(a.db.prepare('SELECT count(*) n FROM resource_occupancy WHERE visit_id=? AND released_at IS NULL').get(a.v.id).n, 0);
+  assert.equal(a.db.prepare('SELECT count(*) n FROM resource_occupancy WHERE visit_id=? AND released_at IS NULL').get(a.v.id).n, 1, '签署病历不能代替实际操作结束与清洁核验');
   assert.equal(a.db.prepare('SELECT status FROM appointment WHERE id=?').get(a.appointment.id).status, '已到诊');
   assert.equal(a.clinical.detail(a.d, { visitId: a.v.id, patientId: 1 }).signedIntegrity, true);
   assert.equal(a.db.prepare("SELECT count(*) n FROM health_item WHERE certainty='未知'").get().n, 3);

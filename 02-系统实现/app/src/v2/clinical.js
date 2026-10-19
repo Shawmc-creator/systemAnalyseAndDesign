@@ -2,6 +2,7 @@
 const { fail, text, id, instant, dateOnly, day, utc, canonical, hash, insert, fact, row, revision } = require('./common');
 const { signaturePayload } = require('./clinical-gates');
 const CATEGORIES = ['病史', '过敏', '用药'];
+const { startResources }=require('./resource-rules');
 class Clinical {
   constructor(db, unit) { this.db = db; this.unit = unit; }
   scope(ctx, visitId, operation = 'read') {
@@ -73,6 +74,7 @@ class Clinical {
         if (started < visit.arrived_at || started > now || day(started) !== day(now)) fail(422, 'START_TIME', '开始接诊须为当日、已发生且不早于实际到诊');
         const occupancy = this.db.prepare(`SELECT o.*,s.dentist_id,s.status schedule_status FROM resource_occupancy o JOIN dated_schedule s ON s.id=o.dated_schedule_id WHERE o.visit_id=? AND o.released_at IS NULL`).get(visit.id);
         if (!occupancy || occupancy.dentist_id !== visit.dentist_id || occupancy.schedule_status !== '已确认' || started < occupancy.starts_at || started >= occupancy.ends_at) fail(409, 'CONTACT_OUTSIDE_SLOT', '实际接诊不在当前有效占用内，请由前台核对接诊时段');
+        startResources(this.db,visit,occupancy,now);
         this.db.prepare("UPDATE visit SET status='接诊中',started_at=?,updated_at=?,revision=revision+1 WHERE id=?").run(started, now, visit.id);
         return { kind: 'visit', key: visit.id, beforeRevision: visit.revision, revision: visit.revision + 1 };
       }
@@ -123,7 +125,7 @@ class Clinical {
       if (payload.healthReviews.at(-1).health_version_id !== latestVersion?.id) fail(409, 'HEALTH_REVIEW_STALE', '健康版本已经更新，请重新复核后再签署');
       this.db.prepare("UPDATE clinical_record SET status='已签署',signed_at=?,signed_by=?,signed_revision=?,content_hash=?,updated_at=?,revision=revision+1 WHERE id=?").run(now, ctx.session.staff_id, record.revision, hash(canonical(payload)), now, record.id);
       this.db.prepare("UPDATE visit SET status='诊疗结束',ended_at=?,updated_at=?,revision=revision+1 WHERE id=?").run(now, now, visit.id);
-      this.db.prepare("UPDATE resource_occupancy SET released_at=?,released_by=?,release_reason='诊疗结束',updated_at=?,revision=revision+1 WHERE visit_id=? AND released_at IS NULL").run(now, ctx.session.staff_id, now, visit.id);
+      // A signed record does not certify physical end or completed chair preparation.
       ctx.authority.healthReviewIds = payload.healthReviews.map(r => r.id);
       return { kind: 'clinical_record', key: record.id, beforeRevision: record.revision, revision: record.revision + 1, reason: '核对正文、所见和健康复核后签署，结束当次诊疗' };
     });

@@ -26,6 +26,7 @@ function seedDemo(db, auth, reception) {
     }
     insert(db, 'dental_chair', fact(now, { name: '一号诊椅', available_from: now, available_until: null, created_by: manager.staff_id, record_no: 'DEMO-CHAIR-01' }));
     insert(db, 'dental_chair', fact(now, { name: '二号诊椅', available_from: now, available_until: null, created_by: manager.staff_id, record_no: 'DEMO-CHAIR-02' }));
+    insert(db,'clinical_equipment',fact(now,{name:'共享检查设备（演示）',equipment_type:'共享设备',dental_chair_id:null,status:'可用',status_reason:'演示设备，按本次实际需要选择'}));
     insert(db, 'operation_audit', { account_id: null, staff_id: manager.staff_id, session_id: null, submission_id: null, permission_id: null,
       actor_kind: '初始化', event_type: '运行事件', occurred_at: now, object_kind: 'user_account', object_key: 'demo-bootstrap', before_revision: null,
       after_revision: null, reason: '六名演示工作人员和两张诊椅；未导入旧运行数据', outcome_code: 'DEMO_INITIALIZED', correlation_id: 'demo-bootstrap', authority_snapshot: '{}' });

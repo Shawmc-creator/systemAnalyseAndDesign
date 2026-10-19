@@ -22,7 +22,7 @@ async function api(path, { method = 'GET', body } = {}) {
 }
 function showReceipt(result) {
   const box = $('#receipt'); box.hidden = false;
-  const kind = { patient: '患者档案', dated_schedule: '日期排班', appointment: '预约', visit: '就诊' }[result.kind] || '办理记录';
+  const kind = { patient: '患者档案', dated_schedule: '日期排班', appointment: '预约', visit: '就诊',clinical_equipment:'诊疗设备',resource_block:'资源准备或停用' }[result.kind] || '办理记录';
   box.textContent = `${result.replayed ? '已核实原提交，未重复办理。' : '办理成功。'} ${kind} #${result.id}。提交号：${result.requestKey}`;
 }
 async function command(path, values, scope) {
@@ -37,7 +37,9 @@ function openEditor(title, html, submit) {
   $('#dialog-title').textContent = title; $('#dialog-fields').innerHTML = html; $('#form-error').textContent = ''; $('#verify-last').hidden = !pending.size;
   $('#edit-form').onsubmit = async event => {
     event.preventDefault(); const button = $('#edit-form button[type=submit]'); button.disabled = true;
-    try { await submit(Object.fromEntries(new FormData(event.currentTarget))); $('#editor').close(); await render(); }
+    try { const form=new FormData(event.currentTarget),values=Object.fromEntries(form);
+      if(event.currentTarget.querySelector('[name=equipmentIds]'))values.equipmentIds=form.getAll('equipmentIds').map(Number);
+      await submit(values); $('#editor').close(); await render(); }
     catch (error) { $('#form-error').textContent = error.message; }
     finally { button.disabled = false; }
   };
@@ -46,6 +48,7 @@ function openEditor(title, html, submit) {
 const input = (name, title, value = '', type = 'text', required = true) => `<label>${esc(title)}<input name="${name}" type="${type}" value="${esc(value)}" ${required ? 'required' : ''}></label>`;
 const options = (items, label, selected) => items.map(x => `<option value="${x.id}" ${x.id === selected ? 'selected' : ''}>${esc(label(x))}</option>`).join('');
 const select = (name, title, content) => `<label>${esc(title)}<select name="${name}" required>${content}</select></label>`;
+const equipmentFields=(items,selected=[])=>items.length?`<fieldset class="full"><legend>本次必要设备（按实际需要选择）</legend>${items.map(e=>`<label><input type="checkbox" name="equipmentIds" value="${e.id}" ${selected.includes(e.id)?'checked':''}>${esc(e.name)} · ${esc(e.status)}</label>`).join('')}</fieldset>`:'';
 function patientEditor(patient) {
   openEditor(patient ? '修改患者资料' : '建立患者档案', `<div class="form-grid">${input('name', '姓名', patient?.name)}${input('birth_date', '出生日期（未知可留空）', patient?.birth_date, 'date', false)}${input('phone', '联系电话', patient?.phone, 'tel', false)}${input('phone_owner', '电话归属（如本人、母亲）', patient?.phone_owner, 'text', false)}${input('contact_unavailable_reason', '无联系电话时填写原因', patient?.contact_unavailable_reason, 'text', false)}${input('contact_preference', '联系偏好', patient?.contact_preference, 'text', false)}${input('address', '联系地址', patient?.address, 'text', false)}${input('reason', patient ? '变更原因' : '建档依据', patient ? '' : '患者提供身份及联系资料')}</div>`, async data => {
     const { reason, ...fields } = data;
@@ -61,8 +64,9 @@ async function bookingEditor(appointment) {
     if (appointment && Number(data.patientId) !== appointment.patient_id) throw new Error('改约不能更换患者，请重新核对所选身份');
     const schedule = schedules.find(s => s.id === Number(data.scheduleId));
     await command('/appointments/maintain', { action: appointment ? 'reschedule' : 'create', ...(appointment ? { appointmentId: appointment.id, expectedRevision: appointment.revision } : { patientId: Number(data.patientId) }),
-      scheduleId: schedule.id, scheduleRevision: schedule.revision, startsAt: stamp(data.startsAt), endsAt: stamp(data.endsAt), reason: data.reason }, 'appointment');
+      scheduleId: schedule.id, scheduleRevision: schedule.revision, startsAt: stamp(data.startsAt), endsAt: stamp(data.endsAt),equipmentIds:data.equipmentIds||[], reason: data.reason }, 'appointment');
   });
+  $('#dialog-fields .form-grid').insertAdjacentHTML('beforeend',equipmentFields(opts.equipment||[],appointment?.equipmentIds||[]));
   $('#search-booking-patient').onclick = async () => {
     try { const data = await api('/patients/candidates?q=' + encodeURIComponent($('#editor [name=patientSearch]').value)); $('#editor [name=patientId]').innerHTML = '<option value="">请选择核实后的患者</option>' + options(data.items, p => `${p.name} / ${p.phone || p.contact_unavailable_reason} / ${p.record_no}`); }
     catch (e) { $('#form-error').textContent = e.message; }
@@ -84,8 +88,9 @@ async function arrivalEditor(appointment) {
     const schedule = appointment ? opts.schedules.find(s => s.id === appointment.schedule_id) : schedules.find(s => s.id === Number(data.scheduleId));
     if (!schedule) throw new Error('日期安排已经变化，请刷新列表');
     await command('/visits/register', { patientId: appointment?.patient_id || Number(data.patientId), dentistId: schedule.dentist_id,
-      scheduleId: schedule.id, scheduleRevision: schedule.revision, arrivedAt: stamp(data.arrivedAt), ...(appointment ? { appointmentId: appointment.id, expectedRevision: appointment.revision, occupancyRevision: appointment.occupancy_revision } : { startsAt: stamp(data.startsAt), endsAt: stamp(data.endsAt) }) }, 'arrival');
+      scheduleId: schedule.id, scheduleRevision: schedule.revision, arrivedAt: stamp(data.arrivedAt), ...(appointment ? { appointmentId: appointment.id, expectedRevision: appointment.revision, occupancyRevision: appointment.occupancy_revision } : { startsAt: stamp(data.startsAt), endsAt: stamp(data.endsAt),equipmentIds:data.equipmentIds||[] }) }, 'arrival');
   });
+  if(!appointment)$('#dialog-fields .form-grid').insertAdjacentHTML('beforeend',equipmentFields(opts.equipment||[]));
 }
 function scheduleEditor(schedule, action = 'publish') {
   const o = state.options;
@@ -97,11 +102,57 @@ function scheduleEditor(schedule, action = 'publish') {
 function table(heads, rows) { return `<div class="table-wrap"><table><thead><tr>${heads.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`; }
 function empty(message) { return `<div class="empty">${message}</div>`; }
 function filterDate() { $('#filters').innerHTML = `${input('date', '接诊日期', state.date, 'date')}<button id="refresh">查询</button>${state.status.demo ? '<button id="tomorrow">查看明日示例</button>' : ''}`; $('#filters input').id = 'filter-date'; }
+function equipmentEditor(item,data) {
+  openEditor(item?'维护设备':'登记诊疗设备',`${input('name','设备名称',item?.name)}${input('equipmentType','设备类别',item?.equipment_type)}${select('chairId','固定诊椅（共享设备请选择无）','<option value="shared">无，按需要共享</option>'+options(data.chairs,c=>c.name,item?.dental_chair_id))}${select('status','设备状态',options([{id:'可用',name:'可用'},{id:'停用',name:'停用'}],x=>x.name,item?.status||'可用'))}${input('reason','登记或变更依据')}`,async value=>{
+    await command('/resources/equipment',{...value,chairId:value.chairId==='shared'?null:Number(value.chairId),...(item?{equipmentId:item.id,expectedRevision:item.revision}:{})},'equipment');
+  });
+}
+function blockEditor(data) {
+  const targets=[...data.chairs.map(c=>({id:'c:'+c.id,name:'诊椅：'+c.name})),...data.equipment.map(e=>({id:'e:'+e.id,name:'设备：'+e.name}))];
+  openEditor('记录准备、清洁或停用',`${select('target','需要限制使用的资源',options(targets,x=>x.name))}${input('startsAt','开始时间',localDateTime(new Date()),'datetime-local')}${input('endsAt','预计结束（不确定可留空）','','datetime-local',false)}${input('reason','准备、故障或维护情况')}`,async value=>{
+    const [kind,target]=value.target.split(':');
+    await command('/resources/blocks',{action:'block',[kind==='c'?'chairId':'equipmentId']:Number(target),startsAt:stamp(value.startsAt),endsAt:value.endsAt?stamp(value.endsAt):null,reason:value.reason},'resource-block');
+  });
+}
+function restoreEditor(block) {
+  openEditor('核验并恢复接诊条件',`<p>${esc(block.reason)}</p>${input('verificationNote','实际完成的清洁、准备或维护核验')}<label><input name="confirmed" type="checkbox" required>已核实实际使用结束且恢复条件满足</label>`,async value=>{
+    await command('/resources/blocks',{action:'restore',blockId:block.id,expectedRevision:block.revision,confirmed:value.confirmed==='on',verificationNote:value.verificationNote},'restore');
+  });
+}
+function finishEditor(o) {
+  openEditor('确认本次实际操作结束',`<p>就诊 ${esc(o.visit_no)}。确认结束后交由助理清洁核验，诊椅仍不会立即恢复可用。</p>${input('endedAt','实际操作结束时间',localDateTime(new Date()),'datetime-local')}${input('reason','操作结束及交接依据')}<label><input name="confirmed" type="checkbox" required>已结束实际操作并交接清洁准备</label>`,async value=>{
+    await command('/resources/finish',{visitId:o.visit_id,expectedVisitRevision:o.visit_revision,expectedOccupancyRevision:o.revision,endedAt:stamp(value.endedAt),reason:value.reason,confirmed:value.confirmed==='on'},'physical-end');
+  });
+}
+async function renderResources(version) {
+  const data=await api('/resources/query?date='+state.date);if(version!==renderVersion)return;
+  const manage=['assistant','manager'].includes(state.role),name=b=>b.dental_chair_id?data.chairs.find(c=>c.id===b.dental_chair_id)?.name:data.equipment.find(e=>e.id===b.equipment_id)?.name;
+  const equipmentAvailability=e=>{
+    const current=data.equipmentOccupancies.some(o=>o.equipment_id===e.id&&o.status==='使用中');
+    const blocked=data.blocks.some(b=>b.equipment_id===e.id&&b.status==='生效中'&&b.starts_at<=data.now);
+    const reservations=data.equipmentOccupancies.filter(o=>o.equipment_id===e.id&&o.status==='已预留');
+    return `资料状态：${esc(e.status)}<small>${current?'实际使用中':blocked?'准备或停用待核验':'无正在使用记录'}</small>${reservations.length?`<details><summary>设备预留 ${reservations.length}</summary>${reservations.map(o=>`<p>${time(o.starts_at)}—${time(o.ends_at)}</p>`).join('')}</details>`:''}`;
+  };
+  $('#page-actions').innerHTML=(manage?'<button id="new-block">记录准备 / 停用</button>':'')+(state.role==='manager'?'<button id="new-equipment" class="primary">登记设备</button>':'');
+  filterDate();
+  $('#content').innerHTML='<h2 class="subheading">诊椅当前状态</h2>'+table(['诊椅','实际使用','准备及停用'],data.chairs.map(c=>`<tr><td>${esc(c.name)}</td><td>${c.busy?'实际使用未结束':'无正在使用记录'}</td><td>${c.blocked?'准备或停用中':'无生效限制'}</td></tr>`))+
+    '<h2 class="subheading">必要设备</h2>'+(data.equipment.length?table(['设备','类别 / 固定诊椅','可用情况与预留','办理'],data.equipment.map(e=>`<tr><td>${esc(e.name)}<small>${esc(e.status_reason)}</small></td><td>${esc(e.equipment_type)}<small>${esc(data.chairs.find(c=>c.id===e.dental_chair_id)?.name||'共享')}</small></td><td>${equipmentAvailability(e)}</td><td>${state.role==='manager'?`<button data-equipment="${e.id}">维护设备</button>`:'按本次需要预留'}</td></tr>`)):empty('尚未登记设备，由负责人核实后建立资料。'))+
+    '<h2 class="subheading">准备与停用记录</h2>'+(data.blocks.length?table(['资源','情况与开始','预计结束','当前结果','办理'],data.blocks.map(b=>`<tr><td>${esc(name(b))}</td><td>${esc(b.reason)}<small>${esc(localDateTime(b.starts_at))}</small></td><td>${b.ends_at?esc(localDateTime(b.ends_at)):'待核实'}<small>以实际核验为准</small></td><td>${esc(b.status)}</td><td>${manage&&b.status==='生效中'?`<button data-restore="${b.id}">核验恢复</button>`:'保留记录'}</td></tr>`)):empty('本日期范围内没有准备或停用记录。'))+
+    '<h2 class="subheading">接诊预留与实际操作</h2>'+(data.occupancies.length?table(['诊椅 / 就诊','计划时段','实际情况','办理'],data.occupancies.map(o=>`<tr><td>${esc(data.chairs.find(c=>c.id===o.dental_chair_id)?.name)}<small>${esc(o.visit_no||'预约 #'+o.appointment_id)}</small></td><td>${time(o.starts_at)}—${time(o.ends_at)}</td><td>${o.released_at?esc(o.release_reason):o.started_at?'实际使用中，等待结束交接':'接诊预留 / 候诊'}</td><td>${o.canFinish?`<button data-finish="${o.id}">确认操作结束</button>`:'按实际状态交接'}</td></tr>`)):empty('该日期暂无接诊安排。'));
+  if(manage)$('#new-block').onclick=()=>blockEditor(data);
+  if(state.role==='manager')$('#new-equipment').onclick=()=>equipmentEditor(null,data);
+  document.querySelectorAll('[data-equipment]').forEach(b=>b.onclick=()=>equipmentEditor(data.equipment.find(e=>e.id===Number(b.dataset.equipment)),data));
+  document.querySelectorAll('[data-restore]').forEach(b=>b.onclick=()=>restoreEditor(data.blocks.find(e=>e.id===Number(b.dataset.restore))));
+  document.querySelectorAll('[data-finish]').forEach(b=>b.onclick=()=>finishEditor(data.occupancies.find(e=>e.id===Number(b.dataset.finish))));
+  $('#refresh').onclick=()=>{state.date=$('#filter-date').value;render().catch(e=>notice(e.message,true));};
+  if($('#tomorrow'))$('#tomorrow').onclick=()=>{state.date=new Date(Date.parse(state.status.businessDate+'T12:00:00Z')+86400000).toISOString().slice(0,10);render().catch(e=>notice(e.message,true));};
+}
 async function render() {
   const version = ++renderVersion, page = state.page, role = state.role;
-  document.querySelectorAll('[data-page]').forEach(b => { b.classList.toggle('active', b.dataset.page === page); b.hidden = role === 'manager' ? b.dataset.page !== 'schedules' : role === 'frontdesk' ? b.dataset.page === 'schedules' : true; });
-  $('#page-title').textContent = { appointments: '预约与到诊', patients: '患者资料', schedules: '日期排班' }[page];
-  $('#page-hint').textContent = { appointments: '先核对身份，再办理接诊安排', patients: '同名患者分别建档，按患者号确认身份', schedules: '确认牙医、诊椅与指定日期的可用时段' }[page];
+  document.querySelectorAll('[data-page]').forEach(b => { b.classList.toggle('active', b.dataset.page === page); b.hidden = b.dataset.page==='resources'?!['frontdesk','manager','assistant','dentist'].includes(role):role === 'manager' ? b.dataset.page !== 'schedules' : role === 'frontdesk' ? b.dataset.page === 'schedules' : true; });
+  $('#page-title').textContent = { appointments: '预约与到诊', patients: '患者资料', schedules: '日期排班',resources:'诊椅与设备' }[page];
+  $('#page-hint').textContent = { appointments: '先核对身份，再办理接诊安排', patients: '同名患者分别建档，按患者号确认身份', schedules: '确认牙医、诊椅与指定日期的可用时段',resources:'核对实际使用、清洁准备和必要设备，按真实结果交接' }[page];
+  if(page==='resources')return renderResources(version);
   if (!['frontdesk', 'manager'].includes(role)) { $('#page-actions').innerHTML = ''; $('#filters').innerHTML = ''; $('#content').innerHTML = empty('当前批次开放前台与负责人接诊安排页面。该岗位的业务页面将在后续接入。'); return; }
   if (page === 'patients') {
     $('#page-actions').innerHTML = '<button id="new-patient" class="primary">建立患者档案</button>';
@@ -134,7 +185,7 @@ async function render() {
 }
 async function enter(session) {
   state.user = session.user; state.csrf = session.csrf; state.role = session.user.roles.some(r => r.code === 'frontdesk') ? 'frontdesk' : session.user.roles.some(r => r.code === 'manager') ? 'manager' : session.user.roles[0].code;
-  state.status = await api('/status'); state.date = state.status.businessDate; state.page = state.role === 'manager' ? 'schedules' : 'appointments';
+  state.status = await api('/status'); state.date = state.status.businessDate; state.page = state.role === 'manager' ? 'schedules' : ['assistant','dentist'].includes(state.role)?'resources':'appointments';
   $('#login-view').hidden = true; $('#workspace').hidden = false; $('#staff-name').textContent = state.user.name;
   $('#role').innerHTML = state.user.roles.map(r => `<option value="${r.code}">${esc(r.name)}</option>`).join(''); $('#role').value = state.role;
   $('#clinic-date').textContent = state.status.businessDate + ' · 诊所当地时间'; pending.clear(); $('#receipt').hidden = true; $('#notice').hidden = true;
@@ -147,7 +198,7 @@ $('#login-form').onsubmit = async event => {
 };
 document.querySelectorAll('[data-login]').forEach(b => b.onclick = () => { $('#login-form [name=username]').value = b.dataset.login; $('#login-form [name=password]').value = 'Clinic123!'; $('#login-form').requestSubmit(); });
 $('#logout').onclick = async () => { try { await api('/auth/logout', { method: 'POST', body: {} }); location.reload(); } catch (e) { notice(e.message, true); } };
-$('#role').onchange = () => { state.role = $('#role').value; state.page = state.role === 'manager' ? 'schedules' : 'appointments'; state.cursor = null; $('#receipt').hidden = true; pending.clear(); render().catch(e => notice(e.message, true)); };
+$('#role').onchange = () => { state.role = $('#role').value; state.page = state.role === 'manager' ? 'schedules' : ['assistant','dentist'].includes(state.role)?'resources':'appointments'; state.cursor = null; $('#receipt').hidden = true; pending.clear(); render().catch(e => notice(e.message, true)); };
 document.querySelectorAll('[data-page]').forEach(b => b.onclick = () => { state.page = b.dataset.page; state.cursor = null; render().catch(e => notice(e.message, true)); });
 $('#close-dialog').onclick = $('#cancel-dialog').onclick = () => $('#editor').close();
 $('#verify-last').onclick = async () => {

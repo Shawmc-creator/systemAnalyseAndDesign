@@ -1,0 +1,47 @@
+'use strict';
+const {createApplication}=require('../src/v2/server');
+let clock=new Date('2026-10-19T01:00:00Z'),serial=0;
+const a=createApplication({demo:true,clock:()=>clock});
+const command=value=>({...value,commandVersion:1,requestKey:'inventory-demo-'+(++serial)});
+const steps=[],keep=(name,result)=>{steps.push({name,result});return result;};
+try {
+  const login=username=>{const s=a.auth.login({username,password:'Clinic123!'});return {token:s.token,csrf:s.csrf,role:username==='assistant'?'assistant':username};};
+  const m=login('manager'),i=login('assistant'),f=login('frontdesk'),d=login('dentist');
+  const schedule=a.reception.schedule(m,command({action:'publish',businessDate:'2026-10-19',dentistId:4,chairId:1,startsAt:'2026-10-19T09:00:00+08:00',endsAt:'2026-10-19T18:00:00+08:00',reason:'隔离软件演示接诊安排'}));
+  const appt=a.reception.appointment(f,command({action:'create',patientId:1,scheduleId:schedule.id,scheduleRevision:1,startsAt:'2026-10-19T09:30:00+08:00',endsAt:'2026-10-19T10:00:00+08:00',reason:'虚拟患者预约'}));
+  clock=new Date('2026-10-19T01:35:00Z');
+  const visit=a.reception.arrive(f,command({patientId:1,dentistId:4,appointmentId:appt.id,expectedRevision:1,occupancyRevision:1,scheduleRevision:1,arrivedAt:a.auth.now()}));
+  a.clinical.record(d,command({action:'start',visitId:visit.id,expectedVisitRevision:1,startedAt:a.auth.now()}));
+  const material=keep('助理建材料档案：1盒=10个，数量精度0，追溯与效期明确',a.inventory.record(i,command({action:'material',name:'流程演示材料（虚构）',specification:'仅用于软件流程演示',baseUnit:'个',purchaseUnit:'盒',conversionNumerator:10,conversionDenominator:1,quantityScale:0,requiresTrace:true,requiresExpiry:true,reason:'明确实物单位和追溯要求'})));
+  keep('负责人核实材料单位后投入使用',a.inventory.approve(m,command({action:'confirmMaterial',materialId:material.id,expectedRevision:1,reason:'隔离演示单位核实'})));
+  const location=a.inventory.record(i,command({action:'location',name:'演示耗材库',purpose:'分批分处存放',reason:'演示位置'}));
+  const batch=keep('按实际来源建立待检批次，尚无库存',a.inventory.record(i,command({action:'batch',materialId:material.id,batchNo:'DEMO-20261019-A',expiryDate:'2027-10-19',sourceNote:'虚构供应商本次实物批次'})));
+  const supplier=keep('负责人核验供应商与结算依据',a.purchases.supplier(m,command({name:'流程演示供应商',contactName:'虚拟联系人',phone:'13800000003',settlementBasis:'隔离软件演示核验记录',isActive:true,reason:'负责人核验供货与结算信息'})));
+  const purchase=keep('助理提出采购100个，单价每盒1000分',a.purchases.draft(i,command({action:'create',supplierId:supplier.id,expectedSupplierRevision:1,agreedAt:a.auth.now(),deliveryTerms:'分批实物验收，差异另行确认',reason:'虚构采购需求',items:[{materialId:material.id,expectedMaterialRevision:2,orderedQuantityScaled:100,unitPriceCents:1000}]})));
+  keep('负责人确认采购约定，此时不形成库存或实付款',a.purchases.approve(m,command({action:'approve',purchaseId:purchase.id,expectedRevision:1,expectedSupplierRevision:1,reviewNote:'核对采购数量与单位单价'})));
+  const item=a.db.prepare('SELECT * FROM purchase_order_item WHERE purchase_order_id=?').get(purchase.id);
+  const receipt=keep('到货100个，合格60个、待检40个，只入库60个',a.purchases.receive(i,command({action:'receive',purchaseId:purchase.id,expectedPurchaseRevision:2,arrivedAt:a.auth.now(),deliveryEvidence:'DEMO随货单-001',items:[{purchaseItemId:item.id,expectedItemRevision:1,batchId:batch.id,locationId:location.id,arrivedQuantityScaled:100,acceptedQuantityScaled:60,rejectedQuantityScaled:0,pendingQuantityScaled:40,inspectionNote:'虚构实物检验：60个合格、40个待检'}]})));
+  const stock=()=>a.db.prepare('SELECT * FROM batch_stock WHERE material_batch_id=?').get(batch.id);
+  const snapshot=()=>{const q=a.inventory.query(i,{materialId:material.id});return {quantityScaled:stock().quantity_scaled,availableQuantityScaled:q.items[0].availableQuantityScaled,revision:stock().revision};};
+  keep('待检批次账面60个，可领用0个',snapshot());
+  keep('负责人放行已认可范围，批次可用',a.inventory.approve(m,command({action:'release',batchId:batch.id,expectedRevision:1,reason:'核实该批次合格验收范围及实际效期'})));
+  const line=a.db.prepare('SELECT * FROM purchase_receipt_item WHERE purchase_receipt_id=?').get(receipt.id);
+  const inspection=command({action:'inspectPending',receiptId:receipt.id,expectedRevision:1,receiptItemId:line.id,expectedItemRevision:1,newAcceptedQuantityScaled:40,newRejectedQuantityScaled:0,inspectionNote:'后续40个已完成检验并认可合格'});
+  keep('后续40个转合格，仅追加40个入库',a.purchases.receive(i,inspection));
+  keep('重复提交后续检验返回原回执，不再入库',a.purchases.receive(i,inspection));
+  keep('累计库存100个',snapshot());
+  const move=(action,extra)=>a.inventory.recordMovement(i,command({action,stockId:stock().id,expectedStockRevision:stock().revision,reason:'虚构实际办理的软件演示记录',...extra}));
+  const issue=keep('领用20个，库内余额变为80个',move('issue',{quantityScaled:20}));
+  keep('实际使用12个关联真实接诊，不再次扣库',move('use',{originalMovementId:issue.id,quantityScaled:12,visitId:visit.id,patientId:1,usedAt:a.auth.now()}));
+  keep('剩余未用8个退回原批次位置',move('return',{originalMovementId:issue.id,quantityScaled:8}));
+  keep('实际用料12个、未用退回8个，库内余额88个',snapshot());
+  const count=keep('助理实点87个，仅保存差异快照',move('count',{countedQuantityScaled:87,countedAt:a.auth.now()}));
+  keep('负责人核实差异，另记盘点减少1个',a.inventory.approveCount(m,command({action:'approveCount',countId:count.id,expectedRevision:1,reviewNote:'核对实物和当前库存后确认差异'})));
+  keep('发现异常立即隔离，不改变账面数量',a.inventory.record(i,command({action:'isolate',batchId:batch.id,expectedRevision:2,reason:'虚构软件场景：发现异常立即隔离'})));
+  keep('隔离后账面87个，可领用0个',snapshot());
+  keep('负责人核实异常解决后恢复，保留隔离历史',a.inventory.approve(m,command({action:'restore',batchId:batch.id,expectedRevision:3,reason:'虚构软件场景：核实异常已经解决且效期有效'})));
+  keep('最终账面及可领用量87个，采购不自动形成付款', {...snapshot(),supplierPaymentCount:a.db.prepare('SELECT count(*) n FROM supplier_payment').get().n,
+    actualUse:a.db.prepare('SELECT quantity_scaled,visit_id FROM material_usage').all(),receiptAmountCents:a.db.prepare('SELECT accepted_amount_cents FROM purchase_receipt_item').get().accepted_amount_cents});
+  keep('外键与完整性检查',{foreignKeyErrors:a.db.prepare('PRAGMA foreign_key_check').all(),integrity:a.db.prepare('PRAGMA integrity_check').get().integrity_check});
+  process.stdout.write(JSON.stringify({scenario:'材料确认—采购—分批验收—领用与实际用料—退回—盘点—隔离恢复',isolatedInMemory:true,touchesLiveData:false,simulatedBusinessDate:'2026-10-19',steps},null,2)+'\n');
+} finally {a.db.close();}

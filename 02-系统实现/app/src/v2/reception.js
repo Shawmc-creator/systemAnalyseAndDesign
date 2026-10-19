@@ -1,6 +1,7 @@
 'use strict';
 const { fail, text, id, instant, dateOnly, day, utc, insert, fact, recordNo, row, revision } = require('./common');
 const PATIENT_FIELDS = ['name', 'birth_date', 'phone', 'phone_owner', 'address', 'contact_preference', 'contact_unavailable_reason'];
+const { equipmentIds,assertReady,reserveEquipment,releaseReservations }=require('./resource-rules');
 class Reception {
   constructor(db, unit) { this.db = db; this.unit = unit; }
   personFields(fields, now) {
@@ -48,12 +49,13 @@ class Reception {
       AND (q.valid_until IS NULL OR q.valid_until>=?) AND (q.revoked_at IS NULL OR q.revoked_at>=?)`).get(dentistId, day(start), day(end), start, end, end);
     if (!qualified) fail(409, 'DENTIST_UNAVAILABLE', '牙医在该时段不具备有效在岗资格');
   }
-  checkSchedule(scheduleId, expected, start, end) {
+  checkSchedule(scheduleId, expected, start, end, checkResources = true) {
     const s = row(this.db, 'dated_schedule', scheduleId); revision(s, expected);
     if (s.status !== '已确认' || start < s.starts_at || end > s.ends_at || start >= end) fail(409, 'SCHEDULE_CHANGED', '时段不在当前已确认排班内');
     this.dentistAvailable(s.dentist_id, start, end);
     const chair = row(this.db, 'dental_chair', s.dental_chair_id);
     if (chair.available_from > start || (chair.available_until && chair.available_until < end)) fail(409, 'CHAIR_UNAVAILABLE', '诊椅在该时段不可用');
+    if(checkResources)assertReady(this.db,s.dental_chair_id,[],end);
     return s;
   }
   schedule(credentials, input) {
@@ -101,9 +103,13 @@ class Reception {
   }
   restoreFollowups(appointmentId, now) {
     // Only restore requirements whose latest linked contact points at this appointment.
-    this.db.prepare(`UPDATE followup_requirement SET status='待联系',next_contact_date=?,updated_at=?,revision=revision+1
-      WHERE status='待到诊或评估' AND id IN (SELECT c.followup_requirement_id FROM contact_history c WHERE c.appointment_id=?
-      AND NOT EXISTS (SELECT 1 FROM contact_history n WHERE n.followup_requirement_id=c.followup_requirement_id AND (n.contacted_at>c.contacted_at OR (n.contacted_at=c.contacted_at AND n.id>c.id))))`).run(day(now), now, appointmentId);
+    const affected = this.db.prepare(`SELECT * FROM followup_requirement WHERE status='待到诊或评估'
+      AND id IN (SELECT c.followup_requirement_id FROM contact_history c WHERE c.appointment_id=?
+      AND NOT EXISTS (SELECT 1 FROM contact_history n WHERE n.followup_requirement_id=c.followup_requirement_id AND (n.contacted_at>c.contacted_at OR (n.contacted_at=c.contacted_at AND n.id>c.id))))`).all(appointmentId);
+    for (const f of affected) this.db.prepare("UPDATE followup_requirement SET status='待联系',next_contact_date=?,updated_at=?,revision=revision+1 WHERE id=?").run(day(now), now, f.id);
+    return affected.map(f => ({ kind: 'followup_requirement', key: f.id, beforeRevision: f.revision, revision: f.revision + 1,
+      code: 'FOLLOWUP_CONTACT_RESTORED', reason: '复诊预约取消或未到，恢复原责任人的待联系事项，保留联系和预约历史',
+      changes: [{ field: 'status', before: f.status, after: '待联系' }, { field: 'next_contact_date', before: f.next_contact_date, after: day(now) }] }));
   }
   appointment(credentials, input) {
     return this.unit.command(credentials, 'uc01.maintain', input, (ctx, now) => {
@@ -118,6 +124,7 @@ class Reception {
           reason: text(input.reason, '就诊目的'), due_at: end, arrangement_revision: 1, status_reason: null, notified_at: null,
           created_by: ctx.session.staff_id, notified_by: null, status: '已预约', record_no: recordNo('A') }));
         this.occupy(schedule, { start, end }, ctx, now, key);
+        reserveEquipment(this.db,schedule.dental_chair_id,equipmentIds(input.equipmentIds),start,end,now,key);
         return { kind: 'appointment', key, revision: 1 };
       }
       const old = row(this.db, 'appointment', input.appointmentId); revision(old, input.expectedRevision);
@@ -125,13 +132,16 @@ class Reception {
       const occupancy = this.db.prepare('SELECT * FROM resource_occupancy WHERE appointment_id=? AND released_at IS NULL').get(old.id);
       if (!occupancy) fail(409, 'OCCUPANCY_MISSING', '原预约占用缺失，需要负责人核对');
       const reason = text(input.reason, '办理依据');
-      let start = null, end = null, schedule = null, arrangementRevision = old.arrangement_revision;
+      let start = null, end = null, schedule = null, arrangementRevision = old.arrangement_revision, relatedChanges = [];
       if (action === 'reschedule') {
         start = instant(input.startsAt, '新预约开始'); end = instant(input.endsAt, '新预约结束');
         if (start <= now) fail(422, 'PAST_APPOINTMENT', '新预约开始必须晚于当前时间');
         schedule = this.checkSchedule(input.scheduleId, input.scheduleRevision, start, end);
+        const selected=input.equipmentIds===undefined?this.db.prepare("SELECT equipment_id FROM equipment_occupancy WHERE appointment_id=? AND status='已预留'").all(old.id).map(e=>e.equipment_id):equipmentIds(input.equipmentIds);
+        releaseReservations(this.db,old.id,now,'改约释放原设备预留：'+reason);
         this.release(occupancy, ctx, now, reason);
         this.occupy(schedule, { start, end }, ctx, now, old.id);
+        reserveEquipment(this.db,schedule.dental_chair_id,selected,start,end,now,old.id);
         arrangementRevision++;
         this.db.prepare('UPDATE appointment SET planned_start=?,planned_end=?,due_at=?,arrangement_revision=?,notified_at=NULL,notified_by=NULL,updated_at=?,revision=revision+1 WHERE id=?').run(start, end, end, arrangementRevision, now, old.id);
       } else if (action === 'notify') {
@@ -139,8 +149,9 @@ class Reception {
       } else {
         if (action === 'noShow' && now <= old.due_at) fail(409, 'NOT_DUE', '尚未超过预约截止时间，不能登记未到');
         this.release(occupancy, ctx, now, reason);
+        releaseReservations(this.db,old.id,now,'预约取消或未到：'+reason);
         this.db.prepare('UPDATE appointment SET status=?,status_reason=?,updated_at=?,revision=revision+1 WHERE id=?').run(action === 'cancel' ? '已取消' : '未到', reason, now, old.id);
-        this.restoreFollowups(old.id, now);
+        relatedChanges = this.restoreFollowups(old.id, now);
       }
       // A no-show is a state fact, not a cancellation or an invented change_kind.
       // Its grounds remain in appointment.status_reason and the field-level audit.
@@ -149,6 +160,7 @@ class Reception {
         change_kind: { reschedule: '改约', cancel: '取消', noShow: '未到', notify: '通知' }[action], operator_id: ctx.session.staff_id,
         old_schedule_id: occupancy.dated_schedule_id, new_schedule_id: schedule?.id || (action === 'notify' ? occupancy.dated_schedule_id : null) }));
       return { kind: 'appointment', key: old.id, revision: old.revision + 1, beforeRevision: old.revision, reason,
+        relatedChanges,
         changes: action === 'noShow' ? [{ field: 'status', before: old.status, after: '未到' }, { field: 'status_reason', before: old.status_reason, after: reason }] : [] };
     });
   }
@@ -167,7 +179,8 @@ class Reception {
         occupancy = this.db.prepare('SELECT * FROM resource_occupancy WHERE appointment_id=? AND released_at IS NULL').get(appointment.id);
         if (!occupancy) fail(409, 'OCCUPANCY_MISSING', '预约占用缺失');
         revision(occupancy, input.occupancyRevision);
-        schedule = this.checkSchedule(occupancy.dated_schedule_id, input.scheduleRevision, occupancy.starts_at, occupancy.ends_at);
+        // Real arrival is recorded even if a resource fault has just occurred.
+        schedule = this.checkSchedule(occupancy.dated_schedule_id, input.scheduleRevision, occupancy.starts_at, occupancy.ends_at, false);
       } else {
         const start = instant(input.startsAt, '现场接诊开始'), end = instant(input.endsAt, '现场接诊结束');
         if (day(start) !== day(now) || end <= arrived || start < arrived) fail(422, 'INVALID_INPUT', '现场接诊时段需在当日到诊后');
@@ -179,8 +192,13 @@ class Reception {
         arrival_source: appointment ? '预约' : '现场', registered_by: ctx.session.staff_id, status: '候诊', record_no: recordNo('V') }));
       if (appointment) {
         this.db.prepare('UPDATE resource_occupancy SET visit_id=?,updated_at=?,revision=revision+1 WHERE id=?').run(key, now, occupancy.id);
+        this.db.prepare("UPDATE equipment_occupancy SET visit_id=?,updated_at=?,revision=revision+1 WHERE appointment_id=? AND status='已预留'").run(key,now,appointment.id);
         this.db.prepare("UPDATE appointment SET status='已到诊',updated_at=?,revision=revision+1 WHERE id=?").run(now, appointment.id);
-      } else this.occupy(schedule, { start: instant(input.startsAt, '现场开始'), end: instant(input.endsAt, '现场结束') }, ctx, now, null, key);
+      } else {
+        const start=instant(input.startsAt,'现场开始'),end=instant(input.endsAt,'现场结束');
+        this.occupy(schedule,{start,end},ctx,now,null,key);
+        reserveEquipment(this.db,schedule.dental_chair_id,equipmentIds(input.equipmentIds),start,end,now,null,key);
+      }
       insert(this.db, 'clinical_record', fact(now, { visit_id: key, status: '草稿', record_no: recordNo('C') }));
       return { kind: 'visit', key, revision: 1 };
     });
@@ -198,7 +216,7 @@ class Reception {
         LEFT JOIN dated_schedule s ON s.id=o.dated_schedule_id LEFT JOIN staff d ON d.id=s.dentist_id LEFT JOIN dental_chair c ON c.id=s.dental_chair_id
         LEFT JOIN visit v ON v.appointment_id=a.id WHERE a.planned_start>=? AND a.planned_start<? AND a.id>?
         AND (? IS NULL OR a.patient_id=?) ORDER BY a.id LIMIT 101`).all(utc(from + 'T00:00:00+08:00'), utc(Date.parse(to + 'T00:00:00+08:00') + 86400_000), cursor, patientId, patientId);
-      const history = rows.slice(0, 100).map(a => ({ ...a, history: this.db.prepare('SELECT * FROM appointment_change WHERE appointment_id=? ORDER BY id').all(a.id) }));
+      const history = rows.slice(0, 100).map(a => ({ ...a,equipmentIds:this.db.prepare("SELECT equipment_id FROM equipment_occupancy WHERE appointment_id=? AND status<>'已释放'").all(a.id).map(e=>e.equipment_id), history: this.db.prepare('SELECT * FROM appointment_change WHERE appointment_id=? ORDER BY id').all(a.id) }));
       return { items: history, nextCursor: rows.length > 100 ? history.at(-1).id : null };
     });
   }

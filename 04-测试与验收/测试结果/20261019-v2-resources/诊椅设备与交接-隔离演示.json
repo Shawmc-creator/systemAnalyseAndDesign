@@ -1,0 +1,284 @@
+{
+  "scenario": "设备预留冲突—实际延时—签署不释放—操作结束—清洁核验—下一患者",
+  "isolatedInMemory": true,
+  "touchesLiveData": false,
+  "documentUsecases": [
+    "UC-02",
+    "UC-03",
+    "UC-06",
+    "UC-09",
+    "UC-24"
+  ],
+  "integrity": "ok",
+  "foreignKeys": [],
+  "steps": [
+    {
+      "name": "患者甲预留一号诊椅及共享设备09:30—10:00",
+      "result": {
+        "kind": "appointment",
+        "id": 2,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "resource-demo-3",
+        "committedAt": "2026-10-19T01:00:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "其他诊椅在同一时段也不能重复预留共享设备",
+      "result": {
+        "code": "EQUIPMENT_CONFLICT",
+        "message": "必要设备在该时段已有其他预留"
+      }
+    },
+    {
+      "name": "患者乙预留10:00—11:00，保留先后接诊安排",
+      "result": {
+        "kind": "appointment",
+        "id": 3,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "resource-demo-5",
+        "committedAt": "2026-10-19T01:00:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "牙医确认患者甲实际开始，设备转为使用中",
+      "result": {
+        "kind": "visit",
+        "id": 1,
+        "revision": 2,
+        "code": "COMMITTED",
+        "requestKey": "resource-demo-7",
+        "committedAt": "2026-10-19T01:35:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "患者甲实际操作延时，计划结束时间到达仍不能接诊乙",
+      "result": {
+        "code": "RESOURCE_STILL_IN_USE",
+        "message": "前次实际操作尚未确认结束，预计结束时间和病历签署均不释放使用中的资源"
+      }
+    },
+    {
+      "name": "签署病历并结束临床记录，不替代资源交接",
+      "result": {
+        "kind": "clinical_record",
+        "id": 1,
+        "revision": 3,
+        "code": "COMMITTED",
+        "requestKey": "resource-demo-12",
+        "committedAt": "2026-10-19T02:05:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "签署后仍需明确确认实际操作结束",
+      "result": {
+        "code": "RESOURCE_STILL_IN_USE",
+        "message": "前次实际操作尚未确认结束，预计结束时间和病历签署均不释放使用中的资源"
+      }
+    },
+    {
+      "name": "牙医交接实际结束，自动形成诊椅清洁待核验",
+      "result": {
+        "kind": "resource_block",
+        "id": 1,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "resource-demo-14",
+        "committedAt": "2026-10-19T02:05:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "未完成清洁时患者乙继续候诊",
+      "result": {
+        "code": "RESOURCE_BLOCKED",
+        "message": "诊椅仍在清洁、准备或停用中，须核验恢复后再安排"
+      }
+    },
+    {
+      "name": "助理实际清洁核验后恢复资源",
+      "result": {
+        "kind": "resource_block",
+        "id": 1,
+        "revision": 2,
+        "code": "COMMITTED",
+        "requestKey": "resource-demo-16",
+        "committedAt": "2026-10-19T02:10:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "牙医开始患者乙接诊，共享设备正常转入下一次使用",
+      "result": {
+        "kind": "visit",
+        "id": 2,
+        "revision": 2,
+        "code": "COMMITTED",
+        "requestKey": "resource-demo-17",
+        "committedAt": "2026-10-19T02:10:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "乙的实际操作结束，病历草稿仍可后续完成",
+      "result": {
+        "kind": "resource_block",
+        "id": 2,
+        "revision": 1,
+        "code": "COMMITTED",
+        "requestKey": "resource-demo-18",
+        "committedAt": "2026-10-19T02:25:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "助理完成乙使用后的清洁核验",
+      "result": {
+        "kind": "resource_block",
+        "id": 2,
+        "revision": 2,
+        "code": "COMMITTED",
+        "requestKey": "resource-demo-19",
+        "committedAt": "2026-10-19T02:25:00Z",
+        "replayed": false
+      }
+    },
+    {
+      "name": "最终资源状态与原使用历史分别可查",
+      "result": {
+        "businessDate": "2026-10-19",
+        "now": "2026-10-19T02:25:00Z",
+        "chairs": [
+          {
+            "id": 1,
+            "name": "一号诊椅",
+            "revision": 1,
+            "busy": false,
+            "blocked": false
+          },
+          {
+            "id": 2,
+            "name": "二号诊椅",
+            "revision": 1,
+            "busy": false,
+            "blocked": false
+          }
+        ],
+        "equipment": [
+          {
+            "id": 1,
+            "name": "共享检查设备（演示）",
+            "equipment_type": "共享设备",
+            "dental_chair_id": null,
+            "status": "可用",
+            "status_reason": "演示设备，按本次实际需要选择",
+            "created_at": "2026-10-19T01:00:00Z",
+            "updated_at": "2026-10-19T01:00:00Z",
+            "revision": 1
+          }
+        ],
+        "blocks": [
+          {
+            "id": 2,
+            "dental_chair_id": 1,
+            "equipment_id": null,
+            "starts_at": "2026-10-19T02:25:00Z",
+            "ends_at": null,
+            "reason": "诊后清洁与准备待核验：V-65b86ea5-246f-43e7-b4ff-ace6ec1f1b50",
+            "released_at": "2026-10-19T02:25:00Z",
+            "status": "已解除",
+            "operator_id": 5,
+            "created_at": "2026-10-19T02:25:00Z",
+            "updated_at": "2026-10-19T02:25:00Z",
+            "revision": 2
+          },
+          {
+            "id": 1,
+            "dental_chair_id": 1,
+            "equipment_id": null,
+            "starts_at": "2026-10-19T02:05:00Z",
+            "ends_at": null,
+            "reason": "诊后清洁与准备待核验：V-c7703801-342f-4a2a-aaed-20f3c34c7a2f",
+            "released_at": "2026-10-19T02:10:00Z",
+            "status": "已解除",
+            "operator_id": 5,
+            "created_at": "2026-10-19T02:05:00Z",
+            "updated_at": "2026-10-19T02:10:00Z",
+            "revision": 2
+          }
+        ],
+        "occupancies": [
+          {
+            "id": 2,
+            "revision": 3,
+            "visit_id": 1,
+            "appointment_id": 2,
+            "starts_at": "2026-10-19T01:30:00Z",
+            "ends_at": "2026-10-19T02:00:00Z",
+            "released_at": "2026-10-19T02:05:00Z",
+            "release_reason": "实际操作结束，转清洁核验",
+            "dental_chair_id": 1,
+            "dentist_id": 4,
+            "visit_status": "诊疗结束",
+            "started_at": "2026-10-19T01:35:00Z",
+            "visit_revision": 3,
+            "visit_no": "V-c7703801-342f-4a2a-aaed-20f3c34c7a2f",
+            "canFinish": false
+          },
+          {
+            "id": 3,
+            "revision": 3,
+            "visit_id": 2,
+            "appointment_id": 3,
+            "starts_at": "2026-10-19T02:00:00Z",
+            "ends_at": "2026-10-19T03:00:00Z",
+            "released_at": "2026-10-19T02:25:00Z",
+            "release_reason": "实际操作结束，转清洁核验",
+            "dental_chair_id": 1,
+            "dentist_id": 4,
+            "visit_status": "接诊中",
+            "started_at": "2026-10-19T02:10:00Z",
+            "visit_revision": 2,
+            "visit_no": "V-65b86ea5-246f-43e7-b4ff-ace6ec1f1b50",
+            "canFinish": false
+          }
+        ],
+        "equipmentOccupancies": [
+          {
+            "id": 1,
+            "equipment_id": 1,
+            "appointment_id": 2,
+            "visit_id": 1,
+            "starts_at": "2026-10-19T01:30:00Z",
+            "ends_at": "2026-10-19T02:00:00Z",
+            "actual_ended_at": "2026-10-19T02:05:00Z",
+            "status": "已释放",
+            "release_reason": "牙医确认实际操作结束并交接清洁",
+            "created_at": "2026-10-19T01:00:00Z",
+            "updated_at": "2026-10-19T02:05:00Z",
+            "revision": 4
+          },
+          {
+            "id": 2,
+            "equipment_id": 1,
+            "appointment_id": 3,
+            "visit_id": 2,
+            "starts_at": "2026-10-19T02:00:00Z",
+            "ends_at": "2026-10-19T03:00:00Z",
+            "actual_ended_at": "2026-10-19T02:25:00Z",
+            "status": "已释放",
+            "release_reason": "牙医确认实际操作结束并交接清洁",
+            "created_at": "2026-10-19T01:00:00Z",
+            "updated_at": "2026-10-19T02:25:00Z",
+            "revision": 4
+          }
+        ]
+      }
+    }
+  ]
+}

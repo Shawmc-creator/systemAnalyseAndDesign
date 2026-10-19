@@ -150,6 +150,8 @@ class Treatment {
       const correcting = input.originalExecutionId != null;
       if (!correcting && visit.status !== '接诊中') fail(409, 'VISIT_NOT_ACTIVE', '实际执行须在接诊中确认；结束后的事实请走有依据的更正');
       const completed = instant(input.completedAt, '实际执行时间');
+      const physicalEnd=this.db.prepare("SELECT released_at FROM resource_occupancy WHERE visit_id=? AND release_reason='实际操作结束，转清洁核验' ORDER BY id DESC LIMIT 1").get(visit.id)?.released_at;
+      if(physicalEnd && completed>physicalEnd)fail(422,'EXECUTION_AFTER_PHYSICAL_END','实际项目时间晚于本次已确认的操作结束，不能在已交接诊椅后继续记为当次操作');
       if (!visit.started_at || completed < visit.started_at || completed > now || (visit.ended_at && completed > visit.ended_at)) fail(422, 'EXECUTION_TIME', '执行时间须真实发生且在该次实际接诊期间');
       const service = row(this.db, 'service', input.serviceId), quantity = id(input.quantity, '实际完成数量'), teeth = toothFields(input);
       if (!service.is_active && !correcting) fail(409, 'SERVICE_DISABLED', '该收费项目已停用，不能用于新执行');

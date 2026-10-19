@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 20261019,
+  "totalTables": 88,
+  "originalBusinessRowsPreserved": true,
+  "originalTables": 85,
+  "permissionChanges": [
+    {
+      "table": "access_permission",
+      "before": 50,
+      "after": 54
+    },
+    {
+      "table": "role_permission",
+      "before": 57,
+      "after": 65
+    }
+  ],
+  "newTablesMatchCurrentCoreModel": true,
+  "foreignKeys": [],
+  "integrity": "ok",
+  "backupFile": "before-resources-1792412934563-805d364f-8779-4561-86de-0ad44cde58f2.db"
+}

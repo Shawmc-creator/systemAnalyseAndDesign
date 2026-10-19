@@ -1,0 +1,23 @@
+{
+  "passed": true,
+  "serverUsesIsolatedMemory": true,
+  "touchesLiveData": false,
+  "roles": [
+    "manager",
+    "assistant",
+    "dentist",
+    "frontdesk"
+  ],
+  "scenarios": [
+    "负责人网页登记共享设备",
+    "标记诊椅准备/停用",
+    "助理真实核验恢复",
+    "牙医网页确认实际操作结束",
+    "结束后清洁核验再次恢复",
+    "前台只读资源权限",
+    "前台预约表单选择必要设备并实际预留",
+    "手机导航及表格横向滚动"
+  ],
+  "consoleErrors": [],
+  "foreignKeys": []
+}
