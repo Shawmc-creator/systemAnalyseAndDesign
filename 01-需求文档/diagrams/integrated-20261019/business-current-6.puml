@@ -17,18 +17,31 @@ skinparam ranksep 34
 hide footbox
 autonumber
 skinparam maxMessageSize 150
-actor "患者" as A0
-actor "前台" as A1
-actor "牙医" as A2
-actor "收费人员" as A3
-participant "医保平台" as A4
-entity "医保费用登记" as A5
-A0 -> A1 : 提供身份并选择医保办理
-A1 -> A4 : 通过专用服务核验登记
-A2 -> A3 : 交接诊断和实际项目
-A3 -> A4 : 核对编码、上传费用并预结算
-A3 -> A0 : 说明分摊并记录患者选择
-A3 -> A4 : 正式结算并查询结果
-A3 -> A5 : 保留结果并与自付账核对
+actor "患者" as P
+actor "前台" as F
+actor "牙医" as D
+actor "收费人员" as C
+participant "医保平台" as I
+entity "医保费用登记" as R
+P -> F : 提供必要身份信息并申请医保办理
+F -> I : 核验参保身份与登记条件
+I --> F : 返回实际核验及登记结果
+D -> C : 交接诊断与实际发生项目
+C -> I : 核对编码、上传费用并预结算
+I --> C : 返回预估分摊及自费项目
+C -> P : 说明基金、个账与其他自付
+P --> C : 确认医保办理或选择其他安排
+alt 确认医保且预结算有效
+ C -> I : 提交正式结算
+ I --> C : 返回原笔结果与最终分摊
+ opt 结果未知
+  C -> I : 查询原笔，保留待核实
+  I --> C : 返回可核查结果
+ end
+ C -> R : 区分明确完成与待核实的结果
+else 暂缓或选择自费
+ C -> R : 记录患者选择及后续事项
+end
+C -> P : 说明真实办理结果和后续安排
 
 @enduml

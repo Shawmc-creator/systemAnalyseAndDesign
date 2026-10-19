@@ -16,33 +16,47 @@ skinparam nodesep 24
 skinparam ranksep 34
 hide footbox
 autonumber
-skinparam maxMessageSize 150
-actor "收费人员" as A
-boundary "收费人员页面" as P
-control "办理费用更正与\n退费服务" as S
-entity "费用申请对象" as E
-participant "业务数据存储接口" as R
-A -> P : 办理费用更正与退费
-P -> S : 提交对象编号和业务内容
-activate S
-S -> R : 读取对象状态与关联业务
-activate R
-R --> S : 当前业务数据
-deactivate R
-S -> E : 医保撤销、费用更正与实际退款分\n别有结果
-activate E
-E --> S : 核对结果及本次变更
-deactivate E
-alt 业务条件满足
-S -> R : 以事务保存本次关联结果
-activate R
-R --> S : 保存成功
-deactivate R
-S --> P : 返回结果编号及状态
-else 核对或保存失败
-S --> P : 返回原因并保留原记录
+skinparam maxMessageSize 145
+actor "收费人员／负责人" as A
+boundary "费用更正与退费页面" as P
+control "费用办理服务" as S
+entity "费用申请与调整" as C
+participant "费用业务存取" as R
+participant "医保服务适配" as I
+participant "支付服务适配" as Pay
+A -> P : 查原单并提交申请或审核意见
+P -> S : 提交原业务、处理依据和批准范围
+S -> R : 读取原项目、医保、付款及有效处理记录
+R --> S : 返回原始及当前有效业务
+S -> C : 核对权限、批准范围和重复办理情况
+alt 已批准处理
+ opt 必要的医保原单处理
+  S -> I : 按原结算办理更正或撤销并查询
+  I --> S : 返回真实处理结果
+  S -> R : 保存医保阶段结果及核实依据
+ end
+ alt 无需医保处理或必要医保处理已完成
+  S -> C : 核对最终分摊及患者退补差额
+  S -> R : 共同保存已确认费用调整及后续办理
+  alt 患者有应退的实际原付款
+   alt 原款为电子支付
+    S -> Pay : 办理原款退款或查询原笔
+    Pay --> S : 返回成功、失败或待核实
+   else 原款为现金
+    A -> P : 实际退回并核实接收
+    P -> S : 提交真实退款凭据
+   end
+   S -> R : 保存实际退款状态及原款关联
+  else 无应退或需要补收
+   S --> P : 提供真实差额与后续办理
+  end
+ else 医保处理未完成或结果未知
+  S --> P : 保留待办，不确认最终退补差额
+ end
+else 未批准或核对不通过
+ S --> P : 显示原因并保留原业务
 end
-P --> A : 展示结果并刷新列表
-deactivate S
+S --> P : 分别返回费用、医保及实际退款状态
+P --> A : 显示真实处理结果
 
 @enduml

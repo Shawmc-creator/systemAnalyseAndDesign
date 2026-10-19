@@ -352,8 +352,8 @@ service |o--o{ insurance_item_mapping
 material |o--o{ insurance_item_mapping
 patient ||--o{ insurance_case
 visit ||--o{ insurance_case
-bill ||--o{ insurance_case
-insurance_identity ||--o{ insurance_case
+bill |o--o{ insurance_case
+insurance_identity |o--o{ insurance_case
 insurance_case ||--o{ insurance_fee
 bill_item ||--o{ insurance_fee
 insurance_item_mapping ||--o{ insurance_fee

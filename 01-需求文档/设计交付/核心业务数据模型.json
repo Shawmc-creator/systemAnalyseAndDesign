@@ -7330,7 +7330,9 @@
       "table": "insurance_case",
       "design_status": "随主要业务新增的设计，尚未写入运行程序",
       "rules": [
-        "同一患者、就诊和账单归属一致；预结算与正式结算结果分别保存。"
+        "同一患者、就诊和账单归属一致；预结算与正式结算结果分别保存。",
+        "待核验时允许身份、账单、诊断及费用版本尚未取得；预结算前必须核验通过并补齐原费用及项目对应。",
+        "有效预结算且患者实际确认医保后才能正式结算；原费用或项目变化后旧预结算失效。"
       ],
       "fields": [
         {
@@ -7360,16 +7362,16 @@
         {
           "name": "bill_id",
           "type": "INTEGER",
-          "nullable": false,
-          "description": "关联bill",
+          "nullable": true,
+          "description": "关联bill；初始办理未取得时可空，预结算前必须补齐并核对",
           "source": "本次核心业务补全",
           "foreign_key": "bill"
         },
         {
           "name": "identity_id",
           "type": "INTEGER",
-          "nullable": false,
-          "description": "关联insurance_identity",
+          "nullable": true,
+          "description": "关联insurance_identity；初始办理未取得时可空，预结算前必须补齐并核对",
           "source": "本次核心业务补全",
           "foreign_key": "insurance_identity"
         },
@@ -7384,8 +7386,8 @@
         {
           "name": "fee_revision",
           "type": "INTEGER",
-          "nullable": false,
-          "description": "本次核对的费用版本，正整数",
+          "nullable": true,
+          "description": "本次核对的费用版本，正整数；初始办理未取得时可空，预结算前必须补齐并核对",
           "source": "本次核心业务补全"
         },
         {
@@ -7417,8 +7419,8 @@
         {
           "name": "diagnosis_code",
           "type": "TEXT",
-          "nullable": false,
-          "description": "与本次诊断对应的医保编码",
+          "nullable": true,
+          "description": "与本次诊断对应的医保编码；初始办理未取得时可空，预结算前必须补齐并核对",
           "source": "本次核心业务补全"
         },
         {

@@ -43,7 +43,7 @@ entity "医保结算款收付\ninsurance_fund_receipt" as insurance_fund_receipt
 * id : INTEGER <<PK>>
  settlement_id : INTEGER <<FK>>
 }
-insurance_identity ||--o{ insurance_case
+insurance_identity |o--o{ insurance_case
 insurance_case ||--o{ insurance_fee
 insurance_item_mapping ||--o{ insurance_fee
 insurance_case ||--o{ insurance_settlement

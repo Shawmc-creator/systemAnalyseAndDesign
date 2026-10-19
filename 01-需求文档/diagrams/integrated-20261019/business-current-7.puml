@@ -17,19 +17,40 @@ skinparam ranksep 34
 hide footbox
 autonumber
 skinparam maxMessageSize 150
-actor "患者" as A0
-actor "收费人员" as A1
-actor "负责人" as A2
-entity "原单与处理记录" as A3
-participant "医保平台" as A4
-participant "支付平台" as A5
-A0 -> A1 : 提出费用异议
-A1 -> A3 : 查找实际项目和原收款
-A1 -> A2 : 提交原单与处理依据
-A2 -> A1 : 确认处理范围
-A1 -> A4 : 有医保原单时按规则处理
-A1 -> A5 : 电子原款办理相应退款并核实
-A1 -> A3 : 记录更正和实际退费
-A1 -> A0 : 说明处理结果
+actor "患者" as P
+actor "收费人员" as C
+actor "负责人" as M
+entity "原单与处理记录" as R
+participant "医保平台" as I
+participant "支付平台" as Pay
+P -> C : 提出费用异议或退费申请
+C -> R : 核对原项目、医保及实际付款
+C -> M : 提交原单与处理依据
+M --> C : 返回批准范围或不予批准意见
+alt 批准处理
+ opt 原费用涉及医保且需要处理
+  C -> I : 按规则办理原医保更正或撤销
+  I --> C : 返回实际结果或仍待核实
+ end
+ alt 必要医保处理已完成或无需医保处理
+  C -> R : 按批准范围与最终分摊核对差额
+  alt 有患者实际应退款
+   alt 原款为现金
+    C -> P : 实际交付现金并核实接收
+   else 原款为电子支付
+    C -> Pay : 按原付款办理退款及查询
+    Pay --> C : 明确成功、失败或仍待核实
+   end
+   C -> R : 分别记录费用更正和实际退款结果
+  else 无应退或需补收
+   C -> P : 说明差额及后续安排
+  end
+ else 医保处理未完成
+  C -> R : 保留待处理，不确认最终患者退补差额
+ end
+else 未批准
+ C -> R : 保留原费用及处理意见
+end
+C -> P : 交付实际处理结果和凭据
 
 @enduml

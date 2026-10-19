@@ -301,17 +301,17 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.15
+      "minimum_font_pt": 9.94
     },
     {
       "stem": "business-current-7",
       "title": "费用更正与退费现状业务序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 11.15
+      "minimum_font_pt": 12.24
     },
     {
       "stem": "business-current-8",
@@ -391,27 +391,27 @@
         210,
         297
       ],
-      "minimum_font_pt": 12.99
+      "minimum_font_pt": 12.8
     },
     {
       "stem": "business-improved-6",
       "title": "门诊医保结算改进业务序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 12.08
+      "minimum_font_pt": 12.82
     },
     {
       "stem": "business-improved-7",
       "title": "费用更正与退费改进业务序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 11.35
+      "minimum_font_pt": 12.11
     },
     {
       "stem": "business-improved-8",
@@ -448,10 +448,10 @@
       "title": "患者服务全过程",
       "kind": "activity",
       "paper": [
-        420,
-        594
+        594,
+        841
       ],
-      "minimum_font_pt": 8.83
+      "minimum_font_pt": 10.01
     },
     {
       "stem": "business-resource-flow",
@@ -926,7 +926,7 @@
         297,
         420
       ],
-      "minimum_font_pt": 11.25
+      "minimum_font_pt": 10.82
     },
     {
       "stem": "analysis-seq-15",
@@ -1006,7 +1006,7 @@
         297,
         420
       ],
-      "minimum_font_pt": 11.61
+      "minimum_font_pt": 9.79
     },
     {
       "stem": "analysis-seq-23",
@@ -1360,13 +1360,13 @@
     },
     {
       "stem": "design-seq-14",
-      "title": "办理费用更正与退费设计序列图",
+      "title": "UC-14 办理费用更正与退费设计序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 9.47
+      "minimum_font_pt": 10.57
     },
     {
       "stem": "design-seq-16",
@@ -1400,13 +1400,13 @@
     },
     {
       "stem": "design-seq-22",
-      "title": "核验医保身份并办理预结算设计序列图",
+      "title": "UC-22 核验医保身份并办理预结算设计序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 9.47
+      "minimum_font_pt": 11.44
     },
     {
       "stem": "design-seq-24",
@@ -1536,7 +1536,7 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 9.68
     },
     {
       "stem": "screen-11",

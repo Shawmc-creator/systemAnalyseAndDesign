@@ -52,7 +52,7 @@ class "医保结算款收付" as insurance_fund_receipt <<entity>> {
  实际到账金额
  核对依据
 }
-insurance_identity "1" -- "0..*" insurance_case
+insurance_identity "0..1" -- "0..*" insurance_case
 insurance_case "1" -- "0..*" insurance_fee
 insurance_item_mapping "1" -- "0..*" insurance_fee
 insurance_case "1" -- "0..*" insurance_settlement
