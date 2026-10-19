@@ -1,0 +1,26 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 已预约
+已预约 --> 已取消 : 患者取消/释放安排
+已预约 --> 已到诊 : 前台确认实际到诊
+已预约 --> 未到 : 核实到期未到
+已预约 --> 已预约 : 改约/保留变更依据
+已取消 --> [*]
+已到诊 --> [*]
+未到 --> [*]
+@enduml

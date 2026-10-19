@@ -1,0 +1,27 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 待核验
+待核验 --> 待预结算 : 身份就诊条件符合
+待预结算 --> 预结算完成 : 返回有效预估分摊
+预结算完成 --> 待预结算 : 原费用或条件变化/旧预估失效
+预结算完成 --> 结算待核实 : 提交正式办理
+结算待核实 --> 已结算 : 核实正式成功
+结算待核实 --> 待预结算 : 明确失败并需重新核对
+已结算 --> 已撤销 : 核实撤销或冲正成功
+已撤销 --> [*]
+@enduml

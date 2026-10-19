@@ -1,0 +1,31 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as A0
+actor "牙医" as A1
+actor "助理" as A2
+A1 -> A0 : 询问主诉与健康情况
+A0 -> A1 : 说明病史和不适
+A1 -> A1 : 检查并书写诊断
+A1 -> A0 : 说明治疗方案和费用
+A0 -> A1 : 确认治疗安排
+A1 -> A2 : 准备材料与经处理器械
+A1 -> A0 : 实施治疗并给出诊后指导
+
+@enduml

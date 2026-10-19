@@ -1,0 +1,27 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 草稿
+草稿 --> 待确认 : 牙医说明方案
+待确认 --> 已确认 : 患者同意
+待确认 --> 暂缓 : 患者暂缓
+待确认 --> 已拒绝 : 患者拒绝
+已确认 --> 本版执行完成 : 完成确认范围
+暂缓 --> [*]
+已拒绝 --> [*]
+本版执行完成 --> [*]
+@enduml

@@ -1,0 +1,31 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "收费人员" as A0
+actor "负责人" as A1
+participant "支付平台" as A2
+participant "医保平台" as A3
+entity "营业收款记录" as A4
+A0 -> A4 : 汇总费用、现金、电子款及退款
+A0 -> A2 : 核对渠道交易
+A0 -> A3 : 核对医保已结算及实际回款
+A0 -> A1 : 交接差异欠费和未完成事项
+A1 -> A4 : 明确后续责任与日期
+
+@enduml

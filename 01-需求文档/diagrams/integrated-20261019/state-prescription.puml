@@ -1,0 +1,22 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 草稿
+草稿 --> 已开立 : 牙医完成确认及适用签名
+已开立 --> 已作废 : 核实作废条件并保留原处方
+已作废 --> [*]
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor/ "患者" as P
+actor/ "供应商" as V
+rectangle "青禾牙科诊所" {
+usecase/ "BUC-01\n预约与到诊" as U0
+usecase/ "BUC-02\n接受检查与诊断" as U1
+usecase/ "BUC-03\n接受口腔治疗" as U2
+usecase/ "BUC-04\n复诊与随访" as U3
+usecase/ "BUC-05\n办理诊疗缴费" as U4
+usecase/ "BUC-06\n费用更正与退费" as U5
+usecase/ "BUC-07\n材料采购与验收" as U6
+}
+P --> U0
+P --> U1
+P --> U2
+P --> U3
+P --> U4
+P --> U5
+V --> U6
+
+@enduml

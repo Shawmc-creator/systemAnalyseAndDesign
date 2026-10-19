@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+entity "健康版本\nhealth_version" as health_version {
+* id : INTEGER <<PK>>
+ previous_version_id : INTEGER <<FK>>
+}
+entity "健康条目\nhealth_item" as health_item {
+* id : INTEGER <<PK>>
+ health_version_id : INTEGER <<FK>>
+}
+entity "健康复核\nhealth_review" as health_review {
+* id : INTEGER <<PK>>
+ health_version_id : INTEGER <<FK>>
+}
+entity "病历\nclinical_record" as clinical_record {
+* id : INTEGER <<PK>>
+}
+entity "检查所见\nclinical_finding" as clinical_finding {
+* id : INTEGER <<PK>>
+ clinical_record_id : INTEGER <<FK>>
+}
+entity "病历补充\nrecord_addendum" as record_addendum {
+* id : INTEGER <<PK>>
+ clinical_record_id : INTEGER <<FK>>
+}
+entity "诊疗文件\nclinical_document" as clinical_document {
+* id : INTEGER <<PK>>
+}
+entity "文件版本\ndocument_version" as document_version {
+* id : INTEGER <<PK>>
+ clinical_document_id : INTEGER <<FK>>
+ previous_version_id : INTEGER <<FK>>
+}
+entity "处方\nprescription" as prescription {
+* id : INTEGER <<PK>>
+}
+entity "处方明细\nprescription_item" as prescription_item {
+* id : INTEGER <<PK>>
+ prescription_id : INTEGER <<FK>>
+}
+entity "实际发药\ndispense_record" as dispense_record {
+* id : INTEGER <<PK>>
+ prescription_item_id : INTEGER <<FK>>
+}
+health_version ||--o{ health_item
+health_version ||--o{ health_review
+clinical_record ||--o{ clinical_finding
+clinical_record ||--o{ record_addendum
+clinical_document ||--o{ document_version
+prescription ||--o{ prescription_item
+prescription_item ||--o{ dispense_record
+
+@enduml

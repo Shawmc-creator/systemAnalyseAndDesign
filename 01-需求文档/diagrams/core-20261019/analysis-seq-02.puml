@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 120
+actor "前台" as A
+boundary "前台接口" as B
+control "维护预约安排控制" as K
+entity "日期安排" as E0
+entity "接诊占用" as E1
+entity "预约" as E2
+entity "预约变更" as E3
+A -> B : 维护预约安排
+B -> K : 提交对象编号及办理内容
+activate K
+K -> K : 核对岗位权限与必要资料
+alt 可以办理
+K -> E0 : 查询已发布日期排班
+activate E0
+E0 --> K : 可接诊时间与资源
+deactivate E0
+K -> E1 : 核对并保留无冲突时段
+activate E1
+E1 --> K : 有效资源安排
+deactivate E1
+K -> E2 : 保存新预约或预约变更
+activate E2
+E2 --> K : 预约编号及状态
+deactivate E2
+K -> E3 : 保留改约取消依据
+activate E3
+E3 --> K : 原安排及变更记录
+deactivate E3
+K --> B : 返回本次结果
+else 权限资料或状态不符合
+K --> B : 返回核对原因且不改变原记录
+end
+B --> A : 展示结果
+deactivate K
+
+@enduml

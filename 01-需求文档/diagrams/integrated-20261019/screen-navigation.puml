@@ -1,0 +1,33 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 登录
+登录 --> 岗位工作台 : 验证岗位
+岗位工作台 --> 患者与预约
+岗位工作台 --> 牙医接诊
+岗位工作台 --> 收费结算
+岗位工作台 --> 复诊随访
+岗位工作台 --> 材料库存
+岗位工作台 --> 诊所管理
+牙医接诊 --> 处方与取药
+收费结算 --> 医保办理
+诊所管理 --> 接诊资源协调
+患者与预约 --> 牙医接诊 : 准备就绪并实际接诊
+牙医接诊 --> 收费结算 : 实际费用
+牙医接诊 --> 复诊随访 : 后续要求
+
+@enduml

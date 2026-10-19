@@ -1,0 +1,27 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 待发布
+待发布 --> 待联系 : 来源诊疗意见确认后发布
+待联系 --> 待联系 : 未联系上/保留下次日期
+待联系 --> 待到诊或评估 : 确认预约或交牙医评估
+待到诊或评估 --> 待联系 : 取消预约或继续联系
+待到诊或评估 --> 已完成 : 牙医记录实际评估
+待联系 --> 已撤销 : 牙医说明原因
+已完成 --> [*]
+已撤销 --> [*]
+@enduml

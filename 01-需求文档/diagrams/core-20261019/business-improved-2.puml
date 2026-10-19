@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as A0
+actor "牙医" as A1
+actor "助理" as A2
+entity "诊所管理系统" as S
+A1 -> S : 调阅既往病历和健康资料
+A1 -> A0 : 询问并核对实际情况
+A1 -> S : 保存检查、诊断和方案
+A1 -> A0 : 说明方案并取得确认
+A1 -> A2 : 准备材料与经处理器械
+A1 -> A0 : 实施实际治疗
+A1 -> S : 登记完成项目并签署病历
+
+@enduml

@@ -1,0 +1,34 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+package 表示层 {
+ [岗位网页] as UI
+}
+package 业务层 {
+ [用例服务] as S
+ [业务实体] as E
+}
+package 数据层 {
+ database "SQLite数据库" as DB
+ [文件存储] as FS
+}
+UI --> S : 输入与反馈
+S --> E : 协调业务
+E --> DB : 业务数据
+S --> FS : 影像及文书
+
+@enduml

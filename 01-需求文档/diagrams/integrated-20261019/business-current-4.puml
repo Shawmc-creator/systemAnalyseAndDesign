@@ -1,0 +1,31 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as A0
+actor "牙医" as A1
+actor "前台" as A2
+entity "复诊登记" as A3
+A1 -> A0 : 说明复诊目的和建议日期
+A1 -> A3 : 登记后续要求
+A1 -> A2 : 交接需联系患者
+A2 -> A0 : 联系并协调时间
+A2 -> A3 : 保留联系和安排
+A1 -> A0 : 实际复查并说明评估结果
+
+@enduml

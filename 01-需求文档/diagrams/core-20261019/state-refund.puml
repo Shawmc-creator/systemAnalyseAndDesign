@@ -1,0 +1,25 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 待审核
+待审核 --> 已同意 : 负责人核实原单与金额
+待审核 --> 已拒绝 : 说明审核结果
+待审核 --> 已退回 : 要求补充处理依据
+已退回 --> 待审核 : 补充后重新提交
+已同意 --> [*]
+已拒绝 --> [*]
+@enduml

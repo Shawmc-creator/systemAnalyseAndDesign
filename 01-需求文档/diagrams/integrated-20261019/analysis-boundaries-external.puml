@@ -1,0 +1,29 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor "支付平台" as P
+actor "医保平台" as I
+boundary "支付服务接口" as PB
+boundary "医保服务接口" as IB
+control "UC-13、14、21\n收付与核对控制" as PC
+control "UC-14、22、23\n医保办理控制" as IC
+P -- PB
+I -- IB
+PC ..> PB
+IC ..> IB
+
+@enduml

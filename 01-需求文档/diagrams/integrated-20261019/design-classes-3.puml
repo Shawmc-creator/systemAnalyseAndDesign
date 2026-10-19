@@ -1,0 +1,101 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+class "收费与复诊服务入口" as P <<boundary>> {
+ 接收输入()
+ 展示结果()
+}
+class "维护收费项目与价\n目服务" as S11 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S11
+class "收费项目对象" as E11 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S11 --> E11
+class "查询账单与待结算\n费用服务" as S12 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S12
+class "应收账目对象" as E12 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S12 --> E12
+class "办理患者付款与到\n账核实服务" as S13 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S13
+class "患者资金对象" as E13 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S13 --> E13
+class "办理费用更正与退\n费服务" as S14 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S14
+class "费用申请对象" as E14 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S14 --> E14
+class "提出复诊随访要求服务" as S15 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S15
+class "诊后要求对象" as E15 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S15 --> E15
+class "办理复诊联系与预\n约服务" as S16 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S16
+class "诊后要求对象" as E16 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S16 --> E16
+class "记录复诊随访评估服务" as S17 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S17
+class "诊后要求对象" as E17 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S17 --> E17
+
+@enduml

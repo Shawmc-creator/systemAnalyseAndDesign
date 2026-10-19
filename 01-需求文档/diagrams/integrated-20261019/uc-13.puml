@@ -1,0 +1,26 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor "收费人员" as A0
+actor "支付平台" as A1
+rectangle "牙科诊所管理系统" {
+usecase "UC-13\n办理患者付款与到账核实" as U
+}
+A0 -- U
+U -- A1
+
+@enduml

@@ -1,0 +1,38 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor "牙医" as A0
+boundary "牙医接口" as B0
+A0 -- B0
+control "UC-05\n查阅患者诊疗资料控制" as C0_5
+B0 ..> C0_5
+control "UC-06\n记录检查诊断与健\n康资料控制" as C0_6
+B0 ..> C0_6
+control "UC-07\n制定治疗方案并记\n录患者确认控制" as C0_7
+B0 ..> C0_7
+control "UC-08\n登记实际治疗与完\n成项目控制" as C0_8
+B0 ..> C0_8
+control "UC-09\n签署及补充病历控制" as C0_9
+B0 ..> C0_9
+control "UC-10\n管理影像与诊疗文\n书控制" as C0_10
+B0 ..> C0_10
+control "UC-15\n提出复诊随访要求控制" as C0_15
+B0 ..> C0_15
+control "UC-17\n记录复诊随访评估控制" as C0_17
+B0 ..> C0_17
+
+@enduml

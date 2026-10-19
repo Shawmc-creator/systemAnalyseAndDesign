@@ -1,0 +1,31 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as A0
+actor "收费人员" as A1
+actor "负责人" as A2
+entity "诊所管理系统" as S
+A0 -> A1 : 提出费用异议
+A1 -> S : 查找原账单和付款
+A1 -> S : 提交费用更正依据
+A2 -> S : 核实并确认处理范围
+A1 -> A0 : 办理实际退费
+A1 -> S : 登记实际金额及凭据
+
+@enduml

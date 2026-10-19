@@ -1,0 +1,47 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 145
+actor "前台／收费人员" as A
+boundary "医保办理接口" as B
+control "核验与预结算控制" as C
+entity "医保身份核验" as I
+entity "医保就诊办理" as F
+boundary "医保服务接口" as E
+actor "医保平台" as X
+A -> B : 提交患者就诊及必要身份信息
+B -> C : 核对机构条件与办理资料
+C -> E : 核验参保身份并登记就诊
+E -> X : 办理核验登记
+X --> E : 真实核验及登记结果
+E --> C : 身份和适用条件
+C -> I : 保存实际核验结果
+alt 条件符合
+ C -> F : 核对诊断编码、原费用及项目对应
+ C -> E : 上传费用并申请预结算
+ E -> X : 办理费用核对及预结算
+ X --> E : 基金、个账和其他自付预估
+ E --> C : 返回平台结果
+ C -> F : 保存预结算与患者选择
+else 不符合或结果未知
+ C --> B : 说明原因，补充或核实原笔
+end
+C --> B : 返回后续可办理事项
+B --> A : 展示并向患者说明
+
+@enduml

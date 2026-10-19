@@ -1,0 +1,66 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+skinparam nodesep 55
+skinparam ranksep 65
+class "材料" as material <<entity>> {
+ 名称
+ 规格
+ 基本单位
+}
+class "材料批次" as material_batch <<entity>> {
+ 批号
+ 效期
+ 来源说明
+}
+class "批次变更" as batch_change <<entity>> {
+ 原可用性
+ 新可用性
+ 原因
+}
+class "存放位置" as stock_location <<entity>> {
+ 名称
+ 用途
+}
+class "批次存量" as batch_stock <<entity>> {
+ 基本单位数量
+}
+class "库存变动" as inventory_movement <<entity>> {
+ 类型
+ 数量
+ 前后数量
+}
+class "实际用料" as material_usage <<entity>> {
+ 使用数量
+ 使用时间
+ 说明
+}
+class "盘点核实" as stock_count <<entity>> {
+ 账面快照
+ 实点数量
+ 原因
+}
+material "1" -- "0..*" material_batch
+material_batch "1" *-- "0..*" batch_change
+material_batch "1" -- "0..*" batch_stock
+stock_location "1" -- "0..*" batch_stock
+batch_stock "1" *-- "0..*" inventory_movement
+stock_count "0..1" -- "0..1" inventory_movement
+inventory_movement "1" *-- "0..*" material_usage
+batch_stock "1" *-- "0..*" stock_count
+
+@enduml

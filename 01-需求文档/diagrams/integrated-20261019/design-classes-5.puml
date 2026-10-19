@@ -1,0 +1,57 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+class "医保与药学服务入口" as P <<boundary>> {
+ 接收输入()
+ 展示结果()
+}
+class "核验医保身份并办\n理预结算服务" as S22 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S22
+class "医保身份核验对象" as E22 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S22 --> E22
+class "办理医保结算、撤\n销与回款核对服务" as S23 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S23
+class "医保就诊办理对象" as E23 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S23 --> E23
+class "开立处方并衔接院\n内外取药服务" as S25 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S25
+class "处方对象" as E25 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S25 --> E25
+
+@enduml

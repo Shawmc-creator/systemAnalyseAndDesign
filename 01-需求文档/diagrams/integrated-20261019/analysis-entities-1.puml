@@ -1,0 +1,112 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+skinparam nodesep 55
+skinparam ranksep 65
+class "患者" as patient <<entity>> {
+ 姓名
+ 出生日期
+ 联系电话
+}
+class "职员" as staff <<entity>> {
+ 姓名
+ 在岗起止
+}
+class "患者资料变更" as patient_change <<entity>> {
+ 原值
+ 新值
+ 原因
+}
+class "职员账号" as user_account <<entity>> {
+ 规范化小写登录名
+ 含算法、盐和参数的慢哈希编码
+ 启用或停用
+}
+class "诊椅" as dental_chair <<entity>> {
+ 名称
+ 可用起止
+}
+class "日期安排" as dated_schedule <<entity>> {
+ 营业日期
+ 起止时间
+ 确认时间
+}
+class "安排变更" as schedule_change <<entity>> {
+ 原日期时段
+ 新日期时段
+ 原因
+}
+class "接诊占用" as resource_occupancy <<entity>> {
+ 起止时间
+ 释放时间
+}
+class "预约" as appointment <<entity>> {
+ 计划起止
+ 就诊原因
+ 到期时间
+}
+class "预约变更" as appointment_change <<entity>> {
+ 原安排
+ 新安排
+ 原因
+}
+class "就诊" as visit <<entity>> {
+ 到诊时间
+ 接诊开始
+ 诊疗结束
+}
+class "诊疗设备" as clinical_equipment <<entity>> {
+ 设备名称
+ 设备类别
+ 可用状态
+}
+class "资源停用时段" as resource_block <<entity>> {
+ 开始时间
+ 结束时间
+ 清洁或停用原因
+}
+class "设备占用" as equipment_occupancy <<entity>> {
+ 计划时段
+ 实际使用时段
+ 占用状态
+}
+patient "1" *-- "0..*" patient_change
+staff "1" -- "0..1" user_account
+staff "1" -- "0..*" dated_schedule
+dental_chair "1" -- "0..*" dated_schedule
+dated_schedule "1" *-- "0..*" schedule_change
+staff "1" -- "0..*" schedule_change
+dental_chair "1" -- "0..*" schedule_change
+dated_schedule "1" -- "0..*" resource_occupancy
+appointment "0..1" -- "0..*" resource_occupancy
+visit "0..1" -- "0..*" resource_occupancy
+staff "0..1" -- "0..*" resource_occupancy
+patient "1" -- "0..*" appointment
+staff "0..1" -- "0..*" appointment
+appointment "1" *-- "0..*" appointment_change
+dated_schedule "1" -- "0..*" appointment_change
+patient "1" -- "0..*" visit
+appointment "0..1" -- "0..1" visit
+staff "1" -- "0..*" visit
+dental_chair "0..1" -- "0..*" clinical_equipment
+dental_chair "0..1" -- "0..*" resource_block
+clinical_equipment "0..1" -- "0..*" resource_block
+clinical_equipment "1" -- "0..*" equipment_occupancy
+appointment "0..1" -- "0..*" equipment_occupancy
+visit "0..1" -- "0..*" equipment_occupancy
+
+@enduml

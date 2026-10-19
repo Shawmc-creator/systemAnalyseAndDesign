@@ -1,0 +1,33 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "前台" as A0
+actor "牙医" as A1
+actor "助理" as A2
+actor "负责人" as A3
+actor "维护服务单位" as A4
+entity "资源使用登记" as A5
+A2 -> A5 : 核对诊椅设备及器械准备
+A1 -> A0 : 反馈实际使用延时
+A2 -> A3 : 报告故障或准备问题
+A3 -> A4 : 协调维护维修
+A0 -> A1 : 协调受影响患者
+A2 -> A5 : 实际结束并准备合格后更新可用
+
+@enduml

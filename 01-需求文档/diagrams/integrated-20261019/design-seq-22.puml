@@ -1,0 +1,48 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "前台" as A
+boundary "前台页面" as P
+control "核验医保身份并\n办理预结算服务" as S
+entity "医保身份核验对象" as E
+participant "业务数据存储接口" as R
+A -> P : 核验医保身份并办理预结算
+P -> S : 提交对象编号和业务内容
+activate S
+S -> R : 读取对象状态与关联业务
+activate R
+R --> S : 当前业务数据
+deactivate R
+S -> E : 身份核验不保证所有项目可报销
+activate E
+E --> S : 核对结果及本次变更
+deactivate E
+alt 业务条件满足
+S -> R : 以事务保存本次关联结果
+activate R
+R --> S : 保存成功
+deactivate R
+S --> P : 返回结果编号及状态
+else 核对或保存失败
+S --> P : 返回原因并保留原记录
+end
+P --> A : 展示结果并刷新列表
+deactivate S
+
+@enduml

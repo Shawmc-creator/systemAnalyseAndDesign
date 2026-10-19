@@ -1,0 +1,73 @@
+{
+  "version": "2026-10-19-integrated-ABCD",
+  "document_pages": 179,
+  "original_pages": 448,
+  "reduction_percent": 60.04,
+  "chapters": [
+    {
+      "name": "A业务建模",
+      "pdf_page": 3
+    },
+    {
+      "name": "B需求",
+      "pdf_page": 38
+    },
+    {
+      "name": "C分析",
+      "pdf_page": 70
+    },
+    {
+      "name": "D设计",
+      "pdf_page": 118
+    }
+  ],
+  "coverage": {
+    "business_usecases": 10,
+    "current_business_sequences": 10,
+    "improved_business_sequences": 10,
+    "system_usecases": 25,
+    "individual_system_usecase_diagrams": 25,
+    "analysis_sequences": 25,
+    "analysis_state_diagrams": 11,
+    "core_entity_classes": 69,
+    "core_tables": 69,
+    "database_overall_diagrams": 1,
+    "database_region_diagrams": 9,
+    "page_wireframes": 12,
+    "total_figures": 155
+  },
+  "checks": {
+    "missing_figure_files": 0,
+    "duplicate_figure_inclusions": 0,
+    "plantuml_errors": 0,
+    "latex_layout_warnings": 0,
+    "undefined_references": 0,
+    "core_class_table_match": true,
+    "foreign_keys_outside_core_model": 0,
+    "minimum_checked_figure_font_pt": 8.83,
+    "visual_review": "全稿缩略图总览，重点复核业务前后序列图、医保处方用例和分析序列图、数据库总图及分区图、字段表与岗位页面。",
+    "final_targeted_page_review": [
+      13,
+      23,
+      56,
+      64,
+      65,
+      67,
+      100,
+      108,
+      111,
+      123,
+      132,
+      133,
+      148,
+      176,
+      177
+    ]
+  },
+  "pdf_sha256": "6abe79987cbae1a72c48433d1bf9f8d02e8f65376f20da8e7639de202eb4d1b7",
+  "tex_sha256": "656c4e494d3bc2883ade173d74972578316ec3d0cb10c79e27a96ad955504f5f",
+  "unchanged_sql_sha256": "6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d",
+  "implementation_status": "未修改应用代码、运行数据或SQL；69表为现行核心业务设计，含54张保留表与15张新增设计表。",
+  "figures": "../diagrams/integrated-20261019/",
+  "data_model": "核心业务数据模型.json"
+}

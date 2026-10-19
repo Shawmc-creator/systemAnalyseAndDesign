@@ -1,0 +1,97 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor "前台" as A0
+actor "牙医" as A1
+actor "诊疗助理" as A2
+actor "收费人员" as A3
+actor "诊所负责人" as A4
+actor "药学岗位" as A5
+actor "支付平台" as A6
+actor "医保平台" as A7
+rectangle "牙科诊所管理系统" {
+usecase "UC-01\n维护患者资料" as U1
+usecase "UC-02\n维护预约安排" as U2
+usecase "UC-03\n登记到诊" as U3
+usecase "UC-04\n维护排班与接诊安排" as U4
+usecase "UC-05\n查阅患者诊疗资料" as U5
+usecase "UC-06\n记录检查诊断与健康资料" as U6
+usecase "UC-07\n制定治疗方案并记录患者确认" as U7
+usecase "UC-08\n登记实际治疗与完成项目" as U8
+usecase "UC-09\n签署及补充病历" as U9
+usecase "UC-10\n管理影像与诊疗文书" as U10
+usecase "UC-11\n维护收费项目与价目" as U11
+usecase "UC-12\n查询账单与待结算费用" as U12
+usecase "UC-13\n办理患者付款与到账核实" as U13
+usecase "UC-14\n办理费用更正与退费" as U14
+usecase "UC-15\n提出复诊随访要求" as U15
+usecase "UC-16\n办理复诊联系与预约" as U16
+usecase "UC-17\n记录复诊随访评估" as U17
+usecase "UC-18\n维护材料与批次资料" as U18
+usecase "UC-19\n登记基础采购与到货验收" as U19
+usecase "UC-20\n办理库存领用、退回与盘点" as U20
+usecase "UC-21\n核对日常经营与收付款" as U21
+usecase "UC-22\n核验医保身份并办理预结算" as U22
+usecase "UC-23\n办理医保结算、撤销与回款核对" as U23
+usecase "UC-24\n协调诊椅设备准备与停用恢复" as U24
+usecase "UC-25\n开立处方并衔接院内外取药" as U25
+}
+A0 -- U1
+A0 -- U2
+A0 -- U3
+A0 -- U16
+A0 -- U22
+A1 -- U5
+A1 -- U6
+A1 -- U7
+A1 -- U8
+A1 -- U9
+A1 -- U10
+A1 -- U15
+A1 -- U17
+A1 -- U25
+A2 -- U10
+A2 -- U18
+A2 -- U19
+A2 -- U20
+A2 -- U24
+A3 -- U11
+A3 -- U12
+A3 -- U13
+A3 -- U14
+A3 -- U21
+A3 -- U22
+A3 -- U23
+A4 -- U4
+A4 -- U11
+A4 -- U14
+A4 -- U18
+A4 -- U19
+A4 -- U20
+A4 -- U21
+A4 -- U23
+A4 -- U24
+A5 -- U25
+A6 -- U13
+A6 -- U14
+A6 -- U21
+A7 -- U14
+A7 -- U21
+A7 -- U22
+A7 -- U23
+
+@enduml

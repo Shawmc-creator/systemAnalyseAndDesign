@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor "收费人员" as A0
+boundary "收费人员接口" as B0
+A0 -- B0
+control "UC-11\n维护收费项目与价\n目控制" as C0_11
+B0 ..> C0_11
+control "UC-12\n查询账单与待结算\n费用控制" as C0_12
+B0 ..> C0_12
+control "UC-13\n办理患者收款与结\n算控制" as C0_13
+B0 ..> C0_13
+control "UC-14\n办理费用更正与退\n费控制" as C0_14
+B0 ..> C0_14
+control "UC-21\n查询日常经营与收\n款统计控制" as C0_21
+B0 ..> C0_21
+
+@enduml

@@ -1,0 +1,29 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 待支付
+待支付 --> 处理中 : 患者选择电子支付
+处理中 --> 已成功 : 核实原单成功且金额相符
+处理中 --> 已失败 : 明确未成功
+处理中 --> 待核实 : 超时或结果不明
+待核实 --> 已成功 : 查原笔确认成功
+待核实 --> 已失败 : 查原笔确认失败
+待支付 --> 已关闭 : 未付单经确认关闭
+已成功 --> [*]
+已失败 --> [*]
+已关闭 --> [*]
+@enduml

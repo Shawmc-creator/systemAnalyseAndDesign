@@ -1,0 +1,40 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as P
+actor "牙医" as D
+actor "药学岗位" as A
+entity "诊所管理系统" as S
+D -> S : 保存有效处方及取药路径
+D -> P : 说明用药安排
+alt 院外取药
+ S --> D : 提供可交付处方
+ D -> P : 交付处方和用药指导
+else 机构及人员具备院内条件
+ S --> A : 提供待审处方
+ A -> S : 记录审核结果
+ opt 需要医师重新确认
+  S --> D : 交接问题与原处方
+  D -> S : 核实并重新处理
+ end
+ A -> P : 审核通过及条件满足后实际发药
+ A -> S : 记录交付、用药交代和库存来源
+end
+
+@enduml

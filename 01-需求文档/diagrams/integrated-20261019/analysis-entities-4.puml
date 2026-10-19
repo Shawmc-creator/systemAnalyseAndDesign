@@ -1,0 +1,78 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+skinparam nodesep 55
+skinparam ranksep 65
+class "患者资金" as patient_funds <<entity>> {
+ 开户时间
+}
+class "收费项目" as service <<entity>> {
+ 名称
+ 计价单位
+}
+class "价目" as service_price <<entity>> {
+ 单价
+ 生效起止
+ 变更原因
+}
+class "应收账目" as bill <<entity>> {
+ 形成时间
+ 计费期间
+}
+class "应收项目" as bill_item <<entity>> {
+ 数量
+ 单价快照
+ 计费时点
+}
+class "患者付款" as patient_payment <<entity>> {
+ 净额
+ 实收
+ 找零
+}
+class "付款分配" as payment_allocation <<entity>> {
+ 分配金额
+ 生效时间
+ 变更原因
+}
+class "预付抵扣" as prepayment_offset <<entity>> {
+ 抵扣金额
+ 抵扣时间
+}
+class "电子支付单" as payment_order <<entity>> {
+ 渠道与金额
+ 渠道交易号
+ 支付状态
+}
+class "收退款核对" as payment_reconciliation <<entity>> {
+ 核对日期
+ 渠道差额
+ 处理结果
+}
+service "1" *-- "0..*" service_price
+patient_funds "1" -- "0..*" bill
+bill "1" *-- "0..*" bill_item
+service_price "0..1" -- "0..*" bill_item
+patient_funds "1" *-- "0..*" patient_payment
+patient_payment "1" *-- "0..*" payment_allocation
+bill "1" -- "0..*" payment_allocation
+patient_payment "1" *-- "0..*" prepayment_offset
+bill "1" -- "0..*" prepayment_offset
+bill "1" -- "0..*" payment_order
+patient_payment "0..1" -- "0..1" payment_order
+payment_order "0..1" -- "0..*" payment_reconciliation
+
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+start
+partition 前台 {
+:核实患者并安排预约;
+:登记到诊;
+}
+partition 牙医 {
+:复核健康资料并检查诊断;
+:说明方案与记录患者确认;
+:实施治疗并登记实际项目;
+:签署病历并提出后续要求;
+}
+partition 收费人员 {
+:核对账单与登记实际付款;
+}
+partition 前台 {
+:联系复诊并安排后续预约;
+}
+stop
+@enduml

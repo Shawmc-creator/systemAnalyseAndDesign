@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "助理" as A0
+actor "负责人" as A1
+actor "供应商" as A2
+entity "诊所管理系统" as S
+A0 -> S : 核对库存并提出需求
+A1 -> S : 确认采购内容
+A1 -> A2 : 确认供货安排
+A2 -> A0 : 交付实物
+A0 -> S : 保存实际验收与批次效期
+S -> A0 : 更新合格库存
+A0 -> S : 记录领用、用料、退回或盘点
+
+@enduml

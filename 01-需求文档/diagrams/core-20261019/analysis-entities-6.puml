@@ -1,0 +1,38 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+skinparam nodesep 55
+skinparam ranksep 65
+class "诊后要求" as followup_requirement <<entity>> {
+ 目的
+ 类型
+ 目标日期
+}
+class "联系经历" as contact_history <<entity>> {
+ 方式
+ 联系时间
+ 结果
+}
+class "临床评估" as clinical_assessment <<entity>> {
+ 方式
+ 评估时间
+ 结果
+}
+followup_requirement "1" *-- "0..*" contact_history
+followup_requirement "1" *-- "0..*" clinical_assessment
+
+@enduml

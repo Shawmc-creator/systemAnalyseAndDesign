@@ -1,0 +1,64 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+entity "患者资金\npatient_funds" as patient_funds {
+* id : INTEGER <<PK>>
+}
+entity "收费项目\nservice" as service {
+* id : INTEGER <<PK>>
+}
+entity "价目\nservice_price" as service_price {
+* id : INTEGER <<PK>>
+ service_id : INTEGER <<FK>>
+}
+entity "应收账目\nbill" as bill {
+* id : INTEGER <<PK>>
+ patient_funds_id : INTEGER <<FK>>
+}
+entity "应收项目\nbill_item" as bill_item {
+* id : INTEGER <<PK>>
+ bill_id : INTEGER <<FK>>
+ service_price_id : INTEGER <<FK>>
+}
+entity "患者付款\npatient_payment" as patient_payment {
+* id : INTEGER <<PK>>
+ patient_funds_id : INTEGER <<FK>>
+}
+entity "付款分配\npayment_allocation" as payment_allocation {
+* id : INTEGER <<PK>>
+ patient_payment_id : INTEGER <<FK>>
+ bill_id : INTEGER <<FK>>
+ original_allocation_id : INTEGER <<FK>>
+}
+entity "预付抵扣\nprepayment_offset" as prepayment_offset {
+* id : INTEGER <<PK>>
+ patient_payment_id : INTEGER <<FK>>
+ bill_id : INTEGER <<FK>>
+ original_offset_id : INTEGER <<FK>>
+}
+service ||--o{ service_price
+patient_funds ||--o{ bill
+bill ||--o{ bill_item
+service_price |o--o{ bill_item
+patient_funds ||--o{ patient_payment
+patient_payment ||--o{ payment_allocation
+bill ||--o{ payment_allocation
+patient_payment ||--o{ prepayment_offset
+bill ||--o{ prepayment_offset
+
+@enduml

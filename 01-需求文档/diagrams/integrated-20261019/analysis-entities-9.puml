@@ -1,0 +1,62 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+skinparam nodesep 55
+skinparam ranksep 65
+class "医保身份核验" as insurance_identity <<entity>> {
+ 参保地区
+ 核验结果
+ 核验时间
+}
+class "医保项目对应" as insurance_item_mapping <<entity>> {
+ 当地医保编码
+ 适用地区期间
+ 对应结果
+}
+class "医保就诊办理" as insurance_case <<entity>> {
+ 原费用版本
+ 患者费用选择
+ 办理状态
+}
+class "医保费用明细" as insurance_fee <<entity>> {
+ 诊疗费用来源
+ 上传编码数量
+ 平台核对结果
+}
+class "医保结算" as insurance_settlement <<entity>> {
+ 最终分摊
+ 医保结算编号
+ 结算结果
+}
+class "医保撤销办理" as insurance_reversal <<entity>> {
+ 原医保结算
+ 撤销原因
+ 核实结果
+}
+class "医保结算款收付" as insurance_fund_receipt <<entity>> {
+ 拨付或退回
+ 实际到账金额
+ 核对依据
+}
+insurance_identity "1" -- "0..*" insurance_case
+insurance_case "1" -- "0..*" insurance_fee
+insurance_item_mapping "1" -- "0..*" insurance_fee
+insurance_case "1" -- "0..*" insurance_settlement
+insurance_settlement "1" -- "0..*" insurance_reversal
+insurance_settlement "1" -- "0..*" insurance_fund_receipt
+
+@enduml

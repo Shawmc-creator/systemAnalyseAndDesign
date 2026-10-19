@@ -1,0 +1,68 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+class "物资与管理服务入口" as P <<boundary>> {
+ 接收输入()
+ 展示结果()
+}
+class "维护材料与批次资\n料服务" as S18 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S18
+class "材料对象" as E18 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S18 --> E18
+class "登记基础采购与到\n货验收服务" as S19 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S19
+class "供应商对象" as E19 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S19 --> E19
+class "办理库存领用、退\n回与盘点服务" as S20 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S20
+class "批次存量对象" as E20 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S20 --> E20
+class "核对日常经营与收\n付款服务" as S21 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S21
+class "就诊对象" as E21 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S21 --> E21
+
+@enduml

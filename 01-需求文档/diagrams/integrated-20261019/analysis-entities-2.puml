@@ -1,0 +1,81 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+skinparam nodesep 55
+skinparam ranksep 65
+class "健康版本" as health_version <<entity>> {
+ 形成时间
+ 变更原因
+}
+class "健康条目" as health_item <<entity>> {
+ 类别
+ 内容
+ 确认程度
+}
+class "健康复核" as health_review <<entity>> {
+ 复核时间
+ 复核结论
+}
+class "病历" as clinical_record <<entity>> {
+ 主诉
+ 诊断
+ 处理意见
+}
+class "检查所见" as clinical_finding <<entity>> {
+ 牙位
+ 牙面
+ 所见内容
+}
+class "病历补充" as record_addendum <<entity>> {
+ 内容
+ 原因
+ 补充时间
+}
+class "诊疗文件" as clinical_document <<entity>> {
+ 类型
+ 来源
+ 归属说明
+}
+class "文件版本" as document_version <<entity>> {
+ 原文件名
+ 大小
+ 校验值
+}
+class "处方" as prescription <<entity>> {
+ 开立医师
+ 用药与取药安排
+ 处方状态
+}
+class "处方明细" as prescription_item <<entity>> {
+ 药品规格
+ 用法用量
+ 开立数量
+}
+class "实际发药" as dispense_record <<entity>> {
+ 发药数量
+ 实际发药时间
+ 核对人员
+}
+health_version "1" *-- "0..*" health_item
+health_version "1" -- "0..*" health_review
+clinical_record "1" *-- "0..*" clinical_finding
+clinical_record "1" *-- "0..*" record_addendum
+clinical_document "1" *-- "0..*" document_version
+prescription "1" -- "0..*" prescription_item
+prescription_item "1" -- "0..*" dispense_record
+
+@enduml

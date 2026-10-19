@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor "前台" as A0
+rectangle "牙科诊所管理系统" {
+usecase "UC-01 维护患者资料" as U1
+usecase "UC-02 维护预约安排" as U2
+usecase "UC-03 登记到诊" as U3
+usecase "UC-16 办理复诊联系与预约" as U16
+usecase "UC-22 核验医保身份并办理预\n结算" as U22
+}
+A0 -- U1
+A0 -- U2
+A0 -- U3
+A0 -- U16
+A0 -- U22
+
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as A0
+actor "前台" as A1
+actor "牙医" as A2
+actor "负责人" as A3
+entity "排班与预约登记表" as A4
+entity "诊椅设备使用情况" as A5
+A3 -> A4 : 登记出诊与接诊安排
+A0 -> A1 : 提出预约或现场需求
+A1 -> A4 : 查找排班及已有预约
+A4 -> A1 : 提供原安排
+A1 -> A2 : 核实接诊情况和是否延时
+A1 -> A5 : 核对现场占用及准备
+A1 -> A0 : 协调并确认接诊时间
+A1 -> A4 : 记录预约与实际到诊
+A1 -> A2 : 交接患者候诊信息
+
+@enduml

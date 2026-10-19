@@ -1,0 +1,23 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 已预留
+已预留 --> 使用中 : 接诊准备满足并实际开始
+已预留 --> 已释放 : 取消或改约释放原预留
+使用中 --> 已释放 : 确认实际使用结束
+已释放 --> [*]
+@enduml

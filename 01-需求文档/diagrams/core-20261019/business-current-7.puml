@@ -1,0 +1,30 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "负责人" as A0
+actor "牙医" as A1
+actor "前台" as A2
+actor "收费人员" as A3
+A0 -> A1 : 核对出诊日期
+A0 -> A2 : 发布接诊安排
+A2 -> A0 : 反馈临时变更
+A3 -> A0 : 汇总收款与欠费
+A0 -> A0 : 核对经营情况并协调问题
+
+@enduml

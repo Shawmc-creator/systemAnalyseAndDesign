@@ -1,0 +1,91 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 40
+skinparam ranksep 50
+|前台|
+start
+:受理预约或现场就诊需求;
+:核对身份、就诊原因与时间意向;
+|牙医|
+if (存在需优先处理的情况?) then (是)
+ :评估接诊优先级与处置条件;
+ if (需要转诊?) then (是)
+  :交付转诊建议并完成必要记录;
+  stop
+ else (优先处置)
+  :协调所需人员和接诊资源;
+ endif
+else (否)
+ |前台|
+ :协调牙医、诊椅及必要设备时段;
+ :确认预约，患者到店后登记到诊;
+endif
+|前台|
+if (患者拟使用医保?) then (是)
+ :核验参保身份与就诊登记条件;
+else (否)
+ :明确按自费方式办理;
+endif
+|诊疗助理|
+:确认诊椅、器械和关键设备就绪;
+|牙医|
+:核对病史、过敏和当前情况;
+:检查诊断，按需安排影像或其他检查;
+:向患者说明治疗方案、费用和用药安排;
+if (患者确认本次治疗?) then (是)
+ :核实执行前必要手续;
+ :实施治疗，记录实际项目与用料;
+else (暂缓或拒绝)
+ :记录决定，给出相应后续建议;
+endif
+if (需要处方?) then (是)
+ :开立并确认处方及用药指导;
+endif
+:完成病历与后续诊疗意见;
+:确认当次诊疗操作结束并交接;
+fork
+|诊疗助理|
+:诊椅腾空后清洁、器械回收;
+:确认环境与设备可用后恢复接诊资源;
+fork again
+|收费人员|
+:按实际发生项目核对费用;
+if (使用医保结算?) then (是)
+ :办理预结算、确认分摊和正式结算;
+endif
+:核实自费或自付收款，交付凭据;
+|前台|
+:说明复诊安排并接续联系待办;
+end fork
+stop
+
+
+
+@enduml

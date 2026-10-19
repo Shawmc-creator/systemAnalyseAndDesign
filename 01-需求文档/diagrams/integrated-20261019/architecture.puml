@@ -1,0 +1,46 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+package 表示层 {
+ [岗位工作台] as UI
+}
+package 业务层 {
+ [接诊与临床服务] as C
+ [收费医保与复诊服务] as F
+ [物资及资源协调服务] as R
+ [业务实体与业务规则] as E
+ [支付服务适配] as P
+ [医保服务适配] as I
+}
+database "SQLite业务数据" as DB
+[影像文书存储] as FS
+cloud "支付平台" as PX
+cloud "医保平台" as IX
+UI --> C
+UI --> F
+UI --> R
+C --> E
+F --> E
+R --> E
+E --> DB
+C --> FS
+F --> P
+F --> I
+P --> PX
+I --> IX
+
+@enduml

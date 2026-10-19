@@ -1,0 +1,97 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+entity "患者\npatient" as patient {
+* id : INTEGER <<PK>>
+}
+entity "职员\nstaff" as staff {
+* id : INTEGER <<PK>>
+}
+entity "患者资料变更\npatient_change" as patient_change {
+* id : INTEGER <<PK>>
+ patient_id : INTEGER <<FK>>
+ operator_id : INTEGER <<FK>>
+}
+entity "职员账号\nuser_account" as user_account {
+* id : INTEGER <<PK>>
+ staff_id : INTEGER <<FK>>
+}
+entity "诊椅\ndental_chair" as dental_chair {
+* id : INTEGER <<PK>>
+}
+entity "日期安排\ndated_schedule" as dated_schedule {
+* id : INTEGER <<PK>>
+ dentist_id : INTEGER <<FK>>
+ dental_chair_id : INTEGER <<FK>>
+}
+entity "安排变更\nschedule_change" as schedule_change {
+* id : INTEGER <<PK>>
+ dated_schedule_id : INTEGER <<FK>>
+ operator_id : INTEGER <<FK>>
+ old_dentist_id : INTEGER <<FK>>
+ new_dentist_id : INTEGER <<FK>>
+ old_chair_id : INTEGER <<FK>>
+ new_chair_id : INTEGER <<FK>>
+}
+entity "接诊占用\nresource_occupancy" as resource_occupancy {
+* id : INTEGER <<PK>>
+ dated_schedule_id : INTEGER <<FK>>
+ appointment_id : INTEGER <<FK>>
+ visit_id : INTEGER <<FK>>
+}
+entity "预约\nappointment" as appointment {
+* id : INTEGER <<PK>>
+ patient_id : INTEGER <<FK>>
+}
+entity "预约变更\nappointment_change" as appointment_change {
+* id : INTEGER <<PK>>
+ appointment_id : INTEGER <<FK>>
+ operator_id : INTEGER <<FK>>
+ old_schedule_id : INTEGER <<FK>>
+ new_schedule_id : INTEGER <<FK>>
+}
+entity "就诊\nvisit" as visit {
+* id : INTEGER <<PK>>
+ patient_id : INTEGER <<FK>>
+ appointment_id : INTEGER <<FK>>
+ dentist_id : INTEGER <<FK>>
+}
+staff ||--o{ patient
+patient ||--o{ patient_change
+staff ||--o{ patient_change
+staff ||--o| user_account
+staff ||--o{ dental_chair
+staff ||--o{ dated_schedule
+dental_chair ||--o{ dated_schedule
+dated_schedule ||--o{ schedule_change
+staff ||--o{ schedule_change
+dental_chair ||--o{ schedule_change
+dated_schedule ||--o{ resource_occupancy
+appointment |o--o{ resource_occupancy
+visit |o--o{ resource_occupancy
+staff ||--o{ resource_occupancy
+patient ||--o{ appointment
+staff ||--o{ appointment
+appointment ||--o{ appointment_change
+staff ||--o{ appointment_change
+dated_schedule ||--o{ appointment_change
+patient ||--o{ visit
+appointment |o--o| visit
+staff ||--o{ visit
+
+@enduml

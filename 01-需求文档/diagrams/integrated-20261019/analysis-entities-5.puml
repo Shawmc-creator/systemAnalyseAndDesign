@@ -1,0 +1,42 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+skinparam nodesep 55
+skinparam ranksep 65
+class "费用申请" as fee_request <<entity>> {
+ 处理理由
+ 拟调整额
+ 拟退额
+}
+class "费用调整" as fee_adjustment <<entity>> {
+ 调整原因
+ 生效时间
+}
+class "调整项目" as fee_adjustment_item <<entity>> {
+ 调整金额
+ 说明
+}
+class "退款办理" as patient_refund <<entity>> {
+ 拟退额
+ 实际额
+ 办理时间
+}
+fee_request "1" -- "0..1" fee_adjustment
+fee_adjustment "1" *-- "0..*" fee_adjustment_item
+fee_request "1" -- "0..*" patient_refund
+
+@enduml

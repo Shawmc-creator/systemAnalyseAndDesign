@@ -1,0 +1,39 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+entity "费用申请\nfee_request" as fee_request {
+* id : INTEGER <<PK>>
+}
+entity "费用调整\nfee_adjustment" as fee_adjustment {
+* id : INTEGER <<PK>>
+ fee_request_id : INTEGER <<FK>>
+}
+entity "调整项目\nfee_adjustment_item" as fee_adjustment_item {
+* id : INTEGER <<PK>>
+ fee_adjustment_id : INTEGER <<FK>>
+}
+entity "退款办理\npatient_refund" as patient_refund {
+* id : INTEGER <<PK>>
+ fee_request_id : INTEGER <<FK>>
+ previous_attempt_id : INTEGER <<FK>>
+}
+fee_request ||--o| fee_adjustment
+fee_adjustment ||--o{ fee_adjustment_item
+fee_request ||--o{ patient_refund
+
+@enduml

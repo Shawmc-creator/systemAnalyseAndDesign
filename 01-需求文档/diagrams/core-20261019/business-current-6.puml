@@ -1,0 +1,29 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "助理" as A0
+actor "负责人" as A1
+actor "供应商" as A2
+A0 -> A1 : 提出材料采购需求
+A1 -> A2 : 确认材料与数量
+A2 -> A0 : 交付实物材料
+A0 -> A0 : 核对批次、效期和数量
+A0 -> A1 : 交接验收及库存情况
+
+@enduml

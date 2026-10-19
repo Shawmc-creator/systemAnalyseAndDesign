@@ -1,0 +1,37 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as P
+actor "收费人员" as C
+entity "诊所管理系统" as S
+participant "支付平台" as Pay
+C -> S : 核对原费用及医保后患者待付
+C -> P : 确认金额和支付方式
+alt 现金
+ P -> C : 实际交付现金
+ C -> S : 记录实收与找零
+else 电子支付
+ C -> S : 发起本次患者付款
+ S -> Pay : 办理原笔支付及必要查询
+ Pay --> S : 明确成功、失败或仍待核实
+end
+S --> C : 返回实际收款、余额与待办
+C -> P : 交付真实结果和凭据
+
+@enduml

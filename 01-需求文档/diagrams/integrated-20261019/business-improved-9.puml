@@ -1,0 +1,34 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "前台" as A0
+actor "牙医" as A1
+actor "助理" as A2
+actor "负责人" as A3
+actor "维护服务单位" as A4
+entity "诊所管理系统" as S
+A2 -> S : 记录准备占用或故障停用
+S -> A0 : 提示冲突和受影响预约
+A3 -> A1 : 协调实际接诊安排
+A3 -> A4 : 安排维护维修
+A1 -> S : 确认实际使用结束
+A2 -> S : 清洁及核验合格后恢复资源
+S -> A0 : 提供恢复后的可用安排
+
+@enduml

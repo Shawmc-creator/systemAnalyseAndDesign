@@ -1,0 +1,35 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as A0
+actor "收费人员" as A1
+actor "负责人" as A2
+entity "原单与处理记录" as A3
+participant "医保平台" as A4
+participant "支付平台" as A5
+A0 -> A1 : 提出费用异议
+A1 -> A3 : 查找实际项目和原收款
+A1 -> A2 : 提交原单与处理依据
+A2 -> A1 : 确认处理范围
+A1 -> A4 : 有医保原单时按规则处理
+A1 -> A5 : 电子原款办理相应退款并核实
+A1 -> A3 : 记录更正和实际退费
+A1 -> A0 : 说明处理结果
+
+@enduml

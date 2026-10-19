@@ -1,0 +1,28 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor/ "患者" as A0
+actor/ "支付服务机构" as A1
+actor/ "医保经办机构" as A2
+rectangle "青禾牙科诊所" {
+usecase/ "BUC-07\n费用更正与退费" as U
+}
+A0 -- U
+U -- A1
+U -- A2
+
+@enduml

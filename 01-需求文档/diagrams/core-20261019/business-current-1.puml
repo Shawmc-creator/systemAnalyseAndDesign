@@ -1,0 +1,30 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as A0
+actor "前台" as A1
+actor "牙医" as A2
+A0 -> A1 : 提出预约或现场就诊需求
+A1 -> A2 : 核对出诊和接诊时间
+A2 -> A1 : 确认可接诊安排
+A1 -> A0 : 说明接诊日期与时段
+A0 -> A1 : 到店并核对身份
+A1 -> A2 : 通知患者候诊
+
+@enduml

@@ -1,0 +1,45 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+entity "供应商\nsupplier" as supplier {
+* id : INTEGER <<PK>>
+}
+entity "采购\npurchase_order" as purchase_order {
+* id : INTEGER <<PK>>
+ supplier_id : INTEGER <<FK>>
+}
+entity "采购项目\npurchase_order_item" as purchase_order_item {
+* id : INTEGER <<PK>>
+ purchase_order_id : INTEGER <<FK>>
+}
+entity "验收\npurchase_receipt" as purchase_receipt {
+* id : INTEGER <<PK>>
+ purchase_order_id : INTEGER <<FK>>
+}
+entity "验收项目\npurchase_receipt_item" as purchase_receipt_item {
+* id : INTEGER <<PK>>
+ purchase_receipt_id : INTEGER <<FK>>
+ purchase_order_item_id : INTEGER <<FK>>
+}
+supplier ||--o{ purchase_order
+purchase_order ||--o{ purchase_order_item
+purchase_order ||--o{ purchase_receipt
+purchase_receipt ||--o{ purchase_receipt_item
+purchase_order_item ||--o{ purchase_receipt_item
+
+@enduml

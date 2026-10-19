@@ -1,0 +1,68 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+class "接诊服务入口" as P <<boundary>> {
+ 接收输入()
+ 展示结果()
+}
+class "维护患者资料服务" as S1 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S1
+class "患者对象" as E1 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S1 --> E1
+class "维护预约安排服务" as S2 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S2
+class "患者对象" as E2 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S2 --> E2
+class "登记到诊服务" as S3 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S3
+class "患者对象" as E3 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S3 --> E3
+class "维护排班与诊椅安\n排服务" as S4 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S4
+class "职员对象" as E4 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S4 --> E4
+
+@enduml

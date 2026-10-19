@@ -1,0 +1,50 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor "牙医" as A0
+actor "诊疗助理" as A1
+rectangle "牙科诊所管理系统" {
+usecase "UC-05 查阅患者诊疗资料" as U5
+usecase "UC-06 记录检查诊断与健康资\n料" as U6
+usecase "UC-07 制定治疗方案并记录患\n者确认" as U7
+usecase "UC-08 登记实际治疗与完成项\n目" as U8
+usecase "UC-09 签署及补充病历" as U9
+usecase "UC-10 管理影像与诊疗文书" as U10
+usecase "UC-15 提出复诊随访要求" as U15
+usecase "UC-17 记录复诊随访评估" as U17
+usecase "UC-18 维护材料与批次资料" as U18
+usecase "UC-19 登记基础采购与到货验\n收" as U19
+usecase "UC-20 办理库存领用、退回与\n盘点" as U20
+usecase "UC-24 协调诊椅设备准备与停\n用恢复" as U24
+usecase "UC-25 开立处方并衔接院内外\n取药" as U25
+}
+A0 -- U5
+A0 -- U6
+A0 -- U7
+A0 -- U8
+A0 -- U9
+A0 -- U10
+A0 -- U15
+A0 -- U17
+A0 -- U25
+A1 -- U10
+A1 -- U18
+A1 -- U19
+A1 -- U20
+A1 -- U24
+
+@enduml

@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor "收费人员" as A0
+actor "诊所负责人" as A1
+rectangle "牙科诊所管理系统" {
+usecase "UC-04 维护排班与接诊安排" as U4
+usecase "UC-11 维护收费项目与价目" as U11
+usecase "UC-12 查询账单与待结算费用" as U12
+usecase "UC-13 办理患者付款与到账核\n实" as U13
+usecase "UC-14 办理费用更正与退费" as U14
+usecase "UC-18 维护材料与批次资料" as U18
+usecase "UC-19 登记基础采购与到货验\n收" as U19
+usecase "UC-20 办理库存领用、退回与\n盘点" as U20
+usecase "UC-21 核对日常经营与收付款" as U21
+usecase "UC-22 核验医保身份并办理预\n结算" as U22
+usecase "UC-23 办理医保结算、撤销与\n回款核对" as U23
+usecase "UC-24 协调诊椅设备准备与停\n用恢复" as U24
+}
+A0 -- U11
+A0 -- U12
+A0 -- U13
+A0 -- U14
+A0 -- U21
+A0 -- U22
+A0 -- U23
+A1 -- U4
+A1 -- U11
+A1 -- U14
+A1 -- U18
+A1 -- U19
+A1 -- U20
+A1 -- U21
+A1 -- U23
+A1 -- U24
+
+@enduml

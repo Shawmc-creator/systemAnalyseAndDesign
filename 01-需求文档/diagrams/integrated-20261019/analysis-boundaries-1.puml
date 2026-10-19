@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+left to right direction
+actor "前台" as A0
+boundary "前台接口" as B0
+A0 -- B0
+control "UC-01\n维护患者资料控制" as C0_1
+B0 ..> C0_1
+control "UC-02\n维护预约安排控制" as C0_2
+B0 ..> C0_2
+control "UC-03\n登记到诊控制" as C0_3
+B0 ..> C0_3
+control "UC-16\n办理复诊联系与预\n约控制" as C0_16
+B0 ..> C0_16
+control "UC-22\n核验医保身份并办\n理预结算控制" as C0_22
+B0 ..> C0_22
+
+@enduml

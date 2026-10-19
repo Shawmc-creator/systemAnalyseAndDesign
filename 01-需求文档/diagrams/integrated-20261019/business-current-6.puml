@@ -1,0 +1,34 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as A0
+actor "前台" as A1
+actor "牙医" as A2
+actor "收费人员" as A3
+participant "医保平台" as A4
+entity "医保费用登记" as A5
+A0 -> A1 : 提供身份并选择医保办理
+A1 -> A4 : 通过专用服务核验登记
+A2 -> A3 : 交接诊断和实际项目
+A3 -> A4 : 核对编码、上传费用并预结算
+A3 -> A0 : 说明分摊并记录患者选择
+A3 -> A4 : 正式结算并查询结果
+A3 -> A5 : 保留结果并与自付账核对
+
+@enduml

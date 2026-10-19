@@ -1,0 +1,59 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+skinparam nodesep 55
+skinparam ranksep 65
+class "治疗方案" as treatment_plan <<entity>> {
+ 目标
+ 建立时间
+ 终止原因
+}
+class "方案版本" as plan_version <<entity>> {
+ 诊断依据说明
+ 说明时间
+ 变更原因
+}
+class "方案项目" as plan_item <<entity>> {
+ 项目内容
+ 牙位
+ 牙面
+}
+class "患者决定" as patient_decision <<entity>> {
+ 决定内容
+ 决定时间
+ 确认范围
+}
+class "患者决定—方案项目" as decision_plan_item <<entity>> {
+ 确认时保留的关联形成时刻。
+}
+class "患者决定—确认原件" as decision_file_version <<entity>> {
+ 确认时保留的关联形成时刻。
+}
+class "诊疗执行" as treatment_execution <<entity>> {
+ 牙位
+ 牙面
+ 完成数量
+}
+treatment_plan "1" *-- "0..*" plan_version
+plan_version "1" *-- "0..*" plan_item
+plan_version "1" *-- "0..*" patient_decision
+patient_decision "1" -- "0..*" decision_plan_item
+plan_item "1" -- "0..*" decision_plan_item
+patient_decision "1" -- "0..*" decision_file_version
+plan_item "0..1" -- "0..*" treatment_execution
+
+@enduml

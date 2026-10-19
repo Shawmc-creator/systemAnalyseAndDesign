@@ -1,0 +1,1594 @@
+{
+  "planned_content_pages": 177,
+  "usecases": 25,
+  "core_tables": 69,
+  "figures": 155,
+  "pages": [
+    "诊所业务与建设目标",
+    "愿景表",
+    "业务主体与岗位责任",
+    "完整业务范围",
+    "业务总体视图",
+    "业务用例办理结果1",
+    "业务用例办理结果2",
+    "业务用例办理结果3",
+    "业务用例办理结果4",
+    "岗位交接与业务完成条件",
+    "预约与到诊现状",
+    "检查诊断与治疗现状",
+    "处方与用药现状",
+    "复诊与随访现状",
+    "自费与自付缴费现状",
+    "门诊医保结算现状",
+    "费用更正与退费现状",
+    "采购与日常物资现状",
+    "资源准备与设备维护现状",
+    "日常经营与款项核对现状",
+    "预约与到诊改进",
+    "检查诊断与治疗改进",
+    "处方与用药改进",
+    "复诊与随访改进",
+    "自费与自付缴费改进",
+    "门诊医保结算改进",
+    "费用更正与退费改进",
+    "采购与日常物资改进",
+    "资源准备与设备维护改进",
+    "日常经营与款项核对改进",
+    "患者服务全过程",
+    "接诊资源协调与恢复",
+    "资源冲突的办理",
+    "开诊准备与日终核对",
+    "支付医保分摊与实际结果",
+    "系统总体视图",
+    "前台用例视图",
+    "牙医与助理用例视图",
+    "收费与负责人用例视图",
+    "核心系统用例清单",
+    "UC-01：维护患者资料",
+    "UC-02：维护预约安排",
+    "UC-03：登记到诊",
+    "UC-04：维护排班与接诊安排",
+    "UC-05：查阅患者诊疗资料",
+    "UC-06：记录检查诊断与健康资料",
+    "UC-07：制定治疗方案并记录患者确认",
+    "UC-08：登记实际治疗与完成项目",
+    "UC-09：签署及补充病历",
+    "UC-10：管理影像与诊疗文书",
+    "UC-11：维护收费项目与价目",
+    "UC-12：查询账单与待结算费用",
+    "UC-13：办理患者付款与到账核实",
+    "UC-14：办理费用更正与退费",
+    "UC-15：提出复诊随访要求",
+    "UC-16：办理复诊联系与预约",
+    "UC-17：记录复诊随访评估",
+    "UC-18：维护材料与批次资料",
+    "UC-19：登记基础采购与到货验收",
+    "UC-20：办理库存领用、退回与盘点",
+    "UC-21：核对日常经营与收付款",
+    "UC-22：核验医保身份并办理预结算",
+    "UC-23：办理医保结算、撤销与回款核对",
+    "UC-24：协调诊椅设备准备与停用恢复",
+    "UC-25：开立处方并衔接院内外取药",
+    "质量与权限要求",
+    "主要业务验收场景",
+    "前台边界与控制",
+    "牙医边界与控制",
+    "收费人员边界与控制",
+    "助理与负责人边界与控制",
+    "药学办理边界与控制",
+    "外部支付医保接口与控制",
+    "身份与接诊实体关系",
+    "病历与诊疗文书实体关系",
+    "治疗方案与实际执行实体关系",
+    "价目、账单与收款实体关系",
+    "费用更正与退费实体关系",
+    "复诊与随访实体关系",
+    "材料与库存实体关系",
+    "基础采购与验收实体关系",
+    "门诊医保与结算款实体关系",
+    "用例与实体责任1",
+    "用例与实体责任2",
+    "UC-01：维护患者资料",
+    "UC-02：维护预约安排",
+    "UC-03：登记到诊",
+    "UC-04：维护排班与接诊安排",
+    "UC-05：查阅患者诊疗资料",
+    "UC-06：记录检查诊断与健康资料",
+    "UC-07：制定治疗方案并记录患者确认",
+    "UC-08：登记实际治疗与完成项目",
+    "UC-09：签署及补充病历",
+    "UC-10：管理影像与诊疗文书",
+    "UC-11：维护收费项目与价目",
+    "UC-12：查询账单与待结算费用",
+    "UC-13：办理患者付款与到账核实",
+    "UC-14：办理费用更正与退费",
+    "UC-15：提出复诊随访要求",
+    "UC-16：办理复诊联系与预约",
+    "UC-17：记录复诊随访评估",
+    "UC-18：维护材料与批次资料",
+    "UC-19：登记基础采购与到货验收",
+    "UC-20：办理库存领用、退回与盘点",
+    "UC-21：核对日常经营与收付款",
+    "UC-22：核验医保身份并办理预结算",
+    "UC-23：办理医保结算、撤销与回款核对",
+    "UC-24：协调诊椅设备准备与停用恢复",
+    "UC-25：开立处方并衔接院内外取药",
+    "主要业务状态1",
+    "主要业务状态2",
+    "主要业务状态3",
+    "主要业务状态4",
+    "主要业务状态5",
+    "主要业务状态6",
+    "三层职责与部署",
+    "分析类与核心表对应1",
+    "分析类与核心表对应2",
+    "分析类与核心表对应3",
+    "分析类与核心表对应4",
+    "数据库关系总图",
+    "身份与接诊数据结构",
+    "病历与诊疗文书数据结构",
+    "治疗方案与实际执行数据结构",
+    "价目、账单与收款数据结构",
+    "费用更正与退费数据结构",
+    "复诊与随访数据结构",
+    "材料与库存数据结构",
+    "基础采购与验收数据结构",
+    "门诊医保与结算款数据结构",
+    "主要业务字段1",
+    "主要业务字段2",
+    "主要业务字段3",
+    "主要业务字段4",
+    "主要业务字段5",
+    "主要业务字段6",
+    "主要业务字段7",
+    "主要业务字段8",
+    "主要业务字段9",
+    "主要业务字段10",
+    "主要业务字段11",
+    "主要业务字段12",
+    "主要业务字段13",
+    "主要业务字段14",
+    "主要业务字段15",
+    "主要业务字段16",
+    "主要业务字段17",
+    "主要业务字段18",
+    "数据完整性与业务保存",
+    "共享字段与存储安排",
+    "接诊服务职责精化",
+    "临床服务职责精化",
+    "收费与复诊服务职责精化",
+    "物资与管理服务职责精化",
+    "医保与药学服务职责精化",
+    "维护预约安排业务协作",
+    "记录检查诊断与健康资料业务协作",
+    "制定治疗方案并记录患者确认业务协作",
+    "登记实际治疗与完成项目业务协作",
+    "办理患者付款与到账核实业务协作",
+    "办理费用更正与退费业务协作",
+    "办理复诊联系与预约业务协作",
+    "登记基础采购与到货验收业务协作",
+    "办理库存领用、退回与盘点业务协作",
+    "核验医保身份并办理预结算业务协作",
+    "协调诊椅设备准备与停用恢复业务协作",
+    "开立处方并衔接院内外取药业务协作",
+    "业务保存及失败反馈",
+    "岗位导航",
+    "岗位页面1",
+    "岗位页面2",
+    "岗位页面3",
+    "岗位页面4",
+    "岗位页面5",
+    "岗位页面6",
+    "页面与岗位权限",
+    "表单输入与结果反馈"
+  ],
+  "figure_jobs": [
+    {
+      "stem": "business-overall",
+      "title": "诊所业务用例图",
+      "kind": "business",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.85
+    },
+    {
+      "stem": "buc-01",
+      "title": "BUC-01 预约与到诊业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "buc-02",
+      "title": "BUC-02 检查诊断与口腔治疗业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "buc-03",
+      "title": "BUC-03 处方与用药服务业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "buc-04",
+      "title": "BUC-04 复诊与随访业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "buc-05",
+      "title": "BUC-05 自费与自付缴费业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "buc-06",
+      "title": "BUC-06 医保门诊结算业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "buc-07",
+      "title": "BUC-07 费用更正与退费业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "buc-08",
+      "title": "BUC-08 物资采购与验收业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "buc-09",
+      "title": "BUC-09 设备维护与恢复业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "buc-10",
+      "title": "BUC-10 日常收款与医保款核对业务用例图",
+      "kind": "business"
+    },
+    {
+      "stem": "business-current-1",
+      "title": "预约与到诊现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.28
+    },
+    {
+      "stem": "business-current-2",
+      "title": "检查诊断与治疗现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.4
+    },
+    {
+      "stem": "business-current-3",
+      "title": "处方与用药现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 12.55
+    },
+    {
+      "stem": "business-current-4",
+      "title": "复诊与随访现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 13.87
+    },
+    {
+      "stem": "business-current-5",
+      "title": "自费与自付缴费现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.43
+    },
+    {
+      "stem": "business-current-6",
+      "title": "门诊医保结算现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.15
+    },
+    {
+      "stem": "business-current-7",
+      "title": "费用更正与退费现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 11.15
+    },
+    {
+      "stem": "business-current-8",
+      "title": "采购与日常物资现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 19.66
+    },
+    {
+      "stem": "business-current-9",
+      "title": "资源准备与设备维护现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.44
+    },
+    {
+      "stem": "business-current-10",
+      "title": "日常经营与款项核对现状业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 13.92
+    },
+    {
+      "stem": "business-improved-1",
+      "title": "预约与到诊改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 13.46
+    },
+    {
+      "stem": "business-improved-2",
+      "title": "检查诊断与治疗改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.87
+    },
+    {
+      "stem": "business-improved-3",
+      "title": "处方与用药改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 15.07
+    },
+    {
+      "stem": "business-improved-4",
+      "title": "复诊与随访改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 15.9
+    },
+    {
+      "stem": "business-improved-5",
+      "title": "自费与自付缴费改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 12.99
+    },
+    {
+      "stem": "business-improved-6",
+      "title": "门诊医保结算改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 12.08
+    },
+    {
+      "stem": "business-improved-7",
+      "title": "费用更正与退费改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 11.35
+    },
+    {
+      "stem": "business-improved-8",
+      "title": "采购与日常物资改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 20.28
+    },
+    {
+      "stem": "business-improved-9",
+      "title": "资源准备与设备维护改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 13.58
+    },
+    {
+      "stem": "business-improved-10",
+      "title": "日常经营与款项核对改进业务序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.67
+    },
+    {
+      "stem": "business-patient-flow",
+      "title": "患者服务全过程",
+      "kind": "activity",
+      "paper": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 8.83
+    },
+    {
+      "stem": "business-resource-flow",
+      "title": "接诊资源准备与占用协调",
+      "kind": "activity",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 10.15
+    },
+    {
+      "stem": "business-daily-flow",
+      "title": "开诊准备与日终业务协作",
+      "kind": "activity",
+      "paper": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 11.58
+    },
+    {
+      "stem": "system-overall",
+      "title": "系统总体用例图",
+      "kind": "usecase",
+      "paper": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 11.03
+    },
+    {
+      "stem": "system-role-1",
+      "title": "前台系统用例图",
+      "kind": "usecase",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 21.21
+    },
+    {
+      "stem": "system-role-2",
+      "title": "牙医与助理系统用例图",
+      "kind": "usecase",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.41
+    },
+    {
+      "stem": "system-role-3",
+      "title": "收费与负责人系统用例图",
+      "kind": "usecase",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.97
+    },
+    {
+      "stem": "uc-01",
+      "title": "UC-01 维护患者资料用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-02",
+      "title": "UC-02 维护预约安排用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-03",
+      "title": "UC-03 登记到诊用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-04",
+      "title": "UC-04 维护排班与接诊安排用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-05",
+      "title": "UC-05 查阅患者诊疗资料用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-06",
+      "title": "UC-06 记录检查诊断与健康资料用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-07",
+      "title": "UC-07 制定治疗方案并记录患者确认用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-08",
+      "title": "UC-08 登记实际治疗与完成项目用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-09",
+      "title": "UC-09 签署及补充病历用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-10",
+      "title": "UC-10 管理影像与诊疗文书用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-11",
+      "title": "UC-11 维护收费项目与价目用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-12",
+      "title": "UC-12 查询账单与待结算费用用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-13",
+      "title": "UC-13 办理患者付款与到账核实用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-14",
+      "title": "UC-14 办理费用更正与退费用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-15",
+      "title": "UC-15 提出复诊随访要求用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-16",
+      "title": "UC-16 办理复诊联系与预约用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-17",
+      "title": "UC-17 记录复诊随访评估用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-18",
+      "title": "UC-18 维护材料与批次资料用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-19",
+      "title": "UC-19 登记基础采购与到货验收用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-20",
+      "title": "UC-20 办理库存领用、退回与盘点用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-21",
+      "title": "UC-21 核对日常经营与收付款用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-22",
+      "title": "UC-22 核验医保身份并办理预结算用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-23",
+      "title": "UC-23 办理医保结算、撤销与回款核对用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-24",
+      "title": "UC-24 协调诊椅设备准备与停用恢复用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "uc-25",
+      "title": "UC-25 开立处方并衔接院内外取药用例图",
+      "kind": "usecase"
+    },
+    {
+      "stem": "analysis-boundaries-1",
+      "title": "前台边界类与控制类",
+      "kind": "robustness",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 16.25
+    },
+    {
+      "stem": "analysis-boundaries-2",
+      "title": "牙医边界类与控制类",
+      "kind": "robustness",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.51
+    },
+    {
+      "stem": "analysis-boundaries-3",
+      "title": "收费人员边界类与控制类",
+      "kind": "robustness",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 12.55
+    },
+    {
+      "stem": "analysis-boundaries-4",
+      "title": "诊疗助理、诊所负责人边界类与控制类",
+      "kind": "robustness",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.98
+    },
+    {
+      "stem": "analysis-boundaries-pharmacy",
+      "title": "处方与药学边界控制类",
+      "kind": "robustness",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 20.65
+    },
+    {
+      "stem": "analysis-boundaries-external",
+      "title": "外部支付医保接口与控制类",
+      "kind": "robustness",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 25.51
+    },
+    {
+      "stem": "analysis-entities-1",
+      "title": "身份与接诊分析实体类图",
+      "kind": "class",
+      "paper": [
+        420,
+        297
+      ],
+      "minimum_font_pt": 12.0
+    },
+    {
+      "stem": "analysis-entities-2",
+      "title": "病历与诊疗文书分析实体类图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.43
+    },
+    {
+      "stem": "analysis-entities-3",
+      "title": "治疗方案与实际执行分析实体类图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 11.51
+    },
+    {
+      "stem": "analysis-entities-4",
+      "title": "价目、账单与收款分析实体类图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.48
+    },
+    {
+      "stem": "analysis-entities-5",
+      "title": "费用更正与退费分析实体类图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 19.91
+    },
+    {
+      "stem": "analysis-entities-6",
+      "title": "复诊与随访分析实体类图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 30.05
+    },
+    {
+      "stem": "analysis-entities-7",
+      "title": "材料与库存分析实体类图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.2
+    },
+    {
+      "stem": "analysis-entities-8",
+      "title": "基础采购与验收分析实体类图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.09
+    },
+    {
+      "stem": "analysis-entities-9",
+      "title": "门诊医保与结算款分析实体类图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.09
+    },
+    {
+      "stem": "analysis-seq-01",
+      "title": "UC-01 维护患者资料分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 11.94
+    },
+    {
+      "stem": "analysis-seq-02",
+      "title": "UC-02 维护预约安排分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.13
+    },
+    {
+      "stem": "analysis-seq-03",
+      "title": "UC-03 登记到诊分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 11.07
+    },
+    {
+      "stem": "analysis-seq-04",
+      "title": "UC-04 维护排班与接诊安排分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.54
+    },
+    {
+      "stem": "analysis-seq-05",
+      "title": "UC-05 查阅患者诊疗资料分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.11
+    },
+    {
+      "stem": "analysis-seq-06",
+      "title": "UC-06 记录检查诊断与健康资料分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.06
+    },
+    {
+      "stem": "analysis-seq-07",
+      "title": "UC-07 制定治疗方案并记录患者确认分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.56
+    },
+    {
+      "stem": "analysis-seq-08",
+      "title": "UC-08 登记实际治疗与完成项目分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.19
+    },
+    {
+      "stem": "analysis-seq-09",
+      "title": "UC-09 签署及补充病历分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.87
+    },
+    {
+      "stem": "analysis-seq-10",
+      "title": "UC-10 管理影像与诊疗文书分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 12.2
+    },
+    {
+      "stem": "analysis-seq-11",
+      "title": "UC-11 维护收费项目与价目分析序列图",
+      "kind": "sequence",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 14.04
+    },
+    {
+      "stem": "analysis-seq-12",
+      "title": "UC-12 查询账单与待结算费用分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.47
+    },
+    {
+      "stem": "analysis-seq-13",
+      "title": "UC-13 办理患者付款与到账核实分析序列图",
+      "kind": "sequence",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 12.62
+    },
+    {
+      "stem": "analysis-seq-14",
+      "title": "UC-14 办理费用更正与退费分析序列图",
+      "kind": "sequence",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 11.25
+    },
+    {
+      "stem": "analysis-seq-15",
+      "title": "UC-15 提出复诊随访要求分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 12.53
+    },
+    {
+      "stem": "analysis-seq-16",
+      "title": "UC-16 办理复诊联系与预约分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.93
+    },
+    {
+      "stem": "analysis-seq-17",
+      "title": "UC-17 记录复诊随访评估分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 11.94
+    },
+    {
+      "stem": "analysis-seq-18",
+      "title": "UC-18 维护材料与批次资料分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "analysis-seq-19",
+      "title": "UC-19 登记基础采购与到货验收分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.97
+    },
+    {
+      "stem": "analysis-seq-20",
+      "title": "UC-20 办理库存领用、退回与盘点分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.11
+    },
+    {
+      "stem": "analysis-seq-21",
+      "title": "UC-21 核对日常经营与收付款分析序列图",
+      "kind": "sequence",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 13.04
+    },
+    {
+      "stem": "analysis-seq-22",
+      "title": "UC-22 核验医保身份并办理预结算分析序列图",
+      "kind": "sequence",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 11.61
+    },
+    {
+      "stem": "analysis-seq-23",
+      "title": "UC-23 办理医保结算、撤销与回款核对分析序列图",
+      "kind": "sequence",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 11.93
+    },
+    {
+      "stem": "analysis-seq-24",
+      "title": "UC-24 协调诊椅设备准备与停用恢复分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 11.35
+    },
+    {
+      "stem": "analysis-seq-25",
+      "title": "UC-25 开立处方并衔接院内外取药分析序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.37
+    },
+    {
+      "stem": "state-appointment",
+      "title": "预约分析状态机图",
+      "kind": "state",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.78
+    },
+    {
+      "stem": "state-visit",
+      "title": "就诊分析状态机图",
+      "kind": "state",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.82
+    },
+    {
+      "stem": "state-record",
+      "title": "病历分析状态机图",
+      "kind": "state",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 22.16
+    },
+    {
+      "stem": "state-plan",
+      "title": "方案版本分析状态机图",
+      "kind": "state",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 12.09
+    },
+    {
+      "stem": "state-followup",
+      "title": "复诊要求分析状态机图",
+      "kind": "state",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 12.09
+    },
+    {
+      "stem": "state-batch",
+      "title": "材料批次分析状态机图",
+      "kind": "state",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 12.8
+    },
+    {
+      "stem": "state-refund",
+      "title": "费用申请分析状态机图",
+      "kind": "state",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 19.84
+    },
+    {
+      "stem": "state-payment",
+      "title": "支付单分析状态机图",
+      "kind": "state",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 12.09
+    },
+    {
+      "stem": "state-insurance",
+      "title": "医保办理分析状态机图",
+      "kind": "state",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.0
+    },
+    {
+      "stem": "state-equipment",
+      "title": "设备占用分析状态机图",
+      "kind": "state",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 16.23
+    },
+    {
+      "stem": "state-prescription",
+      "title": "处方分析状态机图",
+      "kind": "state",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.82
+    },
+    {
+      "stem": "architecture",
+      "title": "三层职责及外部服务协作",
+      "kind": "architecture",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.71
+    },
+    {
+      "stem": "database-overall",
+      "title": "核心业务数据库关系总图",
+      "kind": "erd-overall",
+      "paper": [
+        594,
+        841
+      ],
+      "minimum_font_pt": 9.78
+    },
+    {
+      "stem": "database-region-1",
+      "title": "身份与接诊数据库关系图",
+      "kind": "erd",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 9.14
+    },
+    {
+      "stem": "database-region-2",
+      "title": "病历与诊疗文书数据库关系图",
+      "kind": "erd",
+      "paper": [
+        297,
+        420
+      ],
+      "minimum_font_pt": 12.37
+    },
+    {
+      "stem": "database-region-3",
+      "title": "治疗方案与实际执行数据库关系图",
+      "kind": "erd",
+      "paper": [
+        297,
+        210
+      ],
+      "minimum_font_pt": 10.62
+    },
+    {
+      "stem": "database-region-4",
+      "title": "价目、账单与收款数据库关系图",
+      "kind": "erd",
+      "paper": [
+        297,
+        210
+      ],
+      "minimum_font_pt": 9.27
+    },
+    {
+      "stem": "database-region-5",
+      "title": "费用更正与退费数据库关系图",
+      "kind": "erd",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.29
+    },
+    {
+      "stem": "database-region-6",
+      "title": "复诊与随访数据库关系图",
+      "kind": "erd",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 13.77
+    },
+    {
+      "stem": "database-region-7",
+      "title": "材料与库存数据库关系图",
+      "kind": "erd",
+      "paper": [
+        420,
+        297
+      ],
+      "minimum_font_pt": 10.46
+    },
+    {
+      "stem": "database-region-8",
+      "title": "基础采购与验收数据库关系图",
+      "kind": "erd",
+      "paper": [
+        297,
+        210
+      ],
+      "minimum_font_pt": 11.03
+    },
+    {
+      "stem": "database-region-9",
+      "title": "门诊医保与结算款数据库关系图",
+      "kind": "erd",
+      "paper": [
+        297,
+        210
+      ],
+      "minimum_font_pt": 11.82
+    },
+    {
+      "stem": "design-classes-1",
+      "title": "接诊服务设计类协作图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 12.19
+    },
+    {
+      "stem": "design-classes-2",
+      "title": "临床服务设计类协作图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.42
+    },
+    {
+      "stem": "design-classes-3",
+      "title": "收费与复诊服务设计类协作图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 8.88
+    },
+    {
+      "stem": "design-classes-4",
+      "title": "物资与管理服务设计类协作图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.96
+    },
+    {
+      "stem": "design-classes-5",
+      "title": "医保与药学服务设计类协作图",
+      "kind": "class",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 14.65
+    },
+    {
+      "stem": "design-seq-02",
+      "title": "维护预约安排设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.88
+    },
+    {
+      "stem": "design-seq-06",
+      "title": "记录检查诊断与健康资料设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.88
+    },
+    {
+      "stem": "design-seq-07",
+      "title": "制定治疗方案并记录患者确认设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.67
+    },
+    {
+      "stem": "design-seq-08",
+      "title": "登记实际治疗与完成项目设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.88
+    },
+    {
+      "stem": "design-seq-13",
+      "title": "办理患者付款与到账核实设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.47
+    },
+    {
+      "stem": "design-seq-14",
+      "title": "办理费用更正与退费设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.47
+    },
+    {
+      "stem": "design-seq-16",
+      "title": "办理复诊联系与预约设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.67
+    },
+    {
+      "stem": "design-seq-19",
+      "title": "登记基础采购与到货验收设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.58
+    },
+    {
+      "stem": "design-seq-20",
+      "title": "办理库存领用、退回与盘点设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.47
+    },
+    {
+      "stem": "design-seq-22",
+      "title": "核验医保身份并办理预结算设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.47
+    },
+    {
+      "stem": "design-seq-24",
+      "title": "协调诊椅设备准备与停用恢复设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.67
+    },
+    {
+      "stem": "design-seq-25",
+      "title": "开立处方并衔接院内外取药设计序列图",
+      "kind": "sequence",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 9.88
+    },
+    {
+      "stem": "screen-navigation",
+      "title": "岗位导航与主要业务衔接",
+      "kind": "state",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 13.46
+    },
+    {
+      "stem": "screen-1",
+      "title": "患者与预约页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-2",
+      "title": "牙医接诊页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-3",
+      "title": "方案与影像页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-4",
+      "title": "账单与收款页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-5",
+      "title": "费用更正与退费页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-6",
+      "title": "复诊与随访页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-7",
+      "title": "材料与采购页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-8",
+      "title": "库存办理页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-9",
+      "title": "排班与经营页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-10",
+      "title": "医保办理页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-11",
+      "title": "接诊资源协调页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "screen-12",
+      "title": "处方与取药页面结构",
+      "kind": "wireframe",
+      "paper": [
+        210,
+        297
+      ],
+      "minimum_font_pt": 10.58
+    }
+  ],
+  "scope": "预约接诊、临床处方、支付医保、复诊、资源准备、采购库存及日常核对",
+  "source_map": {
+    "8": 1,
+    "1": 2,
+    "3": 3,
+    "15": 4,
+    "9": 5,
+    "10": 6,
+    "22": 7,
+    "4": 8,
+    "11": 9,
+    "23": 10,
+    "5": 11,
+    "6": 12,
+    "7": 13,
+    "24": 14,
+    "12": 15,
+    "13": 16,
+    "14": 17,
+    "32": 18,
+    "27": 19,
+    "18": 20,
+    "19": 21,
+    "2": 2,
+    "16": 2,
+    "17": 20,
+    "20": 21,
+    "21": 6,
+    "25": 14,
+    "26": 14,
+    "28": 19
+  }
+}

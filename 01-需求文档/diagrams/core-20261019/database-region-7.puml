@@ -1,0 +1,61 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+entity "材料\nmaterial" as material {
+* id : INTEGER <<PK>>
+}
+entity "材料批次\nmaterial_batch" as material_batch {
+* id : INTEGER <<PK>>
+ material_id : INTEGER <<FK>>
+}
+entity "批次变更\nbatch_change" as batch_change {
+* id : INTEGER <<PK>>
+ material_batch_id : INTEGER <<FK>>
+}
+entity "存放位置\nstock_location" as stock_location {
+* id : INTEGER <<PK>>
+}
+entity "批次存量\nbatch_stock" as batch_stock {
+* id : INTEGER <<PK>>
+ material_batch_id : INTEGER <<FK>>
+ stock_location_id : INTEGER <<FK>>
+}
+entity "库存变动\ninventory_movement" as inventory_movement {
+* id : INTEGER <<PK>>
+ batch_stock_id : INTEGER <<FK>>
+ original_movement_id : INTEGER <<FK>>
+ stock_count_id : INTEGER <<FK>>
+}
+entity "实际用料\nmaterial_usage" as material_usage {
+* id : INTEGER <<PK>>
+ inventory_movement_id : INTEGER <<FK>>
+}
+entity "盘点核实\nstock_count" as stock_count {
+* id : INTEGER <<PK>>
+ batch_stock_id : INTEGER <<FK>>
+}
+material ||--o{ material_batch
+material_batch ||--o{ batch_change
+material_batch ||--o{ batch_stock
+stock_location ||--o{ batch_stock
+batch_stock ||--o{ inventory_movement
+stock_count |o--o| inventory_movement
+inventory_movement ||--o{ material_usage
+batch_stock ||--o{ stock_count
+
+@enduml

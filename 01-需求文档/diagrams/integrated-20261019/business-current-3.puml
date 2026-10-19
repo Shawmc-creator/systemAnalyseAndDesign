@@ -1,0 +1,35 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as P
+actor "牙医" as D
+actor "药学岗位" as A
+entity "处方与发药记录" as R
+D -> P : 说明用药与取药安排
+D -> R : 开立并确认有效处方
+alt 院外取药
+ D -> P : 交付处方及用药指导
+else 具备条件的院内取药
+ D -> A : 交接处方
+ A -> D : 需要时反馈审方问题并重新核实
+ A -> P : 审核及条件满足后实际发药并交代
+ A -> R : 记录真实发药及库存依据
+end
+
+@enduml

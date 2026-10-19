@@ -1,0 +1,37 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as P
+actor "收费人员" as C
+entity "项目及收款登记" as R
+participant "支付平台" as Pay
+C -> R : 核对实际项目及患者待付
+C -> P : 说明金额并确认付款方式
+alt 现金
+ P -> C : 交付现金
+ C -> P : 核对实收并找零
+else 电子支付
+ P -> Pay : 确认支付
+ Pay --> C : 提供可核查交易结果
+ C -> Pay : 结果未知时查询原笔
+end
+C -> R : 按真实结果登记实际收款或待核实
+C -> P : 交付付款结果及凭据
+
+@enduml

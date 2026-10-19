@@ -1,0 +1,33 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 150
+actor "患者" as A0
+actor "牙医" as A1
+actor "收费人员" as A2
+actor "负责人" as A3
+entity "诊所管理系统" as S
+A1 -> S : 确认实际完成项目
+A2 -> S : 查看项目、价目和账单
+A2 -> A0 : 核对费用
+A0 -> A2 : 实际付款
+A2 -> S : 登记实际收款与渠道
+S -> A2 : 返回凭据和未付金额
+A3 -> S : 查看日常经营及收款统计
+
+@enduml

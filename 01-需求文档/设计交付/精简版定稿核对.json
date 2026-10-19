@@ -1,0 +1,71 @@
+{
+  "version": "2026-10-19-core-ABCD",
+  "document_pages": 173,
+  "previous_pages": 448,
+  "reduction_percent": 61.38,
+  "chapters": [
+    {
+      "name": "A业务建模",
+      "pdf_page": 3
+    },
+    {
+      "name": "B需求",
+      "pdf_page": 27
+    },
+    {
+      "name": "C分析",
+      "pdf_page": 63
+    },
+    {
+      "name": "D设计",
+      "pdf_page": 105
+    }
+  ],
+  "coverage": {
+    "business_usecases": 7,
+    "current_business_sequences": 7,
+    "improved_business_sequences": 7,
+    "system_usecases": 21,
+    "individual_system_usecase_diagrams": 21,
+    "analysis_sequences": 21,
+    "analysis_state_diagrams": 7,
+    "core_entity_classes": 54,
+    "core_tables": 54,
+    "database_overall_diagrams": 1,
+    "database_region_diagrams": 8,
+    "page_wireframes": 9,
+    "total_figures": 121
+  },
+  "checks": {
+    "missing_figure_files": 0,
+    "duplicate_figure_inclusions": 0,
+    "plantuml_errors": 0,
+    "latex_overfull_boxes": 0,
+    "latex_underfull_boxes": 0,
+    "undefined_references": 0,
+    "core_class_table_match": true,
+    "thumbnail_review": "173页缩略图总览，并对修正后的类图和序列图重点复核",
+    "targeted_page_review": [
+      26,
+      39,
+      69,
+      72,
+      77,
+      85,
+      90,
+      96,
+      110,
+      118,
+      163
+    ],
+    "large_diagram_minimum_font_pt": 8.88
+  },
+  "pdf_sha256": "9f63f7e36144a6789ea002a86496a96953d6678e3bccc5850e9aadcab0edbe37",
+  "tex_sha256": "b61103e9256c5ac8df41fc055c857628ac7f4f1f3aa42b149ecfa292668bdbba",
+  "sql_sha256": "6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d",
+  "code_change": "未修改应用代码、运行数据或SQL；完整扩展设计仍为85表。",
+  "numbering_map": "精简范围与用例编号对照.json",
+  "figures": "diagrams/core-20261019（PlantUML、SVG及矢量PDF）",
+  "applicability": "历史版本记录，不代表现行179页整合主报告。",
+  "current_document_validation": "需求文档整合核对.json"
+}

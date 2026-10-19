@@ -1,0 +1,68 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 40
+skinparam ranksep 50
+left to right direction
+actor/ "患者" as P
+actor/ "支付服务机构" as Pay
+actor/ "医保经办机构" as Ins
+actor/ "供应商" as Sup
+actor/ "设备维护服务单位" as Repair
+rectangle "青禾牙科诊所" {
+ usecase/ "安排预约与接诊" as U1
+ usecase/ "提供检查诊断与治疗" as U2
+ usecase/ "提供处方与用药服务" as U3
+ usecase/ "开展复诊与随访" as U4
+ usecase/ "办理自费与自付缴费" as U5
+ usecase/ "办理门诊医保结算" as U6
+ usecase/ "处理费用异议与退费" as U7
+ usecase/ "完成物资采购与验收" as U8
+ usecase/ "协调设备维护与恢复" as U9
+ usecase/ "核对日常收款与医保款" as U10
+}
+P -- U1
+P -- U2
+P -- U3
+P -- U4
+P -- U5
+P -- U6
+P -- U7
+Pay -- U5
+Pay -- U7
+Pay -- U10
+Ins -- U6
+Ins -- U7
+Ins -- U10
+Sup -- U8
+Repair -- U9
+
+
+
+@enduml

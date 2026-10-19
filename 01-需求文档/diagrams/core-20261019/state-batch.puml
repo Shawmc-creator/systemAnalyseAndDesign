@@ -1,0 +1,28 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+top to bottom direction
+[*] --> 待检
+待检 --> 可用 : 核实合格及有效期
+可用 --> 隔离 : 发现异常
+隔离 --> 可用 : 负责人核实恢复
+隔离 --> 停用 : 负责人确认停用
+可用 --> 过期 : 达到失效条件
+待检 --> 过期 : 核实已过效期
+隔离 --> 过期 : 核实已过效期
+停用 --> [*]
+过期 --> [*]
+@enduml

@@ -1,0 +1,90 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+class "临床服务入口" as P <<boundary>> {
+ 接收输入()
+ 展示结果()
+}
+class "查阅患者诊疗资料服务" as S5 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S5
+class "患者对象" as E5 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S5 --> E5
+class "记录检查诊断与健\n康资料服务" as S6 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S6
+class "就诊对象" as E6 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S6 --> E6
+class "制定治疗方案并记\n录患者确认服务" as S7 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S7
+class "治疗方案对象" as E7 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S7 --> E7
+class "登记实际治疗与完\n成项目服务" as S8 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S8
+class "就诊对象" as E8 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S8 --> E8
+class "签署及补充病历服务" as S9 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S9
+class "病历对象" as E9 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S9 --> E9
+class "管理影像与诊疗文\n书服务" as S10 <<control>> {
+ 核对办理权限()
+ 协调本次业务()
+ 返回办理结果()
+}
+P --> S10
+class "诊疗文件对象" as E10 <<entity>> {
+ 核对当前状态()
+ 确认业务结果()
+}
+S10 --> E10
+
+@enduml

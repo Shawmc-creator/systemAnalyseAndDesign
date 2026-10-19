@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+entity "医保身份核验\ninsurance_identity" as insurance_identity {
+* id : INTEGER <<PK>>
+}
+entity "医保项目对应\ninsurance_item_mapping" as insurance_item_mapping {
+* id : INTEGER <<PK>>
+}
+entity "医保就诊办理\ninsurance_case" as insurance_case {
+* id : INTEGER <<PK>>
+ identity_id : INTEGER <<FK>>
+}
+entity "医保费用明细\ninsurance_fee" as insurance_fee {
+* id : INTEGER <<PK>>
+ insurance_case_id : INTEGER <<FK>>
+ mapping_id : INTEGER <<FK>>
+}
+entity "医保结算\ninsurance_settlement" as insurance_settlement {
+* id : INTEGER <<PK>>
+ insurance_case_id : INTEGER <<FK>>
+}
+entity "医保撤销办理\ninsurance_reversal" as insurance_reversal {
+* id : INTEGER <<PK>>
+ settlement_id : INTEGER <<FK>>
+}
+entity "医保结算款收付\ninsurance_fund_receipt" as insurance_fund_receipt {
+* id : INTEGER <<PK>>
+ settlement_id : INTEGER <<FK>>
+}
+insurance_identity ||--o{ insurance_case
+insurance_case ||--o{ insurance_fee
+insurance_item_mapping ||--o{ insurance_fee
+insurance_case ||--o{ insurance_settlement
+insurance_settlement ||--o{ insurance_reversal
+insurance_settlement ||--o{ insurance_fund_receipt
+
+@enduml
