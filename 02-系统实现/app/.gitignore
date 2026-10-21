@@ -1,0 +1,5 @@
+# Clinical originals belong to the local data package, not the source repository.
+data/clinical-files/
+data/pharmacy-config.json
+
+/data/insurance-config.json

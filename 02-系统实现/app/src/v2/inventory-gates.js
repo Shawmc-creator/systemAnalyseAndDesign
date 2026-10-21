@@ -45,7 +45,7 @@ function validateInventory(db, before) {
   }
   for (const item of db.prepare('SELECT id,ordered_quantity_scaled FROM purchase_order_item').all()) {
     const receipts = db.prepare('SELECT accepted_quantity_scaled FROM purchase_receipt_item WHERE purchase_order_item_id=?').all(item.id);
-    if (receipts.reduce((n,r) => n + BigInt(r.accepted_quantity_scaled), 0n) > require('./supply-rules').acceptanceLimit(db,item)) fail(409, 'PURCHASE_ACCEPTANCE_LIMIT', '合格认可量超出原约定及实际退供换货范围');
+    if (receipts.reduce((n,r) => n + BigInt(r.accepted_quantity_scaled), 0n) > require('./legacy-scope').acceptanceLimit(db,item)) fail(409, 'PURCHASE_ACCEPTANCE_LIMIT', '合格认可量超出当前采购约定');
   }
   for (const p of db.prepare('SELECT id FROM purchase_order').all()) {
     if (!db.prepare('SELECT id FROM purchase_order_item WHERE purchase_order_id=?').get(p.id)) fail(409, 'PURCHASE_EMPTY', '采购必须包含明确项目');

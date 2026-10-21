@@ -44,5 +44,5 @@ test('followup HTTP routes preserve scoped queues, contact retries, cancellation
   assert.equal(JSON.stringify(await send(q, d)).includes('HTTP验收专用临床结论正文'), true);
   await send(q, c, null, 403); await send('/followups/options', f);
   const receipt = await send('/submissions/' + contact.requestKey, f); assert.equal(receipt.id, attempts[0].id);
-  assert.equal((await send('/status', f)).followupApi.length, 3);
+  const status=await send('/status',f);for(const number of [15,16,17])assert.ok(status.implementedCoreUsecases.includes(number));
 });

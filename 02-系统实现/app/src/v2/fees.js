@@ -142,6 +142,7 @@ class Fees {
           changes: changes(request, { status, review_note: review, reviewed_at: now, reviewed_by: ctx.session.staff_id }, ['status','review_note','reviewed_at','reviewed_by']) };
       }
       if (input.action !== 'approve') fail(422, 'INVALID_ACTION', '审核动作无效');
+      require('./settlement-rules').feeChangeGate(this.db,request.bill_id);
       const source = this.sources(input, request), basis = this.submittedBasis(request);
       if (canonical(source.refs) !== canonical(basis.sourceRefs)) fail(409, 'FEE_SOURCE_STALE', '原账目或资金已变化，请退回后重新核对并提交');
       const adjustment = signedAmount(input.adjustmentCents), refund = this.billing.amount(input.refundCents, true);
@@ -155,7 +156,7 @@ class Fees {
         if (line.bill_id !== source.bill?.id || line.pricing_status !== '已核价') fail(409, 'ADJUSTMENT_SOURCE', '只能调整原账目中已经核价的项目');
         const amount = signedAmount(item.amountCents); if (amount === 0) fail(422, 'INVALID_MONEY', '调整明细不能为零');
         const old = this.db.prepare('SELECT amount_cents FROM fee_adjustment_item WHERE bill_item_id=?').all(line.id);
-        const after = old.reduce((n, i) => n + BigInt(i.amount_cents), BigInt(line.quantity) * BigInt(line.unit_price_cents)) + BigInt(amount);
+        const after = old.reduce((n, i) => n + BigInt(i.amount_cents), BigInt(line.amount_cents)) + BigInt(amount);
         if (after < 0n) fail(409, 'LINE_NEGATIVE', '调整后单项应收不能为负'); safe(after); total += BigInt(amount);
       }
       if (total !== BigInt(adjustment)) fail(422, 'ADJUSTMENT_SUM', '逐项调整合计须等于本次批准金额');
@@ -193,6 +194,7 @@ class Fees {
     return this.unit.command(credentials, 'uc26.refund', input, (ctx, now) => {
       if (input.action === 'initiate') {
         const request = row(this.db, 'fee_request', input.requestId); revision(request, input.expectedApprovalRevision);
+        require('./settlement-rules').feeChangeGate(this.db,request.bill_id);
         const source = this.sources({ ...input, billId: request.bill_id, paymentId: input.paymentId });
         if (request.status !== '已同意' || request.patient_funds_id !== source.funds.id || request.approved_refund_cents <= 0) fail(409, 'REFUND_NOT_APPROVED', '未取得当前患者的明确退款授权');
         if (!source.payment || source.payment.status !== '到账已确认' || (request.patient_payment_id && request.patient_payment_id !== source.payment.id)) fail(409, 'REFUND_SOURCE', '退款必须引用授权范围内的已确认原款');
@@ -215,6 +217,7 @@ class Fees {
       }
       if (!['markUnknown', 'verify'].includes(input.action)) fail(422, 'INVALID_ACTION', '退款办理动作无效');
       const refund = row(this.db, 'patient_refund', input.refundId); revision(refund, input.expectedRevision);
+      require('./settlement-rules').feeChangeGate(this.db,row(this.db,'fee_request',refund.fee_request_id).bill_id);
       const funds = row(this.db, 'patient_funds', refund.patient_funds_id); revision(funds, input.expectedFundsRevision);
       if (funds.patient_id !== input.patientId) fail(409, 'PAYMENT_PATIENT', '退款与当前患者不一致');
       if (!['待办理','待核实'].includes(refund.status)) fail(409, 'REFUND_FROZEN', '终结的退款结果不能覆盖；重试请使用原提交号或有据建立失败后继');
@@ -246,7 +249,8 @@ class Fees {
       if (size > 100 || page > 1000000) fail(422, 'INVALID_PAGE', '每页最多100项，请使用有效页码');
       if (input.status != null && !['待审核','已退回','已拒绝','已同意','已撤回'].includes(input.status)) fail(422, 'INVALID_STATE', '申请状态筛选无效');
       const funds = this.db.prepare('SELECT * FROM patient_funds WHERE patient_id=?').get(patient.id);
-      if (!funds) return { patientId: patient.id, total: 0, page, pageSize: size, items: [], funds: this.billing.fundsSummary(patient.id) };
+      const identity={id:patient.id,name:patient.name,recordNo:patient.record_no};
+      if (!funds) return { patientId: patient.id,patient:identity, total: 0, page, pageSize: size, items: [], funds: this.billing.fundsSummary(patient.id) };
       const all = this.db.prepare('SELECT * FROM fee_request WHERE patient_funds_id=? AND (? IS NULL OR status=?) ORDER BY submitted_at DESC,id DESC').all(funds.id, input.status ?? null, input.status ?? null);
       const items = all.slice((page - 1) * size, page * size).map(request => {
         const history = this.db.prepare(`SELECT a.id,a.occurred_at,a.staff_id,a.after_revision,a.authority_snapshot,a.reason FROM operation_audit a
@@ -256,11 +260,12 @@ class Fees {
         const adjustment = this.db.prepare('SELECT * FROM fee_adjustment WHERE fee_request_id=?').get(request.id);
         return { ...request, currentSourceRefs: { fundsRevision: funds.revision,
           billRevision: request.bill_id ? row(this.db, 'bill', request.bill_id).revision : null, paymentRevision: request.patient_payment_id ? row(this.db, 'patient_payment', request.patient_payment_id).revision : null },
-          history, adjustment: adjustment ? { ...adjustment, items: this.db.prepare('SELECT * FROM fee_adjustment_item WHERE fee_adjustment_id=? ORDER BY id').all(adjustment.id) } : null,
+          history,billSource:request.bill_id?{...row(this.db,'bill',request.bill_id),summary:this.billing.billSummary(request.bill_id),items:this.billing.lines(request.bill_id)}:null,
+          adjustment: adjustment ? { ...adjustment, items: this.db.prepare('SELECT * FROM fee_adjustment_item WHERE fee_adjustment_id=? ORDER BY id').all(adjustment.id) } : null,
           remainingApprovedRefundCents: request.status === '已同意' ? this.remaining(request) : 0,
           refunds: this.db.prepare('SELECT * FROM patient_refund WHERE fee_request_id=? ORDER BY id').all(request.id) };
       });
-      return { patientId: patient.id, computedAt: this.unit.auth.now(), total: all.length, page, pageSize: size, items, funds: this.billing.fundsSummary(patient.id) };
+      return { patientId: patient.id,patient:identity, computedAt: this.unit.auth.now(), total: all.length, page, pageSize: size, items, funds: this.billing.fundsSummary(patient.id) };
     });
   }
 }

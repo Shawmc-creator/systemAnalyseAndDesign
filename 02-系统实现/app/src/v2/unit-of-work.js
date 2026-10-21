@@ -6,12 +6,23 @@ const { treatmentSnapshot, validateTreatment } = require('./treatment-gates');
 const { feeSnapshot, validateFees } = require('./fee-gates');
 const { publishSourceFollowups, followupSnapshot, validateFollowups } = require('./followup-rules');
 const { inventorySnapshot, validateInventory } = require('./inventory-gates');
-const { supplySnapshot, validateSupply } = require('./supply-rules');
+const legacyScope=require('./legacy-scope');
+const {validatePrescriptions}=require('./prescriptions');
+const {validatePharmacy}=require('./pharmacy');
+const {validateSettlements}=require('./settlement-rules');
 const RESULT_TABLES = new Set(['patient', 'dated_schedule', 'appointment', 'visit', 'health_review', 'clinical_record', 'record_addendum',
   'treatment_plan', 'plan_version', 'patient_decision', 'treatment_execution', 'service', 'service_price', 'bill_item', 'patient_payment', 'patient_funds', 'fee_request', 'patient_refund',
   'followup_requirement', 'contact_history', 'clinical_assessment', 'material', 'material_batch', 'stock_location', 'inventory_movement', 'material_usage', 'stock_count', 'supplier', 'purchase_order', 'purchase_receipt', 'purchase_issue', 'supplier_funds', 'supplier_payment', 'supplier_refund',
-  'clinical_equipment','resource_block','equipment_occupancy']);
+  'clinical_equipment','resource_block','equipment_occupancy','clinical_document','document_version','prescription','dispense_record','staff_role_qualification',
+  'payment_order','payment_reconciliation','cash_reconciliation','issue_followup','insurance_identity','insurance_item_mapping','insurance_case','insurance_settlement','insurance_reversal','insurance_fund_receipt']);
 const SQL_ERRORS = {
+  dispense_quantity:['DISPENSE_QUANTITY','实际发药累计数量超过原处方剩余量'],
+  dispense_context:['DISPENSE_CONTEXT','发药处方、患者、批次出库或计费来源不一致'],
+  dispense_frozen:['DISPENSE_FROZEN','实际发药事实不能覆盖或删除'],
+  prescription_frozen:['PRESCRIPTION_SEALED','已开立处方及明细不能覆盖，请保留原方、核实后作废重开'],
+  prescription_material_frozen:['MATERIAL_UNITS_FROZEN','已被处方引用的药品分类、基本单位及数量精度不能改写'],
+  prescription_context:['PRESCRIPTION_CONTEXT','处方患者、就诊和病历不一致'],
+  prescription_state:['PRESCRIPTION_STATE','当前处方状态不能进行此操作'],
   equipment_overlap:['EQUIPMENT_CONFLICT','必要设备在该时段已有其他预留'],
   resource_history_frozen:['RESOURCE_HISTORY_FROZEN','已解除停用或已释放占用的历史不能覆盖'],
   supplier_payment_budget: ['SUPPLY_PAYMENT_BALANCE', '供货分配和退回款超过原付款实际额度'],
@@ -94,7 +105,7 @@ class UnitOfWork {
       const feeBefore = feeSnapshot(this.db);
       const followupBefore = followupSnapshot(this.db);
       const inventoryBefore = inventorySnapshot(this.db);
-      const supplyBefore = supplySnapshot(this.db);
+      const legacyBefore = legacyScope.snapshot(this.db);
       const output = handler(ctx, this.auth.now());
       const related = [...(output.relatedChanges || []), ...publishSourceFollowups(this.db, this.auth, permission, input, output, this.auth.now())];
       if (related.length) {
@@ -107,7 +118,10 @@ class UnitOfWork {
       validateFees(this.db, feeBefore);
       validateFollowups(this.db, followupBefore);
       validateInventory(this.db, inventoryBefore);
-      validateSupply(this.db, supplyBefore);
+      legacyScope.validate(this.db, legacyBefore);
+      validatePrescriptions(this.db);
+      validatePharmacy(this.db);
+      validateSettlements(this.db);
       const now = this.auth.now();
       const sid = insert(this.db, 'request_submission', { account_id: ctx.session.account_id, permission_id: ctx.permission.id,
         request_key: requestKey, payload_digest: digest, command_version: 1, status: '已提交', created_at: now, committed_at: now,

@@ -135,7 +135,9 @@ class Clinical {
       const visit = this.scope(ctx, Number(input.visitId));
       if (Number(input.patientId) !== visit.patient_id) fail(403, 'PATIENT_MISMATCH', '患者与获准就诊不一致');
       const record = this.recordFor(visit.id), versions = this.db.prepare('SELECT * FROM health_version WHERE patient_id=? ORDER BY version_no DESC').all(visit.patient_id);
-      return { visit, patient: row(this.db, 'patient', visit.patient_id), record,
+      const occupancy=this.db.prepare('SELECT * FROM resource_occupancy WHERE visit_id=? AND released_at IS NULL').get(visit.id)||null;
+      return { serverNow:this.unit.auth.now(),visit, patient: row(this.db, 'patient', visit.patient_id), record,
+        occupancy,physicalEnd:this.db.prepare("SELECT released_at FROM resource_occupancy WHERE visit_id=? AND release_reason='实际操作结束，转清洁核验' ORDER BY id DESC LIMIT 1").get(visit.id)?.released_at||null,
         findings: this.db.prepare('SELECT * FROM clinical_finding WHERE clinical_record_id=? ORDER BY sequence_no').all(record.id),
         addenda: this.db.prepare('SELECT * FROM record_addendum WHERE clinical_record_id=? ORDER BY id').all(record.id),
         healthVersions: versions.map(v => ({ ...v, items: this.db.prepare('SELECT * FROM health_item WHERE health_version_id=? ORDER BY id').all(v.id) })),
@@ -146,7 +148,7 @@ class Clinical {
   queue(credentials, input) {
     return this.unit.query(credentials, 'uc09.query', ctx => {
       const date = dateOnly(input.date || day(this.unit.auth.now()));
-      return { items: this.db.prepare(`SELECT v.id,v.patient_id,v.record_no,v.status,v.revision,v.arrived_at,p.name patient_name,c.id record_id,c.status record_status
+      return { items: this.db.prepare(`SELECT v.id,v.patient_id,v.record_no,v.status,v.revision,v.arrived_at,p.name patient_name,p.record_no patient_no,c.id record_id,c.status record_status
         FROM visit v JOIN patient p ON p.id=v.patient_id JOIN clinical_record c ON c.visit_id=v.id
         WHERE v.dentist_id=? AND v.arrived_at>=? AND v.arrived_at<? ORDER BY v.arrived_at,v.id`).all(ctx.session.staff_id, utc(date + 'T00:00:00+08:00'), utc(Date.parse(date + 'T00:00:00+08:00') + 86400_000)) };
     });

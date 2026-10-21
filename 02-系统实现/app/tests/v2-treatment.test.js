@@ -164,13 +164,11 @@ test('verified proxy scope and exact confirmed document versions are linked and 
   const a = setup(t), v = a.draft(); a.publish(v.id); const now = a.auth.now();
   const proxy = insert(a.db, 'patient_proxy', fact(now, { patient_id: 1, proxy_name: '已核实代理人', relationship: '实际监护关系',
     scope: JSON.stringify({ planVersionIds: [v.id], operations: ['decide'] }), valid_from: now, valid_until: null, verification_basis: '隔离验证所需的既有资格', verified_by: 4 }));
-  const doc = insert(a.db, 'clinical_document', fact(now, { patient_id: 1, visit_id: a.v.id, plan_version_id: v.id,
-    document_type: '同意文书', source: '文书模块已存储原件的模拟夹具', ownership_note: '当前患者和版本', created_by: 4, record_no: 'TEST-DOC' }));
-  const file = insert(a.db, 'document_version', fact(now, { clinical_document_id: doc, original_name: 'confirmed.pdf', size_bytes: 1, sha256: 'a'.repeat(64),
-    captured_at: now, confirmed_at: null, change_reason: '首次归档', version_no: 1, storage_key: 'isolated-test', media_type: 'application/pdf',
-    verification_note: null, uploaded_by: 4, confirmed_by: null, previous_version_id: null, status: '原件待确认' }));
+  const actual=Buffer.from('%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\n%%EOF\n');
+  const receipt=a.documents.upload(a.d,command({...a.context,planVersionId:v.id,documentType:'同意文书',source:'实际原件上传夹具',ownershipNote:'核对当前患者和版本',originalName:'confirmed.pdf',contentBase64:actual.toString('base64'),reason:'首次归档'}));
+  const file=receipt.id,doc=a.db.prepare('SELECT clinical_document_id FROM document_version WHERE id=?').get(file).clinical_document_id;
   rejects(() => a.decide(v.id, 2, { proxyId: proxy, documentVersionIds: [file] }), 'DOCUMENT_UNCONFIRMED');
-  a.db.prepare("UPDATE document_version SET status='原件已确认',confirmed_at=?,confirmed_by=4 WHERE id=?").run(now, file);
+  a.documents.verify(a.d,command({action:'confirm',versionId:file,expectedRevision:1,confirmed:true,verificationNote:'已查看原件并确认患者及方案归属'}));
   const d = a.decide(v.id, 2, { proxyId: proxy, documentVersionIds: [file] });
   assert.deepEqual(a.info().plans[0].versions[0].decisions[0].documentVersionIds, [file]);
   const second = insert(a.db, 'document_version', fact(now, { clinical_document_id: doc, original_name: 'v2.pdf', size_bytes: 1, sha256: 'b'.repeat(64),

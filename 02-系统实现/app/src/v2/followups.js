@@ -220,6 +220,28 @@ class Followups {
       return { total: visible.length, page, pageSize: size, computedAt: this.unit.auth.now(), items };
     });
   }
+  context(credentials,input){
+    const dentist=credentials.role==='dentist';
+    return this.unit.query(credentials,dentist?'uc14.assess':'uc13.contact',ctx=>{
+      const f=row(this.db,'followup_requirement',Number(input.followupId));
+      if(dentist)this.scope(ctx,f,'assess');
+      else if(f.responsible_frontdesk_id!==ctx.session.staff_id||f.status==='待发布')fail(403,'FOLLOWUP_FRONTDESK_SCOPE','只能查看本人负责且已发布的诊后联系资料');
+      if(dentist){
+        const planVisit=f.source_plan_version_id?row(this.db,'plan_version',f.source_plan_version_id).source_visit_id:null;
+        const candidates=this.db.prepare(`SELECT id,record_no,patient_id,dentist_id,status,started_at,ended_at FROM visit
+          WHERE patient_id=? AND id IS NOT ? AND id IS NOT ? AND started_at>=? AND status IN ('接诊中','诊疗结束') ORDER BY started_at DESC,id DESC`).all(f.patient_id,f.source_visit_id,planVisit,f.created_at);
+        const visits=candidates.filter(v=>{try{this.clinical.scope(ctx,v.id,'assess');return true;}catch(e){if(e.code==='CLINICAL_SCOPE')return false;throw e;}});
+        return {followupId:f.id,patientId:f.patient_id,visits};
+      }
+      const original=f.source_visit_id?row(this.db,'visit',f.source_visit_id).appointment_id:null;
+      const date=input.date?dateOnly(input.date):null;
+      const appointments=this.db.prepare(`SELECT a.id,a.record_no,a.revision,a.planned_start,a.planned_end,a.status FROM appointment a
+        WHERE a.patient_id=? AND a.id IS NOT ? AND a.status IN ('已预约','已到诊') AND a.planned_start>=?
+        AND (a.status='已到诊' OR a.planned_end>?) ORDER BY a.planned_start,a.id`).all(f.patient_id,original,f.created_at,this.unit.auth.now())
+        .filter(a=>day(a.planned_start)>=f.target_start&&day(a.planned_start)<=f.target_end&&(!date||day(a.planned_start)===date));
+      return {followupId:f.id,patientId:f.patient_id,appointments:appointments.slice(0,100),total:appointments.length};
+    });
+  }
   options(credentials) {
     const permission = credentials.role === 'dentist' ? 'uc12.propose' : 'uc13.contact';
     return this.unit.query(credentials, permission, () => ({ staff: this.db.prepare('SELECT id,name FROM staff ORDER BY id').all()

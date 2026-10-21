@@ -31,6 +31,7 @@ class Payments {
     let total = 0n;
     for (const allocation of allocations) {
       const bill = row(this.db, 'bill', allocation.billId); revision(bill, allocation.expectedRevision);
+      require('./settlement-rules').paymentGate(this.db,bill.id,ctx.authority.paymentOrderId);
       if (bill.patient_funds_id !== funds.id || bill.patient_id !== funds.patient_id) fail(409, 'PAYMENT_PATIENT', '原款和目标账目必须属于同一患者');
       const cents = this.billing.amount(allocation.amountCents);
       if (cents > this.billing.billSummary(bill.id).unpaidCents) fail(409, 'BILL_BUDGET', '分配不能超过当前已核价应收的未付金额');

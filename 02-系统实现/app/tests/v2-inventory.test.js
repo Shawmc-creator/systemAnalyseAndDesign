@@ -6,7 +6,7 @@ const rejects=(fn,code)=>assert.throws(fn,e=>e.code===code,code);
 test('confirmed purchase creates no stock or supplier payment; settlement evidence is hidden from assistants',t=>{
   const a=setupInventory(t,{receive:false});
   assert.equal(a.stock(),undefined);assert.equal(a.db.prepare('SELECT count(*) n FROM supplier_payment').get().n,0);
-  assert.equal(a.db.prepare('SELECT count(*) n FROM supplier_funds').get().n,1);
+  assert.equal(a.db.prepare('SELECT count(*) n FROM supplier_funds').get().n,0);
   assert.equal(JSON.stringify(a.purchases.query(a.i)).includes('只用于软件测试的核验依据'),false);
   assert.equal(JSON.stringify(a.purchases.query(a.m)).includes('只用于软件测试的核验依据'),true);
   rejects(()=>a.purchases.query(a.f),'FORBIDDEN');

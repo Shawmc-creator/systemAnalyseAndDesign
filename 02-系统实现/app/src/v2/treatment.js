@@ -9,7 +9,7 @@ function toothFields(input) {
   return { tooth_code: tooth, surface_code: surface };
 }
 class Treatment {
-  constructor(db, unit, clinical, billing) { Object.assign(this, { db, unit, clinical, billing }); }
+  constructor(db, unit, clinical, billing,documents) { Object.assign(this, { db, unit, clinical, billing,documents }); }
   context(ctx, input, operation = 'plan') {
     const visit = this.clinical.scope(ctx, input.visitId, operation);
     if (visit.patient_id !== input.patientId) fail(409, 'PATIENT_MISMATCH', '患者与获准就诊不一致');
@@ -126,6 +126,8 @@ class Treatment {
     for (const fileId of files) {
       const file = row(this.db, 'document_version', fileId), doc = row(this.db, 'clinical_document', file.clinical_document_id);
       if (doc.patient_id !== plan.patient_id || (doc.plan_version_id && doc.plan_version_id !== version.id) || file.status !== '原件已确认' || !file.confirmed_at || file.confirmed_at > now) fail(409, 'DOCUMENT_UNCONFIRMED', '原件必须已确认，且属于当前患者和相应方案版本');
+      if(doc.visit_id)this.clinical.scope(ctx,doc.visit_id);
+      this.documents?.requireEvidence(fileId);
     }
     const key = insert(this.db, 'patient_decision', fact(now, { plan_version_id: version.id, patient_proxy_id: proxyId,
       decision: input.decision, decided_at: decidedAt, explanation_basis: text(input.explanationBasis, '实际告知及决定依据', 4000),

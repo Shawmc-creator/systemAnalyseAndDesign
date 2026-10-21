@@ -203,6 +203,52 @@ class Reception {
       return { kind: 'visit', key, revision: 1 };
     });
   }
+  recoordinate(credentials,input) {
+    return this.unit.command(credentials,'uc03.register',input,(ctx,now)=>{
+      const visit=row(this.db,'visit',input.visitId);revision(visit,input.expectedVisitRevision);
+      if(visit.patient_id!==id(input.patientId,'患者'))fail(409,'PATIENT_MISMATCH','请重新核对本次就诊的患者身份');
+      if(visit.status!=='候诊'||visit.started_at)fail(409,'VISIT_ALREADY_STARTED','只能重新安排尚未实际开始接诊的候诊记录');
+      if(day(visit.arrived_at)!==day(now))fail(409,'WAITING_DATE','请核对当日候诊记录，跨日应重新受理到诊');
+      if(input.confirmed!==true)fail(422,'CONFIRM_REQUIRED','请先核对患者和新的接诊安排');
+      const oldRows=this.db.prepare('SELECT * FROM resource_occupancy WHERE visit_id=? AND released_at IS NULL').all(visit.id);
+      if(oldRows.length!==1)fail(409,'OCCUPANCY_MISSING','候诊占用缺失或不唯一，请由负责人核对');
+      const old=oldRows[0];revision(old,input.expectedOccupancyRevision);
+      const start=instant(input.startsAt,'新的接诊开始'),end=instant(input.endsAt,'新的接诊结束');
+      if(day(start)!==day(now)||day(end)!==day(now)||start<visit.arrived_at||end<=now)fail(422,'WAITING_INTERVAL','新的候诊安排须为当日到诊后的有效时段，且尚未结束');
+      const schedule=this.checkSchedule(input.scheduleId,input.scheduleRevision,start,end),reason=text(input.reason,'重新安排依据');
+      const equipment=this.db.prepare("SELECT * FROM equipment_occupancy WHERE visit_id=? AND status<>'已释放'").all(visit.id);
+      if(equipment.some(e=>e.status==='使用中'))fail(409,'EQUIPMENT_IN_USE','必要设备已实际使用，不能按候诊安排释放');
+      const selected=input.equipmentIds===undefined?equipment.map(e=>e.equipment_id):equipmentIds(input.equipmentIds);
+      this.release(old,ctx,now,'候诊重新安排：'+reason);
+      this.db.prepare("UPDATE equipment_occupancy SET status='已释放',release_reason=?,updated_at=?,revision=revision+1 WHERE visit_id=? AND status='已预留'").run('候诊重新安排：'+reason,now,visit.id);
+      const occupancyId=this.occupy(schedule,{start,end},ctx,now,visit.appointment_id,visit.id);
+      reserveEquipment(this.db,schedule.dental_chair_id,selected,start,end,now,visit.appointment_id,visit.id);
+      this.db.prepare('UPDATE visit SET dentist_id=?,updated_at=?,revision=revision+1 WHERE id=?').run(schedule.dentist_id,now,visit.id);
+      const relatedChanges=[];
+      if(visit.appointment_id){
+        const a=row(this.db,'appointment',visit.appointment_id);
+        if(a.status!=='已到诊')fail(409,'INVALID_STATE','本次就诊与原预约的到诊状态不一致');
+        this.db.prepare('UPDATE appointment SET planned_start=?,planned_end=?,due_at=?,arrangement_revision=arrangement_revision+1,notified_at=NULL,notified_by=NULL,updated_at=?,revision=revision+1 WHERE id=?').run(start,end,end,now,a.id);
+        insert(this.db,'appointment_change',fact(now,{appointment_id:a.id,old_start:a.planned_start,old_end:a.planned_end,old_revision:a.arrangement_revision,new_start:start,new_end:end,new_revision:a.arrangement_revision+1,reason:'到诊后候诊重新安排：'+reason,occurred_at:now,change_kind:'改约',operator_id:ctx.session.staff_id,old_schedule_id:old.dated_schedule_id,new_schedule_id:schedule.id}));
+        relatedChanges.push({kind:'appointment',key:a.id,beforeRevision:a.revision,revision:a.revision+1,reason:'保留已到诊状态，更新候诊安排并保留原安排历史'});
+      }
+      Object.assign(ctx.authority,{visitId:visit.id,patientId:visit.patient_id,oldOccupancyId:old.id,newOccupancyId:occupancyId,equipmentIds:selected});
+      return {kind:'visit',key:visit.id,beforeRevision:visit.revision,revision:visit.revision+1,reason,relatedChanges,
+        changes:[{field:'dentist_id',before:visit.dentist_id,after:schedule.dentist_id},{field:'dated_schedule_id',before:old.dated_schedule_id,after:schedule.id},{field:'planned_start',before:old.starts_at,after:start},{field:'planned_end',before:old.ends_at,after:end}]};
+    });
+  }
+  waiting(credentials){
+    return this.unit.query(credentials,'uc03.register',()=>{
+      const date=day(this.unit.auth.now()),start=utc(date+'T00:00:00+08:00');
+      const items=this.db.prepare(`SELECT v.*,p.name patient_name,p.record_no patient_no,d.name dentist_name,
+        o.id occupancy_id,o.revision occupancy_revision,o.starts_at,o.ends_at,s.id schedule_id,s.revision schedule_revision,c.name chair_name
+        FROM visit v JOIN patient p ON p.id=v.patient_id JOIN staff d ON d.id=v.dentist_id
+        LEFT JOIN resource_occupancy o ON o.visit_id=v.id AND o.released_at IS NULL
+        LEFT JOIN dated_schedule s ON s.id=o.dated_schedule_id LEFT JOIN dental_chair c ON c.id=s.dental_chair_id
+        WHERE v.arrived_at>=? AND v.arrived_at<? ORDER BY v.arrived_at,v.id`).all(start,utc(Date.parse(start)+86400000));
+      return {items:items.map(v=>({...v,equipmentIds:this.db.prepare("SELECT equipment_id FROM equipment_occupancy WHERE visit_id=? AND status<>'已释放'").all(v.id).map(e=>e.equipment_id)}))};
+    });
+  }
   list(credentials, filters = {}) {
     return this.unit.query(credentials, 'uc02.query', () => {
       const from = dateOnly(filters.from || day(this.unit.auth.now())), to = dateOnly(filters.to || from);

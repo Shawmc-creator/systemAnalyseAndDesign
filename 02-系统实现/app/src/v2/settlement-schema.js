@@ -1,0 +1,45 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const VERSION=20261022;
+function upgradeSettlements(db,filename,backupNeeded=true){
+ const version=db.prepare('PRAGMA user_version').get().user_version;if(version===VERSION)return;
+ if(version!==20261021)throw new Error('不支持此数据库版本，未执行结算升级');
+ if(filename!==':memory:'&&backupNeeded){const folder=path.join(path.dirname(path.resolve(filename)),'backups');fs.mkdirSync(folder,{recursive:true});db.prepare('VACUUM INTO ?').run(path.join(folder,'before-settlements-'+Date.now()+'-'+crypto.randomUUID()+'.db'));}
+ const meta='created_at TEXT NOT NULL,updated_at TEXT NOT NULL,revision INTEGER NOT NULL DEFAULT 1 CHECK(revision>0)';
+ const money='INTEGER NOT NULL CHECK(VALUE BETWEEN 0 AND 9007199254740991)';
+ const amount=name=>name+' '+money.replace('VALUE',name);
+ db.exec('BEGIN IMMEDIATE');
+ try{
+ db.exec(`CREATE TABLE payment_order(id INTEGER PRIMARY KEY AUTOINCREMENT,bill_id INTEGER NOT NULL REFERENCES bill(id),patient_payment_id INTEGER UNIQUE REFERENCES patient_payment(id),business_no TEXT NOT NULL UNIQUE,
+ channel TEXT NOT NULL CHECK(channel IN ('银行卡','微信','支付宝')),${amount('amount_cents')},external_reference TEXT,verified_at TEXT,
+ status TEXT NOT NULL CHECK(status IN ('待支付','处理中','待核实','已成功','已失败','已关闭')),result_note TEXT NOT NULL,operator_id INTEGER NOT NULL REFERENCES staff(id),${meta},CHECK(amount_cents>0),CHECK(status<>'已成功' OR (patient_payment_id IS NOT NULL AND external_reference IS NOT NULL AND verified_at IS NOT NULL))) STRICT;
+ CREATE UNIQUE INDEX payment_order_live_bill ON payment_order(bill_id) WHERE status IN ('待支付','处理中','待核实');
+ CREATE UNIQUE INDEX payment_order_external ON payment_order(channel,external_reference) WHERE external_reference IS NOT NULL;
+ CREATE TABLE payment_reconciliation(id INTEGER PRIMARY KEY AUTOINCREMENT,payment_order_id INTEGER REFERENCES payment_order(id),patient_refund_id INTEGER REFERENCES patient_refund(id),business_date TEXT NOT NULL,
+ ${amount('expected_cents')},actual_cents INTEGER CHECK(actual_cents BETWEEN 0 AND 9007199254740991),status TEXT NOT NULL CHECK(status IN ('待核对','一致','差异待处理','已处理')),resolution TEXT NOT NULL,previous_reconciliation_id INTEGER UNIQUE REFERENCES payment_reconciliation(id),operator_id INTEGER NOT NULL REFERENCES staff(id),${meta},CHECK((payment_order_id IS NOT NULL)+(patient_refund_id IS NOT NULL)=1)) STRICT;
+ CREATE TABLE insurance_identity(id INTEGER PRIMARY KEY AUTOINCREMENT,patient_id INTEGER NOT NULL REFERENCES patient(id),insured_person_no TEXT NOT NULL,insured_area TEXT NOT NULL,verified_at TEXT NOT NULL,valid_until TEXT NOT NULL,
+ status TEXT NOT NULL CHECK(status IN ('核验通过','核验未通过')),result_note TEXT NOT NULL,operator_id INTEGER NOT NULL REFERENCES staff(id),${meta},CHECK(valid_until>verified_at)) STRICT;
+ CREATE TABLE insurance_item_mapping(id INTEGER PRIMARY KEY AUTOINCREMENT,service_id INTEGER REFERENCES service(id),material_id INTEGER REFERENCES material(id),insurance_code TEXT NOT NULL,insured_area TEXT NOT NULL,valid_from TEXT NOT NULL,valid_until TEXT,
+ status TEXT NOT NULL CHECK(status IN ('有效','停用')),basis TEXT NOT NULL,operator_id INTEGER NOT NULL REFERENCES staff(id),${meta},CHECK((service_id IS NOT NULL)+(material_id IS NOT NULL)=1),CHECK(valid_until IS NULL OR valid_until>valid_from)) STRICT;
+ CREATE TABLE insurance_case(id INTEGER PRIMARY KEY AUTOINCREMENT,patient_id INTEGER NOT NULL REFERENCES patient(id),visit_id INTEGER NOT NULL REFERENCES visit(id),bill_id INTEGER REFERENCES bill(id),identity_id INTEGER REFERENCES insurance_identity(id),business_no TEXT NOT NULL UNIQUE,fee_revision INTEGER,
+ patient_choice TEXT NOT NULL CHECK(patient_choice IN ('待确认','医保','自费')),patient_confirmed_at TEXT,institution_code TEXT NOT NULL,diagnosis_code TEXT,estimated_fund_cents INTEGER,estimated_account_cents INTEGER,estimated_patient_cents INTEGER,
+ status TEXT NOT NULL CHECK(status IN ('待核验','待预结算','预结算完成','结算待核实','已结算','已撤销')),result_note TEXT NOT NULL,fee_digest TEXT,pre_valid_until TEXT,pre_reference TEXT,operator_id INTEGER NOT NULL REFERENCES staff(id),${meta}) STRICT;
+ CREATE UNIQUE INDEX insurance_live_bill ON insurance_case(bill_id) WHERE status<>'已撤销';
+ CREATE TABLE insurance_fee(id INTEGER PRIMARY KEY AUTOINCREMENT,insurance_case_id INTEGER NOT NULL REFERENCES insurance_case(id),bill_item_id INTEGER NOT NULL REFERENCES bill_item(id),mapping_id INTEGER NOT NULL REFERENCES insurance_item_mapping(id),${amount('amount_cents')},quantity INTEGER NOT NULL CHECK(quantity>0),quantity_scale INTEGER NOT NULL CHECK(quantity_scale BETWEEN 0 AND 6),uploaded_at TEXT NOT NULL,result_note TEXT NOT NULL,${meta},UNIQUE(insurance_case_id,bill_item_id)) STRICT;
+ CREATE TABLE insurance_settlement(id INTEGER PRIMARY KEY AUTOINCREMENT,insurance_case_id INTEGER NOT NULL UNIQUE REFERENCES insurance_case(id),external_reference TEXT NOT NULL UNIQUE,${['total_cents','fund_cents','account_cents','patient_due_cents'].map(amount).join(',')},confirmed_at TEXT NOT NULL,
+ status TEXT NOT NULL CHECK(status IN ('有效','已撤销')),${meta},CHECK(total_cents=fund_cents+account_cents+patient_due_cents)) STRICT;
+ CREATE TABLE insurance_reversal(id INTEGER PRIMARY KEY AUTOINCREMENT,settlement_id INTEGER NOT NULL REFERENCES insurance_settlement(id),fee_request_id INTEGER NOT NULL REFERENCES fee_request(id),business_no TEXT NOT NULL UNIQUE,reason TEXT NOT NULL,external_reference TEXT UNIQUE,verified_at TEXT,
+ status TEXT NOT NULL CHECK(status IN ('待办理','待核实','已成功','已失败')),result_note TEXT NOT NULL,operator_id INTEGER NOT NULL REFERENCES staff(id),${meta}) STRICT;
+ CREATE UNIQUE INDEX insurance_live_reversal ON insurance_reversal(settlement_id) WHERE status IN ('待办理','待核实','已成功');
+ CREATE TABLE insurance_fund_receipt(id INTEGER PRIMARY KEY AUTOINCREMENT,settlement_id INTEGER NOT NULL REFERENCES insurance_settlement(id),flow_type TEXT NOT NULL CHECK(flow_type IN ('拨付','退回')),${amount('amount_cents')},occurred_at TEXT NOT NULL,evidence_reference TEXT NOT NULL UNIQUE,operator_id INTEGER NOT NULL REFERENCES staff(id),${meta},CHECK(amount_cents>0)) STRICT;`);
+ for(const table of ['insurance_identity','insurance_fee','insurance_fund_receipt','payment_reconciliation'])db.exec(`CREATE TRIGGER ${table}_frozen_update BEFORE UPDATE ON ${table} BEGIN SELECT RAISE(ABORT,'immutable_fact'); END;`);
+ for(const table of ['payment_order','payment_reconciliation','insurance_identity','insurance_item_mapping','insurance_case','insurance_fee','insurance_settlement','insurance_reversal','insurance_fund_receipt'])db.exec(`CREATE TRIGGER ${table}_no_delete BEFORE DELETE ON ${table} BEGIN SELECT RAISE(ABORT,'delete_forbidden'); END;`);
+ db.exec(`CREATE TRIGGER payment_order_terminal BEFORE UPDATE ON payment_order WHEN OLD.status IN ('已成功','已失败','已关闭') OR NEW.bill_id IS NOT OLD.bill_id OR NEW.business_no IS NOT OLD.business_no OR NEW.amount_cents IS NOT OLD.amount_cents OR NEW.channel IS NOT OLD.channel BEGIN SELECT RAISE(ABORT,'immutable_fact'); END;
+ CREATE TRIGGER insurance_settlement_terminal BEFORE UPDATE ON insurance_settlement WHEN OLD.status='已撤销' OR NEW.status<>'已撤销' OR NEW.total_cents<>OLD.total_cents OR NEW.fund_cents<>OLD.fund_cents OR NEW.account_cents<>OLD.account_cents OR NEW.patient_due_cents<>OLD.patient_due_cents OR NEW.external_reference<>OLD.external_reference OR NEW.insurance_case_id<>OLD.insurance_case_id OR NEW.confirmed_at<>OLD.confirmed_at BEGIN SELECT RAISE(ABORT,'immutable_fact'); END;
+ CREATE TRIGGER insurance_reversal_terminal BEFORE UPDATE ON insurance_reversal WHEN OLD.status IN ('已成功','已失败') OR NEW.settlement_id<>OLD.settlement_id OR NEW.fee_request_id<>OLD.fee_request_id OR NEW.business_no<>OLD.business_no OR NEW.reason<>OLD.reason BEGIN SELECT RAISE(ABORT,'immutable_fact'); END;`);
+ const specs=[['settlements.query','查询经营与收付核对','UC-21','查询',['cashier','manager']],['settlements.reconcile','办理实际收付核对','UC-21','业务写入',['cashier']],['settlements.manage','处理收付差异和责任','UC-21','业务写入',['manager']],['insurance.identity','核验医保身份及登记','UC-22','业务写入',['frontdesk','cashier']],['insurance.query','查询医保办理','UC-22','查询',['frontdesk','cashier','manager']],['insurance.prepare','核对费用并办理预结算','UC-22','业务写入',['cashier']],['insurance.settle','办理结算及核实原单','UC-23','业务写入',['cashier']],['insurance.manage','维护医保项目和批准撤销','UC-23','业务写入',['manager']],['insurance.receipt','核实医保实际收付','UC-23','业务写入',['cashier']]];
+ for(const [code,name,uc,kind,roles] of specs){db.prepare('INSERT INTO access_permission(code,usecase_no,name,operation_kind,object_rule,config_version) VALUES(?,?,?,?,?,1)').run(code,uc,name,kind,'当前岗位有效；核对患者、原费用与原单，保留真实结果');const p=db.prepare('SELECT id FROM access_permission WHERE code=?').get(code);for(const role of roles)db.prepare('INSERT INTO role_permission(role_id,permission_id,config_version,created_at) SELECT id,?,1,? FROM access_role WHERE code=?').run(p.id,'2026-10-21T00:00:00Z',role);}
+ db.exec(`PRAGMA user_version=${VERSION};COMMIT`);
+ }catch(e){if(db.isTransaction)db.exec('ROLLBACK');throw e;}
+}
+module.exports={VERSION,upgradeSettlements};

@@ -2,9 +2,9 @@
 const { createApplication } = require('../../src/v2/server');
 let sequence = 0;
 const command = value => ({ ...value, commandVersion: 1, requestKey: 'treatment-' + (++sequence) });
-function setup(t) {
+function setup(t,options={}) {
   let clock = new Date('2026-10-19T01:00:00Z');
-  const a = createApplication({ demo: true, clock: () => clock });
+  const a = createApplication({ ...options,demo: true, clock: () => clock });
   t.after(() => a.db.close());
   const login = (name, role = name) => { const s = a.auth.login({ username: name, password: 'Clinic123!' }); return { token: s.token, csrf: s.csrf, role }; };
   a.f = login('frontdesk'); a.m = login('manager'); a.d = login('dentist'); a.c = login('cashier'); a.other = login('manager', 'dentist');

@@ -4,24 +4,26 @@
   "private": true,
   "description": "A dependency-free dental clinic web system built with Node.js and SQLite.",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node src/v2/server.js",
     "start:v2": "node src/v2/server.js",
     "demo:v2": "node src/v2/server.js --demo",
     "demo:treatment:v2": "node scripts/demo-v2-treatment.js",
     "demo:fees:v2": "node scripts/demo-v2-fees.js",
     "demo:followups:v2": "node scripts/demo-v2-followups.js",
     "demo:inventory:v2": "node scripts/demo-v2-inventory.js",
-    "demo:supply:v2": "node scripts/demo-v2-supply.js",
     "demo:resources:v2": "node scripts/demo-v2-resources.js",
     "test:v2": "node --test tests/v2-*.test.js",
     "backup": "node scripts/backup.js",
-    "demo": "node scripts/seed-demo.js",
+    "demo": "node src/v2/server.js --demo",
     "workflow": "node scripts/run-demo-workflow.js",
     "export:demo": "node scripts/export-demo.js",
     "test:exceptions": "node --test tests/http-exceptions.test.js",
     "verify:backup": "node scripts/verify-backup.js",
     "smoke": "node scripts/smoke-http.js",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "demo:settlements:v2": "node scripts/demo-v2-settlements.js",
+    "demo:business:v2": "node scripts/serve-v2-business-demo.js",
+    "check:ui:settlements": "node scripts/check-v2-settlements-ui.cjs"
   },
   "engines": {
     "node": ">=24"

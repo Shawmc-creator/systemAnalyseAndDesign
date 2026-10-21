@@ -67,6 +67,7 @@ class Auth {
     const p = this.db.prepare(`SELECT p.* FROM access_permission p JOIN role_permission rp ON rp.permission_id=p.id
       JOIN access_role r ON r.id=rp.role_id WHERE r.code=? AND p.code=? AND rp.config_version=p.config_version`).get(role || '', permission);
     if (!grant || !p) fail(403, 'FORBIDDEN', '当前岗位无权办理此操作');
+    if(permission==='uc28.approve'||/^uc(29|30|31)\./.test(permission))fail(410,'FEATURE_REMOVED','该旧功能已移出当前需求范围');
     return { session: s, permission: p, authority: { role, grantId: grant.grant_id, qualificationId: grant.qualification_id, configVersion: p.config_version } };
   }
   logout(token) {

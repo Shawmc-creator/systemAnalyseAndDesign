@@ -5,16 +5,19 @@ const UNIT_FIELDS = ['base_unit','purchase_unit','conversion_numerator','convers
 class Inventory {
   constructor(db,unit) { Object.assign(this,{db,unit}); }
   materialFields(input) {
+    if(input.isDrug!==undefined&&typeof input.isDrug!=='boolean')fail(422,'MATERIAL_FIELDS','是否为处方药品须明确选择');
     const scale = integer(input.quantityScale,'数量小数位',true);
     if (scale > 6 || typeof input.requiresTrace !== 'boolean' || typeof input.requiresExpiry !== 'boolean') fail(422,'MATERIAL_FIELDS','数量精度为0至6，追溯和效期要求必须明确');
     return { name:text(input.name,'材料名称'), specification:text(input.specification,'规格'), base_unit:text(input.baseUnit,'基本单位',40),
       purchase_unit:text(input.purchaseUnit,'采购单位',40), conversion_numerator:integer(input.conversionNumerator,'换算分子'),
-      conversion_denominator:integer(input.conversionDenominator,'换算分母'), quantity_scale:scale, requires_trace:+input.requiresTrace, requires_expiry:+input.requiresExpiry };
+      conversion_denominator:integer(input.conversionDenominator,'换算分母'), quantity_scale:scale, requires_trace:+input.requiresTrace, requires_expiry:+input.requiresExpiry,
+      is_drug:input.isDrug===true?1:0,billing_service_id:input.billingServiceId==null?null:id(input.billingServiceId) };
   }
+  billingFields(fields){if(fields.billing_service_id){const s=row(this.db,'service',fields.billing_service_id);if(!fields.is_drug||!s.is_active||s.billing_unit!==fields.base_unit)fail(422,'DRUG_BILLING_CONTEXT','药品收费项目须启用，计价单位须与药品基本单位一致');}}
   hasLedger(materialId) { return !!this.db.prepare('SELECT x.id FROM inventory_movement x JOIN batch_stock s ON s.id=x.batch_stock_id JOIN material_batch b ON b.id=s.material_batch_id WHERE b.material_id=? LIMIT 1').get(materialId); }
   batchContext(batchId) { const batch=row(this.db,'material_batch',batchId); return { batch, material:row(this.db,'material',batch.material_id) }; }
   available(batch,material,location,now) {
-    return batch.status==='可用' && material.is_active===1 && material.confirmed_at!=null && location.is_active===1 && batch.expiry_date!=null && batch.expiry_date>=day(now);
+    return batch.status==='可用' && material.is_active===1 && material.confirmed_at!=null && location.is_active===1 && (!material.requires_expiry||batch.expiry_date!=null) && (!batch.expiry_date||batch.expiry_date>=day(now));
   }
   stockContext(input,now,usable=false) {
     const stock=row(this.db,'batch_stock',input.stockId); revision(stock,input.expectedStockRevision);
@@ -34,13 +37,18 @@ class Inventory {
         const fields=this.materialFields(input); let key=input.materialId;
         if(key!=null) {
           const old=row(this.db,'material',key); revision(old,input.expectedRevision);
-          const structural=[...UNIT_FIELDS,'requires_trace','requires_expiry'].some(k=>old[k]!==fields[k]);
-          if(structural && (this.hasLedger(key)||this.db.prepare('SELECT id FROM purchase_order_item WHERE material_id=? LIMIT 1').get(key))) fail(409,'MATERIAL_UNITS_FROZEN','已有采购或流水的单位、精度及追溯效期要求不能改写');
-          this.db.prepare(`UPDATE material SET name=?,specification=?,base_unit=?,purchase_unit=?,conversion_numerator=?,conversion_denominator=?,quantity_scale=?,requires_trace=?,requires_expiry=?,
+          if(input.isDrug===undefined)fields.is_drug=old.is_drug;
+          if(input.billingServiceId===undefined)fields.billing_service_id=old.billing_service_id;
+          else if(typeof input.isDrug!=='boolean')fail(422,'MATERIAL_FIELDS','是否为处方药品须明确选择');
+          const unitChange=[...UNIT_FIELDS,'requires_trace','requires_expiry'].some(k=>old[k]!==fields[k]);
+          this.billingFields(fields);
+          const structural=unitChange||old.is_drug!==fields.is_drug||old.billing_service_id!==fields.billing_service_id||((old.is_drug||fields.is_drug)&&['name','specification'].some(k=>old[k]!==fields[k]));
+          if(unitChange && (this.hasLedger(key)||this.db.prepare('SELECT id FROM purchase_order_item WHERE material_id=? LIMIT 1').get(key))) fail(409,'MATERIAL_UNITS_FROZEN','已有采购或流水的单位、精度及追溯效期要求不能改写');
+          this.db.prepare(`UPDATE material SET name=?,specification=?,base_unit=?,purchase_unit=?,conversion_numerator=?,conversion_denominator=?,quantity_scale=?,requires_trace=?,requires_expiry=?,is_drug=?,billing_service_id=?,
             confirmed_at=?,confirmed_by=?,is_active=?,updated_at=?,revision=revision+1 WHERE id=?`).run(...Object.values(fields),structural?null:old.confirmed_at,structural?null:old.confirmed_by,structural?0:old.is_active,now,key);
           return {kind:'material',key,beforeRevision:old.revision,revision:old.revision+1,reason:text(input.reason,'维护依据'),changes:Object.keys(fields).filter(k=>fields[k]!==old[k]).map(k=>({field:k,before:old[k],after:fields[k]}))};
         }
-        key=insert(this.db,'material',fact(now,{...fields,confirmed_at:null,confirmed_by:null,is_active:0,created_by:ctx.session.staff_id,record_no:recordNo('MAT')}));
+        this.billingFields(fields);key=insert(this.db,'material',fact(now,{...fields,confirmed_at:null,confirmed_by:null,is_active:0,created_by:ctx.session.staff_id,record_no:recordNo('MAT')}));
         return {kind:'material',key,revision:1,reason:text(input.reason,'材料建档依据')};
       }
       if(input.action==='location') {
@@ -63,7 +71,7 @@ class Inventory {
     const reason=text(input.reason,'状态处理依据',2000);
     const expiry=input.expiryDate===undefined?batch.expiry_date:(input.expiryDate==null?null:dateOnly(input.expiryDate,'核实效期'));
     if(status==='可用') {
-      if(!material.confirmed_at || !material.is_active || !expiry || expiry<day(now)) fail(409,'BATCH_UNAVAILABLE','恢复须已确认材料和实际有效期；未知效期不能当作无限有效');
+      if(!material.confirmed_at || !material.is_active || material.requires_expiry&&!expiry || expiry&&expiry<day(now)) fail(409,'BATCH_UNAVAILABLE','恢复须已确认材料及适用的实际有效期；需效期材料的未知效期不能当作无限有效');
       if(!this.db.prepare(`SELECT r.id FROM purchase_receipt_item r JOIN purchase_receipt h ON h.id=r.purchase_receipt_id
         WHERE r.material_batch_id=? AND r.accepted_quantity_scaled>0 AND h.accepted_at IS NOT NULL AND h.confirmed_by IS NOT NULL`).get(batch.id)) fail(409,'BATCH_ACCEPTANCE_REQUIRED','须有该批次已认可的合格验收范围');
       if(this.db.prepare(`SELECT i.id FROM purchase_issue i JOIN purchase_receipt_item r ON r.id=i.purchase_receipt_item_id
@@ -157,6 +165,17 @@ class Inventory {
       return {kind:'stock_count',key:count.id,beforeRevision:count.revision,revision:count.revision+1,reason};
     });
   }
+  options(credentials){
+    return this.unit.query(credentials,'uc17.query',()=>({materials:this.db.prepare('SELECT * FROM material ORDER BY id').all(),batches:this.db.prepare('SELECT * FROM material_batch ORDER BY id').all(),locations:this.db.prepare('SELECT * FROM stock_location ORDER BY id').all(),billingServices:this.db.prepare('SELECT id,name,billing_unit FROM service WHERE is_active=1 ORDER BY name,id').all()}));
+  }
+  usageOptions(credentials,input={}){
+    return this.unit.query(credentials,'uc18.record',()=>{
+      const date=input.date==null?day(this.unit.auth.now()):dateOnly(input.date);
+      if(date>day(this.unit.auth.now()))fail(422,'USAGE_DATE','不能选择未来尚未发生的接诊');
+      return {date,visits:this.db.prepare(`SELECT v.id,v.patient_id,v.record_no,v.started_at,v.ended_at,v.status,p.name patient_name,p.record_no patient_no
+        FROM visit v JOIN patient p ON p.id=v.patient_id WHERE v.started_at IS NOT NULL AND v.status IN ('接诊中','诊疗结束') ORDER BY v.started_at DESC,v.id DESC`).all().filter(v=>day(v.started_at)===date)};
+    });
+  }
   query(credentials,input={}) {
     return this.unit.query(credentials,'uc17.query',ctx=>{
       const page=Number(input.page||1),size=Number(input.pageSize||30);
@@ -175,7 +194,7 @@ class Inventory {
           const movements=this.db.prepare('SELECT * FROM inventory_movement WHERE batch_stock_id=? ORDER BY id').all(stock.id);
           const usages=this.db.prepare(`SELECT u.id,u.inventory_movement_id,u.visit_id,v.record_no visit_no,u.quantity_scaled,u.used_at,u.operator_id
             FROM material_usage u JOIN inventory_movement m ON m.id=u.inventory_movement_id JOIN visit v ON v.id=u.visit_id WHERE m.batch_stock_id=? ORDER BY u.id`).all(stock.id);
-          entries.push({batch,material,stock,location,availableQuantityScaled:available?stock.quantity_scaled:0,availability:available?'可用':!batch.expiry_date?'效期未知':batch.expiry_date<day(this.unit.auth.now())?'实际已过期':'待检、隔离、停用或材料/位置未启用',
+          entries.push({batch,material,stock,location,availableQuantityScaled:available?stock.quantity_scaled:0,availability:available?'可用':!batch.expiry_date&&material.requires_expiry?'效期未知':batch.expiry_date&&batch.expiry_date<day(this.unit.auth.now())?'实际已过期':'待检、隔离、停用或材料/位置未启用',
             movements,usages,counts:this.db.prepare('SELECT * FROM stock_count WHERE batch_stock_id=? ORDER BY id').all(stock.id),changes:this.db.prepare('SELECT * FROM batch_change WHERE material_batch_id=? ORDER BY id').all(batch.id)});
         }
       }

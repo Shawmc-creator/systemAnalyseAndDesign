@@ -13,6 +13,11 @@ class Billing {
     return value;
   }
   fromExecution(execution, visit, ctx, now) {
+    return this.fromFact({patientId:visit.patient_id,at:execution.completed_at,serviceId:execution.service_id,quantity:execution.completed_quantity,quantityScale:0,executionId:execution.id},ctx,now);
+  }
+  fromDispense(d,item,p,ctx,now){return this.fromFact({patientId:p.patient_id,at:d.dispensed_at,serviceId:item.billing_service_id,quantity:d.quantity_scaled,quantityScale:item.quantity_scale,dispenseId:d.id},ctx,now);}
+  fromFact(source,ctx,now){
+    const visit={patient_id:source.patientId},execution={id:source.executionId||null,completed_at:source.at,service_id:source.serviceId,completed_quantity:source.quantity};
     let funds = this.db.prepare('SELECT * FROM patient_funds WHERE patient_id=?').get(visit.patient_id);
     if (!funds) funds = row(this.db, 'patient_funds', insert(this.db, 'patient_funds', fact(now, { patient_id: visit.patient_id, opened_at: now, opened_by: ctx.session.staff_id })));
     const start = utc(day(execution.completed_at) + 'T00:00:00+08:00'), end = utc(Date.parse(start) + 86400_000);
@@ -23,8 +28,8 @@ class Billing {
     const price = this.db.prepare(`SELECT * FROM service_price WHERE service_id=? AND status='已确认可适用'
       AND valid_from<=? AND (valid_until IS NULL OR valid_until>?) ORDER BY valid_from DESC LIMIT 1`).get(execution.service_id, execution.completed_at, execution.completed_at);
     if (price) safe(BigInt(price.unit_price_cents) * BigInt(execution.completed_quantity));
-    const key = insert(this.db, 'bill_item', fact(now, { bill_id: bill.id, treatment_execution_id: execution.id, service_price_id: price?.id || null,
-      quantity: execution.completed_quantity, unit_price_cents: price?.unit_price_cents ?? null, priced_at: execution.completed_at,
+    const key = insert(this.db, 'bill_item', fact(now, { bill_id: bill.id, treatment_execution_id: execution.id, dispense_record_id:source.dispenseId||null,service_price_id: price?.id || null,
+      quantity: execution.completed_quantity,quantity_scale:source.quantityScale, unit_price_cents: price?.unit_price_cents ?? null, priced_at: execution.completed_at,
       pricing_note: price ? '按实际执行发生时点引用已确认价目；依据：' + price.change_reason : '执行事实已保存；缺少适用的已确认价目，待负责人核价',
       pricing_status: price ? '已核价' : '待核价', priced_by: price ? ctx.session.staff_id : null }));
     ctx.authority.billItemId = key; ctx.authority.priceId = price?.id || null;
@@ -85,7 +90,7 @@ class Billing {
   pricePending(ctx, input, now) {
     const item = row(this.db, 'bill_item', input.billItemId); revision(item, input.expectedRevision);
     if (item.pricing_status !== '待核价') fail(409, 'PRICE_FROZEN', '已核价应收不能重新定价，差错须走费用申请');
-    const execution = row(this.db, 'treatment_execution', item.treatment_execution_id), price = row(this.db, 'service_price', input.priceId);
+    const source=this.lines(item.bill_id).find(i=>i.id===item.id),execution={service_id:source.service_id}, price = row(this.db, 'service_price', input.priceId);
     if (price.status !== '已确认可适用' || price.service_id !== execution.service_id || price.valid_from > item.priced_at || (price.valid_until && price.valid_until <= item.priced_at)) fail(409, 'PRICE_NOT_APPLICABLE', '请选择覆盖原执行发生时点的已确认价目');
     safe(BigInt(price.unit_price_cents) * BigInt(item.quantity));
     this.db.prepare("UPDATE bill_item SET service_price_id=?,unit_price_cents=?,pricing_note=?,pricing_status='已核价',priced_by=?,updated_at=?,revision=revision+1 WHERE id=?").run(
@@ -96,18 +101,27 @@ class Billing {
   }
   catalog(credentials) {
     const permission = credentials.role === 'dentist' ? 'uc04.execute' : credentials.role === 'manager' ? 'uc05.approve' : 'uc05.draft';
-    return this.unit.query(credentials, permission, () => ({ services: this.db.prepare('SELECT * FROM service ORDER BY id').all(), prices: this.db.prepare('SELECT * FROM service_price ORDER BY service_id,valid_from,id').all() }));
+    return this.unit.query(credentials, permission, () => ({ services: this.db.prepare('SELECT * FROM service ORDER BY id').all(), prices: this.db.prepare('SELECT * FROM service_price ORDER BY service_id,valid_from,id').all(),
+      ...(credentials.role==='manager'?{pendingItems:this.lines().filter(i=>i.pricing_status==='待核价').slice(0,100)}: {}) }));
   }
+  lines(billId=null){return this.db.prepare(`SELECT i.*,coalesce(e.service_id,pi.billing_service_id) service_id,
+    CASE WHEN d.id IS NOT NULL THEN pi.drug_name ELSE s.name END service_name,coalesce(pi.unit,s.billing_unit) billing_unit,
+    coalesce(e.completed_at,d.dispensed_at) completed_at,EXISTS(SELECT 1 FROM treatment_execution n WHERE n.original_execution_id=e.id) has_clinical_correction,
+    b.record_no bill_no,p.name patient_name,p.record_no patient_no FROM bill_item i JOIN bill b ON b.id=i.bill_id JOIN patient p ON p.id=b.patient_id
+    LEFT JOIN treatment_execution e ON e.id=i.treatment_execution_id LEFT JOIN dispense_record d ON d.id=i.dispense_record_id
+    LEFT JOIN prescription_item pi ON pi.id=d.prescription_item_id LEFT JOIN service s ON s.id=coalesce(e.service_id,pi.billing_service_id)
+    WHERE (? IS NULL OR i.bill_id=?) ORDER BY i.priced_at,i.id`).all(billId,billId);}
   billSummary(billId) {
-    const items = this.db.prepare('SELECT quantity,unit_price_cents,pricing_status FROM bill_item WHERE bill_id=?').all(billId);
+    const items = this.db.prepare('SELECT amount_cents,pricing_status FROM bill_item WHERE bill_id=?').all(billId);
     const priced = items.filter(i => i.pricing_status === '已核价');
-    const charges = priced.reduce((n, i) => n + BigInt(i.quantity) * BigInt(i.unit_price_cents), 0n);
+    const charges = priced.reduce((n, i) => n + BigInt(i.amount_cents), 0n);
     const adjustments = sum(this.db.prepare('SELECT i.amount_cents FROM fee_adjustment_item i JOIN fee_adjustment a ON a.id=i.fee_adjustment_id WHERE a.bill_id=?').all(billId), 'amount_cents');
     const allocated = sum(this.db.prepare('SELECT amount_cents FROM payment_allocation WHERE bill_id=?').all(billId), 'amount_cents');
     const offset = sum(this.db.prepare('SELECT amount_cents FROM prepayment_offset WHERE bill_id=?').all(billId), 'amount_cents');
-    const pending = items.length - priced.length, unpaid = charges + adjustments - allocated - offset;
+    const insuranceCents=require('./settlement-rules').insuranceShare(this.db,billId);
+    const pending = items.length - priced.length, unpaid = charges + adjustments - allocated - offset-BigInt(insuranceCents);
     return { pricedCents: safe(charges), adjustmentCents: safe(adjustments), receivableCents: safe(charges + adjustments), allocatedCents: safe(allocated),
-      offsetCents: safe(offset), unpaidCents: safe(unpaid), pendingPricingCount: pending, settled: items.length > 0 && pending === 0 && unpaid === 0n };
+      offsetCents: safe(offset), insuranceCents,patientDueCents:safe(charges+adjustments-BigInt(insuranceCents)),unpaidCents: safe(unpaid), pendingPricingCount: pending, settled: items.length > 0 && pending === 0 && unpaid === 0n };
   }
   fundsSummary(patientId) {
     const funds = this.db.prepare('SELECT * FROM patient_funds WHERE patient_id=?').get(patientId);
@@ -117,7 +131,7 @@ class Billing {
       const offset = sum(this.db.prepare('SELECT amount_cents FROM prepayment_offset WHERE patient_payment_id=?').all(p.id), 'amount_cents');
       const refunds = this.db.prepare('SELECT status,actual_cents,requested_cents FROM patient_refund WHERE patient_payment_id=?').all(p.id);
       const refunded = sum(refunds.filter(r => r.status === '已确认退款'), 'actual_cents'), held = sum(refunds.filter(r => ['待办理', '待核实'].includes(r.status)), 'requested_cents');
-      const purposes = table => this.db.prepare(`SELECT id,bill_id,amount_cents,effective_at,reason FROM ${table} WHERE patient_payment_id=? ORDER BY id`).all(p.id);
+      const purposes = table => this.db.prepare(`SELECT id,bill_id,amount_cents,effective_at,reason,revision,${table==='payment_allocation'?'original_allocation_id':'original_offset_id'} original_id FROM ${table} WHERE patient_payment_id=? ORDER BY id`).all(p.id);
       return { id: p.id, recordNo: p.record_no, revision: p.revision, status: p.status, channel: p.channel, receivedAt: p.received_at,
         receivedCents: p.received_cents, changeCents: p.change_cents, netCents: p.net_cents, verifiedAt: p.verified_at, externalReference: p.external_reference,
         allocations: purposes('payment_allocation'), offsets: purposes('prepayment_offset'),
@@ -130,6 +144,17 @@ class Billing {
       pendingPaymentCents: safe(sum(payments.filter(p => p.status === '待核实'), 'netCents')),
       allocatedCents: aggregate('allocatedCents'), offsetCents: aggregate('offsetCents'), refundedCents: aggregate('refundedCents'),
       refundHeldCents: aggregate('refundHeldCents'), availableCents: aggregate('availableCents'), payments };
+  }
+  candidates(credentials,input={}){
+    const permission=credentials.role==='manager'?'uc25.approve':'uc06.query';
+    return this.unit.query(credentials,permission,()=>{
+      const q=String(input.q||'').trim();if(q.length>80)fail(422,'INVALID_INPUT','患者查找条件过长');
+      const pattern='%'+q.replace(/[!%_]/g,'!$&')+'%';
+      return {items:this.db.prepare(`SELECT p.id,p.name,p.record_no,p.phone,p.phone_owner FROM patient p
+        WHERE (p.name LIKE ? ESCAPE '!' OR p.phone LIKE ? ESCAPE '!' OR p.record_no=?)
+        AND (?<>'manager' OR EXISTS(SELECT 1 FROM patient_funds f JOIN fee_request r ON r.patient_funds_id=f.id WHERE f.patient_id=p.id))
+        ORDER BY p.id DESC LIMIT 50`).all(pattern,pattern,q,credentials.role)};
+    });
   }
   query(credentials, input) {
     return this.unit.query(credentials, 'uc06.query', () => {
@@ -146,11 +171,7 @@ class Billing {
         AND (? IS NULL OR period_start>=?) AND (? IS NULL OR period_start<?) ORDER BY period_start DESC,id DESC`).all(patient.id, billId, billId, from, from, until, until).map(b => ({ ...b, summary: this.billSummary(b.id) }))
         .filter(b => (!['true', true].includes(input.pendingOnly) || b.summary.pendingPricingCount > 0) && (!['true', true].includes(input.unpaidOnly) || b.summary.unpaidCents > 0));
       const items = bills.slice((page - 1) * size, page * size).map(b => ({ ...b,
-        items: this.db.prepare(`SELECT i.id,i.bill_id,i.treatment_execution_id,i.service_price_id,i.quantity,i.unit_price_cents,i.priced_at,
-          i.pricing_status,i.pricing_note,i.revision,s.name service_name,s.billing_unit,e.completed_at,
-          EXISTS(SELECT 1 FROM treatment_execution n WHERE n.original_execution_id=e.id) has_clinical_correction
-          FROM bill_item i JOIN treatment_execution e ON e.id=i.treatment_execution_id JOIN service s ON s.id=e.service_id
-          WHERE i.bill_id=? ORDER BY i.id`).all(b.id) }));
+        items:this.lines(b.id) }));
       const total = field => safe(bills.reduce((n, b) => n + BigInt(b.summary[field]), 0n));
       return { patient: { id: patient.id, recordNo: patient.record_no, name: patient.name }, computedAt: this.unit.auth.now(), total: bills.length, page, pageSize: size, items,
         totals: { receivableCents: total('receivableCents'), allocatedCents: total('allocatedCents'), offsetCents: total('offsetCents'), unpaidCents: total('unpaidCents'), pendingPricingCount: bills.reduce((n, b) => n + b.summary.pendingPricingCount, 0) },

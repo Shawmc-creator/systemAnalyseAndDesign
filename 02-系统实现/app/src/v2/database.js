@@ -5,7 +5,10 @@ const path = require('node:path');
 const { hash } = require('./common');
 const DESIGN_DIR = path.resolve(__dirname, '../../../../01-需求文档/数据层设计');
 const SCHEMA_HASH = '6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d';
-const { VERSION, upgradeResources } = require('./resource-schema');
+const { VERSION:RESOURCE_VERSION, upgradeResources } = require('./resource-schema');
+const { VERSION:PRESCRIPTION_VERSION,upgradePrescriptions }=require('./prescription-schema');
+const {VERSION:PHARMACY_VERSION,upgradePharmacy}=require('./pharmacy-schema');
+const {VERSION,upgradeSettlements}=require('./settlement-schema');
 const APPLICATION = 0x51484432;
 function openDatabase(filename = ':memory:') {
   // Never pass an existing legacy database through an initialization/migration path.
@@ -19,13 +22,17 @@ function openDatabase(filename = ':memory:') {
       db.exec(sql.toString('utf8'));
       db.exec(`PRAGMA application_id=${APPLICATION}`);
     } else if (db.prepare('PRAGMA application_id').get().application_id !== APPLICATION ||
-      ![[20261018,85],[VERSION,88]].some(([v,n]) => db.prepare('PRAGMA user_version').get().user_version===v && tables.length===n)) {
+      ![[20261018,85],[RESOURCE_VERSION,88],[PRESCRIPTION_VERSION,90],[PHARMACY_VERSION,91],[VERSION,100]].some(([v,n]) => db.prepare('PRAGMA user_version').get().user_version===v && tables.length===n)) {
       throw new Error('此文件不是已识别的新版数据库，拒绝打开或自动迁移；请指定独立的新版文件');
     }
     db.exec('PRAGMA foreign_keys=ON; PRAGMA recursive_triggers=ON; PRAGMA busy_timeout=3000;');
     if (filename !== ':memory:') db.exec('PRAGMA journal_mode=WAL');
     if (db.prepare('PRAGMA foreign_key_check').all().length) throw new Error('数据库外键检查失败');
-    upgradeResources(db, filename);
+    const initialVersion=db.prepare('PRAGMA user_version').get().user_version;
+    if(initialVersion===20261018)upgradeResources(db, filename);
+    if(initialVersion<=PRESCRIPTION_VERSION)upgradePrescriptions(db,filename,initialVersion===RESOURCE_VERSION);
+    if(initialVersion<=PHARMACY_VERSION)upgradePharmacy(db,filename,initialVersion===PRESCRIPTION_VERSION);
+    upgradeSettlements(db,filename,initialVersion===PHARMACY_VERSION);
     if (db.prepare('PRAGMA foreign_key_check').all().length) throw new Error('资源升级后外键检查失败');
     return db;
   } catch (error) { db.close(); throw error; }
