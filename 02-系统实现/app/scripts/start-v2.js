@@ -22,5 +22,5 @@ function openBrowser(){if(process.argv.includes('--no-browser'))return;const chi
   if(current(await status())){console.log('Clinic ready: '+base+' (PID '+child.pid+')');openBrowser();return;}
   if(child.exitCode!==null)break;
  }
- throw new Error('Service did not become ready. See '+path.join(data,'clinic-v2-server.stderr.log'));
+ throw new Error('Service did not become ready. See '+path.join(data,logPrefix+'.stderr.log'));
 })().catch(e=>{console.error(e.message);process.exitCode=1;});

@@ -35,10 +35,13 @@ npm start
 
 ## 检查与演示
 
-当前287项检查全部通过：新版230项、历史兼容57项。本轮新增17项支付、医保、经营及升级检查。已移除的复杂供货流程仍不属于当前范围。
+当前291项检查全部通过：新版234项、历史兼容57项。其中本次交付与备份新增4项，原支付医保批次新增17项。已移除的复杂供货流程仍不属于当前范围。
 
 ```powershell
 npm test
+npm run check:delivery
+npm run backup
+npm run verify:backup
 npm run test:v2
 npm run demo:treatment:v2
 npm run demo:fees:v2
@@ -63,3 +66,6 @@ npm run demo:business:v2
 ## 历史兼容
 
 `src/server.js`、`public/`根目录的旧代码及兼容性检查仅供历史数据维护；日常启动入口已统一到`src/v2/server.js`与`public/v2/`。旧HTML文件直接打开会跳转当前3001入口。
+## 当前备份与操作说明
+
+备份命令已指向`scripts/backup-v2.js`，包括当前数据库、文书原件和已有机构配置；`verify:backup`检查最近完成包的摘要、外键、行数和原件对应。原件损坏会使备份失败，失败包不作为可恢复完成包。具体操作和演示顺序见`../界面与流程说明.md`。旧备份脚本只供历史维护，不由当前npm命令调用。
