@@ -15,6 +15,7 @@ function previousContractSchema(){
 }
 // Only reconstructs isolated test fixtures. Never accepts a filename or opens a live database.
 function removePaymentPrescriptionFixture(db){
+ require('./v2-insurance-legacy').removeInsuranceFixture(db);
  if(!db.prepare('PRAGMA table_xinfo(material)').all().some(c=>c.name==='category'))return;
  const schema=previousContractSchema(),triggers=db.prepare("SELECT name,sql FROM sqlite_master WHERE type='trigger'").all(),indexes=db.prepare("SELECT name,sql FROM sqlite_master WHERE type='index' AND tbl_name IN ('payment_order','payment_reconciliation','prescription') AND sql IS NOT NULL").all(),fk=db.prepare('PRAGMA foreign_keys').get().foreign_keys;
  db.exec('PRAGMA foreign_keys=OFF;BEGIN');

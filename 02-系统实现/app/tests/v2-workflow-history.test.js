@@ -86,9 +86,9 @@ test('a successful estimate cannot fabricate amounts inconsistent with the froze
  const fields=Object.keys(r).filter(k=>!['id','actor_name'].includes(k)),values=fields.map(k=>k==='event_no'?4:k==='operation_no'?'fabricated-result':k==='estimated_fund_cents'?1:r[k]);
  assert.throws(()=>a.db.prepare('INSERT INTO insurance_preestimate_history('+fields.join(',')+') VALUES('+fields.map(()=>'?').join(',')+')').run(...values),/workflow_history_context/);
 });
-test('new insurance fees and settlements cannot omit their exact original request even though legacy columns permit null',t=>{
+test('insurance fees and settlements cannot omit their exact original request',t=>{
  const a=setupInsurance(t);a.ready();const fee=a.db.prepare('SELECT * FROM insurance_fee').get(),fields=Object.keys(fee).filter(k=>k!=='id');
- assert.throws(()=>a.db.prepare('INSERT INTO insurance_fee('+fields.join(',')+') VALUES('+fields.map(()=>'?').join(',')+')').run(...fields.map(k=>k==='preestimate_request_id'?null:fee[k])),/workflow_history_context/);
+ assert.throws(()=>a.db.prepare('INSERT INTO insurance_fee('+fields.join(',')+') VALUES('+fields.map(()=>'?').join(',')+')').run(...fields.map(k=>k==='preestimate_request_id'?null:fee[k])),/workflow_history_context|insurance_contract_context|NOT NULL/);
  a.submit();const settled=a.settle(),s=a.db.prepare('SELECT * FROM insurance_settlement WHERE id=?').get(settled.id);assert.throws(()=>a.db.prepare('UPDATE insurance_settlement SET preestimate_request_id=NULL WHERE id=?').run(s.id),/workflow_history_frozen|immutable_fact/);
 });
 test('all six history tables match the document field types, nullability, primary keys and explicit foreign keys',t=>{

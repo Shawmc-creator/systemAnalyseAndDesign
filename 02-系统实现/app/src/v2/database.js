@@ -12,7 +12,8 @@ const {VERSION:SETTLEMENT_VERSION,upgradeSettlements}=require('./settlement-sche
 const {VERSION:CLINICAL_VERSION,upgradeClinical}=require('./clinical-schema');
 const {VERSION:FINANCIAL_VERSION,upgradeFinancialHistory}=require('./financial-history-schema');
 const {VERSION:WORKFLOW_VERSION,upgradeWorkflowHistory}=require('./workflow-history-schema');
-const {VERSION,upgradePaymentPrescription}=require('./payment-prescription-schema');
+const {VERSION:PAYMENT_VERSION,upgradePaymentPrescription}=require('./payment-prescription-schema');
+const {VERSION,upgradeInsuranceAlignment}=require('./insurance-alignment-schema');
 const APPLICATION = 0x51484432;
 function openDatabase(filename = ':memory:') {
   // Never pass an existing legacy database through an initialization/migration path.
@@ -26,7 +27,7 @@ function openDatabase(filename = ':memory:') {
       db.exec(sql.toString('utf8'));
       db.exec(`PRAGMA application_id=${APPLICATION}`);
     } else if (db.prepare('PRAGMA application_id').get().application_id !== APPLICATION ||
-      ![[20261018,85],[RESOURCE_VERSION,88],[PRESCRIPTION_VERSION,90],[PHARMACY_VERSION,91],[SETTLEMENT_VERSION,100],[CLINICAL_VERSION,100],[FINANCIAL_VERSION,102],[WORKFLOW_VERSION,108],[VERSION,108]].some(([v,n]) => db.prepare('PRAGMA user_version').get().user_version===v && tables.length===n)) {
+      ![[20261018,85],[RESOURCE_VERSION,88],[PRESCRIPTION_VERSION,90],[PHARMACY_VERSION,91],[SETTLEMENT_VERSION,100],[CLINICAL_VERSION,100],[FINANCIAL_VERSION,102],[WORKFLOW_VERSION,108],[PAYMENT_VERSION,108],[VERSION,108]].some(([v,n]) => db.prepare('PRAGMA user_version').get().user_version===v && tables.length===n)) {
       throw new Error('此文件不是已识别的新版数据库，拒绝打开或自动迁移；请指定独立的新版文件');
     }
     db.exec('PRAGMA foreign_keys=ON; PRAGMA recursive_triggers=ON; PRAGMA busy_timeout=3000;');
@@ -40,7 +41,8 @@ function openDatabase(filename = ':memory:') {
     if(initialVersion<=CLINICAL_VERSION)upgradeClinical(db,filename,initialVersion===SETTLEMENT_VERSION);
     if(initialVersion<=FINANCIAL_VERSION)upgradeFinancialHistory(db,filename,initialVersion===CLINICAL_VERSION);
     if(initialVersion<=WORKFLOW_VERSION)upgradeWorkflowHistory(db,filename,initialVersion===FINANCIAL_VERSION);
-    upgradePaymentPrescription(db,filename,initialVersion===WORKFLOW_VERSION);
+    if(initialVersion<=PAYMENT_VERSION)upgradePaymentPrescription(db,filename,initialVersion===WORKFLOW_VERSION);
+    upgradeInsuranceAlignment(db,filename,initialVersion===PAYMENT_VERSION);
     if (db.prepare('PRAGMA foreign_key_check').all().length) throw new Error('资源升级后外键检查失败');
     return db;
   } catch (error) { db.close(); throw error; }

@@ -1,0 +1,1 @@
+Settlements and insurance UI acceptance passed.

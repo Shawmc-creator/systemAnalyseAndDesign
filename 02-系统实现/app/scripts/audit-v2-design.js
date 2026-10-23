@@ -24,6 +24,6 @@ try{
   primaryKeyDifferences:results.filter(t=>t.exists&&!t.primaryKeyMatches).map(t=>t.table),results,
   limits:['仅比较表名、列名、类型、可空、指定单列唯一、外键及主键；不验证业务语义、条件唯一或全部约束','运行库保留历史及技术表，总表数不能代表需求覆盖','规约、历史写入及设计分层仍须分别实施和验收']};
  report.schemaInventoryAligned=report.missingTables.length===0&&report.missingFieldsInExistingTables===0&&report.changedFieldDefinitions===0&&report.primaryKeyDifferences.length===0;
- if(process.argv.includes('--save')){const folder=path.join(delivery,'04-测试与验收/测试结果/20261023-v2-payment-prescription');fs.mkdirSync(folder,{recursive:true});fs.writeFileSync(path.join(folder,'设计结构差异清单.json'),JSON.stringify(report,null,2));}
+ if(process.argv.includes('--save')){const folder=path.join(delivery,'04-测试与验收/测试结果/20261023-v2-insurance-alignment');fs.mkdirSync(folder,{recursive:true});fs.writeFileSync(path.join(folder,'设计结构差异清单.json'),JSON.stringify(report,null,2));}
  console.log(JSON.stringify(report,null,2));if(process.argv.includes('--check')&&!report.schemaInventoryAligned)process.exitCode=2;
 }finally{db.close();}

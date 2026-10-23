@@ -43,6 +43,14 @@ class WorkflowHistoryRepository{
    const old=before.insurance.get(c.id),request=row(this.db,'insurance_preestimate_history',c.current_preestimate_id);
    if(request.insurance_case_id!==c.id||request.event_type!=='提交'||request.bill_id!==c.bill_id||request.identity_id!==c.identity_id||request.fee_revision!==c.fee_revision||request.diagnosis_code!==c.diagnosis_code)
     fail(409,'INSURANCE_HISTORY_CONTEXT','当前医保预结算与原提交不一致');
+   const events=this.db.prepare('SELECT * FROM insurance_preestimate_history WHERE request_id=? ORDER BY event_no').all(request.id),result=events.filter(h=>h.event_type==='结果').at(-1),invalid=events.some(h=>h.event_type==='失效');
+   const projected=result?.result_status==='成功'&&!invalid?result:null;
+   for(const field of ['estimated_fund_cents','estimated_account_cents','estimated_patient_cents'])if(c[field]!== (projected?.[field]??null))fail(409,'INSURANCE_HISTORY_CONTEXT','预估分摊须与当前原提交的明确结果及失效历史一致');
+   if(old?.current_preestimate_id&&old.current_preestimate_id!==request.id){
+    const previous=this.db.prepare('SELECT * FROM insurance_preestimate_history WHERE request_id=? ORDER BY event_no').all(old.current_preestimate_id),lastResult=previous.filter(h=>h.event_type==='结果').at(-1);
+    if(!previous.some(h=>h.event_type==='失效')&&lastResult?.result_status!=='明确失败')fail(409,'INSURANCE_PRE_PENDING','原预结算未明确结束，不能换号绕过');
+    if(c.patient_choice!=='待确认'||c.patient_confirmed_at!==null)fail(409,'INSURANCE_HISTORY_CONTEXT','新提交须重新说明并取得患者实际选择');
+   }
    if(old?.patient_choice!==c.patient_choice&&c.patient_choice!=='待确认'){
     const choice=this.db.prepare("SELECT id FROM insurance_preestimate_history WHERE insurance_case_id=? AND request_id=? AND event_type='患者选择' AND patient_choice=? AND id>?").get(c.id,request.id,c.patient_choice,before.lastPreestimate);
     if(!choice)fail(409,'WORKFLOW_HISTORY_MISSING','本次患者医保选择缺少对应原提交的历史');

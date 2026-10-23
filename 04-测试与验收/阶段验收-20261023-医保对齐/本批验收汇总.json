@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-23",
+  "runtimeVersion": 2026102305,
+  "runtimeTables": 108,
+  "automatedTests": 373,
+  "automatedPassed": 373,
+  "newTests": 21,
+  "newUiScenarios": 10,
+  "existingSettlementUiScenarios": 11,
+  "totalUiScenariosRun": 21,
+  "oldTablesPreserved": 108,
+  "allOriginalRowsAndColumnsPreserved": true,
+  "requirementsChanged": false,
+  "logicalModelUnchanged": true,
+  "missingFieldNames": 0,
+  "fieldDefinitionDifferences": 0,
+  "schemaInventoryAligned": true,
+  "wholeDesignImplemented": false,
+  "remainingWork": "D2其余服务、实体及数据存取分层对照；字段盘点不代替业务及分层验收",
+  "productionPaymentOrInsuranceConnected": false
+}

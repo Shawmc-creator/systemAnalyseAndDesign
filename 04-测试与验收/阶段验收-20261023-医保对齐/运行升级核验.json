@@ -1,0 +1,676 @@
+{
+  "date": "2026-10-23",
+  "passed": true,
+  "previousVersion": 2026102304,
+  "currentVersion": 2026102305,
+  "originalTables": 108,
+  "physicalTables": 108,
+  "allOriginalRowsAndColumnsPreserved": true,
+  "backup": "before-insurance-alignment-1792759545554-c0b9cfaf-c002-4b95-90a7-164c84bb32c9.db",
+  "checks": [
+    {
+      "table": "access_permission",
+      "rows": 70,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "access_role",
+      "rows": 6,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "account_role",
+      "rows": 7,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "appointment",
+      "rows": 1,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "appointment_change",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "audit_change",
+      "rows": 6,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "authentication_event",
+      "rows": 4,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "backup_artifact",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "backup_copy",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "backup_run",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "batch_change",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "batch_stock",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "bill",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "bill_item",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "cash_reconciliation",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "clinical_assessment",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "clinical_document",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "clinical_equipment",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "clinical_finding",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "clinical_handover",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "clinical_record",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "contact_history",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "dated_schedule",
+      "rows": 1,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "decision_file_version",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "decision_plan_item",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "dental_chair",
+      "rows": 2,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "dispense_record",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "document_correction",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "document_version",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "equipment_occupancy",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "fee_adjustment",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "fee_adjustment_item",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "fee_request",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "fee_request_history",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "followup_history",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "followup_requirement",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "health_item",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "health_review",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "health_version",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "instrument_pack",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "instrument_processing",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "instrument_use",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "insurance_case",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "insurance_fee",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "insurance_fund_receipt",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "insurance_identity",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "insurance_item_mapping",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "insurance_preestimate_history",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "insurance_reversal",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "insurance_settlement",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "inventory_movement",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "issue_followup",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "login_session",
+      "rows": 2,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "material",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "material_batch",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "material_usage",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "operation_audit",
+      "rows": 5,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "patient",
+      "rows": 2,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "patient_change",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "patient_decision",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "patient_funds",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "patient_payment",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "patient_proxy",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "patient_refund",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "payment_allocation",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "payment_order",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "payment_reconciliation",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "plan_item",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "plan_version",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "prepayment_offset",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "prescription",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "prescription_item",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "prescription_review_history",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "processing_equipment",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "processing_monitor",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "purchase_issue",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "purchase_order",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "purchase_order_item",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "purchase_receipt",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "purchase_receipt_item",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "receipt_item_history",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "reconciliation_item",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "record_addendum",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "request_submission",
+      "rows": 4,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "resource_block",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "resource_occupancy",
+      "rows": 1,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "restore_check",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "restore_verification",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "role_permission",
+      "rows": 86,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "schedule_change",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "service",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "service_price",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "service_price_history",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "staff",
+      "rows": 6,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "staff_role_qualification",
+      "rows": 7,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "stock_count",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "stock_count_history",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "stock_location",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "supplier",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "supplier_allocation",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "supplier_funds",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "supplier_payment",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "supplier_refund",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "treatment_execution",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "treatment_plan",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "user_account",
+      "rows": 6,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    },
+    {
+      "table": "visit",
+      "rows": 0,
+      "rowsUnchanged": true,
+      "originalColumnsHashUnchanged": true
+    }
+  ],
+  "foreignKeyErrors": 0,
+  "integrity": "ok",
+  "clinicalFactsManufactured": false,
+  "newHistoryTables": [],
+  "newFields": [
+    "insurance_case.previous_case_id",
+    "insurance_fee.is_self_pay",
+    "insurance_fee.insurance_code_snapshot",
+    "insurance_fee.fee_revision",
+    "insurance_reversal.approved_by",
+    "insurance_reversal.approved_at",
+    "insurance_reversal.approval_basis",
+    "insurance_reversal.verified_by",
+    "insurance_reversal.verification_note"
+  ],
+  "note": "精化5张医保表，增加9个设计字段并纠正7项可空定义；实际库无医保旧行，不补造旧提交、批准或核实人"
+}
