@@ -1,0 +1,60 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 120
+actor "收费人员" as A
+boundary "收费人员接口" as B
+control "核对日常经营\n与收付款控制" as K
+entity "就诊" as E0
+entity "应收账目" as E1
+entity "患者付款" as E2
+entity "医保结算" as E3
+entity "医保结算款收付" as E4
+A -> B : 核对日常经营与收付款
+B -> K : 提交对象编号及办理内容
+activate K
+K -> K : 核对岗位权限与必要资料
+alt 可以办理
+K -> E0 : 统计实际接诊及未完事项
+activate E0
+E0 --> K : 接诊与跟进结果
+deactivate E0
+K -> E1 : 核对总费用、医保和患者待付
+activate E1
+E1 --> K : 费用及待付金额
+deactivate E1
+K -> E2 : 汇总实际到账和相关退款
+activate E2
+E2 --> K : 患者实际净收付
+deactivate E2
+K -> E3 : 核对有效医保承担及撤销
+activate E3
+E3 --> K : 医保已结算金额
+deactivate E3
+K -> E4 : 核对实际医保款拨付及退回
+activate E4
+E4 --> K : 实际回款与待核对金额
+deactivate E4
+K --> B : 返回本次结果
+else 权限资料或状态不符合
+K --> B : 返回核对原因且不改变原记录
+end
+B --> A : 展示结果
+deactivate K
+
+@enduml

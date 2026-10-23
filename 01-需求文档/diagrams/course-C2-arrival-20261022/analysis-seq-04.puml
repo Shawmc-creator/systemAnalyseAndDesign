@@ -1,0 +1,116 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceGroupBackgroundColor white
+skinparam BoxPadding 8
+skinparam maxMessageSize 300
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "诊所负责人" as A
+boundary "诊所负责人接口" as B
+control "维护排班与接诊安排控制" as K
+entity "职员" as ST
+entity "诊椅" as C
+entity "日期安排" as S
+entity "接诊占用" as RO
+entity "安排变更" as AH
+
+A -> B : 选择日期及新建／调整／停诊
+B -> K : 原排班编号、日期及办理目的
+activate K
+K -> K : 核验发布权限；读取现有排班、预约和占用
+K --> B : 原安排、当前版本及受影响记录
+alt 2a调整或2b临时停诊
+ A -> B : 原安排、原因及受影响预约的处理依据
+ B -> K : 改约／取消／有效保留和真实通知结果
+ K -> AH : 保留变更前后快照()
+ K -> AH : 记录影响处理依据()
+ K -> RO : 核对时段冲突()
+ break 协调未完成或有当前接诊中占用
+  K --> B : 维持原安排；急停与患者协调交UC-24
+ end
+else 新建
+ A -> B : 填牙医、诊椅及起止时间
+ B -> K : 拟安排及版本
+end
+opt 2a调整
+ A -> B : 填调整后牙医、诊椅和时段
+ B -> K : 调整内容及原版本
+end
+alt 1a或5a仅存新建／未发布草稿
+ K -> S : 保存未发布草稿()
+ K -> K : 保存草稿，不设置正式发布依据
+ K --> B : 草稿编号，尚不可用于预约
+else 2b停诊
+ critical 再核关联预约、占用及原版本
+  K -> K : 查同次结果；重核协调依据和当前占用
+  break 当前条件变化且没有原结果
+   K --> B : 维持原安排，回步骤2核实，不停诊或释放
+  end
+  opt 本次尚未保存且仍可停诊
+  K -> S : 登记停诊()
+  K -> K : 已停诊与原因、原快照及协调依据共同保存
+  end
+ end
+ K --> B : 停诊结果，不生成新时段或释放实际使用
+else 继续发布新排班或调整
+ group 4 核对人员、诊椅及时间条件
+  K -> ST : 核对在岗期间()
+  K -> C : 核对资源有效期间()
+  K -> S : 核对接诊时段()
+ end
+ break 4a 时段、在岗、诊椅或已发布安排冲突
+  K --> B : 返回具体原因及当前资料，回步骤3修正
+ end
+ K --> B : 完整安排及影响核对结果
+ A -> B : 确认发布或暂不发布
+ B -> K : 本次发布选择
+ break 5a 暂不发布
+  opt 新建或未发布记录
+   K -> S : 保存未发布草稿()
+   K -> K : 保存草稿，不设置正式发布依据
+  end
+  K --> B : 草稿结果或维持原有效安排
+ end
+ B -> K : 发布确认、版本及本次办理号
+ critical 6 重查条件、版本与本次办理，未完成才提交
+  K -> K : 查原结果，并重核当前条件和原版本
+  alt 条件或版本已变化
+   K --> B : 返回当前安排及影响，回步骤2
+  else 当前可办理且尚未保存
+  alt 调整已发布安排
+   K -> S : 调整安排()
+   K -> K : 新安排、原快照及影响依据共同保存
+  else 新发布
+   K -> S : 确认发布()
+   K -> K : 已确认排班与发布人、时间共同保存
+  end
+  K --> B : 排班号、已确认及前台可查时段
+  else 已有同次办理结果
+   K --> B : 返回原排班编号及当前状态
+  end
+ end
+end
+opt 6a 保存结果未知
+ K -> K : 查原办理；已存复用，确认未存才重试
+ K --> B : 核实结果，不覆盖原有效安排
+end
+B --> A : 展示本次结果与未完成协调事项
+deactivate K
+note over ST,AH
+同牙医或诊椅的已确认安排不重叠；发布范围不等于具体设备已预留或已就绪。
+患者改约取消由UC-02实际办理并回查依据；停诊不强制结束使用，清洁故障由UC-24承接。
+end note
+
+@enduml

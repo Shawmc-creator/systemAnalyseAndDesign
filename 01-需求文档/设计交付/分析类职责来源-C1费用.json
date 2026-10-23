@@ -1,0 +1,1039 @@
+{
+  "entities": [
+    {
+      "table": "service",
+      "name": "收费项目",
+      "attrs": [
+        "项目编号、名称、计价单位",
+        "启用状态"
+      ],
+      "ops": [
+        "核对项目及计价单位()",
+        "停用新计费(负责人确认)"
+      ],
+      "uc": [
+        11
+      ],
+      "rules": [
+        "R11-2"
+      ]
+    },
+    {
+      "table": "service_price",
+      "name": "价目",
+      "attrs": [
+        "非负单价、适用起止",
+        "调价或零价原因、确认状态",
+        "提出及确认人、时间、意见"
+      ],
+      "ops": [
+        "核对适用区间(同项目价目)",
+        "提交负责人确认()",
+        "确认适用价目(当前版本)",
+        "退回修改(原因)"
+      ],
+      "uc": [
+        11
+      ],
+      "rules": [
+        "R11-1",
+        "R11-2"
+      ]
+    },
+    {
+      "table": "patient_funds",
+      "name": "患者资金",
+      "attrs": [
+        "建立时间、归属经办人",
+        "/同患者资金收付汇总"
+      ],
+      "ops": [
+        "核对唯一患者归属()",
+        "汇总确认收付与未用款()"
+      ],
+      "uc": [
+        12,
+        13,
+        14
+      ],
+      "rules": [
+        "R12-2",
+        "R13-2",
+        "R14-3"
+      ]
+    },
+    {
+      "table": "patient_payment",
+      "name": "患者付款",
+      "attrs": [
+        "实收、找零、渠道、核实状态",
+        "到账时间、核实人及凭据",
+        "/净收、/原款可用额"
+      ],
+      "ops": [
+        "核对实收找零与净收()",
+        "确认实际到账(原单与依据)",
+        "记录未到账核实(依据)",
+        "计算原款可用额(用途与退款)"
+      ],
+      "uc": [
+        13,
+        14,
+        21
+      ],
+      "rules": [
+        "R13-1",
+        "R13-2",
+        "R13-3",
+        "R14-3",
+        "R21-2"
+      ]
+    },
+    {
+      "table": "payment_order",
+      "name": "电子支付单",
+      "attrs": [
+        "唯一原单号、渠道、金额",
+        "平台交易号、核实时间",
+        "支付状态"
+      ],
+      "ops": [
+        "核对原单金额及渠道()",
+        "记录受理或待核实()",
+        "确认渠道结果(原单与交易号)"
+      ],
+      "uc": [
+        13
+      ],
+      "rules": [
+        "R13-3"
+      ]
+    },
+    {
+      "table": "payment_reconciliation",
+      "name": "收退款核对",
+      "attrs": [
+        "营业日期、原单金额",
+        "渠道实际额、差异与状态",
+        "核对人、处理依据"
+      ],
+      "ops": [
+        "核对收款或退款原单()",
+        "记录核对结果(正式依据)",
+        "记录差异处理(原办理结果)"
+      ],
+      "uc": [
+        13,
+        14,
+        21
+      ],
+      "rules": [
+        "R13-3",
+        "R14-4",
+        "R21-3"
+      ]
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "attrs": [
+        "形成时间、计费期间",
+        "/G总应收、/I正式医保承担",
+        "/P患者应付、/S有效抵付",
+        "/待付、/不能最终结算原因"
+      ],
+      "ops": [
+        "汇总已核价应收(生效调整)",
+        "核对正式医保分摊()",
+        "计算当前待付(有效抵付)"
+      ],
+      "uc": [
+        12,
+        21
+      ],
+      "rules": [
+        "R12-1",
+        "R12-2",
+        "R21-2"
+      ]
+    },
+    {
+      "table": "bill_item",
+      "name": "应收项目",
+      "attrs": [
+        "实际数量、单价快照",
+        "核价状态、计费时点",
+        "核价人及依据"
+      ],
+      "ops": [
+        "核对唯一实际来源()",
+        "确认计价(适用价目与依据)",
+        "计算项目金额()",
+        "建立实际来源(计价状态)"
+      ],
+      "uc": [
+        8,
+        11,
+        12,
+        25
+      ],
+      "rules": [
+        "R08-2",
+        "R11-2",
+        "R12-1",
+        "R25-3"
+      ]
+    },
+    {
+      "table": "payment_allocation",
+      "name": "付款分配",
+      "attrs": [
+        "带符号金额、生效时间",
+        "经办人、分配或释放原因"
+      ],
+      "ops": [
+        "核对可分配原款与待付()",
+        "登记本账用途()",
+        "释放原用途(批准申请)",
+        "汇总有效用途净额()"
+      ],
+      "uc": [
+        12,
+        13,
+        14
+      ],
+      "rules": [
+        "R12-2",
+        "R13-1",
+        "R13-2",
+        "R14-1",
+        "R14-2"
+      ]
+    },
+    {
+      "table": "prepayment_offset",
+      "name": "预付抵扣",
+      "attrs": [
+        "带符号金额、生效时间",
+        "经办人、抵扣或释放依据"
+      ],
+      "ops": [
+        "核对同患者原款与待付()",
+        "登记预款抵扣()",
+        "释放原抵扣(批准申请)",
+        "汇总有效用途净额()"
+      ],
+      "uc": [
+        12,
+        13,
+        14
+      ],
+      "rules": [
+        "R12-2",
+        "R13-1",
+        "R13-2",
+        "R14-1",
+        "R14-2"
+      ]
+    },
+    {
+      "table": "fee_request",
+      "name": "费用申请",
+      "attrs": [
+        "原因、证据、提交版本及时间",
+        "拟调整额、拟退上限",
+        "申请状态、批准调整及退款上限",
+        "审核人、时间及意见"
+      ],
+      "ops": [
+        "核对原单归属及申请额度()",
+        "提交或补正重提()",
+        "记录批准退回或拒绝(审核依据)",
+        "撤回未审核申请()",
+        "计算剩余可办退款额度()"
+      ],
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2",
+        "R14-3"
+      ]
+    },
+    {
+      "table": "fee_adjustment",
+      "name": "费用调整",
+      "attrs": [
+        "调整依据、生效时间",
+        "批准负责人"
+      ],
+      "ops": [
+        "核对申请已批准且未生效()",
+        "核对明细合计与批准额()",
+        "确认调整及必要用途释放()"
+      ],
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2"
+      ]
+    },
+    {
+      "table": "fee_adjustment_item",
+      "name": "调整项目",
+      "attrs": [
+        "带符号调整额、原项说明"
+      ],
+      "ops": [
+        "核对同账原项目()",
+        "核对调整后应收非负()"
+      ],
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2"
+      ]
+    },
+    {
+      "table": "patient_refund",
+      "name": "退款办理",
+      "attrs": [
+        "唯一退款号、原渠道、接收方核实",
+        "拟退额、实际额、办理时间",
+        "待办理／待核实／已确认退款／已失败",
+        "核实人、时间、凭据及失败依据"
+      ],
+      "ops": [
+        "核对批准额度及原款可用额()",
+        "建立办理并占用额度()",
+        "保留未知结果与占用()",
+        "确认实际退款(真实金额与凭据)",
+        "确认失败并释放占用(依据)",
+        "关联失败原单重办()"
+      ],
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-3",
+        "R14-4"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "a": "service",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "service_price",
+      "b_multiplicity": "0..*",
+      "uc": [
+        11
+      ],
+      "rules": [
+        "R11-1",
+        "R11-2"
+      ],
+      "meaning": "价目专属项目，调价另建适用记录，历史保留"
+    },
+    {
+      "a": "patient_f",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "patient_funds",
+      "b_multiplicity": "1",
+      "uc": [
+        13
+      ],
+      "rules": [
+        "R13-2"
+      ],
+      "meaning": "同患者唯一资金归属，余额由事实计算"
+    },
+    {
+      "a": "patient_funds",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "patient_payment",
+      "b_multiplicity": "0..*",
+      "uc": [
+        13
+      ],
+      "rules": [
+        "R13-1",
+        "R13-2"
+      ],
+      "meaning": "收款归属患者，不把医保承担记患者实收"
+    },
+    {
+      "a": "patient_payment",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "refund_f",
+      "b_multiplicity": "0..*",
+      "uc": [
+        13,
+        14
+      ],
+      "rules": [
+        "R13-2",
+        "R14-3"
+      ],
+      "meaning": "退款占用与确认实际额回溯原付款"
+    },
+    {
+      "a": "funds_e",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "payment_order",
+      "b_multiplicity": "0..*",
+      "uc": [
+        13
+      ],
+      "rules": [
+        "R13-2",
+        "R13-3"
+      ],
+      "meaning": "电子预收也有确定患者资金归属"
+    },
+    {
+      "a": "bill_e",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "payment_order",
+      "b_multiplicity": "0..*",
+      "uc": [
+        13
+      ],
+      "rules": [
+        "R13-1",
+        "R13-3"
+      ],
+      "meaning": "为账单支付可关联账目；预收可无账目"
+    },
+    {
+      "a": "payment_order",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "payment_e",
+      "b_multiplicity": "0..1",
+      "uc": [
+        13
+      ],
+      "rules": [
+        "R13-3"
+      ],
+      "meaning": "原单成功才与一次确认付款匹配，现金无电子单"
+    },
+    {
+      "a": "payment_order",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "payment_reconciliation",
+      "b_multiplicity": "0..*",
+      "uc": [
+        13
+      ],
+      "rules": [
+        "R13-3"
+      ],
+      "meaning": "核对收款时指向原电子支付单"
+    },
+    {
+      "a": "refund_e",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "payment_reconciliation",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-4"
+      ],
+      "meaning": "核对退款时指向原退款办理"
+    },
+    {
+      "a": "patient_b",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "bill",
+      "b_multiplicity": "0..*",
+      "uc": [
+        12
+      ],
+      "rules": [
+        "R12-1"
+      ],
+      "meaning": "账目属于唯一患者"
+    },
+    {
+      "a": "funds_b",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "bill",
+      "b_multiplicity": "0..*",
+      "uc": [
+        12
+      ],
+      "rules": [
+        "R12-2"
+      ],
+      "meaning": "账目资金归属与患者一致"
+    },
+    {
+      "a": "bill",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "bill_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        12
+      ],
+      "rules": [
+        "R12-1"
+      ],
+      "meaning": "账目项目独占归属，历史及调整保留"
+    },
+    {
+      "a": "execution_b",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "bill_item",
+      "b_multiplicity": "1",
+      "uc": [
+        8,
+        12
+      ],
+      "rules": [
+        "R08-2",
+        "R12-1"
+      ],
+      "meaning": "每笔执行形成唯一应收，缺价保留待核价"
+    },
+    {
+      "a": "dispense_b",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "bill_item",
+      "b_multiplicity": "1",
+      "uc": [
+        12,
+        25
+      ],
+      "rules": [
+        "R25-3",
+        "R12-1"
+      ],
+      "meaning": "每笔实际发药形成唯一应收，院外不生成"
+    },
+    {
+      "a": "price_b",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "bill_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        11,
+        12
+      ],
+      "rules": [
+        "R11-2",
+        "R12-1"
+      ],
+      "meaning": "缺价可空，已核价有单价快照及依据"
+    },
+    {
+      "a": "bill",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "insurance_case_b",
+      "b_multiplicity": "0..*",
+      "uc": [
+        12
+      ],
+      "rules": [
+        "R12-1"
+      ],
+      "meaning": "医保初始办理可无账目，正式结算前须绑定当前同患者账目"
+    },
+    {
+      "a": "insurance_case_b",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "insurance_settlement_b",
+      "b_multiplicity": "0..*",
+      "uc": [
+        12
+      ],
+      "rules": [
+        "R12-1"
+      ],
+      "meaning": "只取同账有效正式结果的基金与个账承担，不以预估或待回款替代"
+    },
+    {
+      "a": "payment_U",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "payment_allocation",
+      "b_multiplicity": "0..*",
+      "uc": [
+        13
+      ],
+      "rules": [
+        "R13-2"
+      ],
+      "meaning": "用途来自唯一原付款，不新增实收"
+    },
+    {
+      "a": "bill_U",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "payment_allocation",
+      "b_multiplicity": "0..*",
+      "uc": [
+        12,
+        13
+      ],
+      "rules": [
+        "R12-2",
+        "R13-1"
+      ],
+      "meaning": "用途只抵付本账，累计不超待付及原款可用额"
+    },
+    {
+      "a": "request_U",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "payment_allocation",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2"
+      ],
+      "meaning": "负向释放须同患者已批准申请"
+    },
+    {
+      "a": "allocation_previous",
+      "a_multiplicity": "原用途\\n0..1",
+      "kind": "--",
+      "b": "payment_allocation",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2"
+      ],
+      "meaning": "负向释放引用原正向用途，累计释放不超原额"
+    },
+    {
+      "a": "payment_V",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "prepayment_offset",
+      "b_multiplicity": "0..*",
+      "uc": [
+        13
+      ],
+      "rules": [
+        "R13-2"
+      ],
+      "meaning": "用途来自唯一原付款，不新增实收"
+    },
+    {
+      "a": "bill_V",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "prepayment_offset",
+      "b_multiplicity": "0..*",
+      "uc": [
+        12,
+        13
+      ],
+      "rules": [
+        "R12-2",
+        "R13-1"
+      ],
+      "meaning": "用途只抵付本账，累计不超待付及原款可用额"
+    },
+    {
+      "a": "request_V",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "prepayment_offset",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2"
+      ],
+      "meaning": "负向释放须同患者已批准申请"
+    },
+    {
+      "a": "offset_previous",
+      "a_multiplicity": "原用途\\n0..1",
+      "kind": "--",
+      "b": "prepayment_offset",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2"
+      ],
+      "meaning": "负向释放引用原正向用途，累计释放不超原额"
+    },
+    {
+      "a": "funds_r",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "fee_request",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1"
+      ],
+      "meaning": "申请有唯一同患者资金归属"
+    },
+    {
+      "a": "bill_r",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "fee_request",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2"
+      ],
+      "meaning": "费用更正关联原账，单退未用预款可无账"
+    },
+    {
+      "a": "payment_r",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "fee_request",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-3"
+      ],
+      "meaning": "退款关联原付款，不要求只有费用调整的申请有付款"
+    },
+    {
+      "a": "request_a",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "fee_adjustment",
+      "b_multiplicity": "0..1",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1"
+      ],
+      "meaning": "同一已批准申请最多生效一次调整"
+    },
+    {
+      "a": "bill_a",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "fee_adjustment",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-2"
+      ],
+      "meaning": "调整对应申请原账"
+    },
+    {
+      "a": "fee_adjustment",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "fee_adjustment_item",
+      "b_multiplicity": "1..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1"
+      ],
+      "meaning": "成功调整至少一项明细，合计等于批准额"
+    },
+    {
+      "a": "item_a",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "fee_adjustment_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2"
+      ],
+      "meaning": "更正回溯原应收项目，不覆盖原账"
+    },
+    {
+      "a": "request_t",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "patient_refund",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-3"
+      ],
+      "meaning": "一申请可分次退，不超剩余批准额度"
+    },
+    {
+      "a": "payment_t",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "patient_refund",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-3"
+      ],
+      "meaning": "原款同渠道退回，不超可用原款"
+    },
+    {
+      "a": "funds_t",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "patient_refund",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-3"
+      ],
+      "meaning": "申请原款及退款归属一致"
+    },
+    {
+      "a": "previous_refund_t",
+      "a_multiplicity": "原失败单\\n0..1",
+      "kind": "--",
+      "b": "patient_refund",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14
+      ],
+      "rules": [
+        "R14-3",
+        "R14-4"
+      ],
+      "meaning": "明确失败后以新编号重办；未知先查原单"
+    },
+    {
+      "a": "payment_e",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "payment_reconciliation",
+      "b_multiplicity": "0..*",
+      "uc": [
+        21
+      ],
+      "rules": [
+        "R21-3"
+      ],
+      "meaning": "现金收款核对直接指向原患者付款；电子原单、现金付款和退款办理恰选其一"
+    }
+  ],
+  "references": [
+    {
+      "table": "patient",
+      "name": "患者",
+      "alias": "patient_f"
+    },
+    {
+      "table": "patient_refund",
+      "name": "退款办理",
+      "alias": "refund_f"
+    },
+    {
+      "table": "patient_funds",
+      "name": "患者资金",
+      "alias": "funds_e"
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "alias": "bill_e"
+    },
+    {
+      "table": "patient_payment",
+      "name": "患者付款",
+      "alias": "payment_e"
+    },
+    {
+      "table": "patient_refund",
+      "name": "退款办理",
+      "alias": "refund_e"
+    },
+    {
+      "table": "patient",
+      "name": "患者",
+      "alias": "patient_b"
+    },
+    {
+      "table": "patient_funds",
+      "name": "患者资金",
+      "alias": "funds_b"
+    },
+    {
+      "table": "treatment_execution",
+      "name": "诊疗执行",
+      "alias": "execution_b"
+    },
+    {
+      "table": "dispense_record",
+      "name": "实际发药",
+      "alias": "dispense_b"
+    },
+    {
+      "table": "service_price",
+      "name": "价目",
+      "alias": "price_b"
+    },
+    {
+      "table": "insurance_case",
+      "name": "医保就诊办理",
+      "alias": "insurance_case_b"
+    },
+    {
+      "table": "insurance_settlement",
+      "name": "医保结算",
+      "alias": "insurance_settlement_b"
+    },
+    {
+      "table": "patient_payment",
+      "name": "患者付款",
+      "alias": "payment_U"
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "alias": "bill_U"
+    },
+    {
+      "table": "fee_request",
+      "name": "费用申请",
+      "alias": "request_U"
+    },
+    {
+      "table": "payment_allocation",
+      "name": "付款分配",
+      "alias": "allocation_previous"
+    },
+    {
+      "table": "patient_payment",
+      "name": "患者付款",
+      "alias": "payment_V"
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "alias": "bill_V"
+    },
+    {
+      "table": "fee_request",
+      "name": "费用申请",
+      "alias": "request_V"
+    },
+    {
+      "table": "prepayment_offset",
+      "name": "预付抵扣",
+      "alias": "offset_previous"
+    },
+    {
+      "table": "patient_funds",
+      "name": "患者资金",
+      "alias": "funds_r"
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "alias": "bill_r"
+    },
+    {
+      "table": "patient_payment",
+      "name": "患者付款",
+      "alias": "payment_r"
+    },
+    {
+      "table": "fee_request",
+      "name": "费用申请",
+      "alias": "request_a"
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "alias": "bill_a"
+    },
+    {
+      "table": "bill_item",
+      "name": "应收项目",
+      "alias": "item_a"
+    },
+    {
+      "table": "fee_request",
+      "name": "费用申请",
+      "alias": "request_t"
+    },
+    {
+      "table": "patient_payment",
+      "name": "患者付款",
+      "alias": "payment_t"
+    },
+    {
+      "table": "patient_funds",
+      "name": "患者资金",
+      "alias": "funds_t"
+    },
+    {
+      "table": "patient_refund",
+      "name": "退款办理",
+      "alias": "previous_refund_t"
+    }
+  ],
+  "source": "现行B的UC-11—14及UC-08、25实际费用来源；原69表用于核对既有对象，不替代B规则",
+  "physical_refinement_pending": [
+    "电子支付单须明确患者资金归属，允许预收时账目为空；原单与确认付款匹配唯一且同患者、同渠道、同金额",
+    "收退款核对明确电子支付单、现金原付款或退款办理恰选其一，实际核实时间、结果及差异依据齐全",
+    "患者资金可用额按确认净收、用途净额、确认退款及未知占用推导；不得用可改余额替代，并发占额需要D明确",
+    "费用申请及价目退回重提保留原提交和审核结果，不把当前行覆盖作为完整历史",
+    "应收项目的实际执行或实际发药来源恰选其一且来源唯一；医保正式分摊、用途释放与退款分别核算",
+    "负向分配或抵扣指向原正向用途且同账同原款，累计释放不超原额；批准调整与释放共同生效",
+    "UC-21现金收款核对须补指向原patient_payment的可空外键，并与电子单/退款原单来源互斥；当前逻辑模型尚缺此键，D同步时修订，不能用电子空单代替现金来源"
+  ],
+  "note": "14项完整定义为本批实体；同名跨组及原对象引用不是新实体或新表。C1业务多重性按B修正，D差异保留待办。"
+}

@@ -1,0 +1,43 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 220
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+hide circle
+hide empty members
+package "牙医评估与完成条件" as A {
+' @reference followup_requirement
+class "诊后要求" as requirement_a <<entity>>
+' @reference visit
+class "就诊" as visit_a <<entity>>
+class "临床评估" as clinical_assessment <<entity>> {
+ 到诊检查或远程沟通、时间、牙医
+ 结论、意见、来源及局限
+ 下次日期、跟进责任人
+ --
+ +核对评估方式与实际依据()
+ +追加实际评估()
+ +判断原目的是否达到()
+ +记录继续跟进(日期与责任人)
+}
+requirement_a "1" -- "0..*" clinical_assessment
+visit_a "0..1" -- "0..*" clinical_assessment
+requirement_a -[hidden]right- visit_a
+note bottom of clinical_assessment
+目的达到且评估完整才完成，评估与完成共同保存。
+远程信息不足则安排到诊；继续跟进有日期及责任人。
+已有安排待到诊或评估，否则转待联系。
+end note
+}
+@enduml

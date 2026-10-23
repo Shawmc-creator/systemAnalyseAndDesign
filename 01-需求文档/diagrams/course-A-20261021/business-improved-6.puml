@@ -1,0 +1,54 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "前台" as F
+actor "收费人员" as C
+entity "诊所管理系统" as S
+participant "医保平台" as I
+P -> F : 申请医保办理并提供必要凭证
+F -> S : 提交患者身份与就诊登记资料
+S -> I : 按启用条件办理核验及登记
+I --> S : 返回核验与登记结果
+S --> F : 显示实际结果及可继续条件
+alt 身份及办理条件符合
+ C -> S : 核对诊断、实际费用及当地编码
+ S -> S : 核对资料归属、编码期间与原费用版本
+ S -> I : 上传必要资料并申请预结算
+ I --> S : 返回预估分摊及适用条件
+ S --> C : 展示基金、个账、其他自付与自费项目
+ C -> P : 说明预估结果及其他选择
+ P --> C : 确认医保、暂缓或选择自费
+ C -> S : 保存患者实际选择与确认依据
+ alt 确认医保且预结算有效
+  S -> I : 按原业务号提交正式结算
+  I --> S : 明确成功、失败或未知
+  alt 正式成功
+   S -> S : 保存结算号和最终分摊
+   S --> C : 提供患者其他待付及医保待回款
+  else 未成功或仍未知
+   S -> I : 查询原笔结果
+   S --> C : 保留真实阶段，核实后再继续
+  end
+ else 暂缓或选择自费
+  S --> C : 保留选择，核实原医保未完事项后衔接
+ end
+else 条件不符或结果未知
+ S --> F : 说明补正或待核实事项
+ F -> P : 协调补充资料及后续安排
+end
+@enduml

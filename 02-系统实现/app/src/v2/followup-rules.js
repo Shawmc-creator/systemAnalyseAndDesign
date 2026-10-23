@@ -14,7 +14,7 @@ function sourceState(db, requirement) {
     FROM visit v JOIN clinical_record c ON c.visit_id=v.id WHERE v.id=?`).get(requirement.source_visit_id) : null;
   const version = requirement.source_plan_version_id ? db.prepare(`SELECT v.id,v.status,v.explained_at,p.patient_id,p.status plan_status
     FROM plan_version v JOIN treatment_plan p ON p.id=v.treatment_plan_id WHERE v.id=?`).get(requirement.source_plan_version_id) : null;
-  const ready = !!(visit || version) && (!requirement.source_visit_id || !!visit && visit.patient_id === requirement.patient_id && visit.status === '诊疗结束' && visit.record_status === '已签署') &&
+  const ready = !!(visit || version) && (!requirement.source_visit_id || !!visit && visit.patient_id === requirement.patient_id && visit.record_status === '已签署') &&
     (!requirement.source_plan_version_id || !!version && version.patient_id === requirement.patient_id && ['已确认','本版执行完成'].includes(version.status) && version.plan_status !== '已终止');
   return { ready, visit, version };
 }

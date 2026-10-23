@@ -1,0 +1,264 @@
+{
+  "date": "2026-10-23",
+  "scope": "D1数据映射器选型、类表映射取舍及处方关键保存",
+  "new_tables": [],
+  "new_fields": [
+    "prescription.guidance_note",
+    "prescription.handed_over_at",
+    "prescription.handed_over_by",
+    "prescription.void_reason",
+    "prescription.voided_at",
+    "prescription.voided_by",
+    "prescription.original_prescription_id",
+    "prescription.reviewed_at"
+  ],
+  "modified_tables": [
+    "document_version",
+    "prescription",
+    "prescription_item",
+    "dispense_record",
+    "service_price",
+    "patient_payment",
+    "patient_refund",
+    "stock_count",
+    "purchase_order_item"
+  ],
+  "simple_status_sources": {
+    "document_version": "UC-10",
+    "service_price": "UC-11",
+    "patient_payment": "UC-13",
+    "patient_refund": "UC-14",
+    "stock_count": "UC-20",
+    "purchase_order_item": "UC-19"
+  },
+  "new_business_relations": [
+    {
+      "parent": "prescription",
+      "child": "prescription",
+      "field": "original_prescription_id",
+      "nullable": true,
+      "unique": false,
+      "source": "UC-25扩展4a；C1用药指导、交付与更正依据"
+    }
+  ],
+  "data_access": {
+    "choice": "数据映射器",
+    "application": "按用例协调并指定本地共同保存边界",
+    "domain": "规则、状态及业务计算",
+    "mapping": "SQL、关联装配、版本比对、字段及对象转换",
+    "external": "稳定原业务号分阶段核实，外部调用不并入SQLite本地事务",
+    "file": "受控原件存取和索引分别核实，一致备份"
+  },
+  "history_audit": {
+    "finding": "较早字段约束引用运行审计，但尚缺具体持久化结构；不能以updated_at、revision或一条可覆盖说明作为完整历史。",
+    "pending": [
+      "费用申请退回重提和历次审核",
+      "价目提交审核",
+      "随访发布后调整前后内容",
+      "盘点重新实点的原快照和决定",
+      "验收待检后确认的历次数量",
+      "医保预结算历次结果与失效、患者再确认",
+      "文件误关联的原归属与更正记录",
+      "处方重复审方的历史意见"
+    ]
+  },
+  "remaining": [
+    "上述业务历史物理保存结构，须对应现有业务对象且保留明确原单",
+    "其他旧字段source编号",
+    "D2服务、实体和存取接口按本批选型精化，D3组件与页面",
+    "运行程序、迁移及真实业务验收另行对齐"
+  ],
+  "region_details": [
+    {
+      "group": 2,
+      "name": "病历与诊疗文书",
+      "main_tables": [
+        "health_version",
+        "health_item",
+        "health_review",
+        "clinical_record",
+        "clinical_finding",
+        "record_addendum",
+        "clinical_document",
+        "document_version",
+        "prescription",
+        "prescription_item",
+        "dispense_record"
+      ],
+      "reference_tables": [
+        "inventory_movement",
+        "material",
+        "patient",
+        "plan_version",
+        "service_price",
+        "staff",
+        "visit"
+      ],
+      "business_relations": [
+        {
+          "parent": "patient",
+          "child": "health_version",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "health_version",
+          "child": "health_version",
+          "field": "previous_version_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "health_version",
+          "child": "health_item",
+          "field": "health_version_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "health_review",
+          "field": "visit_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "health_version",
+          "child": "health_review",
+          "field": "health_version_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "clinical_record",
+          "field": "visit_id",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "parent": "health_review",
+          "child": "clinical_record",
+          "field": "signed_health_review_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "clinical_record",
+          "child": "clinical_finding",
+          "field": "clinical_record_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "clinical_record",
+          "child": "record_addendum",
+          "field": "clinical_record_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient",
+          "child": "clinical_document",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "clinical_document",
+          "field": "visit_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "plan_version",
+          "child": "clinical_document",
+          "field": "plan_version_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "clinical_document",
+          "child": "document_version",
+          "field": "clinical_document_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "document_version",
+          "child": "document_version",
+          "field": "previous_version_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient",
+          "child": "prescription",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "prescription",
+          "field": "visit_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "staff",
+          "child": "prescription",
+          "field": "prescriber_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "prescription",
+          "child": "prescription_item",
+          "field": "prescription_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "material",
+          "child": "prescription_item",
+          "field": "material_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "service_price",
+          "child": "prescription_item",
+          "field": "service_price_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "prescription_item",
+          "child": "dispense_record",
+          "field": "prescription_item_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "inventory_movement",
+          "child": "dispense_record",
+          "field": "inventory_movement_id",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "parent": "prescription",
+          "child": "prescription",
+          "field": "original_prescription_id",
+          "nullable": true,
+          "unique": false,
+          "source": "UC-25扩展4a；C1用药指导、交付与更正依据"
+        }
+      ],
+      "common_staff_links": "岗位归属、接诊牙医、处方开立及跟进责任显式表示；其他编制、上传、发布、确认及经办身份外键在完整模型保留。"
+    }
+  ]
+}

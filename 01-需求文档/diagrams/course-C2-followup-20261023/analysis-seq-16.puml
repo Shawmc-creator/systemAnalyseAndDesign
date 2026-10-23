@@ -1,0 +1,64 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "前台" as A
+boundary "前台接口" as B
+control "办理复诊联系与预约控制" as K
+entity "诊后要求" as R
+entity "联系经历" as C
+
+A -> B : 打开已发布要求，核对目的、日期及是否需评估
+B -> K : 要求及患者
+activate K
+K -> K : 核验前台权限、责任人与未关闭状态；读取既有跟进
+K --> B : 联系资料及原安排；1a取消或未到则继续联系
+break 1b 无需临床评估且目的已实际达到
+ A -> B : 核实实际传达或到诊，填写完成依据
+ B -> K : 实际依据、完成人及时间
+ K -> R : 核对目的达成及完成依据()
+ K -> K : 保存完成依据及状态，不以预约代替到诊
+ K --> B : 已完成；本次结束
+end
+A -> B : 实际联系患者，核实身份、意向及可来时间
+B -> K : 方式、实际时间、沟通事实及结果
+K -> C : 记录实际联系结果()
+K -> K : 先保存本次联系，不依赖预约是否成功
+alt 3a 未联系上、暂缓或拒绝
+ A -> B : 确认下次联系日期及负责前台
+ B -> K : 后续日期与责任人
+ K -> C : 记录继续联系(日期)
+ K -> R : 安排继续跟进(日期与责任人)
+ K --> B : 保持待联系；需撤销交牙医UC-15
+else 患者确认预约意向
+ ref over A,K : UC-02：前台选择牙医、诊椅及必要设备，完成预约
+ alt 4a 预约未成功
+  A -> B : 确认继续协调或下次联系安排
+  B -> K : 下一联系日期与责任人
+  K -> C : 记录继续联系(日期)
+  K -> R : 安排继续跟进(日期与责任人)
+  K --> B : 保留联系；协调后重试预约或待下次联系
+ else 已取得成功预约
+  K -> C : 核对成功预约归属()
+  break 5a 原要求已关闭、患者不符或关联失败
+   K --> B : 查原联系和预约再核；原事实保留，已有预约交UC-02协调
+  end
+  K -> C : 关联既有成功预约()
+  K -> K : 保存关联及待到诊或评估状态；已关联返回原结果
+  K --> B : 预约编号与要求状态；联系或预约不代表完成
+ end
+end
+deactivate K
+
+@enduml

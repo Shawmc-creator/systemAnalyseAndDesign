@@ -1,0 +1,216 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 45
+hide circle
+skinparam linetype ortho
+skinparam minClassWidth 220
+skinparam nodesep 110
+skinparam ranksep 90
+' 来源：UC-01,UC-05；R01-1,R01-2,R01-3
+class "患者" as patient <<entity>> {
+ 患者编号
+ 姓名及出生日期
+ 联系资料及联系偏好
+ --
+ +核对辨识资料()
+ +核对联系资料()
+ +更正基本资料()
+ +建立患者档案()
+}
+' 来源：UC-02,UC-04；R02-1,R04-1
+class "职员" as staff <<entity>> {
+ 职员编号与姓名
+ 在岗期间
+ --
+ +核对在岗期间()
+}
+' 来源：UC-01；R01-3
+class "患者资料变更" as patient_change <<entity>> {
+ 字段及前后值
+ 更正原因
+ 经办人与发生时间
+ --
+ +核对实际变化()
+ +形成更正依据()
+}
+' 来源：UC-01,UC-02,UC-03,UC-04,UC-05,UC-06,UC-07,UC-08,UC-09,UC-10,UC-11,UC-12,UC-13,UC-14,UC-15,UC-16,UC-17,UC-18,UC-19,UC-20,UC-21,UC-22,UC-23,UC-24,UC-25；Q-03
+class "职员账号" as user_account <<entity>> {
+ 个人登录名
+ 启用或停用
+ 授权版本
+ --
+ +核对账号可用性()
+ +核验办理授权()
+}
+' 来源：UC-02,UC-04,UC-24；R02-1,R04-1,R24-1
+class "诊椅" as dental_chair <<entity>> {
+ 诊椅编号与名称
+ 有效期间
+ --
+ +核对资源有效期间()
+}
+' 来源：UC-02,UC-04；R02-1,R04-1,R04-2,R04-3
+class "日期安排" as dated_schedule <<entity>> {
+ 营业日期与时段
+ 牙医与诊椅
+ 发布状态及确认依据
+ --
+ +核对接诊时段()
+ +确认发布()
+ +调整安排()
+ +登记停诊()
+ +保存未发布草稿()
+}
+' 来源：UC-04；R04-2,R04-3
+class "安排变更" as schedule_change <<entity>> {
+ 原牙医与新牙医
+ 原诊椅与新诊椅
+ 前后时段及变更原因
+ 经办时间与影响处理
+ --
+ +保留变更前后快照()
+ +记录影响处理依据()
+}
+' 来源：UC-02,UC-03,UC-06,UC-24；R02-1,R02-3,R03-1,R24-2,R24-3
+class "接诊占用" as resource_occupancy <<entity>> {
+ 来源预约或就诊
+ 安排版本与占用时段
+ 实际使用结束及释放依据
+ --
+ +核对时段冲突()
+ +承接实际使用()
+ +确认实际结束()
+ +释放预约预留()
+ +预留接诊时段()
+}
+' 来源：UC-02,UC-03；R02-1,R02-2,R02-3,R03-1
+class "预约" as appointment <<entity>> {
+ 患者及预约编号
+ 计划时段与就诊目的
+ 预约状态与安排版本
+ --
+ +确认预约()
+ +改约()
+ +取消()
+ +登记到诊()
+ +核实未到()
+}
+' 来源：UC-02；R02-2,R02-3
+class "预约变更" as appointment_change <<entity>> {
+ 前后安排与版本
+ 变更原因
+ 经办时间及通知依据
+ --
+ +保留原安排()
+ +记录变更及通知依据()
+}
+' 来源：UC-03,UC-06,UC-09,UC-24；R03-1,R24-2
+class "就诊" as visit <<entity>> {
+ 患者与就诊编号
+ 来源预约或现场
+ 到诊及接诊起止
+ 候诊或接诊或结束
+ --
+ +登记候诊()
+ +开始接诊()
+ +记录诊疗结束()
+}
+' 来源：UC-02,UC-24；R02-1,R24-1,R24-3
+class "诊疗设备" as clinical_equipment <<entity>> {
+ 名称与设备类别
+ 固定诊椅或共享
+ 可用或停用及原因
+ --
+ +核对适用设备()
+ +登记停用()
+ +依据复核恢复()
+}
+' 来源：UC-02,UC-24；R02-1,R24-1,R24-3
+class "资源停用时段" as resource_block <<entity>> {
+ 诊椅或设备
+ 限制起止与原因
+ 生效中或已解除
+ 核查及实际解除依据
+ --
+ +登记准备或故障限制()
+ +记录真实核查结果()
+ +核对解除依据()
+ +解除本次限制()
+ +核对当前限制()
+}
+' 来源：UC-02,UC-06,UC-24；R02-1,R24-2,R24-3
+class "设备占用" as equipment_occupancy <<entity>> {
+ 设备与预约或就诊
+ 计划及实际使用时段
+ 已预留或使用中或已释放
+ --
+ +预留时段()
+ +开始使用()
+ +确认实际结束()
+ +释放预约预留()
+ +核对设备时段冲突()
+}
+patient "1" *-- "0..*" patient_change
+staff "1" -- "0..1" user_account
+staff "1" -- "0..*" dated_schedule
+dental_chair "1" -- "0..*" dated_schedule
+dated_schedule "1" *-- "0..*" schedule_change
+staff "1..2" -- "0..*" schedule_change
+dental_chair "1..2" -- "0..*" schedule_change
+dated_schedule "1" -- "0..*" resource_occupancy
+patient "1" -- "0..*" appointment
+appointment "1" *-- "0..*" appointment_change
+dated_schedule "原安排\n1" -- "0..*" appointment_change
+dated_schedule "新安排\n0..1" -- "0..*" appointment_change
+patient "1" -- "0..*" visit
+staff "1" -- "0..*" visit
+appointment "0..1" -- "0..1" visit
+appointment "0..1" -- "0..*" resource_occupancy
+visit "0..1" -- "0..*" resource_occupancy
+dental_chair "0..1" -- "0..*" clinical_equipment
+dental_chair "0..1" -- "0..*" resource_block
+clinical_equipment "0..1" -- "0..*" resource_block
+clinical_equipment "1" -- "0..*" equipment_occupancy
+appointment "0..1" -- "0..*" equipment_occupancy
+visit "0..1" -- "0..*" equipment_occupancy
+patient -[hidden]right-> patient_change
+patient_change -[hidden]right-> staff
+staff -[hidden]right-> user_account
+appointment -[hidden]right-> appointment_change
+appointment_change -[hidden]right-> dated_schedule
+dated_schedule -[hidden]right-> schedule_change
+visit -[hidden]right-> resource_occupancy
+resource_occupancy -[hidden]right-> dental_chair
+dental_chair -[hidden]right-> clinical_equipment
+equipment_occupancy -[hidden]right-> resource_block
+patient -[hidden]down-> appointment
+appointment -[hidden]down-> visit
+visit -[hidden]down-> equipment_occupancy
+dental_chair -[hidden]down-> resource_block
+note bottom of resource_block
+诊椅与设备恰选其一；
+预计结束不自动解除。
+end note
+note bottom of resource_occupancy
+至少有预约或就诊来源；
+实际结束同步衔接清洁限制。
+end note
+note right of schedule_change
+原、新角色分别保留；
+前后相同可引用同一对象。
+end note
+
+@enduml

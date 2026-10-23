@@ -1,0 +1,163 @@
+{
+  "date": "2026-10-23",
+  "batch": 30,
+  "status": "第三十批：遗留字段来源、完整D2/D3及ABCD课程项静态核对完成",
+  "pdf_pages": 164,
+  "previous_pdf_pages": 165,
+  "figures": 144,
+  "system_usecases": 25,
+  "C1_classes": 69,
+  "C1_operations": 218,
+  "physical_tables": 77,
+  "core_tables": 69,
+  "history_tables": 8,
+  "logical_fields": 986,
+  "selected_key_fields": 271,
+  "field_source_corrections": 138,
+  "table_source_corrections": 17,
+  "application_services": 5,
+  "usecase_service_methods": 25,
+  "repository_interfaces": 7,
+  "mappers": 5,
+  "design_entities_shown": 33,
+  "design_entity_catalog_covers": 69,
+  "design_sequences": 2,
+  "design_domain_calls_checked": 20,
+  "role_workbenches": 6,
+  "page_wireframes": 12,
+  "shared_components": 8,
+  "changed_pages_before_D2": [
+    130,
+    131
+  ],
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 80,
+    "D": 129,
+    "D2": 151,
+    "D3": 158
+  },
+  "course_document_static_coverage_checked": true,
+  "whole_document_course_compliant": false,
+  "actual_clinic_workflow_verified": false,
+  "client_blueprint_signed": false,
+  "quality_targets_measured": false,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "historical_sql_changed": false,
+  "github_synced": false,
+  "remaining": [
+    "完整设计尚未迁移到运行代码和历史SQL，后续另行对齐与验收",
+    "真实机构现状、蓝图认可和正式外部接口不得以文档静态核对代替"
+  ],
+  "validation": {
+    "A_B_C_tex_unchanged": true,
+    "model_structure_and_constraints_unchanged": true,
+    "key_field_selection_unchanged": true,
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "visible_text_overlap_pairs": 0,
+    "minimum_font_pt": 8.97,
+    "all_144_figure_numbers_pages_preserved": true,
+    "intentional_caption_updates": [
+      "design-classes-4",
+      "screen-navigation"
+    ],
+    "all_25_usecase_service_and_page_coverage": true,
+    "entity_operations_resolve_to_C1": true,
+    "repository_messages_resolve_to_design_interfaces": true,
+    "rendered_and_reviewed_pdf_pages": [
+      130,
+      131,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164
+    ]
+  },
+  "course_coverage": [
+    {
+      "requirement": "A1愿景",
+      "location": "1.1，p.3—6",
+      "document": "已修订并静态核对；有主要涉众及量化口径",
+      "external": "主要涉众实际认可尚未取得"
+    },
+    {
+      "requirement": "A2业务用例",
+      "location": "1.2，p.7—12",
+      "document": "7个对外用例、3类内部支持；边界及对外价值已区分"
+    },
+    {
+      "requirement": "A3现状业务序列",
+      "location": "1.3，p.13—22",
+      "document": "10图保留业务执行者、工人、实体和交接",
+      "external": "真实机构现状未经现场验证"
+    },
+    {
+      "requirement": "A4改进业务蓝图",
+      "location": "1.4，p.23—38",
+      "document": "10图及职责、流程；系统承接信息流与规则",
+      "external": "甲方蓝图认可尚未取得"
+    },
+    {
+      "requirement": "B1需求依据及利益平衡",
+      "location": "2.2.1，p.43",
+      "document": "资料来源及涉众取舍已写入主报告"
+    },
+    {
+      "requirement": "B2用例图及规约",
+      "location": "2.1—2.3，p.39—79",
+      "document": "25个独立图及规约，标准项、步骤扩展和Q/C条款已核对",
+      "external": "质量数值为待实测目标"
+    },
+    {
+      "requirement": "C1分析类",
+      "location": "3.1，p.80—96",
+      "document": "69实体、218操作；业务关系和无必要泛化的选择"
+    },
+    {
+      "requirement": "C2分析序列",
+      "location": "3.2，p.97—122",
+      "document": "25例26图，沿用263条已核对实体调用"
+    },
+    {
+      "requirement": "C3状态机",
+      "location": "3.3，p.123—128",
+      "document": "11图49个持久状态，状态来源及约束已修订"
+    },
+    {
+      "requirement": "D1类、ER及物理表",
+      "location": "4.1，p.129—150",
+      "document": "69主表及8历史表，77表986字段；总图、9分图、键及映射选择，138个字段来源修正",
+      "external": "历史SQL及运行库尚未迁移至此次完整设计"
+    },
+    {
+      "requirement": "D2业务与存取分离",
+      "location": "4.2，p.151—157",
+      "document": "5组服务、25办理方法、7存取接口及5映射器，2张设计序列，实体规则复用C1"
+    },
+    {
+      "requirement": "D3组件与框架",
+      "location": "4.3，p.158—164",
+      "document": "岗位导航、权限、12页面及8组件；HTML/CSS/JavaScript框架与服务对应",
+      "external": "页面为设计结构，尚未据此完成代码和真实验收"
+    }
+  ],
+  "files": {
+    "tex_sha256": "4ee783d58bd4aaf28f4e9f36077e91b65adf1bf92adbc19ceea7fbd1df829c52",
+    "pdf_sha256": "3477884aef8708bd18b3a7e9d570ec36b4d98550ede880c62dfb5f90408840c9",
+    "logical_model_sha256": "b65eaa2d2a7fda34e34d008c62df3514e5a4fb75847198278ae4a7392899c25d"
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "date": "2026-10-23",
+  "status": "第二十批：C2运营四例及现金核对关联；全文复核未完成",
+  "pdf_pages": 164,
+  "figures": 144,
+  "logical_tables": 69,
+  "system_usecases": 25,
+  "analysis_sequence_cases_revised": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
+  "analysis_sequence_cases_remaining": [
+    22,
+    23,
+    24,
+    25
+  ],
+  "analysis_sequence_diagrams": 26,
+  "C1_entity_classes": 69,
+  "C1_operations": 218,
+  "C1_operations_added": [],
+  "C1_relations_added": [
+    {
+      "source": "patient_payment",
+      "target": "payment_reconciliation",
+      "uc": 21,
+      "rule": "R21-3",
+      "purpose": "现金核对回溯原付款"
+    }
+  ],
+  "entity_calls_checked": 44,
+  "entity_calls_previously_checked": 170,
+  "duplicated_screen_notes_removed": 12,
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 80,
+    "D": 129
+  },
+  "validation": {
+    "cover_remains_without_date": true,
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "svg_meaningful_text_overlap_pairs": 0,
+    "updated_vector_figures": 5,
+    "minimum_font_pt": 9.14,
+    "rendered_and_reviewed_pdf_pages": [
+      89,
+      115,
+      116,
+      117,
+      118,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163
+    ],
+    "unchanged_page_text_count": 153,
+    "all_144_figure_titles_numbers_pages_preserved": true,
+    "all_entity_calls_resolve_to_C1_operations": true,
+    "entity_definitions_and_operation_counts_unchanged": true,
+    "A_B_C3_sources_unchanged": true,
+    "D_ER_and_key_field_tables_unchanged": true
+  },
+  "whole_document_course_compliant": false,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "next_batch": "C2 UC-22—25：医保办理结算、资源协调与处方取药",
+  "remaining": [
+    "4例分析序列的业务协作与关键分支",
+    "分析状态机同步",
+    "D类表主外键约束及业务表示层对应，含现金核对原付款关联",
+    "继续精简重复技术展开，保留课程必要项",
+    "真实业务确认与验收"
+  ],
+  "files": {
+    "tex_sha256": "1dd55a5f811fb7e902a75e4e140422ea80f950f3648cc8b51a0cdec117faecc1",
+    "pdf_sha256": "e61c7d7b3dfc2f121220aa4ef372f4f80cd3306e28eadb1fa9c956089e78e133",
+    "logical_model_sha256": "68f5db36dfd9f3eaf9ca11b43ffb9a6abf039bf587ecf15f4f9c2b2b69e239e9"
+  }
+}

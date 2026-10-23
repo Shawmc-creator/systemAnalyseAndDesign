@@ -1,0 +1,59 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 215
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 65
+hide circle
+hide empty members
+package "健康资料与当次复核" as H {
+' @reference patient
+class "患者" as patient_h <<entity>>
+' @reference visit
+class "就诊" as visit_h <<entity>>
+class "健康版本" as health_version <<entity>> {
+ 版本号、形成时间
+ 变更原因、形成牙医
+ --
+ +建立新版(变更原因)
+ +核对患者及前版本()
+}
+class "健康条目" as health_item <<entity>> {
+ 类别、内容
+ 有／无／未知、来源
+ 报告时间、发生时间
+ --
+ +核对类别及确认程度()
+}
+class "健康复核" as health_review <<entity>> {
+ 复核结论
+ 复核牙医、实际时间
+ --
+ +核对版本与就诊归属()
+ +记录当次复核()
+}
+patient_h "1" -- "0..*" health_version
+health_version "1" *-- "0..*" health_item
+health_version "1" -- "0..*" health_review
+visit_h "1" -- "0..*" health_review
+' @reference health_version
+class "健康版本" as previous_health_version <<entity>>
+previous_health_version "前版\n0..1" -- "0..*" health_version
+patient_h -[hidden]right- visit_h
+health_version -[hidden]right- health_review
+note bottom of health_item
+未知不能记为无；新版不覆盖历史。
+复核与所据版本、就诊属于同一患者。
+end note
+}
+@enduml

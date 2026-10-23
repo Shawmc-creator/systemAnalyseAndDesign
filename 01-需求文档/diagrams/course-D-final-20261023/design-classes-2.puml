@@ -1,0 +1,78 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam InterfaceBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 28
+hide circle
+top to bottom direction
+class "临床资料接口" as UI <<controller>> {
+ 读取当前办理身份()
+ 校验输入并调用用例方法()
+ 展示业务结果()
+}
+class "临床应用服务" as S <<application>> {
+ UC-05 查阅患者诊疗资料(患者,诊疗范围)
+ UC-06 记录检查诊断与健康资料(就诊,草稿所见,健康版本)
+ UC-07 制定治疗方案并记录患者确认(方案版本,说明及决定范围)
+ UC-08 登记实际治疗与完成项目(实际项目,数量,原执行)
+ UC-09 签署及补充病历(病历版本,所见及健康复核)
+ UC-10 管理影像与诊疗文书(患者归属,文件版本及依据)
+}
+UI -down-> S
+class "病历" as E_clinical_record <<entity>> {
+ 更新草稿(当前版本)
+ 核对签署完整性(所见与复核)
+ 签署并冻结正文()
+}
+S -right-> E_clinical_record
+class "健康复核" as E_health_review <<entity>> {
+ 核对版本与就诊归属()
+ 记录当次复核()
+}
+S -right-> E_health_review
+class "方案版本" as E_plan_version <<entity>> {
+ 核对诊断与明细完整性()
+ 提交患者确认()
+ 建立修订版(原版本与原因)
+}
+S -right-> E_plan_version
+class "患者决定" as E_patient_decision <<entity>> {
+ 记录决定(项目范围)
+ 核对有效同意范围(时点)
+ 追加撤回决定(范围与时间)
+}
+S -right-> E_patient_decision
+class "诊疗执行" as E_treatment_execution <<entity>> {
+ 核对实际就诊及同意范围()
+ 核对累计完成量()
+ 登记实际完成()
+}
+S -right-> E_treatment_execution
+class "文件版本" as E_document_version <<entity>> {
+ 核对原件格式与大小()
+ 追加版本并保留原件()
+ 确认诊疗归属(牙医与依据)
+}
+S -right-> E_document_version
+interface "临床存取接口" as R0 {
+ 读取患者完整诊疗资料(患者,权限)
+ 保存草稿、所见及健康复核(版本)
+ 保存方案、决定和原件关联(版本)
+ 保存实际治疗及应收来源(办理号)
+ 保存签署与确切复核(版本)
+ 保存文书版本及归属更正(办理号)
+}
+S -down-> R0
+class "SQLite临床映射器" as M <<mapper>> {
+ 装配实体与历史(稳定键)
+ 核对原办理及写入版本()
+ 在本地事务内写关联和历史()
+}
+M .up.|> R0
+@enduml

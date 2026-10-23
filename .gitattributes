@@ -5,3 +5,8 @@
 *.puml text eol=lf
 *.svg text eol=lf
 *.tex text eol=lf
+
+# Preserve the exact signed-off artifacts and the SQL bytes checked by the application.
+01-需求文档/牙科诊所管理系统-需求文档.tex -text
+01-需求文档/设计交付/核心业务数据模型.json -text
+01-需求文档/数据层设计/SQLite-建表设计.sql -text

@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 45
+left to right direction
+actor "诊疗助理" as A
+actor "诊所负责人" as M
+boundary "诊疗助理接口" as BA
+boundary "诊所负责人接口" as BM
+boundary "费用办理接口" as BF
+boundary "医保结算接口" as BI
+A -- BA
+BM -- M
+BF -- M
+BI -- M
+control "UC-04\n维护排班与接诊安排控制" as C04
+control "UC-10\n管理影像与\n诊疗文书控制" as C10
+control "UC-11\n维护收费项目\n与价目控制" as C11
+control "UC-14\n办理费用更正\n与退费控制" as C14
+control "UC-18\n维护材料与批次资料控制" as C18
+control "UC-19\n登记基础采购\n与到货验收控制" as C19
+control "UC-20\n办理库存领用、\n退回与盘点控制" as C20
+control "UC-21\n核对日常经营\n与收付款控制" as C21
+control "UC-23\n办理医保结算、撤销\n与回款核对控制" as C23
+control "UC-24\n协调诊椅设备准备\n与停用恢复控制" as C24
+BA ..> C10
+BA ..> C18
+BA ..> C19
+BA ..> C20
+BA ..> C24
+C04 <.. BM
+C11 <.. BM
+C18 <.. BM
+C19 <.. BM
+C20 <.. BM
+C21 <.. BM
+C24 <.. BM
+C14 <.. BF
+C23 <.. BI
+
+@enduml

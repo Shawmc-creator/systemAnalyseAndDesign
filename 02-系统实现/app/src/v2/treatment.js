@@ -1,6 +1,6 @@
 'use strict';
 const { fail, text, id, instant, insert, fact, row, revision, recordNo } = require('./common');
-const { leafQuantity, decisionFor } = require('./treatment-gates');
+const { leafQuantity, decisionFor, consentFor } = require('./treatment-gates');
 
 function toothFields(input) {
   const tooth = input.toothCode == null ? null : text(input.toothCode, '牙位', 8);
@@ -86,7 +86,13 @@ class Treatment {
       } else if (input.action === 'stop' || input.action === 'completeVersion') {
         if (version.status !== '已确认') fail(409, 'INVALID_STATE', '只有已确认版本可以停止后续或核对本版完成');
         if (input.action === 'completeVersion') {
-          if (this.db.prepare('SELECT id,planned_quantity FROM plan_item WHERE plan_version_id=?').all(version.id).some(i => leafQuantity(this.db, i.id) !== BigInt(i.planned_quantity))) fail(409, 'PLAN_INCOMPLETE', '本版仍有未完成项目');
+          const items=this.db.prepare('SELECT id FROM plan_item WHERE plan_version_id=?').all(version.id);
+          const complete=items.every(i=>{
+            const state=consentFor(this.db,i.id,now);
+            if(!state.latest||state.latest.decision==='暂缓')return false;
+            return leafQuantity(this.db,i.id)>=state.limit;
+          });
+          if(!complete)fail(409,'PLAN_INCOMPLETE','有效同意范围尚未完成，或仍有未决定、暂缓项目');
           this.db.prepare("UPDATE plan_version SET status='本版执行完成',updated_at=?,revision=revision+1 WHERE id=?").run(now, version.id);
         } else this.db.prepare("UPDATE plan_version SET status='停止后续执行',stopped_at=?,stop_reason=?,updated_at=?,revision=revision+1 WHERE id=?").run(now, text(input.reason, '停止依据', 2000), now, version.id);
       } else if (input.action === 'close') {
@@ -109,9 +115,24 @@ class Treatment {
   decide(ctx, input, version, plan, now) {
     if (!['待确认', '已确认'].includes(version.status)) fail(409, 'INVALID_STATE', '当前方案不接受新增患者决定，请先重新说明或改版');
     if (!['同意', '暂缓', '拒绝', '撤回'].includes(input.decision)) fail(422, 'INVALID_DECISION', '患者决定无效');
-    const all = this.db.prepare('SELECT id FROM plan_item WHERE plan_version_id=? ORDER BY sequence_no').all(version.id).map(i => i.id);
+    const items=this.db.prepare('SELECT id,planned_quantity FROM plan_item WHERE plan_version_id=? ORDER BY sequence_no').all(version.id),all=items.map(i=>i.id);
     const selected = input.wholeScope === true ? all : input.itemIds;
     if (!Array.isArray(selected) || !selected.length || new Set(selected).size !== selected.length || selected.some(i => !all.includes(i))) fail(422, 'DECISION_SCOPE', '请明确选择当前版本的具体项目，不能跨版本或重复');
+    const scopes=new Map();
+    if(input.wholeScope===true||input.wholeItems===true){
+      if(input.itemScopes!=null)fail(422,'DECISION_QUANTITY','整项范围与限定数量不能同时提交');
+      selected.forEach(i=>scopes.set(i,null));
+    }else{
+      if(!Array.isArray(input.itemScopes)||input.itemScopes.length!==selected.length)fail(422,'DECISION_QUANTITY','每个所选项目须明确选择整项范围或限定数量');
+      for(const s of input.itemScopes){
+        if(!s||!selected.includes(s.itemId)||scopes.has(s.itemId))fail(422,'DECISION_QUANTITY','决定数量须逐项对应所选项目');
+        const quantity=s.wholeItem===true?null:id(s.quantity,'限定数量');
+        if(s.wholeItem===true&&s.quantity!=null)fail(422,'DECISION_QUANTITY','整项范围不能同时填写限定数量');
+        if(quantity!=null&&quantity>items.find(i=>i.id===s.itemId).planned_quantity)fail(422,'DECISION_QUANTITY','限定数量不能超过该项目计划量');
+        if(input.decision==='同意'&&quantity!=null&&BigInt(quantity)<leafQuantity(this.db,s.itemId))fail(409,'CONSENT_BELOW_COMPLETED','已完成的真实数量保留；新的累计同意上限不能小于既有完成量');
+        scopes.set(s.itemId,quantity);
+      }
+    }
     const decidedAt = instant(input.decidedAt, '患者实际决定时间');
     if (decidedAt > now || decidedAt < version.explained_at) fail(422, 'DECISION_TIME', '实际决定不能在未来或早于该版说明');
     const proxyId = input.proxyId == null ? null : id(input.proxyId);
@@ -132,14 +153,14 @@ class Treatment {
     const key = insert(this.db, 'patient_decision', fact(now, { plan_version_id: version.id, patient_proxy_id: proxyId,
       decision: input.decision, decided_at: decidedAt, explanation_basis: text(input.explanationBasis, '实际告知及决定依据', 4000),
       scope_note: text(input.scopeNote, '决定范围说明', 2000), explained_by: ctx.session.staff_id, recorded_by: ctx.session.staff_id }));
-    for (const itemId of selected) insert(this.db, 'decision_plan_item', { decision_id: key, plan_item_id: itemId, linked_at: now, linked_by: ctx.session.staff_id });
+    for (const itemId of selected) insert(this.db, 'decision_plan_item', { decision_id: key, plan_item_id: itemId,scope_quantity:scopes.get(itemId), linked_at: now, linked_by: ctx.session.staff_id });
     for (const fileId of files) insert(this.db, 'decision_file_version', { decision_id: key, document_version_id: fileId, linked_at: now, linked_by: ctx.session.staff_id });
     let status = version.status;
     const current = all.map(itemId => decisionFor(this.db, itemId, now)?.decision);
     if (version.status === '待确认' && current.includes('同意')) status = '已确认';
     else if (version.status === '待确认' && current.every(d => d === '暂缓')) status = '暂缓';
     else if (version.status === '待确认' && current.every(d => d === '拒绝')) status = '已拒绝';
-    else if (version.status === '已确认' && current.every(d => d === '撤回')) status = '停止后续执行';
+    else if (version.status === '已确认' && current.every(d => d === '撤回')&&all.every(i=>consentFor(this.db,i,now).limit<=leafQuantity(this.db,i))) status = '停止后续执行';
     this.db.prepare('UPDATE plan_version SET status=?,stopped_at=?,stop_reason=?,updated_at=?,revision=revision+1 WHERE id=?').run(status,
       status === '停止后续执行' ? now : null, status === '停止后续执行' ? '患者撤回本版全部范围的同意' : null, now, version.id);
     ctx.authority.decisionItemIds = selected; ctx.authority.documentVersionIds = files;
@@ -171,12 +192,14 @@ class Treatment {
         if (!correcting) {
           const latest = this.db.prepare('SELECT id FROM plan_version WHERE treatment_plan_id=? ORDER BY version_no DESC LIMIT 1').get(plan.id);
           if (version.status !== '已确认' || plan.status !== '进行中' || latest.id !== version.id) fail(409, 'PLAN_NOT_EXECUTABLE', '方案未确认、被后续版本替代、停止或结束，不能新增正常执行');
-          const decision = decisionFor(this.db, item.id, completed), current = decisionFor(this.db, item.id, now);
-          if (!decision || decision.decision !== '同意' || decision.created_at > completed || current?.id !== decision.id) fail(409, 'CONSENT_REQUIRED', '缺少执行发生前已登记且当前仍适用的明确同意；不能倒填同意授权过去执行');
+          const at=consentFor(this.db,item.id,completed),current=consentFor(this.db,item.id,now),decision=at.approval;
+          if (!decision || decision.created_at > completed ||at.latest?.created_at>completed|| current.latest?.id !== at.latest?.id||at.limit<=leafQuantity(this.db,item.id)) fail(409, 'CONSENT_REQUIRED', '缺少执行前已登记且当前仍有效的同意余量；不能倒填或绕过撤回');
           ctx.authority.decisionId = decision.id; ctx.authority.decisionScope = { decisionId: decision.id, itemId: item.id };
         }
         const total = leafQuantity(this.db, item.id) - BigInt(original?.completed_quantity || 0) + BigInt(quantity);
         if (total > BigInt(item.planned_quantity)) fail(409, 'PLAN_QUANTITY_EXCEEDED', '本次提交后有效执行量超过计划量');
+        const allowed=consentFor(this.db,item.id,correcting?original.completed_at:completed);
+        if(!allowed.approval||total>allowed.limit)fail(409,'CONSENT_QUANTITY_EXCEEDED','累计实际完成量超过当前适用的患者同意数量');
         ctx.authority.planVersionId = version.id; ctx.authority.planItemId = item.id;
       } else if (!correcting && input.independentCheck !== true) fail(422, 'INDEPENDENT_BASIS_REQUIRED', '不关联方案时须明确为独立检查咨询，并记录真实依据');
       const note = text(input.procedureNote, '实际操作经过', 8000);
@@ -196,9 +219,10 @@ class Treatment {
       const visit = this.context(ctx, { visitId: Number(input.visitId), patientId: Number(input.patientId) }, 'read');
       return { plans: this.db.prepare('SELECT * FROM treatment_plan WHERE patient_id=? ORDER BY id').all(visit.patient_id).map(plan => ({ ...plan,
         versions: this.db.prepare('SELECT * FROM plan_version WHERE treatment_plan_id=? ORDER BY version_no').all(plan.id).map(version => ({ ...version,
-          items: this.db.prepare('SELECT * FROM plan_item WHERE plan_version_id=? ORDER BY sequence_no').all(version.id).map(item => ({ ...item, effectiveQuantity: Number(leafQuantity(this.db, item.id)), latestDecision: decisionFor(this.db, item.id, this.unit.auth.now()) || null })),
+          items: this.db.prepare('SELECT * FROM plan_item WHERE plan_version_id=? ORDER BY sequence_no').all(version.id).map(item => {const consent=consentFor(this.db,item.id,this.unit.auth.now()),done=leafQuantity(this.db,item.id);return {...item,effectiveQuantity:Number(done),consentedQuantity:Number(consent.limit),remainingConsentQuantity:Number(consent.limit>done?consent.limit-done:0n),latestDecision:decisionFor(this.db,item.id,this.unit.auth.now())||null};}),
           decisions: this.db.prepare('SELECT * FROM patient_decision WHERE plan_version_id=? ORDER BY decided_at,id').all(version.id).map(d => ({ ...d,
             itemIds: this.db.prepare('SELECT plan_item_id FROM decision_plan_item WHERE decision_id=? ORDER BY plan_item_id').all(d.id).map(i => i.plan_item_id),
+            itemScopes:this.db.prepare('SELECT plan_item_id itemId,scope_quantity quantity FROM decision_plan_item WHERE decision_id=? ORDER BY plan_item_id').all(d.id),
             documentVersionIds: this.db.prepare('SELECT document_version_id FROM decision_file_version WHERE decision_id=? ORDER BY document_version_id').all(d.id).map(f => f.document_version_id) })) })) })),
         executions: this.db.prepare(`SELECT e.*,s.name service_name,b.id bill_item_id,b.bill_id,b.pricing_status,
           NOT EXISTS(SELECT 1 FROM treatment_execution n WHERE n.original_execution_id=e.id) is_effective

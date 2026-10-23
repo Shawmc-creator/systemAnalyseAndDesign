@@ -1,0 +1,77 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "诊疗助理" as A
+boundary "诊疗助理接口" as B
+actor "诊所负责人" as M
+boundary "诊所负责人接口" as BM
+control "维护材料与批次资料控制" as K
+entity "材料" as T
+entity "材料批次" as R
+entity "批次变更" as H
+
+A -> B : 选择材料，核对实物来源或原批次
+B -> K : 材料、批次及本次办理选择
+activate K
+K -> K : 核验岗位权限，读取已有设置及批次
+alt 1b 原批次状态变更
+ A -> B : 填写隔离、放行、恢复或停用原因及依据
+ B -> K : 原批次及状态决定
+ K -> H : 核对变更权限与原状态()
+ alt 助理立即隔离
+  K -> R : 立即隔离(原因)
+ else 放行、恢复或停用须负责人确认
+  M -> BM : 核实验收依据、效期及实际状态
+  BM -> K : 负责人决定及依据
+  break 未获确认，或放行/恢复时效期不明、已过期
+   K --> BM : 不放行，保留原状态或过期结果
+  end
+  alt 停用
+   K -> R : 停用批次(负责人及依据)
+  else 放行或恢复
+   K -> R : 放行或恢复(负责人及依据)
+  end
+ end
+ K -> H : 记录状态决定及依据()
+ K -> K : 状态及变更记录共同保存，保留人时
+ K --> B : 真实批次状态；状态变更不增加库存
+else 材料与批次登记
+ alt 新材料或尚未确认计量
+  A -> B : 名称、规格、类别、基本/采购单位、换算及精度
+  B -> K : 材料计量及批次效期管理设置
+  K -> T : 核对单位换算及数量精度()
+  K -> T : 核对历史设置可修改性()
+  break 2a 计量不明，或已有流水却要求换单位
+   K --> B : 补正设置；已使用者另建材料，原历史保留
+  end
+  M -> BM : 核对并确认计量与效期要求
+  BM -> K : 负责人确认内容
+  K -> T : 确认计量设置(负责人)
+  K -> K : 保存已确认材料设置及人时
+ else 1a 已有已确认材料
+  K --> B : 沿用原设置，不按每批重复建材料
+ end
+ A -> B : 登记实际批号、效期及来源
+ B -> K : 材料归属与批次资料
+ K -> R : 核对同材料批号及效期()
+ break 5a 同材料批号已有记录或资料冲突
+  K --> B : 相同返回原编号；冲突回实物核实，不覆盖旧批次
+ end
+ K -> K : 保存新批次为待检；5b已过期记过期，需效期但未知仍待检
+ K --> B : 批次编号及状态；实际入库另由UC-19办理
+end
+deactivate K
+
+@enduml

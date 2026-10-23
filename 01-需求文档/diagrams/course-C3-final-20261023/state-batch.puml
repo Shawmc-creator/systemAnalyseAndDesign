@@ -1,0 +1,39 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "待检" as Pending
+state "可用" as Available
+state "隔离" as Quarantined
+state "停用" as Disabled
+state "过期" as Expired
+[*] --> Pending : 登记批次 [未过期或仍待核实]\n/ 不增加库存
+[*] --> Expired : 登记实物批次 [已核实过期]
+Pending --> Available : 负责人放行 [验收依据、\n材料计量及效期条件满足]
+Pending --> Quarantined : 助理发现异常 / 立即隔离
+Available --> Quarantined : 助理发现异常 / 立即隔离
+Quarantined --> Available : 负责人核实恢复\n[异常消除且实际效期有效]
+Pending --> Disabled : 负责人确认停用 [依据齐全]
+Available --> Disabled : 负责人确认停用 [依据齐全]
+Quarantined --> Disabled : 负责人确认停用 [依据齐全]
+Pending --> Expired : 核实已过效期
+Available --> Expired : 达到实际失效条件
+Quarantined --> Expired : 核实已过效期
+Disabled --> [*]
+Expired --> [*]
+
+@enduml

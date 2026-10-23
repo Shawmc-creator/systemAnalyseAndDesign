@@ -26,7 +26,7 @@ function prescriptionDetails(rx){
 function prescriptionIssue(rx){
  const d=prescriptionView.data;
  if(!d.review)throw new Error('请先回到牙医接诊页面，完成本次健康资料复核');
- openEditor('核对并确认开立'+rx.collection_route+'处方',`<p>${esc(d.patient.name)} · ${esc(d.patient.record_no)}</p>${prescriptionDetails(rx)}<h3>本次健康复核依据</h3>${table(['类别','核实情况','内容'],d.health.map(h=>`<tr><td>${esc(h.category)}</td><td>${esc(h.certainty)}</td><td class="clinical-note">${esc(h.content)}</td></tr>`))}<p>复核结论：${esc(d.review.conclusion)}</p>${clinicalText('reason','医师开立核对依据')}${clinicalConfirm('已核对患者、诊断、病史、过敏和既往用药，并逐项核对本次药品、规格、数量、用法及注意事项；确认开立')}`,async value=>{
+ openEditor('核对并确认开立'+rx.collection_route+'处方',`<p>${esc(d.patient.name)} · ${esc(d.patient.record_no)}</p>${prescriptionDetails(rx)}${workflowHistory(rx.reviewHistory,[['review_status','结论'],['review_note','意见']],'逐次审方记录')}<h3>本次健康复核依据</h3>${table(['类别','核实情况','内容'],d.health.map(h=>`<tr><td>${esc(h.category)}</td><td>${esc(h.certainty)}</td><td class="clinical-note">${esc(h.content)}</td></tr>`))}<p>复核结论：${esc(d.review.conclusion)}</p>${clinicalText('reason','医师开立核对依据')}${clinicalConfirm('已核对患者、诊断、病史、过敏和既往用药，并逐项核对本次药品、规格、数量、用法及注意事项；确认开立')}`,async value=>{
   await command('/prescriptions/write',{...prescriptionView.selected,action:'issue',prescriptionId:rx.id,expectedRevision:rx.revision,expectedPatientRevision:d.patient.revision,expectedRecordRevision:d.record.revision,expectedHealthReviewId:d.review.id,confirmed:value.confirmed==='on',reason:value.reason},'prescription-issue');
  });
 }

@@ -29,7 +29,7 @@ class Documents{
       const documents=this.db.prepare('SELECT * FROM clinical_document WHERE visit_id=? ORDER BY id DESC').all(visit.id).map(doc=>{
         const {storage_key,...unused}=doc; // No physical storage paths are exposed by this API.
         return {...unused,versions:this.db.prepare(`SELECT d.*,s.name uploaded_by_name,c.name confirmed_by_name FROM document_version d JOIN staff s ON s.id=d.uploaded_by LEFT JOIN staff c ON c.id=d.confirmed_by WHERE clinical_document_id=? ORDER BY version_no DESC`).all(doc.id).map(v=>{
-          const {storage_key,...info}=v;return {...info,available:this.store.available(v)};
+          const {storage_key,...info}=v;return {...info,corrections:this.unit.workflowHistory.list('document_version',v.id).map(h=>({id:h.id,event_no:h.event_no,event_type:h.event_type,event_reason:h.event_reason,actor_name:h.actor_name,occurred_at:h.occurred_at,original_confirmed_by:h.original_confirmed_by,original_confirmed_at:h.original_confirmed_at,original_confirmation_note:h.original_confirmation_note})),available:this.store.available(v)};
         })};
       });
       const plans=this.db.prepare(`SELECT v.id,v.version_no,p.goal FROM plan_version v JOIN treatment_plan p ON p.id=v.treatment_plan_id WHERE v.source_visit_id=? AND p.patient_id=? ORDER BY v.id DESC`).all(visit.id,patient.id);
@@ -92,16 +92,20 @@ class Documents{
   correct(credentials,input){
     return this.mutate(credentials,input,'uc23.confirm',(ctx,now,writes)=>{
       const version=row(this.db,'document_version',id(input.versionId)),old=this.own(ctx,version.clinical_document_id,'documents');revision(version,input.expectedRevision);
-      // Confirmed evidence is never reassigned. Correct a pending/returned original by issuing a fresh index.
-      if(!['原件待确认','退回核对'].includes(version.status))fail(409,'DOCUMENT_STATE','已确认原件不能改写归属；请保留原件并重新归档正确资料');
-      if(this.db.prepare("SELECT id FROM document_version WHERE clinical_document_id=? AND (status IN ('原件已确认','缺失或不可读') OR version_no>?)").get(old.id,version.version_no))fail(409,'DOCUMENT_STATE','原索引已有确认版本或更新版本，请先核对完整版本链，不能迁移旧版本归属');
+      // Preserve the original index and all existing consent references. A correction is a new index.
+      if(!['原件待确认','退回核对','原件已确认'].includes(version.status))fail(409,'DOCUMENT_STATE','请先恢复可核实的原件，再处理归属更正');
+      if(this.db.prepare('SELECT id FROM document_correction WHERE document_version_id=?').get(version.id))fail(409,'DOCUMENT_ALREADY_CORRECTED','原版本已有更正记录，请从当前索引继续核对');
+      if(version.status==='原件已确认'&&input.confirmed!==true)fail(422,'DOCUMENT_CONFIRM','已确认原件更正须由牙医重新核对并明确确认正确归属');
+      if(this.db.prepare("SELECT id FROM document_version WHERE clinical_document_id=? AND id<>? AND (status IN ('原件已确认','缺失或不可读') OR version_no>?)").get(old.id,version.id,version.version_no))fail(409,'DOCUMENT_STATE','原索引已有其他确认版本或更新版本，请先核对完整版本链');
       const visit=this.context(ctx,input,'documents'),reason=text(input.reason,'归属更正依据',2000);
       if(visit.id===old.visit_id)fail(422,'DOCUMENT_CONTEXT','请选择核实后的正确就诊');
       if(!this.store.available(version))fail(409,'FILE_UNAVAILABLE','原件缺失，无法进行归属核对');
       const key=insert(this.db,'clinical_document',fact(now,{patient_id:visit.patient_id,visit_id:visit.id,plan_version_id:null,document_type:old.document_type,source:old.source,ownership_note:reason,created_by:ctx.session.staff_id,record_no:recordNo('DOC')}));
       const storageKey=this.store.key();writes.push(this.store.stage(storageKey,this.store.read(version.storage_key)));
       const newVersion=insert(this.db,'document_version',fact(now,{clinical_document_id:key,original_name:version.original_name,size_bytes:version.size_bytes,sha256:version.sha256,captured_at:version.captured_at,confirmed_at:null,change_reason:reason,version_no:1,storage_key:storageKey,media_type:version.media_type,verification_note:null,uploaded_by:ctx.session.staff_id,confirmed_by:null,previous_version_id:null,status:'原件待确认'}));
+      if(version.status==='原件已确认')this.db.prepare("UPDATE document_version SET status='原件已确认',confirmed_by=?,confirmed_at=?,verification_note=? WHERE id=?").run(ctx.session.staff_id,now,reason,newVersion);
       this.db.prepare("UPDATE document_version SET status='退回核对',verification_note=?,updated_at=?,revision=revision+1 WHERE id=?").run(reason,now,version.id);
+      this.unit.workflowHistory.append('document_version',version.id,'归属更正',reason,ctx,input,now,{corrected_document_version_id:newVersion,original_confirmed_by:version.confirmed_by,original_confirmed_at:version.confirmed_at,original_confirmation_note:version.verification_note});
       return {kind:'document_version',key:newVersion,revision:1,reason,changes:[{field:'corrected_from_version_id',after:version.id},{field:'clinical_document_id',after:key}],relatedChanges:[{kind:'document_version',key:version.id,beforeRevision:version.revision,revision:version.revision+1,reason,changes:[{field:'corrected_to_version_id',after:newVersion}]}]};
     });
   }

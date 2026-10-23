@@ -1,0 +1,82 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam InterfaceBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 28
+hide circle
+top to bottom direction
+class "接诊与资源接口" as UI <<controller>> {
+ 读取当前办理身份()
+ 校验输入并调用用例方法()
+ 展示业务结果()
+}
+class "接诊与资源应用服务" as S <<application>> {
+ UC-01 维护患者资料(身份及联系资料,版本)
+ UC-02 维护预约安排(患者,资源时段,版本)
+ UC-03 登记到诊(患者,到诊来源)
+ UC-04 维护排班与接诊安排(牙医诊椅,日期时段,版本)
+ UC-24 协调诊椅设备准备与停用恢复(原占用,真实结束及恢复依据)
+}
+UI -down-> S
+class "患者" as E_patient <<entity>> {
+ 核对辨识资料()
+ 建立患者档案()
+}
+S -right-> E_patient
+class "预约" as E_appointment <<entity>> {
+ 确认预约()
+ 改约()
+ 取消()
+}
+S -right-> E_appointment
+class "日期安排" as E_dated_schedule <<entity>> {
+ 核对接诊时段()
+ 确认发布()
+ 调整安排()
+}
+S -right-> E_dated_schedule
+class "接诊占用" as E_resource_occupancy <<entity>> {
+ 核对时段冲突()
+ 确认实际结束()
+ 预留接诊时段()
+}
+S -right-> E_resource_occupancy
+class "就诊" as E_visit <<entity>> {
+ 登记候诊()
+ 开始接诊()
+ 记录诊疗结束()
+}
+S -right-> E_visit
+class "资源停用时段" as E_resource_block <<entity>> {
+ 登记准备或故障限制()
+ 核对解除依据()
+ 解除本次限制()
+}
+S -right-> E_resource_block
+class "设备占用" as E_equipment_occupancy <<entity>> {
+ 预留时段()
+ 确认实际结束()
+ 核对设备时段冲突()
+}
+S -right-> E_equipment_occupancy
+interface "接诊存取接口" as R0 {
+ 读取患者、排班与占用(稳定键)
+ 保存患者及更正(办理号,版本)
+ 保存预约及资源变更(办理号,版本)
+ 保存到诊及病历草稿(来源)
+ 保存实际结束及准备限制(版本)
+}
+S -down-> R0
+class "SQLite接诊映射器" as M <<mapper>> {
+ 装配实体与历史(稳定键)
+ 核对原办理及写入版本()
+ 在本地事务内写关联和历史()
+}
+M .up.|> R0
+@enduml

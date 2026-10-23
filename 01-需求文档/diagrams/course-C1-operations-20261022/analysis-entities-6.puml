@@ -1,0 +1,97 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 220
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+hide circle
+hide empty members
+package "诊后要求的提出、发布及跟进" as R {
+' @reference patient
+class "患者" as patient_r <<entity>>
+' @reference visit
+class "就诊" as visit_r <<entity>>
+' @reference plan_version
+class "方案版本" as plan_r <<entity>>
+class "诊后要求" as followup_requirement <<entity>> {
+ 类型、目的、目标起止日期
+ 是否需临床评估、负责前台
+ 要求状态、下次联系日期
+ 发布及变更依据、完成或撤销人和时间
+ --
+ +核对患者与诊疗来源()
+ +暂存或发布要求()
+ +调整未完成要求(原因)
+ +撤销要求(牙医依据)
+ +安排继续跟进(日期与责任人)
+ +核对目的达成及完成依据()
+}
+patient_r "1" -- "0..*" followup_requirement
+visit_r "0..1" -- "0..*" followup_requirement
+plan_r "0..1" -- "0..*" followup_requirement
+patient_r -[hidden]right- visit_r
+visit_r -[hidden]right- plan_r
+note bottom of followup_requirement
+来源就诊或方案版本至少一项，均属本患者。
+发布仅产生待办；未联系、拒绝、未到不自动完成。
+调整及撤销保留原历史，不直接取消既有预约。
+end note
+}
+package "前台联系与成功预约关联" as C {
+' @reference followup_requirement
+class "诊后要求" as requirement_c <<entity>>
+' @reference appointment
+class "预约" as appointment_c <<entity>>
+class "联系经历" as contact_history <<entity>> {
+ 实际方式、时间、前台
+ 沟通事实、结果、下次联系日
+ --
+ +记录实际联系结果()
+ +核对成功预约归属()
+ +关联既有成功预约()
+ +记录继续联系(日期)
+}
+requirement_c "1" -- "0..*" contact_history
+appointment_c "0..1" -- "0..*" contact_history
+requirement_c -[hidden]right- appointment_c
+note bottom of contact_history
+实际联系、预约、到诊和评估分别记录。
+预约失败仍保存联系；不自动建预约。
+需评估交牙医；免评估完成仍核对真实目的达成。
+end note
+}
+package "牙医评估与完成条件" as A {
+' @reference followup_requirement
+class "诊后要求" as requirement_a <<entity>>
+' @reference visit
+class "就诊" as visit_a <<entity>>
+class "临床评估" as clinical_assessment <<entity>> {
+ 到诊检查或远程沟通、时间、牙医
+ 结论、意见、来源及局限
+ 下次日期、跟进责任人
+ --
+ +核对评估方式与实际依据()
+ +追加实际评估()
+ +判断原目的是否达到()
+ +记录继续跟进(日期与责任人)
+}
+requirement_a "1" -- "0..*" clinical_assessment
+visit_a "0..1" -- "0..*" clinical_assessment
+requirement_a -[hidden]right- visit_a
+note bottom of clinical_assessment
+目的达到且评估完整才完成，评估与完成共同保存。
+远程信息不足则安排到诊；继续跟进有日期及责任人。
+已有安排待到诊或评估，否则转待联系。
+end note
+}
+@enduml

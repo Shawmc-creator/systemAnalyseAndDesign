@@ -1,48 +1,58 @@
 {
-  "planned_content_pages": 177,
+  "planned_content_pages": 162,
   "usecases": 25,
   "core_tables": 69,
-  "figures": 155,
+  "figures": 144,
   "pages": [
+    "业务建模",
+    "愿景",
     "诊所业务与建设目标",
     "愿景表",
     "业务主体与岗位责任",
     "完整业务范围",
+    "业务用例图",
     "业务总体视图",
-    "业务用例办理结果1",
-    "业务用例办理结果2",
-    "业务用例办理结果3",
-    "业务用例办理结果4",
+    "业务用例及办理结果1",
+    "业务用例及办理结果2",
+    "费用更正与业务衔接",
+    "内部支持工作的责任与结果",
     "岗位交接与业务完成条件",
+    "现状业务序列图",
     "预约与到诊现状",
-    "检查诊断与治疗现状",
-    "处方与用药现状",
+    "检查诊断与口腔治疗现状",
+    "处方与用药服务现状",
     "复诊与随访现状",
     "自费与自付缴费现状",
-    "门诊医保结算现状",
+    "医保门诊结算现状",
     "费用更正与退费现状",
-    "采购与日常物资现状",
-    "资源准备与设备维护现状",
-    "日常经营与款项核对现状",
+    "内部支持：采购与库存保障现状",
+    "内部支持：接诊资源准备与停用恢复现状",
+    "内部支持：日常经营与款项核对现状",
+    "改进业务序列图",
     "预约与到诊改进",
-    "检查诊断与治疗改进",
-    "处方与用药改进",
+    "检查诊断与口腔治疗改进",
+    "处方与用药服务改进",
     "复诊与随访改进",
     "自费与自付缴费改进",
-    "门诊医保结算改进",
+    "医保门诊结算改进",
     "费用更正与退费改进",
-    "采购与日常物资改进",
-    "资源准备与设备维护改进",
-    "日常经营与款项核对改进",
+    "内部支持：采购与库存保障改进",
+    "内部支持：接诊资源准备与停用恢复改进",
+    "内部支持：日常经营与款项核对改进",
+    "系统承接的业务职责",
     "患者服务全过程",
     "接诊资源协调与恢复",
     "资源冲突的办理",
     "开诊准备与日终核对",
     "支付医保分摊与实际结果",
+    "需求",
+    "系统用例图",
     "系统总体视图",
     "前台用例视图",
     "牙医与助理用例视图",
     "收费与负责人用例视图",
+    "系统用例规约",
+    "需求依据与涉众取舍",
     "核心系统用例清单",
     "UC-01：维护患者资料",
     "UC-02：维护预约安排",
@@ -69,8 +79,11 @@
     "UC-23：办理医保结算、撤销与回款核对",
     "UC-24：协调诊椅设备准备与停用恢复",
     "UC-25：开立处方并衔接院内外取药",
-    "质量与权限要求",
+    "共用质量要求与设计约束",
+    "共用设计约束与业务验收",
     "主要业务验收场景",
+    "分析",
+    "分析类图",
     "前台边界与控制",
     "牙医边界与控制",
     "收费人员边界与控制",
@@ -88,6 +101,7 @@
     "门诊医保与结算款实体关系",
     "用例与实体责任1",
     "用例与实体责任2",
+    "分析序列图",
     "UC-01：维护患者资料",
     "UC-02：维护预约安排",
     "UC-03：登记到诊",
@@ -102,6 +116,7 @@
     "UC-12：查询账单与待结算费用",
     "UC-13：办理患者付款与到账核实",
     "UC-14：办理费用更正与退费",
+    "UC-14：实际退款与结果核实（续）",
     "UC-15：提出复诊随访要求",
     "UC-16：办理复诊联系与预约",
     "UC-17：记录复诊随访评估",
@@ -113,17 +128,19 @@
     "UC-23：办理医保结算、撤销与回款核对",
     "UC-24：协调诊椅设备准备与停用恢复",
     "UC-25：开立处方并衔接院内外取药",
+    "分析状态机图",
     "主要业务状态1",
     "主要业务状态2",
     "主要业务状态3",
     "主要业务状态4",
     "主要业务状态5",
     "主要业务状态6",
+    "设计",
+    "建立数据层",
     "三层职责与部署",
-    "分析类与核心表对应1",
-    "分析类与核心表对应2",
-    "分析类与核心表对应3",
-    "分析类与核心表对应4",
+    "业务保存及失败反馈",
+    "分析类与核心表对应（一）",
+    "分析类与核心表对应（二）",
     "数据库关系总图",
     "身份与接诊数据结构",
     "病历与诊疗文书数据结构",
@@ -134,44 +151,18 @@
     "材料与库存数据结构",
     "基础采购与验收数据结构",
     "门诊医保与结算款数据结构",
-    "主要业务字段1",
-    "主要业务字段2",
-    "主要业务字段3",
-    "主要业务字段4",
-    "主要业务字段5",
-    "主要业务字段6",
-    "主要业务字段7",
-    "主要业务字段8",
-    "主要业务字段9",
-    "主要业务字段10",
-    "主要业务字段11",
-    "主要业务字段12",
-    "主要业务字段13",
-    "主要业务字段14",
-    "主要业务字段15",
-    "主要业务字段16",
-    "主要业务字段17",
-    "主要业务字段18",
+    "主要业务字段",
     "数据完整性与业务保存",
     "共享字段与存储安排",
+    "精化业务层",
     "接诊服务职责精化",
     "临床服务职责精化",
     "收费与复诊服务职责精化",
     "物资与管理服务职责精化",
     "医保与药学服务职责精化",
-    "维护预约安排业务协作",
-    "记录检查诊断与健康资料业务协作",
-    "制定治疗方案并记录患者确认业务协作",
-    "登记实际治疗与完成项目业务协作",
-    "办理患者付款与到账核实业务协作",
     "办理费用更正与退费业务协作",
-    "办理复诊联系与预约业务协作",
-    "登记基础采购与到货验收业务协作",
-    "办理库存领用、退回与盘点业务协作",
     "核验医保身份并办理预结算业务协作",
-    "协调诊椅设备准备与停用恢复业务协作",
-    "开立处方并衔接院内外取药业务协作",
-    "业务保存及失败反馈",
+    "精化表示层",
     "岗位导航",
     "岗位页面1",
     "岗位页面2",
@@ -187,291 +178,481 @@
       "stem": "business-overall",
       "title": "诊所业务用例图",
       "kind": "business",
+      "intro": "",
+      "minimum_font_pt": 13.56,
+      "figure_number": 1,
+      "pdf_page": 7,
+      "path": "diagrams/course-A-20261021/business-overall.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-overall.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 10.85
+      ]
     },
     {
       "stem": "buc-01",
       "title": "BUC-01 预约与到诊业务用例图",
-      "kind": "business"
+      "kind": "business",
+      "intro": "",
+      "minimum_font_pt": 13.85,
+      "figure_number": 2,
+      "pdf_page": 8,
+      "path": "diagrams/course-A-20261021/buc-01.pdf",
+      "puml_path": "diagrams/course-A-20261021/buc-01.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "buc-02",
       "title": "BUC-02 检查诊断与口腔治疗业务用例图",
-      "kind": "business"
+      "kind": "business",
+      "intro": "",
+      "minimum_font_pt": 13.85,
+      "figure_number": 3,
+      "pdf_page": 8,
+      "path": "diagrams/course-A-20261021/buc-02.pdf",
+      "puml_path": "diagrams/course-A-20261021/buc-02.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "buc-03",
       "title": "BUC-03 处方与用药服务业务用例图",
-      "kind": "business"
+      "kind": "business",
+      "intro": "",
+      "minimum_font_pt": 13.85,
+      "figure_number": 4,
+      "pdf_page": 8,
+      "path": "diagrams/course-A-20261021/buc-03.pdf",
+      "puml_path": "diagrams/course-A-20261021/buc-03.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "buc-04",
       "title": "BUC-04 复诊与随访业务用例图",
-      "kind": "business"
+      "kind": "business",
+      "intro": "",
+      "minimum_font_pt": 13.85,
+      "figure_number": 5,
+      "pdf_page": 9,
+      "path": "diagrams/course-A-20261021/buc-04.pdf",
+      "puml_path": "diagrams/course-A-20261021/buc-04.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "buc-05",
       "title": "BUC-05 自费与自付缴费业务用例图",
-      "kind": "business"
+      "kind": "business",
+      "intro": "",
+      "minimum_font_pt": 13.85,
+      "figure_number": 6,
+      "pdf_page": 9,
+      "path": "diagrams/course-A-20261021/buc-05.pdf",
+      "puml_path": "diagrams/course-A-20261021/buc-05.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "buc-06",
       "title": "BUC-06 医保门诊结算业务用例图",
-      "kind": "business"
+      "kind": "business",
+      "intro": "",
+      "minimum_font_pt": 13.85,
+      "figure_number": 7,
+      "pdf_page": 9,
+      "path": "diagrams/course-A-20261021/buc-06.pdf",
+      "puml_path": "diagrams/course-A-20261021/buc-06.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "buc-07",
       "title": "BUC-07 费用更正与退费业务用例图",
-      "kind": "business"
+      "kind": "business",
+      "intro": "",
+      "minimum_font_pt": 11.1,
+      "figure_number": 8,
+      "pdf_page": 10,
+      "path": "diagrams/course-A-20261021/buc-07.pdf",
+      "puml_path": "diagrams/course-A-20261021/buc-07.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
-      "stem": "buc-08",
-      "title": "BUC-08 物资采购与验收业务用例图",
-      "kind": "business"
-    },
-    {
-      "stem": "buc-09",
-      "title": "BUC-09 设备维护与恢复业务用例图",
-      "kind": "business"
-    },
-    {
-      "stem": "buc-10",
-      "title": "BUC-10 日常收款与医保款核对业务用例图",
-      "kind": "business"
+      "stem": "business-support",
+      "title": "内部支持工作的责任与服务衔接",
+      "kind": "activity",
+      "intro": "",
+      "minimum_font_pt": 10.16,
+      "figure_number": 9,
+      "pdf_page": 11,
+      "path": "diagrams/course-A-20261021/business-support.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-support.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "business-current-1",
       "title": "预约与到诊现状业务序列图",
       "kind": "sequence",
+      "intro": "BUC-01。预约确认与患者实际到店分别发生；前台分别查记录、向牙医和助理核实资源，再办理到诊交接。",
+      "minimum_font_pt": 9.48,
+      "figure_number": 10,
+      "pdf_page": 13,
+      "path": "diagrams/course-A-20261021/business-current-1.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-1.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 9.28
+      ]
     },
     {
       "stem": "business-current-2",
-      "title": "检查诊断与治疗现状业务序列图",
+      "title": "检查诊断与口腔治疗现状业务序列图",
       "kind": "sequence",
+      "intro": "BUC-02。病历、患者决定与实际治疗分别保留；仅已发生项目交收费核对，准备和实物操作由牙医、助理完成。",
+      "minimum_font_pt": 9.22,
+      "figure_number": 11,
+      "pdf_page": 14,
+      "path": "diagrams/course-A-20261021/business-current-2.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-2.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 14.4
+      ]
     },
     {
       "stem": "business-current-3",
-      "title": "处方与用药现状业务序列图",
+      "title": "处方与用药服务现状业务序列图",
       "kind": "sequence",
+      "intro": "BUC-03。院外交付处方与院内实际发药为替代路径；院内业务按机构和人员条件启用。",
+      "minimum_font_pt": 10.88,
+      "figure_number": 12,
+      "pdf_page": 15,
+      "path": "diagrams/course-A-20261021/business-current-3.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-3.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 12.55
+      ]
     },
     {
       "stem": "business-current-4",
       "title": "复诊与随访现状业务序列图",
       "kind": "sequence",
+      "intro": "BUC-04。提出要求、联系、预约与实际评估分别交接；联系不上或暂缓时保留下次处理日期。",
+      "minimum_font_pt": 10.4,
+      "figure_number": 13,
+      "pdf_page": 16,
+      "path": "diagrams/course-A-20261021/business-current-4.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-4.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 13.87
+      ]
     },
     {
       "stem": "business-current-5",
       "title": "自费与自付缴费现状业务序列图",
       "kind": "sequence",
+      "intro": "BUC-05。原费用、患者承担和实际收到的款项分别核对；电子结果未知时回查原笔。",
+      "minimum_font_pt": 12.04,
+      "figure_number": 14,
+      "pdf_page": 17,
+      "path": "diagrams/course-A-20261021/business-current-5.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-5.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 14.43
+      ]
     },
     {
       "stem": "business-current-6",
-      "title": "门诊医保结算现状业务序列图",
+      "title": "医保门诊结算现状业务序列图",
       "kind": "sequence",
+      "intro": "BUC-06。取得相应定点及联网条件后办理；预估说明、患者选择和正式结果分开，回款核对由内部支持流程接续。",
+      "minimum_font_pt": 13.42,
+      "figure_number": 15,
+      "pdf_page": 18,
+      "path": "diagrams/course-A-20261021/business-current-6.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-6.puml",
       "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.94
+        297,
+        420
+      ]
     },
     {
       "stem": "business-current-7",
       "title": "费用更正与退费现状业务序列图",
       "kind": "sequence",
+      "intro": "BUC-07。负责人先核实范围，必要医保原单处理完成后核对患者差额；费用更正和真实退款分别留据。",
+      "minimum_font_pt": 12.57,
+      "figure_number": 16,
+      "pdf_page": 19,
+      "path": "diagrams/course-A-20261021/business-current-7.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-7.puml",
       "paper": [
         297,
         420
-      ],
-      "minimum_font_pt": 12.24
+      ]
     },
     {
       "stem": "business-current-8",
-      "title": "采购与日常物资现状业务序列图",
+      "title": "采购与库存保障现状业务序列图",
       "kind": "sequence",
+      "intro": "内部支持流程S-01，保障BUC-02、03。采购确认、实物到货与合格入库分开；供应商提供供货，诊所对验收结果负责。",
+      "minimum_font_pt": 9.24,
+      "figure_number": 17,
+      "pdf_page": 20,
+      "path": "diagrams/course-A-20261021/business-current-8.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-8.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 19.66
+      ]
     },
     {
       "stem": "business-current-9",
-      "title": "资源准备与设备维护现状业务序列图",
+      "title": "接诊资源准备与停用恢复现状业务序列图",
       "kind": "sequence",
+      "intro": "内部支持流程S-02，保障BUC-01、02、03。维修反馈、实际操作结束和清洁核验是不同事件，满足全部条件后才恢复。",
+      "minimum_font_pt": 9.68,
+      "figure_number": 18,
+      "pdf_page": 21,
+      "path": "diagrams/course-A-20261021/business-current-9.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-9.puml",
       "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 10.44
+        297,
+        420
+      ]
     },
     {
       "stem": "business-current-10",
       "title": "日常经营与款项核对现状业务序列图",
       "kind": "sequence",
+      "intro": "内部支持流程S-03，衔接BUC-05、06、07。经营费用、患者实际资金及医保实际拨付分列，差异保留原单和责任。",
+      "minimum_font_pt": 10.36,
+      "figure_number": 19,
+      "pdf_page": 22,
+      "path": "diagrams/course-A-20261021/business-current-10.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-current-10.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 13.92
+      ]
     },
     {
       "stem": "business-improved-1",
       "title": "预约与到诊改进业务序列图",
       "kind": "sequence",
+      "intro": "BUC-01。系统集中核对排班、时段及资源冲突；前台确认患者意向，助理核实准备，牙医确认实际开始。",
+      "minimum_font_pt": 13.17,
+      "figure_number": 20,
+      "pdf_page": 23,
+      "path": "diagrams/course-A-20261021/business-improved-1.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-1.puml",
       "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 13.46
+        297,
+        420
+      ]
     },
     {
       "stem": "business-improved-2",
-      "title": "检查诊断与治疗改进业务序列图",
+      "title": "检查诊断与口腔治疗改进业务序列图",
       "kind": "sequence",
+      "intro": "BUC-02。系统保留同一患者、方案版本、患者决定及实际执行的来源，自动核对计费依据；实际诊疗和专业判断由牙医完成。",
+      "minimum_font_pt": 14.04,
+      "figure_number": 21,
+      "pdf_page": 24,
+      "path": "diagrams/course-A-20261021/business-improved-2.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-2.puml",
       "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 14.87
+        297,
+        420
+      ]
     },
     {
       "stem": "business-improved-3",
-      "title": "处方与用药改进业务序列图",
+      "title": "处方与用药服务改进业务序列图",
       "kind": "sequence",
+      "intro": "BUC-03。处方、审核和发药按原处方交接；院外路径交付处方，院内实际发药与库存、费用相互关联。",
+      "minimum_font_pt": 9.71,
+      "figure_number": 22,
+      "pdf_page": 25,
+      "path": "diagrams/course-A-20261021/business-improved-3.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-3.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 15.07
+      ]
     },
     {
       "stem": "business-improved-4",
       "title": "复诊与随访改进业务序列图",
       "kind": "sequence",
+      "intro": "BUC-04。系统将原诊疗意见转换为联系待办，并连续保存联系、预约与评估；临床完成由实际评估条件决定。",
+      "minimum_font_pt": 9.48,
+      "figure_number": 23,
+      "pdf_page": 26,
+      "path": "diagrams/course-A-20261021/business-improved-4.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-4.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 15.9
+      ]
     },
     {
       "stem": "business-improved-5",
       "title": "自费与自付缴费改进业务序列图",
       "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 12.8
-    },
-    {
-      "stem": "business-improved-6",
-      "title": "门诊医保结算改进业务序列图",
-      "kind": "sequence",
+      "intro": "BUC-05。系统核对患者承担、保存原笔并汇总余额；平台受理与真实到账区分，未知结果持续回查。",
+      "minimum_font_pt": 13.07,
+      "figure_number": 24,
+      "pdf_page": 27,
+      "path": "diagrams/course-A-20261021/business-improved-5.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-5.puml",
       "paper": [
         297,
         420
-      ],
-      "minimum_font_pt": 12.82
+      ]
+    },
+    {
+      "stem": "business-improved-6",
+      "title": "医保门诊结算改进业务序列图",
+      "kind": "sequence",
+      "intro": "BUC-06。系统关联身份、诊断、费用版本、编码和平台阶段结果；患者知情选择后才正式结算，实际回款另核对。",
+      "minimum_font_pt": 11.21,
+      "figure_number": 25,
+      "pdf_page": 28,
+      "path": "diagrams/course-A-20261021/business-improved-6.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-6.puml",
+      "paper": [
+        297,
+        420
+      ]
     },
     {
       "stem": "business-improved-7",
       "title": "费用更正与退费改进业务序列图",
       "kind": "sequence",
+      "intro": "BUC-07。原项目、批准、医保和患者退款连续可追查；系统按真实阶段控制办理顺序，负责人确认及真实交付款仍由对应主体完成。",
+      "minimum_font_pt": 11.42,
+      "figure_number": 26,
+      "pdf_page": 29,
+      "path": "diagrams/course-A-20261021/business-improved-7.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-7.puml",
       "paper": [
         297,
         420
-      ],
-      "minimum_font_pt": 12.11
+      ]
     },
     {
       "stem": "business-improved-8",
-      "title": "采购与日常物资改进业务序列图",
+      "title": "采购与库存保障改进业务序列图",
       "kind": "sequence",
+      "intro": "S-01。系统复用原采购、批次及验收信息，核对合格量和数量来源；供货、质量核验与使用仍按实物办理。",
+      "minimum_font_pt": 11.57,
+      "figure_number": 27,
+      "pdf_page": 30,
+      "path": "diagrams/course-A-20261021/business-improved-8.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-8.puml",
       "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 20.28
+        297,
+        420
+      ]
     },
     {
       "stem": "business-improved-9",
-      "title": "资源准备与设备维护改进业务序列图",
+      "title": "接诊资源准备与停用恢复改进业务序列图",
       "kind": "sequence",
+      "intro": "S-02。系统集中反映预留、实际使用及停用影响；维修反馈与清洁核验形成恢复依据，不按预计时间自动放行。",
+      "minimum_font_pt": 11.33,
+      "figure_number": 28,
+      "pdf_page": 31,
+      "path": "diagrams/course-A-20261021/business-improved-9.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-9.puml",
       "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 13.58
+        297,
+        420
+      ]
     },
     {
       "stem": "business-improved-10",
       "title": "日常经营与款项核对改进业务序列图",
       "kind": "sequence",
+      "intro": "S-03。系统自动汇集和分列原业务，工作人员核实真实现金与外部收付，负责人跟进异常；待回款不计当日实收。",
+      "minimum_font_pt": 10.03,
+      "figure_number": 29,
+      "pdf_page": 32,
+      "path": "diagrams/course-A-20261021/business-improved-10.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-improved-10.puml",
       "paper": [
         210,
         297
-      ],
-      "minimum_font_pt": 14.67
+      ]
     },
     {
       "stem": "business-patient-flow",
       "title": "患者服务全过程",
       "kind": "activity",
+      "intro": "",
+      "minimum_font_pt": 10.37,
+      "figure_number": 30,
+      "pdf_page": 34,
+      "path": "diagrams/course-A-20261021/business-patient-flow.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-patient-flow.puml",
       "paper": [
-        594,
-        841
-      ],
-      "minimum_font_pt": 10.01
+        841,
+        594
+      ]
     },
     {
       "stem": "business-resource-flow",
       "title": "接诊资源准备与占用协调",
       "kind": "activity",
+      "intro": "",
+      "minimum_font_pt": 9.33,
+      "figure_number": 31,
+      "pdf_page": 35,
+      "path": "diagrams/course-A-20261021/business-resource-flow.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-resource-flow.puml",
       "paper": [
         297,
         420
-      ],
-      "minimum_font_pt": 10.15
+      ]
     },
     {
       "stem": "business-daily-flow",
       "title": "开诊准备与日终业务协作",
       "kind": "activity",
+      "intro": "",
+      "minimum_font_pt": 9.24,
+      "figure_number": 32,
+      "pdf_page": 37,
+      "path": "diagrams/course-A-20261021/business-daily-flow.pdf",
+      "puml_path": "diagrams/course-A-20261021/business-daily-flow.puml",
       "paper": [
         420,
         594
-      ],
-      "minimum_font_pt": 11.58
+      ]
     },
     {
       "stem": "system-overall",
@@ -481,7 +662,11 @@
         420,
         594
       ],
-      "minimum_font_pt": 11.03
+      "minimum_font_pt": 11.02,
+      "figure_number": 33,
+      "pdf_page": 39,
+      "path": "diagrams/integrated-20261019/system-overall.pdf",
+      "puml_path": "diagrams/integrated-20261019/system-overall.puml"
     },
     {
       "stem": "system-role-1",
@@ -491,7 +676,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 21.21
+      "minimum_font_pt": 21.21,
+      "figure_number": 34,
+      "pdf_page": 40,
+      "path": "diagrams/integrated-20261019/system-role-1.pdf",
+      "puml_path": "diagrams/integrated-20261019/system-role-1.puml"
     },
     {
       "stem": "system-role-2",
@@ -501,7 +690,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 9.41
+      "minimum_font_pt": 9.4,
+      "figure_number": 35,
+      "pdf_page": 41,
+      "path": "diagrams/integrated-20261019/system-role-2.pdf",
+      "puml_path": "diagrams/integrated-20261019/system-role-2.puml"
     },
     {
       "stem": "system-role-3",
@@ -511,132 +704,352 @@
         210,
         297
       ],
-      "minimum_font_pt": 9.97
+      "minimum_font_pt": 9.97,
+      "figure_number": 36,
+      "pdf_page": 42,
+      "path": "diagrams/integrated-20261019/system-role-3.pdf",
+      "puml_path": "diagrams/integrated-20261019/system-role-3.puml"
     },
     {
       "stem": "uc-01",
       "title": "UC-01 维护患者资料用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 37,
+      "pdf_page": 45,
+      "path": "diagrams/integrated-20261019/uc-01.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-01.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-02",
       "title": "UC-02 维护预约安排用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 38,
+      "pdf_page": 47,
+      "path": "diagrams/integrated-20261019/uc-02.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-02.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-03",
       "title": "UC-03 登记到诊用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 39,
+      "pdf_page": 49,
+      "path": "diagrams/integrated-20261019/uc-03.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-03.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-04",
       "title": "UC-04 维护排班与接诊安排用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 40,
+      "pdf_page": 51,
+      "path": "diagrams/integrated-20261019/uc-04.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-04.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-05",
       "title": "UC-05 查阅患者诊疗资料用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 41,
+      "pdf_page": 53,
+      "path": "diagrams/integrated-20261019/uc-05.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-05.puml",
+      "minimum_font_pt": 8.83,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-06",
       "title": "UC-06 记录检查诊断与健康资料用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 42,
+      "pdf_page": 54,
+      "path": "diagrams/integrated-20261019/uc-06.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-06.puml",
+      "minimum_font_pt": 8.83,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-07",
       "title": "UC-07 制定治疗方案并记录患者确认用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 43,
+      "pdf_page": 55,
+      "path": "diagrams/integrated-20261019/uc-07.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-07.puml",
+      "minimum_font_pt": 8.7,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-08",
       "title": "UC-08 登记实际治疗与完成项目用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 44,
+      "pdf_page": 56,
+      "path": "diagrams/integrated-20261019/uc-08.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-08.puml",
+      "minimum_font_pt": 8.83,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-09",
       "title": "UC-09 签署及补充病历用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 45,
+      "pdf_page": 57,
+      "path": "diagrams/integrated-20261019/uc-09.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-09.puml",
+      "minimum_font_pt": 8.83,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-10",
       "title": "UC-10 管理影像与诊疗文书用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 46,
+      "pdf_page": 58,
+      "path": "diagrams/integrated-20261019/uc-10.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-10.puml",
+      "minimum_font_pt": 8.83,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-11",
       "title": "UC-11 维护收费项目与价目用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 47,
+      "pdf_page": 59,
+      "path": "diagrams/integrated-20261019/uc-11.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-11.puml",
+      "minimum_font_pt": 10.3,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-12",
       "title": "UC-12 查询账单与待结算费用用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 48,
+      "pdf_page": 60,
+      "path": "diagrams/integrated-20261019/uc-12.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-12.puml",
+      "minimum_font_pt": 10.3,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-13",
       "title": "UC-13 办理患者付款与到账核实用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 49,
+      "pdf_page": 61,
+      "path": "diagrams/integrated-20261019/uc-13.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-13.puml",
+      "minimum_font_pt": 10.3,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-14",
       "title": "UC-14 办理费用更正与退费用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 50,
+      "pdf_page": 62,
+      "path": "diagrams/integrated-20261019/uc-14.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-14.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-15",
       "title": "UC-15 提出复诊随访要求用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 51,
+      "pdf_page": 64,
+      "path": "diagrams/integrated-20261019/uc-15.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-15.puml",
+      "minimum_font_pt": 10.3,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-16",
       "title": "UC-16 办理复诊联系与预约用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 52,
+      "pdf_page": 65,
+      "path": "diagrams/integrated-20261019/uc-16.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-16.puml",
+      "minimum_font_pt": 10.3,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-17",
       "title": "UC-17 记录复诊随访评估用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 53,
+      "pdf_page": 66,
+      "path": "diagrams/integrated-20261019/uc-17.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-17.puml",
+      "minimum_font_pt": 10.3,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-18",
       "title": "UC-18 维护材料与批次资料用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 54,
+      "pdf_page": 67,
+      "path": "diagrams/integrated-20261019/uc-18.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-18.puml",
+      "minimum_font_pt": 10.3,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-19",
       "title": "UC-19 登记基础采购与到货验收用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 55,
+      "pdf_page": 68,
+      "path": "diagrams/integrated-20261019/uc-19.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-19.puml",
+      "minimum_font_pt": 10.3,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-20",
       "title": "UC-20 办理库存领用、退回与盘点用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 56,
+      "pdf_page": 69,
+      "path": "diagrams/integrated-20261019/uc-20.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-20.puml",
+      "minimum_font_pt": 10.3,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-21",
       "title": "UC-21 核对日常经营与收付款用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 57,
+      "pdf_page": 70,
+      "path": "diagrams/integrated-20261019/uc-21.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-21.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-22",
       "title": "UC-22 核验医保身份并办理预结算用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 58,
+      "pdf_page": 71,
+      "path": "diagrams/integrated-20261019/uc-22.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-22.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-23",
       "title": "UC-23 办理医保结算、撤销与回款核对用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 59,
+      "pdf_page": 73,
+      "path": "diagrams/integrated-20261019/uc-23.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-23.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-24",
       "title": "UC-24 协调诊椅设备准备与停用恢复用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 60,
+      "pdf_page": 75,
+      "path": "diagrams/integrated-20261019/uc-24.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-24.puml",
+      "minimum_font_pt": 9.07,
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "uc-25",
       "title": "UC-25 开立处方并衔接院内外取药用例图",
-      "kind": "usecase"
+      "kind": "usecase",
+      "figure_number": 61,
+      "pdf_page": 76,
+      "path": "diagrams/integrated-20261019/uc-25.pdf",
+      "puml_path": "diagrams/integrated-20261019/uc-25.puml",
+      "paper": [
+        210,
+        297
+      ]
     },
     {
       "stem": "analysis-boundaries-1",
@@ -646,7 +1059,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 16.25
+      "minimum_font_pt": 13.77,
+      "figure_number": 62,
+      "pdf_page": 80,
+      "path": "diagrams/course-C1-20261022/analysis-boundaries-1.pdf",
+      "puml_path": "diagrams/course-C1-20261022/analysis-boundaries-1.puml"
     },
     {
       "stem": "analysis-boundaries-2",
@@ -656,7 +1073,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.51
+      "minimum_font_pt": 9.05,
+      "figure_number": 63,
+      "pdf_page": 81,
+      "path": "diagrams/course-C1-20261022/analysis-boundaries-2.pdf",
+      "puml_path": "diagrams/course-C1-20261022/analysis-boundaries-2.puml"
     },
     {
       "stem": "analysis-boundaries-3",
@@ -666,7 +1087,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 12.55
+      "minimum_font_pt": 12.14,
+      "figure_number": 64,
+      "pdf_page": 82,
+      "path": "diagrams/course-C1-20261022/analysis-boundaries-3.pdf",
+      "puml_path": "diagrams/course-C1-20261022/analysis-boundaries-3.puml"
     },
     {
       "stem": "analysis-boundaries-4",
@@ -676,7 +1101,11 @@
         297,
         420
       ],
-      "minimum_font_pt": 9.98
+      "minimum_font_pt": 13.94,
+      "figure_number": 65,
+      "pdf_page": 83,
+      "path": "diagrams/course-C1-20261022/analysis-boundaries-4.pdf",
+      "puml_path": "diagrams/course-C1-20261022/analysis-boundaries-4.puml"
     },
     {
       "stem": "analysis-boundaries-pharmacy",
@@ -686,7 +1115,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 20.65
+      "minimum_font_pt": 16.9,
+      "figure_number": 66,
+      "pdf_page": 84,
+      "path": "diagrams/course-C1-20261022/analysis-boundaries-pharmacy.pdf",
+      "puml_path": "diagrams/course-C1-20261022/analysis-boundaries-pharmacy.puml"
     },
     {
       "stem": "analysis-boundaries-external",
@@ -696,347 +1129,509 @@
         210,
         297
       ],
-      "minimum_font_pt": 25.51
+      "minimum_font_pt": 17.09,
+      "figure_number": 67,
+      "pdf_page": 85,
+      "path": "diagrams/course-C1-20261022/analysis-boundaries-external.pdf",
+      "puml_path": "diagrams/course-C1-20261022/analysis-boundaries-external.puml"
     },
     {
       "stem": "analysis-entities-1",
       "title": "身份与接诊分析实体类图",
       "kind": "class",
       "paper": [
-        420,
-        297
+        594,
+        420
       ],
-      "minimum_font_pt": 12.0
+      "minimum_font_pt": 12.4,
+      "figure_number": 68,
+      "pdf_page": 86,
+      "path": "diagrams/course-C1-20261022/analysis-entities-1.pdf",
+      "puml_path": "diagrams/course-C1-20261022/analysis-entities-1.puml"
     },
     {
       "stem": "analysis-entities-2",
       "title": "病历与诊疗文书分析实体类图",
       "kind": "class",
       "paper": [
-        210,
-        297
+        594,
+        420
       ],
-      "minimum_font_pt": 9.43
+      "minimum_font_pt": 9.15,
+      "figure_number": 69,
+      "pdf_page": 87,
+      "path": "diagrams/course-C1-clinical-20261022/analysis-entities-2.pdf",
+      "puml_path": "diagrams/course-C1-clinical-20261022/analysis-entities-2.puml",
+      "panel_layout_source": "diagrams/course-C1-clinical-20261022/版面配置.json"
     },
     {
       "stem": "analysis-entities-3",
       "title": "治疗方案与实际执行分析实体类图",
       "kind": "class",
       "paper": [
-        210,
-        297
+        594,
+        420
       ],
-      "minimum_font_pt": 11.51
+      "minimum_font_pt": 10.19,
+      "figure_number": 70,
+      "pdf_page": 88,
+      "path": "diagrams/course-C1-clinical-20261022/analysis-entities-3.pdf",
+      "puml_path": "diagrams/course-C1-clinical-20261022/analysis-entities-3.puml",
+      "panel_layout_source": "diagrams/course-C1-clinical-20261022/版面配置.json"
     },
     {
       "stem": "analysis-entities-4",
       "title": "价目、账单与收款分析实体类图",
       "kind": "class",
       "paper": [
-        210,
-        297
+        594,
+        420
       ],
-      "minimum_font_pt": 14.48
+      "minimum_font_pt": 9.14,
+      "figure_number": 71,
+      "pdf_page": 89,
+      "path": "diagrams/course-C1-fees-20261022/analysis-entities-4.pdf",
+      "puml_path": "diagrams/course-C1-fees-20261022/analysis-entities-4.puml",
+      "panel_layout_source": "diagrams/course-C1-fees-20261022/版面配置.json"
     },
     {
       "stem": "analysis-entities-5",
       "title": "费用更正与退费分析实体类图",
       "kind": "class",
       "paper": [
-        210,
-        297
+        594,
+        420
       ],
-      "minimum_font_pt": 19.91
+      "minimum_font_pt": 12.21,
+      "figure_number": 72,
+      "pdf_page": 90,
+      "path": "diagrams/course-C1-fees-20261022/analysis-entities-5.pdf",
+      "puml_path": "diagrams/course-C1-fees-20261022/analysis-entities-5.puml",
+      "panel_layout_source": "diagrams/course-C1-fees-20261022/版面配置.json"
     },
     {
       "stem": "analysis-entities-6",
       "title": "复诊与随访分析实体类图",
       "kind": "class",
       "paper": [
-        210,
+        420,
         297
       ],
-      "minimum_font_pt": 30.05
+      "minimum_font_pt": 10.47,
+      "figure_number": 73,
+      "pdf_page": 91,
+      "path": "diagrams/course-C1-operations-20261022/analysis-entities-6.pdf",
+      "puml_path": "diagrams/course-C1-operations-20261022/analysis-entities-6.puml",
+      "panel_layout_source": "diagrams/course-C1-operations-20261022/版面配置.json"
     },
     {
       "stem": "analysis-entities-7",
       "title": "材料与库存分析实体类图",
       "kind": "class",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 9.2
+      "minimum_font_pt": 9.55,
+      "figure_number": 74,
+      "pdf_page": 92,
+      "path": "diagrams/course-C1-operations-20261022/analysis-entities-7.pdf",
+      "puml_path": "diagrams/course-C1-operations-20261022/analysis-entities-7.puml",
+      "panel_layout_source": "diagrams/course-C1-operations-20261022/版面配置.json"
     },
     {
       "stem": "analysis-entities-8",
       "title": "基础采购与验收分析实体类图",
       "kind": "class",
       "paper": [
-        210,
+        420,
         297
       ],
-      "minimum_font_pt": 14.09
+      "minimum_font_pt": 11.55,
+      "figure_number": 75,
+      "pdf_page": 93,
+      "path": "diagrams/course-C1-operations-20261022/analysis-entities-8.pdf",
+      "puml_path": "diagrams/course-C1-operations-20261022/analysis-entities-8.puml",
+      "panel_layout_source": "diagrams/course-C1-operations-20261022/版面配置.json"
     },
     {
       "stem": "analysis-entities-9",
       "title": "门诊医保与结算款分析实体类图",
       "kind": "class",
       "paper": [
-        210,
-        297
+        594,
+        420
       ],
-      "minimum_font_pt": 14.09
+      "minimum_font_pt": 11.56,
+      "figure_number": 76,
+      "pdf_page": 94,
+      "path": "diagrams/course-C1-insurance-20261022/analysis-entities-9.pdf",
+      "puml_path": "diagrams/course-C1-insurance-20261022/analysis-entities-9.puml",
+      "panel_layout_source": "diagrams/course-C1-insurance-20261022/版面配置.json"
     },
     {
       "stem": "analysis-seq-01",
       "title": "UC-01 维护患者资料分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 11.94
+      "minimum_font_pt": 8.89,
+      "figure_number": 77,
+      "pdf_page": 97,
+      "path": "diagrams/course-C2-arrival-20261022/analysis-seq-01.pdf",
+      "puml_path": "diagrams/course-C2-arrival-20261022/analysis-seq-01.puml"
     },
     {
       "stem": "analysis-seq-02",
       "title": "UC-02 维护预约安排分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 10.13
+      "minimum_font_pt": 8.88,
+      "figure_number": 78,
+      "pdf_page": 98,
+      "path": "diagrams/course-C2-arrival-20261022/analysis-seq-02.pdf",
+      "puml_path": "diagrams/course-C2-arrival-20261022/analysis-seq-02.puml"
     },
     {
       "stem": "analysis-seq-03",
       "title": "UC-03 登记到诊分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 11.07
+      "minimum_font_pt": 11.23,
+      "figure_number": 79,
+      "pdf_page": 99,
+      "path": "diagrams/course-C2-arrival-20261022/analysis-seq-03.pdf",
+      "puml_path": "diagrams/course-C2-arrival-20261022/analysis-seq-03.puml"
     },
     {
       "stem": "analysis-seq-04",
       "title": "UC-04 维护排班与接诊安排分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 10.54
+      "minimum_font_pt": 9.03,
+      "figure_number": 80,
+      "pdf_page": 100,
+      "path": "diagrams/course-C2-arrival-20261022/analysis-seq-04.pdf",
+      "puml_path": "diagrams/course-C2-arrival-20261022/analysis-seq-04.puml"
     },
     {
       "stem": "analysis-seq-05",
       "title": "UC-05 查阅患者诊疗资料分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 10.11
+      "minimum_font_pt": 9.7,
+      "figure_number": 81,
+      "pdf_page": 101,
+      "path": "diagrams/course-C2-clinical-20261022/analysis-seq-05.pdf",
+      "puml_path": "diagrams/course-C2-clinical-20261022/analysis-seq-05.puml"
     },
     {
       "stem": "analysis-seq-06",
       "title": "UC-06 记录检查诊断与健康资料分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 10.06
+      "minimum_font_pt": 10.87,
+      "figure_number": 82,
+      "pdf_page": 102,
+      "path": "diagrams/course-C2-clinical-20261022/analysis-seq-06.pdf",
+      "puml_path": "diagrams/course-C2-clinical-20261022/analysis-seq-06.puml"
     },
     {
       "stem": "analysis-seq-07",
       "title": "UC-07 制定治疗方案并记录患者确认分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 9.56
+      "minimum_font_pt": 12.17,
+      "figure_number": 83,
+      "pdf_page": 103,
+      "path": "diagrams/course-C2-clinical-20261022/analysis-seq-07.pdf",
+      "puml_path": "diagrams/course-C2-clinical-20261022/analysis-seq-07.puml"
     },
     {
       "stem": "analysis-seq-08",
       "title": "UC-08 登记实际治疗与完成项目分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 10.19
+      "minimum_font_pt": 11.91,
+      "figure_number": 84,
+      "pdf_page": 104,
+      "path": "diagrams/course-C2-clinical-20261022/analysis-seq-08.pdf",
+      "puml_path": "diagrams/course-C2-clinical-20261022/analysis-seq-08.puml"
     },
     {
       "stem": "analysis-seq-09",
       "title": "UC-09 签署及补充病历分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 10.87
+      "minimum_font_pt": 14.01,
+      "figure_number": 85,
+      "pdf_page": 105,
+      "path": "diagrams/course-C2-clinical-20261022/analysis-seq-09.pdf",
+      "puml_path": "diagrams/course-C2-clinical-20261022/analysis-seq-09.puml"
     },
     {
       "stem": "analysis-seq-10",
       "title": "UC-10 管理影像与诊疗文书分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 12.2
+      "minimum_font_pt": 9.06,
+      "figure_number": 86,
+      "pdf_page": 106,
+      "path": "diagrams/course-C2-clinical-20261022/analysis-seq-10.pdf",
+      "puml_path": "diagrams/course-C2-clinical-20261022/analysis-seq-10.puml"
     },
     {
       "stem": "analysis-seq-11",
       "title": "UC-11 维护收费项目与价目分析序列图",
       "kind": "sequence",
       "paper": [
-        297,
-        420
+        420,
+        594
       ],
-      "minimum_font_pt": 14.04
+      "minimum_font_pt": 11.51,
+      "figure_number": 87,
+      "pdf_page": 107,
+      "path": "diagrams/course-C2-fees-20261023/analysis-seq-11.pdf",
+      "puml_path": "diagrams/course-C2-fees-20261023/analysis-seq-11.puml"
     },
     {
       "stem": "analysis-seq-12",
       "title": "UC-12 查询账单与待结算费用分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 9.47
+      "minimum_font_pt": 8.91,
+      "figure_number": 88,
+      "pdf_page": 108,
+      "path": "diagrams/course-C2-fees-20261023/analysis-seq-12.pdf",
+      "puml_path": "diagrams/course-C2-fees-20261023/analysis-seq-12.puml"
     },
     {
       "stem": "analysis-seq-13",
       "title": "UC-13 办理患者付款与到账核实分析序列图",
       "kind": "sequence",
       "paper": [
-        297,
-        420
+        420,
+        594
       ],
-      "minimum_font_pt": 12.62
+      "minimum_font_pt": 9.81,
+      "figure_number": 89,
+      "pdf_page": 109,
+      "path": "diagrams/course-C2-fees-20261023/analysis-seq-13.pdf",
+      "puml_path": "diagrams/course-C2-fees-20261023/analysis-seq-13.puml"
     },
     {
-      "stem": "analysis-seq-14",
-      "title": "UC-14 办理费用更正与退费分析序列图",
+      "stem": "analysis-seq-14a",
+      "title": "UC-14 办理费用更正与退费分析序列图（申请与费用调整）",
       "kind": "sequence",
       "paper": [
-        297,
-        420
+        420,
+        594
       ],
-      "minimum_font_pt": 10.82
+      "minimum_font_pt": 11.85,
+      "figure_number": 90,
+      "pdf_page": 110,
+      "path": "diagrams/course-C2-fees-20261023/analysis-seq-14a.pdf",
+      "puml_path": "diagrams/course-C2-fees-20261023/analysis-seq-14a.puml"
+    },
+    {
+      "stem": "analysis-seq-14b",
+      "title": "UC-14 办理费用更正与退费分析序列图（实际退款与结果核实）",
+      "kind": "sequence",
+      "paper": [
+        420,
+        594
+      ],
+      "minimum_font_pt": 11.09,
+      "figure_number": 91,
+      "pdf_page": 111,
+      "path": "diagrams/course-C2-fees-20261023/analysis-seq-14b.pdf",
+      "puml_path": "diagrams/course-C2-fees-20261023/analysis-seq-14b.puml"
     },
     {
       "stem": "analysis-seq-15",
       "title": "UC-15 提出复诊随访要求分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 12.53
+      "minimum_font_pt": 11.64,
+      "figure_number": 92,
+      "pdf_page": 112,
+      "path": "diagrams/course-C2-followup-20261023/analysis-seq-15.pdf",
+      "puml_path": "diagrams/course-C2-followup-20261023/analysis-seq-15.puml"
     },
     {
       "stem": "analysis-seq-16",
       "title": "UC-16 办理复诊联系与预约分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 10.93
+      "minimum_font_pt": 10.41,
+      "figure_number": 93,
+      "pdf_page": 113,
+      "path": "diagrams/course-C2-followup-20261023/analysis-seq-16.pdf",
+      "puml_path": "diagrams/course-C2-followup-20261023/analysis-seq-16.puml"
     },
     {
       "stem": "analysis-seq-17",
       "title": "UC-17 记录复诊随访评估分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 11.94
+      "minimum_font_pt": 10.73,
+      "figure_number": 94,
+      "pdf_page": 114,
+      "path": "diagrams/course-C2-followup-20261023/analysis-seq-17.pdf",
+      "puml_path": "diagrams/course-C2-followup-20261023/analysis-seq-17.puml"
     },
     {
       "stem": "analysis-seq-18",
       "title": "UC-18 维护材料与批次资料分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 11.89,
+      "figure_number": 95,
+      "pdf_page": 115,
+      "path": "diagrams/course-C2-operations-20261023/analysis-seq-18.pdf",
+      "puml_path": "diagrams/course-C2-operations-20261023/analysis-seq-18.puml"
     },
     {
       "stem": "analysis-seq-19",
       "title": "UC-19 登记基础采购与到货验收分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 9.97
+      "minimum_font_pt": 9.76,
+      "figure_number": 96,
+      "pdf_page": 116,
+      "path": "diagrams/course-C2-operations-20261023/analysis-seq-19.pdf",
+      "puml_path": "diagrams/course-C2-operations-20261023/analysis-seq-19.puml"
     },
     {
       "stem": "analysis-seq-20",
       "title": "UC-20 办理库存领用、退回与盘点分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 9.11
+      "minimum_font_pt": 9.76,
+      "figure_number": 97,
+      "pdf_page": 117,
+      "path": "diagrams/course-C2-operations-20261023/analysis-seq-20.pdf",
+      "puml_path": "diagrams/course-C2-operations-20261023/analysis-seq-20.puml"
     },
     {
       "stem": "analysis-seq-21",
       "title": "UC-21 核对日常经营与收付款分析序列图",
       "kind": "sequence",
       "paper": [
-        297,
-        420
+        420,
+        594
       ],
-      "minimum_font_pt": 13.04
+      "minimum_font_pt": 9.43,
+      "figure_number": 98,
+      "pdf_page": 118,
+      "path": "diagrams/course-C2-operations-20261023/analysis-seq-21.pdf",
+      "puml_path": "diagrams/course-C2-operations-20261023/analysis-seq-21.puml"
     },
     {
       "stem": "analysis-seq-22",
       "title": "UC-22 核验医保身份并办理预结算分析序列图",
       "kind": "sequence",
       "paper": [
-        297,
-        420
+        420,
+        594
       ],
-      "minimum_font_pt": 9.79
+      "minimum_font_pt": 9.43,
+      "figure_number": 99,
+      "pdf_page": 119,
+      "path": "diagrams/course-C2-final-20261023/analysis-seq-22.pdf",
+      "puml_path": "diagrams/course-C2-final-20261023/analysis-seq-22.puml"
     },
     {
       "stem": "analysis-seq-23",
       "title": "UC-23 办理医保结算、撤销与回款核对分析序列图",
       "kind": "sequence",
       "paper": [
-        297,
-        420
+        420,
+        594
       ],
-      "minimum_font_pt": 11.93
+      "minimum_font_pt": 9.73,
+      "figure_number": 100,
+      "pdf_page": 120,
+      "path": "diagrams/course-C2-final-20261023/analysis-seq-23.pdf",
+      "puml_path": "diagrams/course-C2-final-20261023/analysis-seq-23.puml"
     },
     {
       "stem": "analysis-seq-24",
       "title": "UC-24 协调诊椅设备准备与停用恢复分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 11.35
+      "minimum_font_pt": 10.12,
+      "figure_number": 101,
+      "pdf_page": 121,
+      "path": "diagrams/course-C2-final-20261023/analysis-seq-24.pdf",
+      "puml_path": "diagrams/course-C2-final-20261023/analysis-seq-24.puml"
     },
     {
       "stem": "analysis-seq-25",
       "title": "UC-25 开立处方并衔接院内外取药分析序列图",
       "kind": "sequence",
       "paper": [
-        210,
-        297
+        420,
+        594
       ],
-      "minimum_font_pt": 10.37
+      "minimum_font_pt": 11.35,
+      "figure_number": 102,
+      "pdf_page": 122,
+      "path": "diagrams/course-C2-final-20261023/analysis-seq-25.pdf",
+      "puml_path": "diagrams/course-C2-final-20261023/analysis-seq-25.puml"
     },
     {
       "stem": "state-appointment",
@@ -1046,7 +1641,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 14.78
+      "minimum_font_pt": 8.84,
+      "figure_number": 103,
+      "pdf_page": 123,
+      "path": "diagrams/course-C3-final-20261023/state-appointment.pdf",
+      "puml_path": "diagrams/course-C3-final-20261023/state-appointment.puml"
     },
     {
       "stem": "state-visit",
@@ -1056,7 +1655,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.82
+      "minimum_font_pt": 8.84,
+      "figure_number": 104,
+      "pdf_page": 123,
+      "path": "diagrams/course-C3-final-20261023/state-visit.pdf",
+      "puml_path": "diagrams/course-C3-final-20261023/state-visit.puml"
     },
     {
       "stem": "state-record",
@@ -1066,7 +1669,11 @@
         297,
         420
       ],
-      "minimum_font_pt": 22.16
+      "minimum_font_pt": 11.13,
+      "figure_number": 105,
+      "pdf_page": 124,
+      "path": "diagrams/course-C3-final-20261023/state-record.pdf",
+      "puml_path": "diagrams/course-C3-final-20261023/state-record.puml"
     },
     {
       "stem": "state-plan",
@@ -1076,7 +1683,11 @@
         297,
         420
       ],
-      "minimum_font_pt": 12.09
+      "minimum_font_pt": 9.04,
+      "figure_number": 106,
+      "pdf_page": 124,
+      "path": "diagrams/course-C3-core-20261023/state-plan.pdf",
+      "puml_path": "diagrams/course-C3-core-20261023/state-plan.puml"
     },
     {
       "stem": "state-followup",
@@ -1086,7 +1697,11 @@
         297,
         420
       ],
-      "minimum_font_pt": 12.09
+      "minimum_font_pt": 10.83,
+      "figure_number": 107,
+      "pdf_page": 125,
+      "path": "diagrams/course-C3-core-20261023/state-followup.pdf",
+      "puml_path": "diagrams/course-C3-core-20261023/state-followup.puml"
     },
     {
       "stem": "state-batch",
@@ -1096,7 +1711,11 @@
         297,
         420
       ],
-      "minimum_font_pt": 12.8
+      "minimum_font_pt": 9.15,
+      "figure_number": 108,
+      "pdf_page": 125,
+      "path": "diagrams/course-C3-final-20261023/state-batch.pdf",
+      "puml_path": "diagrams/course-C3-final-20261023/state-batch.puml"
     },
     {
       "stem": "state-refund",
@@ -1106,7 +1725,11 @@
         297,
         420
       ],
-      "minimum_font_pt": 19.84
+      "minimum_font_pt": 9.57,
+      "figure_number": 109,
+      "pdf_page": 126,
+      "path": "diagrams/course-C3-core-20261023/state-refund.pdf",
+      "puml_path": "diagrams/course-C3-core-20261023/state-refund.puml"
     },
     {
       "stem": "state-payment",
@@ -1116,7 +1739,11 @@
         297,
         420
       ],
-      "minimum_font_pt": 12.09
+      "minimum_font_pt": 13.01,
+      "figure_number": 110,
+      "pdf_page": 126,
+      "path": "diagrams/course-C3-final-20261023/state-payment.pdf",
+      "puml_path": "diagrams/course-C3-final-20261023/state-payment.puml"
     },
     {
       "stem": "state-insurance",
@@ -1126,7 +1753,11 @@
         297,
         420
       ],
-      "minimum_font_pt": 9.0
+      "minimum_font_pt": 9.43,
+      "figure_number": 111,
+      "pdf_page": 127,
+      "path": "diagrams/course-C3-final-20261023/state-insurance.pdf",
+      "puml_path": "diagrams/course-C3-final-20261023/state-insurance.puml"
     },
     {
       "stem": "state-equipment",
@@ -1136,7 +1767,11 @@
         297,
         420
       ],
-      "minimum_font_pt": 16.23
+      "minimum_font_pt": 9.74,
+      "figure_number": 112,
+      "pdf_page": 127,
+      "path": "diagrams/course-C3-final-20261023/state-equipment.pdf",
+      "puml_path": "diagrams/course-C3-final-20261023/state-equipment.puml"
     },
     {
       "stem": "state-prescription",
@@ -1146,7 +1781,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.82
+      "minimum_font_pt": 13.84,
+      "figure_number": 113,
+      "pdf_page": 128,
+      "path": "diagrams/course-C3-final-20261023/state-prescription.pdf",
+      "puml_path": "diagrams/course-C3-final-20261023/state-prescription.puml"
     },
     {
       "stem": "architecture",
@@ -1156,17 +1795,25 @@
         210,
         297
       ],
-      "minimum_font_pt": 9.71
+      "minimum_font_pt": 9.47,
+      "figure_number": 114,
+      "pdf_page": 129,
+      "path": "diagrams/course-D1-mapper-prescription-20261023/architecture.pdf",
+      "puml_path": "diagrams/course-D1-mapper-prescription-20261023/architecture.puml"
     },
     {
       "stem": "database-overall",
       "title": "核心业务数据库关系总图",
       "kind": "erd-overall",
       "paper": [
-        594,
-        841
+        841,
+        1189
       ],
-      "minimum_font_pt": 9.78
+      "minimum_font_pt": 10.55,
+      "figure_number": 115,
+      "pdf_page": 132,
+      "path": "diagrams/course-D1-business-history-20261023/database-overall.pdf",
+      "puml_path": "diagrams/course-D1-business-history-20261023/database-overall.puml"
     },
     {
       "stem": "database-region-1",
@@ -1176,57 +1823,81 @@
         297,
         420
       ],
-      "minimum_font_pt": 9.14
+      "minimum_font_pt": 9.82,
+      "figure_number": 116,
+      "pdf_page": 133,
+      "path": "diagrams/course-D1-arrival-clinical-followup-20261023/database-region-1.pdf",
+      "puml_path": "diagrams/course-D1-arrival-clinical-followup-20261023/database-region-1.puml"
     },
     {
       "stem": "database-region-2",
       "title": "病历与诊疗文书数据库关系图",
       "kind": "erd",
       "paper": [
-        297,
-        420
+        420,
+        297
       ],
-      "minimum_font_pt": 12.37
+      "minimum_font_pt": 9.25,
+      "figure_number": 117,
+      "pdf_page": 134,
+      "path": "diagrams/course-D1-business-history-20261023/database-region-2.pdf",
+      "puml_path": "diagrams/course-D1-business-history-20261023/database-region-2.puml"
     },
     {
       "stem": "database-region-3",
       "title": "治疗方案与实际执行数据库关系图",
       "kind": "erd",
       "paper": [
-        297,
-        210
+        420,
+        297
       ],
-      "minimum_font_pt": 10.62
+      "minimum_font_pt": 12.34,
+      "figure_number": 118,
+      "pdf_page": 135,
+      "path": "diagrams/course-D1-plan-payment-20261023/database-region-3.pdf",
+      "puml_path": "diagrams/course-D1-plan-payment-20261023/database-region-3.puml"
     },
     {
       "stem": "database-region-4",
       "title": "价目、账单与收款数据库关系图",
       "kind": "erd",
       "paper": [
-        297,
-        210
+        420,
+        297
       ],
-      "minimum_font_pt": 9.27
+      "minimum_font_pt": 9.35,
+      "figure_number": 119,
+      "pdf_page": 136,
+      "path": "diagrams/course-D1-business-history-20261023/database-region-4.pdf",
+      "puml_path": "diagrams/course-D1-business-history-20261023/database-region-4.puml"
     },
     {
       "stem": "database-region-5",
       "title": "费用更正与退费数据库关系图",
       "kind": "erd",
       "paper": [
-        210,
-        297
+        297,
+        210
       ],
-      "minimum_font_pt": 9.29
+      "minimum_font_pt": 9.22,
+      "figure_number": 120,
+      "pdf_page": 137,
+      "path": "diagrams/course-D1-business-history-20261023/database-region-5.pdf",
+      "puml_path": "diagrams/course-D1-business-history-20261023/database-region-5.puml"
     },
     {
       "stem": "database-region-6",
       "title": "复诊与随访数据库关系图",
       "kind": "erd",
       "paper": [
-        210,
-        297
+        297,
+        210
       ],
-      "minimum_font_pt": 13.77
+      "minimum_font_pt": 11.3,
+      "figure_number": 121,
+      "pdf_page": 138,
+      "path": "diagrams/course-D1-business-history-20261023/database-region-6.pdf",
+      "puml_path": "diagrams/course-D1-business-history-20261023/database-region-6.puml"
     },
     {
       "stem": "database-region-7",
@@ -1236,207 +1907,151 @@
         420,
         297
       ],
-      "minimum_font_pt": 10.46
+      "minimum_font_pt": 9.75,
+      "figure_number": 122,
+      "pdf_page": 139,
+      "path": "diagrams/course-D1-business-history-20261023/database-region-7.pdf",
+      "puml_path": "diagrams/course-D1-business-history-20261023/database-region-7.puml"
     },
     {
       "stem": "database-region-8",
       "title": "基础采购与验收数据库关系图",
       "kind": "erd",
       "paper": [
-        297,
-        210
+        420,
+        297
       ],
-      "minimum_font_pt": 11.03
+      "minimum_font_pt": 11.62,
+      "figure_number": 123,
+      "pdf_page": 140,
+      "path": "diagrams/course-D1-business-history-20261023/database-region-8.pdf",
+      "puml_path": "diagrams/course-D1-business-history-20261023/database-region-8.puml"
     },
     {
       "stem": "database-region-9",
       "title": "门诊医保与结算款数据库关系图",
       "kind": "erd",
       "paper": [
-        297,
-        210
+        420,
+        297
       ],
-      "minimum_font_pt": 11.82
+      "minimum_font_pt": 9.85,
+      "figure_number": 124,
+      "pdf_page": 141,
+      "path": "diagrams/course-D1-business-history-20261023/database-region-9.pdf",
+      "puml_path": "diagrams/course-D1-business-history-20261023/database-region-9.puml"
     },
     {
       "stem": "design-classes-1",
       "title": "接诊服务设计类协作图",
       "kind": "class",
       "paper": [
-        210,
+        420,
         297
       ],
-      "minimum_font_pt": 12.19
+      "minimum_font_pt": 11.21,
+      "figure_number": 125,
+      "pdf_page": 151,
+      "path": "diagrams/course-D-final-20261023/design-classes-1.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/design-classes-1.puml"
     },
     {
       "stem": "design-classes-2",
       "title": "临床服务设计类协作图",
       "kind": "class",
       "paper": [
-        210,
+        420,
         297
       ],
-      "minimum_font_pt": 10.42
+      "minimum_font_pt": 9.61,
+      "figure_number": 126,
+      "pdf_page": 152,
+      "path": "diagrams/course-D-final-20261023/design-classes-2.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/design-classes-2.puml"
     },
     {
       "stem": "design-classes-3",
       "title": "收费与复诊服务设计类协作图",
       "kind": "class",
       "paper": [
-        210,
-        297
+        594,
+        420
       ],
-      "minimum_font_pt": 8.88
+      "minimum_font_pt": 9.33,
+      "figure_number": 127,
+      "pdf_page": 153,
+      "path": "diagrams/course-D-final-20261023/design-classes-3.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/design-classes-3.puml"
     },
     {
       "stem": "design-classes-4",
-      "title": "物资与管理服务设计类协作图",
+      "title": "物资与库存服务设计类协作图",
       "kind": "class",
       "paper": [
-        210,
+        420,
         297
       ],
-      "minimum_font_pt": 14.96
+      "minimum_font_pt": 9.04,
+      "figure_number": 128,
+      "pdf_page": 154,
+      "path": "diagrams/course-D-final-20261023/design-classes-4.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/design-classes-4.puml"
     },
     {
       "stem": "design-classes-5",
       "title": "医保与药学服务设计类协作图",
       "kind": "class",
       "paper": [
-        210,
-        297
+        594,
+        420
       ],
-      "minimum_font_pt": 14.65
-    },
-    {
-      "stem": "design-seq-02",
-      "title": "维护预约安排设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.88
-    },
-    {
-      "stem": "design-seq-06",
-      "title": "记录检查诊断与健康资料设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.88
-    },
-    {
-      "stem": "design-seq-07",
-      "title": "制定治疗方案并记录患者确认设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.67
-    },
-    {
-      "stem": "design-seq-08",
-      "title": "登记实际治疗与完成项目设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.88
-    },
-    {
-      "stem": "design-seq-13",
-      "title": "办理患者付款与到账核实设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.47
+      "minimum_font_pt": 11.89,
+      "figure_number": 129,
+      "pdf_page": 155,
+      "path": "diagrams/course-D-final-20261023/design-classes-5.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/design-classes-5.puml"
     },
     {
       "stem": "design-seq-14",
       "title": "UC-14 办理费用更正与退费设计序列图",
       "kind": "sequence",
       "paper": [
-        297,
-        420
+        420,
+        594
       ],
-      "minimum_font_pt": 10.57
-    },
-    {
-      "stem": "design-seq-16",
-      "title": "办理复诊联系与预约设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.67
-    },
-    {
-      "stem": "design-seq-19",
-      "title": "登记基础采购与到货验收设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.58
-    },
-    {
-      "stem": "design-seq-20",
-      "title": "办理库存领用、退回与盘点设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.47
+      "minimum_font_pt": 8.97,
+      "figure_number": 130,
+      "pdf_page": 156,
+      "path": "diagrams/course-D-final-20261023/design-seq-14.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/design-seq-14.puml"
     },
     {
       "stem": "design-seq-22",
       "title": "UC-22 核验医保身份并办理预结算设计序列图",
       "kind": "sequence",
       "paper": [
-        297,
-        420
+        420,
+        594
       ],
-      "minimum_font_pt": 11.44
-    },
-    {
-      "stem": "design-seq-24",
-      "title": "协调诊椅设备准备与停用恢复设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.67
-    },
-    {
-      "stem": "design-seq-25",
-      "title": "开立处方并衔接院内外取药设计序列图",
-      "kind": "sequence",
-      "paper": [
-        210,
-        297
-      ],
-      "minimum_font_pt": 9.88
+      "minimum_font_pt": 9.14,
+      "figure_number": 131,
+      "pdf_page": 157,
+      "path": "diagrams/course-D-final-20261023/design-seq-22.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/design-seq-22.puml"
     },
     {
       "stem": "screen-navigation",
-      "title": "岗位导航与主要业务衔接",
+      "title": "岗位导航与授权入口",
       "kind": "state",
       "paper": [
-        210,
-        297
+        297,
+        420
       ],
-      "minimum_font_pt": 13.46
+      "minimum_font_pt": 13.84,
+      "figure_number": 132,
+      "pdf_page": 158,
+      "path": "diagrams/course-D-final-20261023/screen-navigation.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-navigation.puml"
     },
     {
       "stem": "screen-1",
@@ -1446,7 +2061,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 12.98,
+      "figure_number": 133,
+      "pdf_page": 159,
+      "path": "diagrams/course-D-final-20261023/screen-1.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-1.puml"
     },
     {
       "stem": "screen-2",
@@ -1456,7 +2075,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 13.11,
+      "figure_number": 134,
+      "pdf_page": 159,
+      "path": "diagrams/course-D-final-20261023/screen-2.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-2.puml"
     },
     {
       "stem": "screen-3",
@@ -1466,7 +2089,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 13.11,
+      "figure_number": 135,
+      "pdf_page": 160,
+      "path": "diagrams/course-D-final-20261023/screen-3.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-3.puml"
     },
     {
       "stem": "screen-4",
@@ -1476,7 +2103,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 13.11,
+      "figure_number": 136,
+      "pdf_page": 160,
+      "path": "diagrams/course-D-final-20261023/screen-4.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-4.puml"
     },
     {
       "stem": "screen-5",
@@ -1486,7 +2117,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 12.98,
+      "figure_number": 137,
+      "pdf_page": 161,
+      "path": "diagrams/course-D-final-20261023/screen-5.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-5.puml"
     },
     {
       "stem": "screen-6",
@@ -1496,7 +2131,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 13.11,
+      "figure_number": 138,
+      "pdf_page": 161,
+      "path": "diagrams/course-D-final-20261023/screen-6.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-6.puml"
     },
     {
       "stem": "screen-7",
@@ -1506,7 +2145,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 13.11,
+      "figure_number": 139,
+      "pdf_page": 162,
+      "path": "diagrams/course-D-final-20261023/screen-7.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-7.puml"
     },
     {
       "stem": "screen-8",
@@ -1516,7 +2159,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 13.11,
+      "figure_number": 140,
+      "pdf_page": 162,
+      "path": "diagrams/course-D-final-20261023/screen-8.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-8.puml"
     },
     {
       "stem": "screen-9",
@@ -1526,7 +2173,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 13.11,
+      "figure_number": 141,
+      "pdf_page": 163,
+      "path": "diagrams/course-D-final-20261023/screen-9.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-9.puml"
     },
     {
       "stem": "screen-10",
@@ -1536,7 +2187,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 9.68
+      "minimum_font_pt": 13.25,
+      "figure_number": 142,
+      "pdf_page": 163,
+      "path": "diagrams/course-D-final-20261023/screen-10.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-10.puml"
     },
     {
       "stem": "screen-11",
@@ -1546,7 +2201,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 13.11,
+      "figure_number": 143,
+      "pdf_page": 164,
+      "path": "diagrams/course-D-final-20261023/screen-11.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-11.puml"
     },
     {
       "stem": "screen-12",
@@ -1556,7 +2215,11 @@
         210,
         297
       ],
-      "minimum_font_pt": 10.58
+      "minimum_font_pt": 12.98,
+      "figure_number": 144,
+      "pdf_page": 164,
+      "path": "diagrams/course-D-final-20261023/screen-12.pdf",
+      "puml_path": "diagrams/course-D-final-20261023/screen-12.puml"
     }
   ],
   "scope": "预约接诊、临床处方、支付医保、复诊、资源准备、采购库存及日常核对",
@@ -1590,5 +2253,88 @@
     "25": 14,
     "26": 14,
     "28": 19
-  }
+  },
+  "version": "2026-10-23-course-summary-D-final",
+  "actual_pdf_pages": 164,
+  "business_usecases": 7,
+  "internal_support_workflows": 3,
+  "scope_note": "164页144图；ABCD文档修订静态核对完成，77表986字段；D2/D3完整精化并合并一页；真实机构认可、代码实现和实测验收独立待办。",
+  "completed_full_usecase_specs": [
+    "UC-01",
+    "UC-02",
+    "UC-03",
+    "UC-04",
+    "UC-05",
+    "UC-06",
+    "UC-07",
+    "UC-08",
+    "UC-09",
+    "UC-10",
+    "UC-11",
+    "UC-12",
+    "UC-13",
+    "UC-14",
+    "UC-15",
+    "UC-16",
+    "UC-17",
+    "UC-18",
+    "UC-19",
+    "UC-20",
+    "UC-21",
+    "UC-22",
+    "UC-23",
+    "UC-24",
+    "UC-25"
+  ],
+  "completed_analysis_entity_groups": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "completed_analysis_sequence_cases": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ],
+  "completed_core_state_machines": [
+    "plan_version",
+    "followup_requirement",
+    "fee_request",
+    "appointment",
+    "visit",
+    "clinical_record",
+    "material_batch",
+    "payment_order",
+    "insurance_case",
+    "equipment_occupancy",
+    "prescription"
+  ]
 }

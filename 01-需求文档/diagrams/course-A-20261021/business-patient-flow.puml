@@ -1,0 +1,121 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 40
+skinparam ranksep 50
+|前台|
+start
+:受理预约或现场就诊需求;
+:核对身份、就诊原因与时间意向;
+|牙医|
+if (存在需优先处理的情况?) then (是)
+ :评估接诊优先级与处置条件;
+ if (需要转诊?) then (是)
+  :交付转诊建议并完成必要记录;
+  stop
+ else (优先处置)
+  :协调所需人员和接诊资源;
+  |前台|
+  :记录实际到诊及优先处置交接;
+ endif
+else (否)
+ |前台|
+ :协调牙医、诊椅及必要设备时段;
+ :确认预约，患者到店后登记到诊;
+endif
+|前台|
+if (患者拟使用医保?) then (是)
+ :核验参保身份与就诊登记条件;
+else (否)
+ :明确按自费方式办理;
+endif
+|诊疗助理|
+:确认诊椅、器械和关键设备就绪;
+|牙医|
+:核对病史、过敏和当前情况;
+:检查诊断，按需安排影像或其他检查;
+:向患者说明治疗方案、费用和用药安排;
+if (患者确认本次治疗?) then (是)
+ :核实执行前必要手续;
+ :实施治疗，记录实际项目与用料;
+else (暂缓或拒绝)
+ :记录决定，给出相应后续建议;
+endif
+if (需要处方?) then (是)
+ :开立并确认处方及用药指导;
+ if (采用院内取药且机构人员条件具备?) then (是)
+  |药学岗位|
+  :审核处方并核对实际供药条件;
+  if (审核及供药条件满足?) then (是)
+   :核对患者后实际发药并交代用药;
+   :记录实际数量、批次及费用来源;
+  else (否)
+   :反馈牙医处理或协调院外取药;
+  endif
+  |牙医|
+ else (院外取药)
+  :交付有效处方及用药指导;
+ endif
+endif
+:完成病历与后续诊疗意见;
+:确认当次诊疗操作结束并交接;
+fork
+|诊疗助理|
+:诊椅腾空后清洁、器械回收;
+:确认环境与设备可用后恢复接诊资源;
+fork again
+|收费人员|
+:按实际发生项目核对费用;
+if (使用医保结算?) then (是)
+ :核对项目并取得有效预结算;
+ :说明预估分摊并记录患者选择;
+ if (患者确认医保且预结算有效?) then (是)
+  :办理正式结算并核实原笔结果;
+  if (正式成功?) then (是)
+   :确定最终医保及患者承担;
+  else (未成功或未知)
+   :保留待核实，不确认最终医保分摊;
+  endif
+ else (暂缓或其他选择)
+  :核实原医保未完事项并协调后续安排;
+ endif
+endif
+if (患者承担已明确且无原笔未知?) then (是)
+ :核实自费或自付收款，交付凭据;
+else (否)
+ :说明待处理原因并安排后续核实;
+endif
+|前台|
+:说明复诊安排并接续联系待办;
+end fork
+stop
+
+
+
+@enduml

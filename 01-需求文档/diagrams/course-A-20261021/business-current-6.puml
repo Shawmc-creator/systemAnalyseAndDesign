@@ -1,0 +1,50 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "前台" as F
+actor "收费人员" as C
+entity "诊疗费用与医保记录" as R
+participant "医保平台" as I
+P -> F : 提出医保办理并提供必要凭证
+F -> I : 核验身份和就诊登记条件
+I --> F : 返回核验及登记结果
+F -> R : 保存核验依据并交接当次办理
+alt 条件符合且患者继续医保办理
+ C -> R : 查诊断、实际项目及费用来源
+ R --> C : 本次诊疗费用资料
+ C -> I : 核对适用编码并办理预结算
+ I --> C : 返回预估分摊与自费项目
+ C -> P : 说明基金、个账及其他自付
+ P --> C : 确认医保、暂缓或选择自费
+ alt 确认医保且预结算仍有效
+  C -> I : 按原笔提交正式结算
+  I --> C : 正式成功、明确失败或未知
+  alt 正式成功
+   C -> R : 记录结算号和最终分摊
+   C -> P : 交付结算结果及患者其他待付
+  else 未成功或未知
+   C -> I : 查明原笔结果后再继续
+   C -> R : 保留未完成状态与后续责任
+  end
+ else 暂缓或改为自费
+  C -> R : 记录选择并核实原医保未完事项
+ end
+else 核验未通过或结果未明
+ F -> P : 说明原因并协调补充、核实或其他安排
+end
+@enduml

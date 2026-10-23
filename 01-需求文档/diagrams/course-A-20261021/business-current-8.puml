@@ -1,0 +1,49 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "诊疗助理" as A
+actor "诊所负责人" as M
+actor "供应商" as Sup
+entity "采购、验收与库存记录" as R
+A -> R : 核对余量、效期与日常需求
+R --> A : 当前物资与待处理数量
+A -> M : 提出采购项目和需求
+M -> Sup : 确认规格、数量及交付安排
+Sup --> M : 反馈供货约定
+M -> R : 留存已确认采购
+loop 每次实际到货
+ Sup -> A : 交付实物与随货依据
+ A -> R : 查原采购并记录到货、批次及验收结果
+ alt 存在验收合格量
+  A -> R : 仅将本次合格量登记入库
+ else 无合格量
+  A -> R : 保留待检或拒收，不增加可用量
+ end
+ opt 数量、质量或效期不符
+  A -> M : 交接差异和实物隔离情况
+  M -> Sup : 协调补正或其他处理
+ end
+end
+opt 发生日常领用、实际使用或未用退回
+ A -> R : 核对批次来源并分别登记实际数量
+end
+opt 需要盘点核实
+ A -> R : 记录实点量及账面差异
+ A -> M : 交接差异依据
+ M -> R : 核实并确认调整或不予调整
+end
+@enduml

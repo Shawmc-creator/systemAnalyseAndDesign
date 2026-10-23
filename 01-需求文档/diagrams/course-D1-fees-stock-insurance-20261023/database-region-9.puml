@@ -1,0 +1,88 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam EntityBackgroundColor white
+skinparam EntityBorderColor black
+skinparam nodesep 34
+skinparam ranksep 45
+hide circle
+left to right direction
+entity "医保身份核验\ninsurance_identity" as insurance_identity {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+}
+entity "医保项目对应\ninsurance_item_mapping" as insurance_item_mapping {
+* id : INTEGER <<PK>>
+ service_id : INTEGER <<FK>>
+ material_id : INTEGER <<FK>>
+}
+entity "医保就诊办理\ninsurance_case" as insurance_case {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+* visit_id : INTEGER <<FK>>
+ bill_id : INTEGER <<FK>>
+ identity_id : INTEGER <<FK>>
+ previous_case_id : INTEGER <<FK>>
+}
+entity "医保费用明细\ninsurance_fee" as insurance_fee {
+* id : INTEGER <<PK>>
+* insurance_case_id : INTEGER <<FK>>
+* bill_item_id : INTEGER <<FK>>
+ mapping_id : INTEGER <<FK>>
+* is_self_pay : INTEGER
+ insurance_code_snapshot : TEXT
+* fee_revision : INTEGER
+}
+entity "医保结算\ninsurance_settlement" as insurance_settlement {
+* id : INTEGER <<PK>>
+* insurance_case_id : INTEGER <<FK>>
+}
+entity "医保撤销办理\ninsurance_reversal" as insurance_reversal {
+* id : INTEGER <<PK>>
+* settlement_id : INTEGER <<FK>>
+ fee_request_id : INTEGER <<FK>>
+}
+entity "医保结算款收付\ninsurance_fund_receipt" as insurance_fund_receipt {
+* id : INTEGER <<PK>>
+* settlement_id : INTEGER <<FK>>
+}
+entity "应收账目（跨区引用）\nbill" as bill {
+* id : INTEGER <<PK>>
+}
+entity "应收项目（跨区引用）\nbill_item" as bill_item {
+* id : INTEGER <<PK>>
+}
+entity "费用申请（跨区引用）\nfee_request" as fee_request {
+* id : INTEGER <<PK>>
+}
+entity "材料（跨区引用）\nmaterial" as material {
+* id : INTEGER <<PK>>
+}
+entity "患者（跨区引用）\npatient" as patient {
+* id : INTEGER <<PK>>
+}
+entity "收费项目（跨区引用）\nservice" as service {
+* id : INTEGER <<PK>>
+}
+entity "就诊（跨区引用）\nvisit" as visit {
+* id : INTEGER <<PK>>
+}
+patient ||--o{ insurance_identity
+service |o--o{ insurance_item_mapping
+material |o--o{ insurance_item_mapping
+patient ||--o{ insurance_case
+visit ||--o{ insurance_case
+bill |o--o{ insurance_case
+insurance_identity |o--o{ insurance_case
+insurance_case |o--o{ insurance_case
+insurance_case ||--o{ insurance_fee
+bill_item ||--o{ insurance_fee
+insurance_item_mapping |o--o{ insurance_fee
+insurance_case ||--o{ insurance_settlement
+insurance_settlement ||--o{ insurance_reversal
+fee_request |o--o{ insurance_reversal
+insurance_settlement ||--o{ insurance_fund_receipt
+@enduml

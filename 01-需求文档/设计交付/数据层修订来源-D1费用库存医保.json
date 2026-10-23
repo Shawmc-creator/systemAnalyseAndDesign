@@ -1,0 +1,446 @@
+{
+  "date": "2026-10-23",
+  "scope": "D1费用退费、材料库存、采购验收、医保关系及关键约束",
+  "new_tables": [],
+  "new_fields": [
+    "purchase_order.cancellation_reason",
+    "insurance_fee.is_self_pay",
+    "insurance_fee.insurance_code_snapshot",
+    "insurance_fee.fee_revision",
+    "insurance_case.previous_case_id",
+    "insurance_reversal.approved_by",
+    "insurance_reversal.approved_at",
+    "insurance_reversal.approval_basis",
+    "insurance_reversal.verified_by",
+    "insurance_reversal.verification_note"
+  ],
+  "removed_fields": [
+    "supplier.settlement_basis",
+    "supplier.verified_by",
+    "purchase_receipt_item.accepted_amount_cents"
+  ],
+  "modified_tables": [
+    "fee_request",
+    "patient_refund",
+    "batch_stock",
+    "inventory_movement",
+    "material_usage",
+    "supplier",
+    "purchase_order",
+    "purchase_receipt_item",
+    "insurance_identity",
+    "insurance_item_mapping",
+    "insurance_case",
+    "insurance_fee",
+    "insurance_settlement",
+    "insurance_reversal",
+    "insurance_fund_receipt"
+  ],
+  "region_details": [
+    {
+      "group": 5,
+      "name": "费用更正与退费",
+      "main_tables": [
+        "fee_request",
+        "fee_adjustment",
+        "fee_adjustment_item",
+        "patient_refund"
+      ],
+      "reference_tables": [
+        "bill",
+        "bill_item",
+        "patient_funds",
+        "patient_payment"
+      ],
+      "business_relations": [
+        {
+          "parent": "patient_funds",
+          "child": "fee_request",
+          "field": "patient_funds_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "bill",
+          "child": "fee_request",
+          "field": "bill_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient_payment",
+          "child": "fee_request",
+          "field": "patient_payment_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "fee_request",
+          "child": "fee_adjustment",
+          "field": "fee_request_id",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "parent": "bill",
+          "child": "fee_adjustment",
+          "field": "bill_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "fee_adjustment",
+          "child": "fee_adjustment_item",
+          "field": "fee_adjustment_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "bill_item",
+          "child": "fee_adjustment_item",
+          "field": "bill_item_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "fee_request",
+          "child": "patient_refund",
+          "field": "fee_request_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient_payment",
+          "child": "patient_refund",
+          "field": "patient_payment_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient_funds",
+          "child": "patient_refund",
+          "field": "patient_funds_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient_refund",
+          "child": "patient_refund",
+          "field": "previous_attempt_id",
+          "nullable": true,
+          "unique": false
+        }
+      ],
+      "common_staff_links": "经办、提出、批准及核实身份在逻辑模型保留，图中不逐条重复职员审计外键。"
+    },
+    {
+      "group": 7,
+      "name": "材料与库存",
+      "main_tables": [
+        "material",
+        "material_batch",
+        "batch_change",
+        "stock_location",
+        "batch_stock",
+        "inventory_movement",
+        "material_usage",
+        "stock_count"
+      ],
+      "reference_tables": [
+        "purchase_receipt_item",
+        "visit"
+      ],
+      "business_relations": [
+        {
+          "parent": "material",
+          "child": "material_batch",
+          "field": "material_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "material_batch",
+          "child": "batch_change",
+          "field": "material_batch_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "material_batch",
+          "child": "batch_stock",
+          "field": "material_batch_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "stock_location",
+          "child": "batch_stock",
+          "field": "stock_location_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "batch_stock",
+          "child": "inventory_movement",
+          "field": "batch_stock_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "inventory_movement",
+          "child": "inventory_movement",
+          "field": "original_movement_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "stock_count",
+          "child": "inventory_movement",
+          "field": "stock_count_id",
+          "nullable": true,
+          "unique": true
+        },
+        {
+          "parent": "purchase_receipt_item",
+          "child": "inventory_movement",
+          "field": "purchase_receipt_item_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "inventory_movement",
+          "child": "material_usage",
+          "field": "inventory_movement_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "material_usage",
+          "field": "visit_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "batch_stock",
+          "child": "stock_count",
+          "field": "batch_stock_id",
+          "nullable": false,
+          "unique": false
+        }
+      ],
+      "common_staff_links": "经办、提出、批准及核实身份在逻辑模型保留，图中不逐条重复职员审计外键。"
+    },
+    {
+      "group": 8,
+      "name": "基础采购与验收",
+      "main_tables": [
+        "supplier",
+        "purchase_order",
+        "purchase_order_item",
+        "purchase_receipt",
+        "purchase_receipt_item"
+      ],
+      "reference_tables": [
+        "material",
+        "material_batch",
+        "stock_location"
+      ],
+      "business_relations": [
+        {
+          "parent": "supplier",
+          "child": "purchase_order",
+          "field": "supplier_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "purchase_order",
+          "child": "purchase_order_item",
+          "field": "purchase_order_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "material",
+          "child": "purchase_order_item",
+          "field": "material_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "purchase_order",
+          "child": "purchase_receipt",
+          "field": "purchase_order_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "purchase_receipt",
+          "child": "purchase_receipt_item",
+          "field": "purchase_receipt_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "purchase_order_item",
+          "child": "purchase_receipt_item",
+          "field": "purchase_order_item_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "material_batch",
+          "child": "purchase_receipt_item",
+          "field": "material_batch_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "stock_location",
+          "child": "purchase_receipt_item",
+          "field": "stock_location_id",
+          "nullable": true,
+          "unique": false
+        }
+      ],
+      "common_staff_links": "经办、提出、批准及核实身份在逻辑模型保留，图中不逐条重复职员审计外键。"
+    },
+    {
+      "group": 9,
+      "name": "门诊医保与结算款",
+      "main_tables": [
+        "insurance_identity",
+        "insurance_item_mapping",
+        "insurance_case",
+        "insurance_fee",
+        "insurance_settlement",
+        "insurance_reversal",
+        "insurance_fund_receipt"
+      ],
+      "reference_tables": [
+        "bill",
+        "bill_item",
+        "fee_request",
+        "material",
+        "patient",
+        "service",
+        "visit"
+      ],
+      "business_relations": [
+        {
+          "parent": "patient",
+          "child": "insurance_identity",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "service",
+          "child": "insurance_item_mapping",
+          "field": "service_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "material",
+          "child": "insurance_item_mapping",
+          "field": "material_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient",
+          "child": "insurance_case",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "insurance_case",
+          "field": "visit_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "bill",
+          "child": "insurance_case",
+          "field": "bill_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "insurance_identity",
+          "child": "insurance_case",
+          "field": "identity_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "insurance_case",
+          "child": "insurance_case",
+          "field": "previous_case_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "insurance_case",
+          "child": "insurance_fee",
+          "field": "insurance_case_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "bill_item",
+          "child": "insurance_fee",
+          "field": "bill_item_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "insurance_item_mapping",
+          "child": "insurance_fee",
+          "field": "mapping_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "insurance_case",
+          "child": "insurance_settlement",
+          "field": "insurance_case_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "insurance_settlement",
+          "child": "insurance_reversal",
+          "field": "settlement_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "fee_request",
+          "child": "insurance_reversal",
+          "field": "fee_request_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "insurance_settlement",
+          "child": "insurance_fund_receipt",
+          "field": "settlement_id",
+          "nullable": false,
+          "unique": false
+        }
+      ],
+      "common_staff_links": "经办、提出、批准及核实身份在逻辑模型保留，图中不逐条重复职员审计外键。"
+    }
+  ],
+  "remaining": [
+    "费用申请、价目、随访调整及盘点重核、验收历次数量、预结算历次结果等历史保存方式",
+    "处方更正作废交付、文件误关联依据等关键保存",
+    "旧字段source编号、状态引用、泛化和值表取舍、D-04数据访问及D2/D3",
+    "实际程序、迁移及真实验收另行对齐"
+  ]
+}

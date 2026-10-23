@@ -1,0 +1,973 @@
+{
+  "date": "2026-10-21",
+  "status": "A模型修订完成；严格符合课程要求的整体复核尚未通过",
+  "pdf_pages": 180,
+  "figures": 153,
+  "a_plantuml_diagrams": 32,
+  "business_usecases": 7,
+  "internal_support_workflows": 3,
+  "current_business_sequences": 10,
+  "improved_business_sequences": 10,
+  "system_usecases": 25,
+  "logical_tables": 69,
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 71,
+    "D": 119
+  },
+  "addressed_findings": [
+    "A-03",
+    "A-04",
+    "A-06"
+  ],
+  "remaining_A_evidence": [
+    "A-01主要涉众的实际认可",
+    "A-05真实机构现状核实",
+    "业务蓝图的甲方真实认可"
+  ],
+  "next_batch": "B：UC-01—04完整规约；明确涉众利益、可检测条件、步骤分支、字段、规则和质量设计约束",
+  "validation": {
+    "latex": "passed",
+    "plantuml": "passed",
+    "unique_figure_captions": 153,
+    "figure_files_present": true,
+    "single_page_vector_figures": true,
+    "new_diagrams_minimum_font_pt": 9.22,
+    "layout_warnings": 0,
+    "visual_review": "全部A页面及最终调整页已渲染检查",
+    "bcd_source_unchanged": true,
+    "schema_and_model_unchanged": true
+  },
+  "whole_document_course_compliant": false,
+  "actual_clinic_workflow_verified": false,
+  "client_blueprint_signed": false,
+  "files": {
+    "tex_sha256": "355104a4957ba6d42b935136d97639e50e7cf775b260fb537f8405c714a7cff7",
+    "pdf_sha256": "9df5cf74ab3418d847325bd43af1c855d0130be9ddf7c3d032c863815a6106eb"
+  },
+  "reference_summary": "主要参考课程总结和既有业务范围；成熟系统官方资料的具体对照及边界见修订工作底稿",
+  "figure_pages": [
+    {
+      "number": 1,
+      "title": "诊所业务用例图",
+      "pdf_page": 7,
+      "source": "diagrams/course-A-20261021/business-overall.puml"
+    },
+    {
+      "number": 2,
+      "title": "BUC-01 预约与到诊业务用例图",
+      "pdf_page": 8,
+      "source": "diagrams/course-A-20261021/buc-01.puml"
+    },
+    {
+      "number": 3,
+      "title": "BUC-02 检查诊断与口腔治疗业务用例图",
+      "pdf_page": 8,
+      "source": "diagrams/course-A-20261021/buc-02.puml"
+    },
+    {
+      "number": 4,
+      "title": "BUC-03 处方与用药服务业务用例图",
+      "pdf_page": 8,
+      "source": "diagrams/course-A-20261021/buc-03.puml"
+    },
+    {
+      "number": 5,
+      "title": "BUC-04 复诊与随访业务用例图",
+      "pdf_page": 9,
+      "source": "diagrams/course-A-20261021/buc-04.puml"
+    },
+    {
+      "number": 6,
+      "title": "BUC-05 自费与自付缴费业务用例图",
+      "pdf_page": 9,
+      "source": "diagrams/course-A-20261021/buc-05.puml"
+    },
+    {
+      "number": 7,
+      "title": "BUC-06 医保门诊结算业务用例图",
+      "pdf_page": 9,
+      "source": "diagrams/course-A-20261021/buc-06.puml"
+    },
+    {
+      "number": 8,
+      "title": "BUC-07 费用更正与退费业务用例图",
+      "pdf_page": 10,
+      "source": "diagrams/course-A-20261021/buc-07.puml"
+    },
+    {
+      "number": 9,
+      "title": "内部支持工作的责任与服务衔接",
+      "pdf_page": 11,
+      "source": "diagrams/course-A-20261021/business-support.puml"
+    },
+    {
+      "number": 10,
+      "title": "预约与到诊现状业务序列图",
+      "pdf_page": 13,
+      "source": "diagrams/course-A-20261021/business-current-1.puml"
+    },
+    {
+      "number": 11,
+      "title": "检查诊断与口腔治疗现状业务序列图",
+      "pdf_page": 14,
+      "source": "diagrams/course-A-20261021/business-current-2.puml"
+    },
+    {
+      "number": 12,
+      "title": "处方与用药服务现状业务序列图",
+      "pdf_page": 15,
+      "source": "diagrams/course-A-20261021/business-current-3.puml"
+    },
+    {
+      "number": 13,
+      "title": "复诊与随访现状业务序列图",
+      "pdf_page": 16,
+      "source": "diagrams/course-A-20261021/business-current-4.puml"
+    },
+    {
+      "number": 14,
+      "title": "自费与自付缴费现状业务序列图",
+      "pdf_page": 17,
+      "source": "diagrams/course-A-20261021/business-current-5.puml"
+    },
+    {
+      "number": 15,
+      "title": "医保门诊结算现状业务序列图",
+      "pdf_page": 18,
+      "source": "diagrams/course-A-20261021/business-current-6.puml"
+    },
+    {
+      "number": 16,
+      "title": "费用更正与退费现状业务序列图",
+      "pdf_page": 19,
+      "source": "diagrams/course-A-20261021/business-current-7.puml"
+    },
+    {
+      "number": 17,
+      "title": "采购与库存保障现状业务序列图",
+      "pdf_page": 20,
+      "source": "diagrams/course-A-20261021/business-current-8.puml"
+    },
+    {
+      "number": 18,
+      "title": "接诊资源准备与停用恢复现状业务序列图",
+      "pdf_page": 21,
+      "source": "diagrams/course-A-20261021/business-current-9.puml"
+    },
+    {
+      "number": 19,
+      "title": "日常经营与款项核对现状业务序列图",
+      "pdf_page": 22,
+      "source": "diagrams/course-A-20261021/business-current-10.puml"
+    },
+    {
+      "number": 20,
+      "title": "预约与到诊改进业务序列图",
+      "pdf_page": 23,
+      "source": "diagrams/course-A-20261021/business-improved-1.puml"
+    },
+    {
+      "number": 21,
+      "title": "检查诊断与口腔治疗改进业务序列图",
+      "pdf_page": 24,
+      "source": "diagrams/course-A-20261021/business-improved-2.puml"
+    },
+    {
+      "number": 22,
+      "title": "处方与用药服务改进业务序列图",
+      "pdf_page": 25,
+      "source": "diagrams/course-A-20261021/business-improved-3.puml"
+    },
+    {
+      "number": 23,
+      "title": "复诊与随访改进业务序列图",
+      "pdf_page": 26,
+      "source": "diagrams/course-A-20261021/business-improved-4.puml"
+    },
+    {
+      "number": 24,
+      "title": "自费与自付缴费改进业务序列图",
+      "pdf_page": 27,
+      "source": "diagrams/course-A-20261021/business-improved-5.puml"
+    },
+    {
+      "number": 25,
+      "title": "医保门诊结算改进业务序列图",
+      "pdf_page": 28,
+      "source": "diagrams/course-A-20261021/business-improved-6.puml"
+    },
+    {
+      "number": 26,
+      "title": "费用更正与退费改进业务序列图",
+      "pdf_page": 29,
+      "source": "diagrams/course-A-20261021/business-improved-7.puml"
+    },
+    {
+      "number": 27,
+      "title": "采购与库存保障改进业务序列图",
+      "pdf_page": 30,
+      "source": "diagrams/course-A-20261021/business-improved-8.puml"
+    },
+    {
+      "number": 28,
+      "title": "接诊资源准备与停用恢复改进业务序列图",
+      "pdf_page": 31,
+      "source": "diagrams/course-A-20261021/business-improved-9.puml"
+    },
+    {
+      "number": 29,
+      "title": "日常经营与款项核对改进业务序列图",
+      "pdf_page": 32,
+      "source": "diagrams/course-A-20261021/business-improved-10.puml"
+    },
+    {
+      "number": 30,
+      "title": "患者服务全过程",
+      "pdf_page": 34,
+      "source": "diagrams/course-A-20261021/business-patient-flow.puml"
+    },
+    {
+      "number": 31,
+      "title": "接诊资源准备与占用协调",
+      "pdf_page": 35,
+      "source": "diagrams/course-A-20261021/business-resource-flow.puml"
+    },
+    {
+      "number": 32,
+      "title": "开诊准备与日终业务协作",
+      "pdf_page": 37,
+      "source": "diagrams/course-A-20261021/business-daily-flow.puml"
+    },
+    {
+      "number": 33,
+      "title": "系统总体用例图",
+      "pdf_page": 39,
+      "source": "diagrams/integrated-20261019/system-overall.puml"
+    },
+    {
+      "number": 34,
+      "title": "前台系统用例图",
+      "pdf_page": 40,
+      "source": "diagrams/integrated-20261019/system-role-1.puml"
+    },
+    {
+      "number": 35,
+      "title": "牙医与助理系统用例图",
+      "pdf_page": 41,
+      "source": "diagrams/integrated-20261019/system-role-2.puml"
+    },
+    {
+      "number": 36,
+      "title": "收费与负责人系统用例图",
+      "pdf_page": 42,
+      "source": "diagrams/integrated-20261019/system-role-3.puml"
+    },
+    {
+      "number": 37,
+      "title": "UC-01 维护患者资料用例图",
+      "pdf_page": 44,
+      "source": "diagrams/integrated-20261019/uc-01.puml"
+    },
+    {
+      "number": 38,
+      "title": "UC-02 维护预约安排用例图",
+      "pdf_page": 45,
+      "source": "diagrams/integrated-20261019/uc-02.puml"
+    },
+    {
+      "number": 39,
+      "title": "UC-03 登记到诊用例图",
+      "pdf_page": 46,
+      "source": "diagrams/integrated-20261019/uc-03.puml"
+    },
+    {
+      "number": 40,
+      "title": "UC-04 维护排班与接诊安排用例图",
+      "pdf_page": 47,
+      "source": "diagrams/integrated-20261019/uc-04.puml"
+    },
+    {
+      "number": 41,
+      "title": "UC-05 查阅患者诊疗资料用例图",
+      "pdf_page": 48,
+      "source": "diagrams/integrated-20261019/uc-05.puml"
+    },
+    {
+      "number": 42,
+      "title": "UC-06 记录检查诊断与健康资料用例图",
+      "pdf_page": 49,
+      "source": "diagrams/integrated-20261019/uc-06.puml"
+    },
+    {
+      "number": 43,
+      "title": "UC-07 制定治疗方案并记录患者确认用例图",
+      "pdf_page": 50,
+      "source": "diagrams/integrated-20261019/uc-07.puml"
+    },
+    {
+      "number": 44,
+      "title": "UC-08 登记实际治疗与完成项目用例图",
+      "pdf_page": 51,
+      "source": "diagrams/integrated-20261019/uc-08.puml"
+    },
+    {
+      "number": 45,
+      "title": "UC-09 签署及补充病历用例图",
+      "pdf_page": 52,
+      "source": "diagrams/integrated-20261019/uc-09.puml"
+    },
+    {
+      "number": 46,
+      "title": "UC-10 管理影像与诊疗文书用例图",
+      "pdf_page": 53,
+      "source": "diagrams/integrated-20261019/uc-10.puml"
+    },
+    {
+      "number": 47,
+      "title": "UC-11 维护收费项目与价目用例图",
+      "pdf_page": 54,
+      "source": "diagrams/integrated-20261019/uc-11.puml"
+    },
+    {
+      "number": 48,
+      "title": "UC-12 查询账单与待结算费用用例图",
+      "pdf_page": 55,
+      "source": "diagrams/integrated-20261019/uc-12.puml"
+    },
+    {
+      "number": 49,
+      "title": "UC-13 办理患者付款与到账核实用例图",
+      "pdf_page": 56,
+      "source": "diagrams/integrated-20261019/uc-13.puml"
+    },
+    {
+      "number": 50,
+      "title": "UC-14 办理费用更正与退费用例图",
+      "pdf_page": 57,
+      "source": "diagrams/integrated-20261019/uc-14.puml"
+    },
+    {
+      "number": 51,
+      "title": "UC-15 提出复诊随访要求用例图",
+      "pdf_page": 58,
+      "source": "diagrams/integrated-20261019/uc-15.puml"
+    },
+    {
+      "number": 52,
+      "title": "UC-16 办理复诊联系与预约用例图",
+      "pdf_page": 59,
+      "source": "diagrams/integrated-20261019/uc-16.puml"
+    },
+    {
+      "number": 53,
+      "title": "UC-17 记录复诊随访评估用例图",
+      "pdf_page": 60,
+      "source": "diagrams/integrated-20261019/uc-17.puml"
+    },
+    {
+      "number": 54,
+      "title": "UC-18 维护材料与批次资料用例图",
+      "pdf_page": 61,
+      "source": "diagrams/integrated-20261019/uc-18.puml"
+    },
+    {
+      "number": 55,
+      "title": "UC-19 登记基础采购与到货验收用例图",
+      "pdf_page": 62,
+      "source": "diagrams/integrated-20261019/uc-19.puml"
+    },
+    {
+      "number": 56,
+      "title": "UC-20 办理库存领用、退回与盘点用例图",
+      "pdf_page": 63,
+      "source": "diagrams/integrated-20261019/uc-20.puml"
+    },
+    {
+      "number": 57,
+      "title": "UC-21 核对日常经营与收付款用例图",
+      "pdf_page": 64,
+      "source": "diagrams/integrated-20261019/uc-21.puml"
+    },
+    {
+      "number": 58,
+      "title": "UC-22 核验医保身份并办理预结算用例图",
+      "pdf_page": 65,
+      "source": "diagrams/integrated-20261019/uc-22.puml"
+    },
+    {
+      "number": 59,
+      "title": "UC-23 办理医保结算、撤销与回款核对用例图",
+      "pdf_page": 66,
+      "source": "diagrams/integrated-20261019/uc-23.puml"
+    },
+    {
+      "number": 60,
+      "title": "UC-24 协调诊椅设备准备与停用恢复用例图",
+      "pdf_page": 67,
+      "source": "diagrams/integrated-20261019/uc-24.puml"
+    },
+    {
+      "number": 61,
+      "title": "UC-25 开立处方并衔接院内外取药用例图",
+      "pdf_page": 68,
+      "source": "diagrams/integrated-20261019/uc-25.puml"
+    },
+    {
+      "number": 62,
+      "title": "前台边界类与控制类",
+      "pdf_page": 71,
+      "source": "diagrams/integrated-20261019/analysis-boundaries-1.puml"
+    },
+    {
+      "number": 63,
+      "title": "牙医边界类与控制类",
+      "pdf_page": 72,
+      "source": "diagrams/integrated-20261019/analysis-boundaries-2.puml"
+    },
+    {
+      "number": 64,
+      "title": "收费人员边界类与控制类",
+      "pdf_page": 73,
+      "source": "diagrams/integrated-20261019/analysis-boundaries-3.puml"
+    },
+    {
+      "number": 65,
+      "title": "诊疗助理、诊所负责人边界类与控制类",
+      "pdf_page": 74,
+      "source": "diagrams/integrated-20261019/analysis-boundaries-4.puml"
+    },
+    {
+      "number": 66,
+      "title": "处方与药学边界控制类",
+      "pdf_page": 75,
+      "source": "diagrams/integrated-20261019/analysis-boundaries-pharmacy.puml"
+    },
+    {
+      "number": 67,
+      "title": "外部支付医保接口与控制类",
+      "pdf_page": 76,
+      "source": "diagrams/integrated-20261019/analysis-boundaries-external.puml"
+    },
+    {
+      "number": 68,
+      "title": "身份与接诊分析实体类图",
+      "pdf_page": 77,
+      "source": "diagrams/integrated-20261019/analysis-entities-1.puml"
+    },
+    {
+      "number": 69,
+      "title": "病历与诊疗文书分析实体类图",
+      "pdf_page": 78,
+      "source": "diagrams/integrated-20261019/analysis-entities-2.puml"
+    },
+    {
+      "number": 70,
+      "title": "治疗方案与实际执行分析实体类图",
+      "pdf_page": 79,
+      "source": "diagrams/integrated-20261019/analysis-entities-3.puml"
+    },
+    {
+      "number": 71,
+      "title": "价目、账单与收款分析实体类图",
+      "pdf_page": 80,
+      "source": "diagrams/integrated-20261019/analysis-entities-4.puml"
+    },
+    {
+      "number": 72,
+      "title": "费用更正与退费分析实体类图",
+      "pdf_page": 81,
+      "source": "diagrams/integrated-20261019/analysis-entities-5.puml"
+    },
+    {
+      "number": 73,
+      "title": "复诊与随访分析实体类图",
+      "pdf_page": 82,
+      "source": "diagrams/integrated-20261019/analysis-entities-6.puml"
+    },
+    {
+      "number": 74,
+      "title": "材料与库存分析实体类图",
+      "pdf_page": 83,
+      "source": "diagrams/integrated-20261019/analysis-entities-7.puml"
+    },
+    {
+      "number": 75,
+      "title": "基础采购与验收分析实体类图",
+      "pdf_page": 84,
+      "source": "diagrams/integrated-20261019/analysis-entities-8.puml"
+    },
+    {
+      "number": 76,
+      "title": "门诊医保与结算款分析实体类图",
+      "pdf_page": 85,
+      "source": "diagrams/integrated-20261019/analysis-entities-9.puml"
+    },
+    {
+      "number": 77,
+      "title": "UC-01 维护患者资料分析序列图",
+      "pdf_page": 88,
+      "source": "diagrams/integrated-20261019/analysis-seq-01.puml"
+    },
+    {
+      "number": 78,
+      "title": "UC-02 维护预约安排分析序列图",
+      "pdf_page": 89,
+      "source": "diagrams/integrated-20261019/analysis-seq-02.puml"
+    },
+    {
+      "number": 79,
+      "title": "UC-03 登记到诊分析序列图",
+      "pdf_page": 90,
+      "source": "diagrams/integrated-20261019/analysis-seq-03.puml"
+    },
+    {
+      "number": 80,
+      "title": "UC-04 维护排班与接诊安排分析序列图",
+      "pdf_page": 91,
+      "source": "diagrams/integrated-20261019/analysis-seq-04.puml"
+    },
+    {
+      "number": 81,
+      "title": "UC-05 查阅患者诊疗资料分析序列图",
+      "pdf_page": 92,
+      "source": "diagrams/integrated-20261019/analysis-seq-05.puml"
+    },
+    {
+      "number": 82,
+      "title": "UC-06 记录检查诊断与健康资料分析序列图",
+      "pdf_page": 93,
+      "source": "diagrams/integrated-20261019/analysis-seq-06.puml"
+    },
+    {
+      "number": 83,
+      "title": "UC-07 制定治疗方案并记录患者确认分析序列图",
+      "pdf_page": 94,
+      "source": "diagrams/integrated-20261019/analysis-seq-07.puml"
+    },
+    {
+      "number": 84,
+      "title": "UC-08 登记实际治疗与完成项目分析序列图",
+      "pdf_page": 95,
+      "source": "diagrams/integrated-20261019/analysis-seq-08.puml"
+    },
+    {
+      "number": 85,
+      "title": "UC-09 签署及补充病历分析序列图",
+      "pdf_page": 96,
+      "source": "diagrams/integrated-20261019/analysis-seq-09.puml"
+    },
+    {
+      "number": 86,
+      "title": "UC-10 管理影像与诊疗文书分析序列图",
+      "pdf_page": 97,
+      "source": "diagrams/integrated-20261019/analysis-seq-10.puml"
+    },
+    {
+      "number": 87,
+      "title": "UC-11 维护收费项目与价目分析序列图",
+      "pdf_page": 98,
+      "source": "diagrams/integrated-20261019/analysis-seq-11.puml"
+    },
+    {
+      "number": 88,
+      "title": "UC-12 查询账单与待结算费用分析序列图",
+      "pdf_page": 99,
+      "source": "diagrams/integrated-20261019/analysis-seq-12.puml"
+    },
+    {
+      "number": 89,
+      "title": "UC-13 办理患者付款与到账核实分析序列图",
+      "pdf_page": 100,
+      "source": "diagrams/integrated-20261019/analysis-seq-13.puml"
+    },
+    {
+      "number": 90,
+      "title": "UC-14 办理费用更正与退费分析序列图",
+      "pdf_page": 101,
+      "source": "diagrams/integrated-20261019/analysis-seq-14.puml"
+    },
+    {
+      "number": 91,
+      "title": "UC-15 提出复诊随访要求分析序列图",
+      "pdf_page": 102,
+      "source": "diagrams/integrated-20261019/analysis-seq-15.puml"
+    },
+    {
+      "number": 92,
+      "title": "UC-16 办理复诊联系与预约分析序列图",
+      "pdf_page": 103,
+      "source": "diagrams/integrated-20261019/analysis-seq-16.puml"
+    },
+    {
+      "number": 93,
+      "title": "UC-17 记录复诊随访评估分析序列图",
+      "pdf_page": 104,
+      "source": "diagrams/integrated-20261019/analysis-seq-17.puml"
+    },
+    {
+      "number": 94,
+      "title": "UC-18 维护材料与批次资料分析序列图",
+      "pdf_page": 105,
+      "source": "diagrams/integrated-20261019/analysis-seq-18.puml"
+    },
+    {
+      "number": 95,
+      "title": "UC-19 登记基础采购与到货验收分析序列图",
+      "pdf_page": 106,
+      "source": "diagrams/integrated-20261019/analysis-seq-19.puml"
+    },
+    {
+      "number": 96,
+      "title": "UC-20 办理库存领用、退回与盘点分析序列图",
+      "pdf_page": 107,
+      "source": "diagrams/integrated-20261019/analysis-seq-20.puml"
+    },
+    {
+      "number": 97,
+      "title": "UC-21 核对日常经营与收付款分析序列图",
+      "pdf_page": 108,
+      "source": "diagrams/integrated-20261019/analysis-seq-21.puml"
+    },
+    {
+      "number": 98,
+      "title": "UC-22 核验医保身份并办理预结算分析序列图",
+      "pdf_page": 109,
+      "source": "diagrams/integrated-20261019/analysis-seq-22.puml"
+    },
+    {
+      "number": 99,
+      "title": "UC-23 办理医保结算、撤销与回款核对分析序列图",
+      "pdf_page": 110,
+      "source": "diagrams/integrated-20261019/analysis-seq-23.puml"
+    },
+    {
+      "number": 100,
+      "title": "UC-24 协调诊椅设备准备与停用恢复分析序列图",
+      "pdf_page": 111,
+      "source": "diagrams/integrated-20261019/analysis-seq-24.puml"
+    },
+    {
+      "number": 101,
+      "title": "UC-25 开立处方并衔接院内外取药分析序列图",
+      "pdf_page": 112,
+      "source": "diagrams/integrated-20261019/analysis-seq-25.puml"
+    },
+    {
+      "number": 102,
+      "title": "预约分析状态机图",
+      "pdf_page": 113,
+      "source": "diagrams/integrated-20261019/state-appointment.puml"
+    },
+    {
+      "number": 103,
+      "title": "就诊分析状态机图",
+      "pdf_page": 113,
+      "source": "diagrams/integrated-20261019/state-visit.puml"
+    },
+    {
+      "number": 104,
+      "title": "病历分析状态机图",
+      "pdf_page": 114,
+      "source": "diagrams/integrated-20261019/state-record.puml"
+    },
+    {
+      "number": 105,
+      "title": "方案版本分析状态机图",
+      "pdf_page": 114,
+      "source": "diagrams/integrated-20261019/state-plan.puml"
+    },
+    {
+      "number": 106,
+      "title": "复诊要求分析状态机图",
+      "pdf_page": 115,
+      "source": "diagrams/integrated-20261019/state-followup.puml"
+    },
+    {
+      "number": 107,
+      "title": "材料批次分析状态机图",
+      "pdf_page": 115,
+      "source": "diagrams/integrated-20261019/state-batch.puml"
+    },
+    {
+      "number": 108,
+      "title": "费用申请分析状态机图",
+      "pdf_page": 116,
+      "source": "diagrams/integrated-20261019/state-refund.puml"
+    },
+    {
+      "number": 109,
+      "title": "支付单分析状态机图",
+      "pdf_page": 116,
+      "source": "diagrams/integrated-20261019/state-payment.puml"
+    },
+    {
+      "number": 110,
+      "title": "医保办理分析状态机图",
+      "pdf_page": 117,
+      "source": "diagrams/integrated-20261019/state-insurance.puml"
+    },
+    {
+      "number": 111,
+      "title": "设备占用分析状态机图",
+      "pdf_page": 117,
+      "source": "diagrams/integrated-20261019/state-equipment.puml"
+    },
+    {
+      "number": 112,
+      "title": "处方分析状态机图",
+      "pdf_page": 118,
+      "source": "diagrams/integrated-20261019/state-prescription.puml"
+    },
+    {
+      "number": 113,
+      "title": "三层职责及外部服务协作",
+      "pdf_page": 119,
+      "source": "diagrams/integrated-20261019/architecture.puml"
+    },
+    {
+      "number": 114,
+      "title": "核心业务数据库关系总图",
+      "pdf_page": 124,
+      "source": "diagrams/integrated-20261019/database-overall.puml"
+    },
+    {
+      "number": 115,
+      "title": "身份与接诊数据库关系图",
+      "pdf_page": 125,
+      "source": "diagrams/integrated-20261019/database-region-1.puml"
+    },
+    {
+      "number": 116,
+      "title": "病历与诊疗文书数据库关系图",
+      "pdf_page": 126,
+      "source": "diagrams/integrated-20261019/database-region-2.puml"
+    },
+    {
+      "number": 117,
+      "title": "治疗方案与实际执行数据库关系图",
+      "pdf_page": 127,
+      "source": "diagrams/integrated-20261019/database-region-3.puml"
+    },
+    {
+      "number": 118,
+      "title": "价目、账单与收款数据库关系图",
+      "pdf_page": 128,
+      "source": "diagrams/integrated-20261019/database-region-4.puml"
+    },
+    {
+      "number": 119,
+      "title": "费用更正与退费数据库关系图",
+      "pdf_page": 129,
+      "source": "diagrams/integrated-20261019/database-region-5.puml"
+    },
+    {
+      "number": 120,
+      "title": "复诊与随访数据库关系图",
+      "pdf_page": 130,
+      "source": "diagrams/integrated-20261019/database-region-6.puml"
+    },
+    {
+      "number": 121,
+      "title": "材料与库存数据库关系图",
+      "pdf_page": 131,
+      "source": "diagrams/integrated-20261019/database-region-7.puml"
+    },
+    {
+      "number": 122,
+      "title": "基础采购与验收数据库关系图",
+      "pdf_page": 132,
+      "source": "diagrams/integrated-20261019/database-region-8.puml"
+    },
+    {
+      "number": 123,
+      "title": "门诊医保与结算款数据库关系图",
+      "pdf_page": 133,
+      "source": "diagrams/integrated-20261019/database-region-9.puml"
+    },
+    {
+      "number": 124,
+      "title": "接诊服务设计类协作图",
+      "pdf_page": 154,
+      "source": "diagrams/integrated-20261019/design-classes-1.puml"
+    },
+    {
+      "number": 125,
+      "title": "临床服务设计类协作图",
+      "pdf_page": 155,
+      "source": "diagrams/integrated-20261019/design-classes-2.puml"
+    },
+    {
+      "number": 126,
+      "title": "收费与复诊服务设计类协作图",
+      "pdf_page": 156,
+      "source": "diagrams/integrated-20261019/design-classes-3.puml"
+    },
+    {
+      "number": 127,
+      "title": "物资与管理服务设计类协作图",
+      "pdf_page": 157,
+      "source": "diagrams/integrated-20261019/design-classes-4.puml"
+    },
+    {
+      "number": 128,
+      "title": "医保与药学服务设计类协作图",
+      "pdf_page": 158,
+      "source": "diagrams/integrated-20261019/design-classes-5.puml"
+    },
+    {
+      "number": 129,
+      "title": "维护预约安排设计序列图",
+      "pdf_page": 159,
+      "source": "diagrams/integrated-20261019/design-seq-02.puml"
+    },
+    {
+      "number": 130,
+      "title": "记录检查诊断与健康资料设计序列图",
+      "pdf_page": 160,
+      "source": "diagrams/integrated-20261019/design-seq-06.puml"
+    },
+    {
+      "number": 131,
+      "title": "制定治疗方案并记录患者确认设计序列图",
+      "pdf_page": 161,
+      "source": "diagrams/integrated-20261019/design-seq-07.puml"
+    },
+    {
+      "number": 132,
+      "title": "登记实际治疗与完成项目设计序列图",
+      "pdf_page": 162,
+      "source": "diagrams/integrated-20261019/design-seq-08.puml"
+    },
+    {
+      "number": 133,
+      "title": "办理患者付款与到账核实设计序列图",
+      "pdf_page": 163,
+      "source": "diagrams/integrated-20261019/design-seq-13.puml"
+    },
+    {
+      "number": 134,
+      "title": "UC-14 办理费用更正与退费设计序列图",
+      "pdf_page": 164,
+      "source": "diagrams/integrated-20261019/design-seq-14.puml"
+    },
+    {
+      "number": 135,
+      "title": "办理复诊联系与预约设计序列图",
+      "pdf_page": 165,
+      "source": "diagrams/integrated-20261019/design-seq-16.puml"
+    },
+    {
+      "number": 136,
+      "title": "登记基础采购与到货验收设计序列图",
+      "pdf_page": 166,
+      "source": "diagrams/integrated-20261019/design-seq-19.puml"
+    },
+    {
+      "number": 137,
+      "title": "办理库存领用、退回与盘点设计序列图",
+      "pdf_page": 167,
+      "source": "diagrams/integrated-20261019/design-seq-20.puml"
+    },
+    {
+      "number": 138,
+      "title": "UC-22 核验医保身份并办理预结算设计序列图",
+      "pdf_page": 168,
+      "source": "diagrams/integrated-20261019/design-seq-22.puml"
+    },
+    {
+      "number": 139,
+      "title": "协调诊椅设备准备与停用恢复设计序列图",
+      "pdf_page": 169,
+      "source": "diagrams/integrated-20261019/design-seq-24.puml"
+    },
+    {
+      "number": 140,
+      "title": "开立处方并衔接院内外取药设计序列图",
+      "pdf_page": 170,
+      "source": "diagrams/integrated-20261019/design-seq-25.puml"
+    },
+    {
+      "number": 141,
+      "title": "岗位导航与主要业务衔接",
+      "pdf_page": 172,
+      "source": "diagrams/integrated-20261019/screen-navigation.puml"
+    },
+    {
+      "number": 142,
+      "title": "患者与预约页面结构",
+      "pdf_page": 173,
+      "source": "diagrams/integrated-20261019/screen-1.puml"
+    },
+    {
+      "number": 143,
+      "title": "牙医接诊页面结构",
+      "pdf_page": 173,
+      "source": "diagrams/integrated-20261019/screen-2.puml"
+    },
+    {
+      "number": 144,
+      "title": "方案与影像页面结构",
+      "pdf_page": 174,
+      "source": "diagrams/integrated-20261019/screen-3.puml"
+    },
+    {
+      "number": 145,
+      "title": "账单与收款页面结构",
+      "pdf_page": 174,
+      "source": "diagrams/integrated-20261019/screen-4.puml"
+    },
+    {
+      "number": 146,
+      "title": "费用更正与退费页面结构",
+      "pdf_page": 175,
+      "source": "diagrams/integrated-20261019/screen-5.puml"
+    },
+    {
+      "number": 147,
+      "title": "复诊与随访页面结构",
+      "pdf_page": 175,
+      "source": "diagrams/integrated-20261019/screen-6.puml"
+    },
+    {
+      "number": 148,
+      "title": "材料与采购页面结构",
+      "pdf_page": 176,
+      "source": "diagrams/integrated-20261019/screen-7.puml"
+    },
+    {
+      "number": 149,
+      "title": "库存办理页面结构",
+      "pdf_page": 176,
+      "source": "diagrams/integrated-20261019/screen-8.puml"
+    },
+    {
+      "number": 150,
+      "title": "排班与经营页面结构",
+      "pdf_page": 177,
+      "source": "diagrams/integrated-20261019/screen-9.puml"
+    },
+    {
+      "number": 151,
+      "title": "医保办理页面结构",
+      "pdf_page": 177,
+      "source": "diagrams/integrated-20261019/screen-10.puml"
+    },
+    {
+      "number": 152,
+      "title": "接诊资源协调页面结构",
+      "pdf_page": 178,
+      "source": "diagrams/integrated-20261019/screen-11.puml"
+    },
+    {
+      "number": 153,
+      "title": "处方与取药页面结构",
+      "pdf_page": 178,
+      "source": "diagrams/integrated-20261019/screen-12.puml"
+    }
+  ],
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false
+}

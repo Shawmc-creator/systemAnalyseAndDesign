@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-22",
+  "status": "第十七批：C2诊疗六例，C1同步三操作；其余C2/C3及D未完成",
+  "pdf_pages": 173,
+  "figures": 143,
+  "logical_tables": 69,
+  "system_usecases": 25,
+  "analysis_sequence_cases_revised": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "analysis_sequence_cases_remaining": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ],
+  "C1_entity_classes": 69,
+  "C1_operations": 216,
+  "C1_operations_added": [
+    {
+      "part": "诊疗",
+      "table": "clinical_record",
+      "op": "核对病历患者及就诊归属()",
+      "uc": 5,
+      "rule": "R05-1"
+    },
+    {
+      "part": "诊疗",
+      "table": "prescription",
+      "op": "核对处方就诊归属()",
+      "uc": 5,
+      "rule": "R05-2"
+    },
+    {
+      "part": "费用",
+      "table": "bill_item",
+      "op": "建立实际来源(计价状态)",
+      "uc": 8,
+      "rule": "R08-2"
+    }
+  ],
+  "entity_calls_checked": 57,
+  "entity_calls_previously_checked": 51,
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 80,
+    "D": 128
+  },
+  "validation": {
+    "cover_remains_without_date": true,
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "svg_meaningful_text_overlap_pairs": 0,
+    "updated_vector_figures": 8,
+    "minimum_font_pt": 9.06,
+    "rendered_and_reviewed_pdf_pages": [
+      87,
+      89,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106
+    ],
+    "unchanged_page_text_count": 165,
+    "all_143_figure_titles_numbers_pages_preserved": true,
+    "all_entity_calls_resolve_to_C1_operations": true,
+    "entity_operations_unique": true,
+    "A_B_C3_D_sources_unchanged": true,
+    "previous_C2_01_04_sources_unchanged": true
+  },
+  "whole_document_course_compliant": false,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "next_batch": "C2 UC-11—14：价目、账目查询、收款与费用更正退款",
+  "remaining": [
+    "15例分析序列的消息、分支及操作对应",
+    "分析状态机同步",
+    "D字段关系约束、数据访问和组件对应",
+    "真实业务确认与验收"
+  ],
+  "files": {
+    "tex_sha256": "357f3783ed3410c3a233476e4defe196a23f746e4e8122467b22d704a94495a5",
+    "pdf_sha256": "ce63e1ed8b8cd23485d5a531d0d256e2c4440e5d975e3f3c6fd3c4e12bad854d",
+    "logical_model_sha256": "68f5db36dfd9f3eaf9ca11b43ffb9a6abf039bf587ecf15f4f9c2b2b69e239e9"
+  }
+}

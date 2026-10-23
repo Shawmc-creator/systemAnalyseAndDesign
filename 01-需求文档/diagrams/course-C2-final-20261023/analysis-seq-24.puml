@@ -1,0 +1,81 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as D
+boundary "牙医接口" as BD
+actor "诊疗助理" as A
+boundary "诊疗助理接口" as B
+control "协调诊椅设备准备与停用恢复控制" as K
+entity "就诊" as V
+entity "接诊占用" as O
+entity "设备占用" as E
+entity "资源停用时段" as R
+entity "诊疗设备" as Q
+
+alt 基本路径：牙医确认实际使用结束
+ D -> BD : 选择原就诊、诊椅及所用设备，确认实际结束
+ BD -> K : 原使用记录及实际结束时间
+ K -> K : 核验牙医权限及原就诊、资源归属
+ K -> V : 记录诊疗结束()
+ K -> O : 确认实际结束()
+ opt 本次设备已实际结束使用
+  K -> E : 确认实际结束()
+ end
+ K -> R : 登记准备或故障限制()
+ K -> K : 实际结束、占用释放与清洁准备限制共同保存
+ K --> BD : 实际结束已登记，资源仍须清洁核查
+else 1a 开诊准备
+ A -> B : 选择尚未核实准备的资源
+ B -> K : 资源及准备要求
+ K -> K : 核验助理权限及资源归属
+ K -> R : 登记准备或故障限制()
+ K --> B : 保持准备限制，不虚构前次使用
+else 1b 故障或延时
+ A -> B : 登记故障或延时事实及影响
+ B -> K : 资源限制及后续责任
+ K -> K : 核验助理登记权限及实际资源
+ K -> R : 登记准备或故障限制()
+ opt 设备故障
+  K -> Q : 登记停用()
+ end
+ ref over A,K : 负责人协调维修及核实恢复依据；前台按UC-02协调受影响预约
+ break 使用未结束、维修未完成或结果未知
+  K --> B : 保留实际占用和限制；使用结束回步骤1，维修后再核查
+ end
+end
+A -> B : 实际完成清洁、器械处理及环境设备核查
+B -> K : 各项真实结果、经办人时间及依据；故障恢复附负责人确认
+activate K
+K -> R : 记录真实核查结果()
+break 3a 尚未完成或核查不合格
+ K --> B : 保存不合格原因及后续责任，限制仍生效
+end
+K -> R : 核对解除依据()
+break 5a 仍有实际使用、本次依据不满足或记录已变化
+ K --> B : 显示当前事实，核实后再处理，不提前解除
+end
+K -> R : 解除本次限制()
+opt 故障已修复且负责人核实依据齐全
+ K -> Q : 依据复核恢复()
+end
+K -> K : 保存本次解除，合并资源有效期、全部占用及其他限制判定可用性
+alt 5a 仍有其他限制或安排冲突
+ K --> B : 仅本次限制已解除，资源仍不可用，继续协调
+else 当前条件已就绪
+ K --> B : 返回准备就绪及影响安排；新预约仍按UC-02核对
+end
+deactivate K
+
+@enduml

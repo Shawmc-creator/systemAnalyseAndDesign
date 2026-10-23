@@ -1,0 +1,102 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceGroupBackgroundColor white
+skinparam BoxPadding 8
+skinparam maxMessageSize 300
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "前台" as A
+boundary "前台接口" as B
+control "登记到诊控制" as K
+entity "患者" as P
+entity "日期安排" as S
+entity "预约" as AP
+entity "诊疗设备" as E
+entity "资源停用时段" as RB
+entity "接诊占用" as RO
+entity "设备占用" as EO
+entity "就诊" as V
+entity "病历" as CR
+
+A -> B : 选择已实际到店患者
+B -> K : 患者编号及本次登记号
+activate K
+K -> K : 核验授权；读取预约、安排及已有就诊
+K -> P : 核对辨识资料()
+K --> B : 原预约、接诊安排及已有记录
+A -> B : 选择预约，或确认现场接诊安排
+B -> K : 本次来源、牙医及日期安排
+break 2a 尚未确定承接安排
+ K --> B : 先协调牙医及资源，确定后返回步骤3
+end
+K -> S : 核对接诊时段()
+alt 预约来源
+ K -> K : 核对预约同患者、可到诊及对应就诊
+ break 4b 预约已取消／未到或患者不符
+  K --> B : 保留原事实；核实现场则走3a，否则重选
+ end
+else 3a现场无预约
+ K -> RO : 核对时段冲突()
+ K -> RB : 核对当前限制()
+ opt 本次需要设备
+  K -> E : 核对适用设备()
+  K -> EO : 核对设备时段冲突()
+ end
+ K -> K : 核对现场预留所需人员、诊椅及设备时段
+end
+break 4a 已有同次就诊
+ K --> B : 返回原就诊号及状态，不重建病历
+end
+A -> B : 确认真实到店时间及候诊安排
+B -> K : 时间、来源及确认版本
+break 5a 到店时间晚于当前等不符
+ K --> B : 返回原因，核实后重填步骤5
+end
+critical 6 重核归属、原结果及安排版本后共同保存
+ K -> K : 已有原结果则复用；新登记才创建
+ break 条件变化且没有同次原结果
+  K --> B : 返回当前安排，回步骤2重核，不新建
+ end
+ opt 新登记且当前条件仍满足
+ K -> V : 登记候诊()
+ K -> CR : 建立当次草稿()
+ alt 预约来源
+  K -> AP : 登记到诊()
+  K -> K : 关联原预约及原候诊资源安排
+ else 现场来源
+  K -> RO : 预留接诊时段()
+  opt 本次需要设备
+   K -> EO : 预留时段()
+  end
+  K -> K : 现场来源且预约关联为空
+ end
+ K -> K : 就诊、草稿、安排关联及预约状态共同提交
+ end
+end
+alt 6a 结果未知或重复
+ K -> K : 按本次登记及原预约查结果
+ K --> B : 已有记录返回原号；确认未保存才重试
+else 保存成功
+ K --> B : 就诊号、候诊状态、牙医及准备提示
+end
+B --> A : 展示候诊及病历草稿结果
+deactivate K
+note over S,CR
+已有明确接诊安排但暂未清洁就绪，可先登记候诊并显示准备提示。
+登记不开始实际接诊，不计治疗费，不释放实际使用占用；开始和准备另由UC-06、24核对。
+现场不补造预约；独立再次接诊须核实目的和安排，不能只按同日或同名合并。
+end note
+
+@enduml

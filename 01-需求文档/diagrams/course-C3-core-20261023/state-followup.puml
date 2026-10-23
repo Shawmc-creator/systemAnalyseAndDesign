@@ -1,0 +1,40 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "待发布" as Draft
+state "待联系" as Contact
+state "待到诊或评估" as Attend
+state "已完成" as Done
+state "已撤销" as Cancel
+[*] --> Draft : 牙医暂存
+[*] --> Contact : 牙医直接发布 [发布条件满足]
+Draft : 补正或暂存 / 不交前台正式办理
+Draft --> Contact : 牙医发布 [来源同患者，\n目的、日期、评估要求\n及负责前台齐全]
+Contact : 未联系上、暂缓、拒绝或预约失败\n/ 逐次记联系，下次日期及责任
+Contact --> Attend : 衔接后续 [同患者预约成功关联\n或交牙医实际评估] / 保留安排
+Attend --> Contact : 取消、未到或评估后需再联系\n[要求仍有效] / 指定下次日期及责任
+Attend : 评估后仍需跟进 [已有有效安排]\n/ 追加评估、后续日期及责任
+Contact --> Done : 核实完成 [目的达到，且\n牙医实际评估完整；或\n目的达到、明确免评估且依据齐全]\n/ 保存评估或事实、完成人时
+Attend --> Done : 核实完成 [目的达到，且\n牙医实际评估完整；或\n目的达到、明确免评估且依据齐全]\n/ 保存评估或事实、完成人时
+Draft --> Cancel : 牙医撤销\n[原因依据齐全]
+Contact --> Cancel : 牙医撤销\n[原因依据齐全]
+Attend --> Cancel : 牙医撤销\n[原因依据齐全]
+Done --> [*]
+Cancel --> [*]
+
+@enduml

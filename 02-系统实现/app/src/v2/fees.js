@@ -11,6 +11,15 @@ const proposalDigest = r => hash(canonical(Object.fromEntries(['patient_funds_id
   'proposed_adjustment_cents','proposed_refund_cents','submission_no','submitted_at','created_by'].map(k => [k, r[k]]))));
 class Fees {
   constructor(db, unit, billing, payments) { Object.assign(this, { db, unit, billing, payments }); }
+  submitter(request){
+    const latest=this.unit.financialHistory.list('fee_request',request.id).filter(h=>h.event_type==='提交').at(-1);
+    if(latest)return latest.actor_id;
+    const audit=this.db.prepare(`SELECT a.staff_id,a.authority_snapshot FROM operation_audit a JOIN access_permission p ON p.id=a.permission_id
+      WHERE a.object_kind='fee_request' AND a.object_key=? AND a.event_type='变更' AND p.code='uc24.apply' ORDER BY a.id DESC LIMIT 1`).get(String(request.id));
+    try{const basis=JSON.parse(audit?.authority_snapshot);if(basis.submissionNo===request.submission_no&&basis.proposalDigest===proposalDigest(request))return audit.staff_id;}catch{}
+    // An original creator cannot stand in for an unknown later resubmitter.
+    return request.submission_no===1?request.created_by:null;
+  }
   sources(input, existing = null) {
     const patient = row(this.db, 'patient', input.patientId), funds = this.db.prepare('SELECT * FROM patient_funds WHERE patient_id=?').get(patient.id);
     if (!funds) fail(409, 'FEE_SOURCE_MISSING', '患者尚无可追溯的费用或原付款来源');
@@ -71,8 +80,11 @@ class Fees {
         const request = row(this.db, 'fee_request', input.requestId); revision(request, input.expectedRevision);
         const source = this.sources(input, request);
         if (request.status !== '待审核') fail(409, 'INVALID_STATE', '只能撤回尚待审核的申请');
+        const submitter=this.submitter(request);
+        if(submitter!==ctx.session.staff_id)fail(403,'FEE_WITHDRAW_OWNER','只有本次提交申请的收费人员可以撤回');
         const reason = text(input.reason, '撤回原因', 2000);
         this.db.prepare("UPDATE fee_request SET status='已撤回',updated_at=?,revision=revision+1 WHERE id=?").run(now, request.id);
+        this.unit.financialHistory.append('fee_request',request.id,'撤回',reason,ctx,input,now);
         ctx.authority.sourceRefs = source.refs;
         return { kind: 'fee_request', key: request.id, beforeRevision: request.revision, revision: request.revision + 1, reason,
           changes: [{ field: 'status', before: request.status, after: '已撤回' }] };
@@ -95,6 +107,7 @@ class Fees {
         created_by: ctx.session.staff_id, record_no: recordNo('FEE') }));
       ctx.authority.sourceRefs = source.refs; ctx.authority.submissionNo = fields.submission_no; ctx.authority.clinicalCorrectionIds = correctionIds;
       ctx.authority.proposalDigest = proposalDigest(row(this.db, 'fee_request', key));
+      this.unit.financialHistory.append('fee_request',key,'提交',fields.reason,ctx,input,now);
       return { kind: 'fee_request', key, beforeRevision: old?.revision, revision: old ? old.revision + 1 : 1, reason: '保留本次申请和原单版本；尚未改变应收及资金',
         changes: old ? changes(old, fields, HISTORY) : [] };
     });
@@ -138,6 +151,7 @@ class Fees {
       if (['return', 'reject'].includes(input.action)) {
         const status = input.action === 'return' ? '已退回' : '已拒绝';
         this.db.prepare('UPDATE fee_request SET status=?,review_note=?,reviewed_at=?,reviewed_by=?,updated_at=?,revision=revision+1 WHERE id=?').run(status, review, now, ctx.session.staff_id, now, request.id);
+        this.unit.financialHistory.append('fee_request',request.id,input.action==='return'?'退回':'拒绝',review,ctx,input,now);
         return { kind: 'fee_request', key: request.id, beforeRevision: request.revision, revision: request.revision + 1, reason: '负责人退回或拒绝，不改变原资金',
           changes: changes(request, { status, review_note: review, reviewed_at: now, reviewed_by: ctx.session.staff_id }, ['status','review_note','reviewed_at','reviewed_by']) };
       }
@@ -178,6 +192,7 @@ class Fees {
       if (source.bill && adjustment !== 0) this.db.prepare('UPDATE bill SET updated_at=?,revision=revision+1 WHERE id=?').run(now, source.bill.id);
       this.payments.touchFunds(source.funds, now);
       ctx.authority.sourceRefs = source.refs; ctx.authority.submissionNo = request.submission_no; ctx.authority.clinicalCorrectionIds = basis.clinicalCorrectionIds || [];
+      this.unit.financialHistory.append('fee_request',request.id,'同意',review,ctx,input,now);
       return { kind: 'fee_request', key: request.id, beforeRevision: request.revision, revision: request.revision + 1,
         reason: '批准、调整明细和原用途释放共同生效；批准尚不代表实际退款',
         changes: [{ field: 'status', before: request.status, after: '已同意' }, { field: 'approved_adjustment_cents', before: null, after: adjustment }, { field: 'approved_refund_cents', before: null, after: refund }] };
@@ -208,6 +223,7 @@ class Fees {
         const amount = this.billing.amount(input.amountCents), balance = this.billing.fundsSummary(input.patientId).payments.find(p => p.id === source.payment.id);
         if (amount > balance.availableCents || amount > this.remaining(request)) fail(409, 'REFUND_BUDGET', '退款超过原款可用额或批准剩余额');
         if (!['现金','银行卡','微信','支付宝'].includes(input.channel)) fail(422, 'REFUND_CHANNEL', '退款渠道无效');
+        if(input.channel!==source.payment.channel)fail(409,'REFUND_ORIGINAL_CHANNEL','须沿原付款渠道退回；渠道异常请先核实原单，不改走其他渠道');
         const key = insert(this.db, 'patient_refund', fact(now, { fee_request_id: request.id, patient_payment_id: source.payment.id, patient_funds_id: source.funds.id,
           requested_cents: amount, actual_cents: null, initiated_at: now, channel: input.channel, transaction_evidence: null, verification_note: null, external_reference: null,
           verified_at: null, recipient_verification: text(input.recipientVerification, '接收方核实依据', 2000), operator_id: ctx.session.staff_id,
@@ -244,7 +260,7 @@ class Fees {
   }
   query(credentials, input) {
     const permission = credentials.role === 'manager' ? 'uc25.approve' : 'uc24.apply';
-    return this.unit.query(credentials, permission, () => {
+    return this.unit.query(credentials, permission, ctx => {
       const patient = row(this.db, 'patient', Number(input.patientId)), page = input.page == null ? 1 : id(Number(input.page)), size = input.pageSize == null ? 20 : id(Number(input.pageSize));
       if (size > 100 || page > 1000000) fail(422, 'INVALID_PAGE', '每页最多100项，请使用有效页码');
       if (input.status != null && !['待审核','已退回','已拒绝','已同意','已撤回'].includes(input.status)) fail(422, 'INVALID_STATE', '申请状态筛选无效');
@@ -253,14 +269,17 @@ class Fees {
       if (!funds) return { patientId: patient.id,patient:identity, total: 0, page, pageSize: size, items: [], funds: this.billing.fundsSummary(patient.id) };
       const all = this.db.prepare('SELECT * FROM fee_request WHERE patient_funds_id=? AND (? IS NULL OR status=?) ORDER BY submitted_at DESC,id DESC').all(funds.id, input.status ?? null, input.status ?? null);
       const items = all.slice((page - 1) * size, page * size).map(request => {
-        const history = this.db.prepare(`SELECT a.id,a.occurred_at,a.staff_id,a.after_revision,a.authority_snapshot,a.reason FROM operation_audit a
+        const auditHistory = this.db.prepare(`SELECT a.id,a.occurred_at,a.staff_id,a.after_revision,a.authority_snapshot,a.reason FROM operation_audit a
           WHERE a.object_kind='fee_request' AND a.object_key=? AND a.event_type='变更' ORDER BY a.id`).all(String(request.id)).map(a => ({ id: a.id, occurredAt: a.occurred_at, staffId: a.staff_id, revision: a.after_revision, reason: a.reason,
-          sourceRefs: JSON.parse(a.authority_snapshot).sourceRefs || null, clinicalCorrectionIds: JSON.parse(a.authority_snapshot).clinicalCorrectionIds || [],
+          financialHistoryId:JSON.parse(a.authority_snapshot).financialHistory?.id||null,sourceRefs: JSON.parse(a.authority_snapshot).sourceRefs || null, clinicalCorrectionIds: JSON.parse(a.authority_snapshot).clinicalCorrectionIds || [],
           changes: this.db.prepare('SELECT field_name,before_value,after_value FROM audit_change WHERE audit_id=? ORDER BY sequence_no').all(a.id) }));
+        const snapshots=this.unit.financialHistory.list('fee_request',request.id);
+        const history=snapshots.map(h=>({...h,occurredAt:h.occurred_at,staffId:h.actor_id,reason:h.event_reason,proposalReason:h.reason,sourceRefs:auditHistory.find(a=>a.financialHistoryId===h.id)?.sourceRefs||null,clinicalCorrectionIds:auditHistory.find(a=>a.financialHistoryId===h.id)?.clinicalCorrectionIds||[]}));
+        const legacyHistory=auditHistory.filter(h=>!h.financialHistoryId),submitter=this.submitter(request);
         const adjustment = this.db.prepare('SELECT * FROM fee_adjustment WHERE fee_request_id=?').get(request.id);
         return { ...request, currentSourceRefs: { fundsRevision: funds.revision,
           billRevision: request.bill_id ? row(this.db, 'bill', request.bill_id).revision : null, paymentRevision: request.patient_payment_id ? row(this.db, 'patient_payment', request.patient_payment_id).revision : null },
-          history,billSource:request.bill_id?{...row(this.db,'bill',request.bill_id),summary:this.billing.billSummary(request.bill_id),items:this.billing.lines(request.bill_id)}:null,
+          history,legacyHistory,historyCoverage:'历史保留已记录的申请与审核内容；早期审计记录单独列示。',canWithdraw:request.status==='待审核'&&ctx.session.staff_id===submitter,billSource:request.bill_id?{...row(this.db,'bill',request.bill_id),summary:this.billing.billSummary(request.bill_id),items:this.billing.lines(request.bill_id)}:null,
           adjustment: adjustment ? { ...adjustment, items: this.db.prepare('SELECT * FROM fee_adjustment_item WHERE fee_adjustment_id=? ORDER BY id').all(adjustment.id) } : null,
           remainingApprovedRefundCents: request.status === '已同意' ? this.remaining(request) : 0,
           refunds: this.db.prepare('SELECT * FROM patient_refund WHERE fee_request_id=? ORDER BY id').all(request.id) };

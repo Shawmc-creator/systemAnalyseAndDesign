@@ -1,0 +1,77 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "收费人员" as A
+boundary "费用办理接口" as B
+control "办理费用更正与退费控制" as K
+entity "费用申请" as F
+entity "患者付款" as P
+entity "退款办理" as R
+boundary "支付服务接口" as PE
+actor "支付平台" as X
+ A -> B : 核对原付款、接收方及本次拟退额
+ B -> K : 原付款、批准申请及本次退款办理号
+activate K
+K -> K : 核验办理权限、原批准及必要费用调整已生效
+break 当前权限或批准不满足、必要调整尚未生效
+ K --> B : 停止退款，先核原申请及调整
+end
+ K -> K : 先查原退款号；医保基金及个账不退作患者现金
+ break 原办理已确认退款或已明确失败
+  K --> B : 返回原结果；失败重办须新号并关联原失败单
+ end
+ critical 重核双重额度，先建立待办理再实际退款
+  opt 该办理号尚无原记录
+  K -> F : 计算剩余可办退款额度()
+  K -> P : 计算原款可用额(用途与退款)
+  K -> R : 核对批准额度及原款可用额()
+  break 拟退非正、超额或归属不符
+   K --> B : 拒绝办理并重核；未知原笔先查不重发
+  end
+  K -> R : 建立办理并占用额度()
+  K -> K : 保存唯一退款号、原款及待办占用；已有原笔仅核实
+  end
+ end
+ alt 原现金付款
+  K --> B : 新笔交付一次；原待核实笔只核对原交付事实
+  A -> B : 实际交付后核实真实金额、接收方及凭据
+  B -> K : 原退款号及真实结果
+ else 7a 原电子付款
+  K -> PE : 新笔按原付款退款；已有待核实仅查询原退款
+  PE -> X : 原渠道退款或查询原单
+  X --> PE : 明确成功、失败或仍未知及正式凭据
+  PE --> K : 原退款真实结果
+ end
+ critical 按原退款号重核并保存一次真实结果
+ K -> K : 查当前原办理状态，防止重复或矛盾确认
+ break 原笔已有明确最终结果
+  K --> B : 返回已确认退款或失败原结果，不覆盖
+ end
+ alt 8a 未知或本地保存失败
+  K -> R : 保留未知结果与占用()
+  K -> K : 先查原办理；已有结果复用，确认未存才补记，不重发
+  K --> B : 待核实或原结果，保留占用
+ else 8b 明确失败
+  K -> R : 确认失败并释放占用(依据)
+  K --> B : 失败依据；重办须新编号并重核额度，关联原失败单
+ else 已核实实际成功
+  K -> R : 确认实际退款(真实金额与凭据)
+  K -> K : 仅确认一次且实际额不超拟退；保存人时及原单引用
+  K --> B : 凭据、未完成额度及最新账目；部分成功重核余款
+ end
+ end
+deactivate K
+@enduml

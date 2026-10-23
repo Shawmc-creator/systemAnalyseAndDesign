@@ -24,12 +24,13 @@ function setup(t) {
   a.sign = (extra = {}) => a.clinical.sign(a.d, command({ action: 'sign', recordId: a.recordId, expectedRevision: 2, confirmed: true, ...extra }));
   return a;
 }
-test('clinical flow starts actual contact, retains unknown health facts, signs canonical content and ends visit atomically', t => {
+test('clinical flow starts actual contact, retains unknown health facts, signs canonical content while keeping actual visit and resources active', t => {
   const a = setup(t); a.start(); a.health(); a.save();
   const signed = a.sign(), record = a.db.prepare('SELECT * FROM clinical_record WHERE id=?').get(a.recordId);
   assert.equal(record.status, '已签署'); assert.equal(record.signed_revision, 2); assert.equal(record.revision, 3);
   assert.equal(record.content_hash, hash(canonical(signaturePayload(a.db, record))));
-  assert.equal(a.db.prepare('SELECT status FROM visit WHERE id=?').get(a.v.id).status, '诊疗结束');
+  assert.equal(a.db.prepare('SELECT status FROM visit WHERE id=?').get(a.v.id).status, '接诊中');
+  assert.equal(a.db.prepare('SELECT ended_at FROM visit WHERE id=?').get(a.v.id).ended_at,null);
   assert.equal(a.db.prepare('SELECT count(*) n FROM resource_occupancy WHERE visit_id=? AND released_at IS NULL').get(a.v.id).n, 1, '签署病历不能代替实际操作结束与清洁核验');
   assert.equal(a.db.prepare('SELECT status FROM appointment WHERE id=?').get(a.appointment.id).status, '已到诊');
   assert.equal(a.clinical.detail(a.d, { visitId: a.v.id, patientId: 1 }).signedIntegrity, true);
@@ -82,19 +83,21 @@ test('signed records remain frozen, addenda are independent and duplicate reques
   const first = a.clinical.sign(a.d, input), repeat = a.clinical.sign(a.d, input);
   assert.equal(first.id, repeat.id); assert.equal(repeat.replayed, true);
   assert.deepEqual(a.db.prepare('SELECT * FROM clinical_record WHERE id=?').get(a.recordId), old);
-  assert.throws(() => a.save({ expectedRevision: 3 }), e => e.code === 'VISIT_NOT_ACTIVE');
+  assert.throws(() => a.save({ expectedRevision: 3 }), e => e.code === 'RECORD_SIGNED');
   assert.equal(a.db.prepare('SELECT count(*) n FROM record_addendum').get().n, 1);
 });
-test('signed health references cannot be expanded after signing', t => {
+test('later reviews do not change the exact frozen review used by the signature', t => {
   const a = setup(t); a.start(); a.health(); a.save(); a.sign();
   const version = a.db.prepare('SELECT id FROM health_version').get().id;
-  assert.throws(() => a.unit.command(a.d, 'uc21.health', command({}), (ctx, now) => {
+  a.unit.command(a.d, 'uc21.health', command({}), (ctx, now) => {
     const key = insert(a.db, 'health_review', fact(now, { visit_id: a.v.id, health_version_id: version, reviewed_at: now, conclusion: '签后附加复核', reviewed_by: 4 }));
     return { kind: 'health_review', key, revision: 1 };
-  }), e => e.code === 'SIGNED_CONTENT_CHANGED');
-  assert.equal(a.db.prepare('SELECT count(*) n FROM health_review').get().n, 1);
+  });
+  assert.equal(a.db.prepare('SELECT count(*) n FROM health_review').get().n, 2);
+  assert.equal(a.db.prepare('SELECT signed_health_review_id FROM clinical_record WHERE id=?').get(a.recordId).signed_health_review_id,1);
+  assert.equal(a.clinical.detail(a.d,{visitId:a.v.id,patientId:1}).signedIntegrity,true);
 });
-test('a signing audit fault rolls back signature, visit termination and occupancy release together', t => {
+test('a signing audit fault rolls back signature and keeps the original visit and resources', t => {
   const a = setup(t); a.start(); a.health(); a.save();
   a.db.exec("CREATE TEMP TRIGGER signing_audit_fault BEFORE INSERT ON operation_audit WHEN NEW.object_kind='clinical_record' AND NEW.after_revision=3 AND NEW.event_type='变更' BEGIN SELECT RAISE(ABORT,'signing_audit_fault'); END");
   assert.throws(a.sign, /signing_audit_fault/);

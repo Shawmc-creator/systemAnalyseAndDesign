@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-23",
+  "scope": "两处新增字段和既有应收唯一来源的SQLite隔离设计样例；跨表规则用样例触发器验证可表达性，不是生产实现或运行库验收",
+  "checks": 27,
+  "passed": 27,
+  "sqlite_version": "3.53.1",
+  "results": [
+    {
+      "name": "预收有资金归属无账单",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "预收缺资金归属",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "账单付款同归属",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "账单归属不符",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "零支付金额",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "成功关联同渠道同金额原付款",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "成功付款渠道不符",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "成功付款归属不符",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "成功付款金额不符",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "重复关联同一原付款",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "重复渠道交易号",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "未核实付款不允许成功",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "未限定整项范围",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "限定部分数量",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "数量超过原计划",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "零限定数量",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "负限定数量",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "项目与决定版本不符",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "另一版本合法范围",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "实际治疗来源",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "实际发药来源",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "无实际来源",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "两个实际来源",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "同执行重复计费",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "同发药重复计费",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "不存在执行来源",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "另一实际治疗",
+      "passed": true,
+      "expected": "accept"
+    }
+  ],
+  "limitations": [
+    "未验证并发资金占额、历次决定的生效计算和完整业务工作单元",
+    "样例临时触发器不修改运行程序或历史SQL，数据访问及生产约束实现仍待后续"
+  ]
+}

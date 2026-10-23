@@ -1,0 +1,223 @@
+{
+  "date": "2026-10-23",
+  "scope": "D1八类已有业务历史的物理保存映射",
+  "new_tables": [
+    {
+      "table": "fee_request_history",
+      "analysis_owner": "fee_request",
+      "owner_field": "fee_request_id",
+      "source_uc": [
+        "UC-14"
+      ],
+      "group": 5
+    },
+    {
+      "table": "service_price_history",
+      "analysis_owner": "service_price",
+      "owner_field": "service_price_id",
+      "source_uc": [
+        "UC-11"
+      ],
+      "group": 4
+    },
+    {
+      "table": "followup_history",
+      "analysis_owner": "followup_requirement",
+      "owner_field": "followup_requirement_id",
+      "source_uc": [
+        "UC-15",
+        "UC-16",
+        "UC-17"
+      ],
+      "group": 6
+    },
+    {
+      "table": "stock_count_history",
+      "analysis_owner": "stock_count",
+      "owner_field": "stock_count_id",
+      "source_uc": [
+        "UC-20"
+      ],
+      "group": 7
+    },
+    {
+      "table": "receipt_item_history",
+      "analysis_owner": "purchase_receipt_item",
+      "owner_field": "purchase_receipt_item_id",
+      "source_uc": [
+        "UC-19"
+      ],
+      "group": 8
+    },
+    {
+      "table": "insurance_preestimate_history",
+      "analysis_owner": "insurance_case",
+      "owner_field": "insurance_case_id",
+      "source_uc": [
+        "UC-22",
+        "UC-23"
+      ],
+      "group": 9
+    },
+    {
+      "table": "document_correction",
+      "analysis_owner": "document_version",
+      "owner_field": "document_version_id",
+      "source_uc": [
+        "UC-10"
+      ],
+      "group": 2
+    },
+    {
+      "table": "prescription_review_history",
+      "analysis_owner": "prescription",
+      "owner_field": "prescription_id",
+      "source_uc": [
+        "UC-25"
+      ],
+      "group": 2
+    }
+  ],
+  "new_core_fields": [
+    "insurance_case.current_preestimate_id",
+    "insurance_fee.preestimate_request_id",
+    "insurance_settlement.preestimate_request_id"
+  ],
+  "modified_core_tables": [
+    "document_version",
+    "insurance_case",
+    "service_price",
+    "stock_count",
+    "clinical_document",
+    "prescription",
+    "followup_requirement",
+    "purchase_receipt_item",
+    "insurance_settlement",
+    "fee_request",
+    "insurance_fee"
+  ],
+  "history_tables": 8,
+  "core_tables": 69,
+  "physical_tables": 77,
+  "logical_fields": 986,
+  "new_diagram_relations": [
+    {
+      "parent": "insurance_preestimate_history",
+      "child": "insurance_case",
+      "field": "current_preestimate_id",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "parent": "insurance_preestimate_history",
+      "child": "insurance_fee",
+      "field": "preestimate_request_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "insurance_preestimate_history",
+      "child": "insurance_settlement",
+      "field": "preestimate_request_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "fee_request",
+      "child": "fee_request_history",
+      "field": "fee_request_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "service_price",
+      "child": "service_price_history",
+      "field": "service_price_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "followup_requirement",
+      "child": "followup_history",
+      "field": "followup_requirement_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "stock_count",
+      "child": "stock_count_history",
+      "field": "stock_count_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "purchase_receipt_item",
+      "child": "receipt_item_history",
+      "field": "purchase_receipt_item_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "inventory_movement",
+      "child": "receipt_item_history",
+      "field": "inventory_movement_id",
+      "nullable": true,
+      "unique": true
+    },
+    {
+      "parent": "insurance_case",
+      "child": "insurance_preestimate_history",
+      "field": "insurance_case_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "insurance_preestimate_history",
+      "child": "insurance_preestimate_history",
+      "field": "request_id",
+      "nullable": true,
+      "unique": false
+    },
+    {
+      "parent": "bill",
+      "child": "insurance_preestimate_history",
+      "field": "bill_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "insurance_identity",
+      "child": "insurance_preestimate_history",
+      "field": "identity_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "document_version",
+      "child": "document_correction",
+      "field": "document_version_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "document_version",
+      "child": "document_correction",
+      "field": "corrected_document_version_id",
+      "nullable": false,
+      "unique": false
+    },
+    {
+      "parent": "prescription",
+      "child": "prescription_review_history",
+      "field": "prescription_id",
+      "nullable": false,
+      "unique": false
+    }
+  ],
+  "snapshot_fk_policy": "快照保留原业务的有类型字段及引用；图展开历史归属与结果来源，重复快照外键在完整模型中核对，不重复铺开。",
+  "remaining": [
+    "其他旧字段来源编号清理",
+    "D2具体服务实体与数据映射器接口、D3页面组件精化",
+    "历史结构尚未迁移至运行程序，真实验收另行进行"
+  ]
+}

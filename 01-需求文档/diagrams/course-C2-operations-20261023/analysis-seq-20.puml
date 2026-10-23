@@ -1,0 +1,90 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "诊疗助理" as A
+boundary "诊疗助理接口" as B
+actor "诊所负责人" as M
+boundary "诊所负责人接口" as BM
+control "办理库存领用、退回与盘点控制" as K
+entity "材料批次" as R
+entity "批次存量" as S
+entity "库存变动" as V
+entity "实际用料" as U
+entity "盘点核实" as C
+
+A -> B : 选批次位置及领用、退回、实际用料或盘点
+B -> K : 原库存及实际办理依据
+activate K
+K -> K : 核验助理权限，读取材料计量及位置
+K -> S : 核对当前量及版本()
+K --> B : 当前账面量、批次状态、效期及原办理
+alt 基本路径：普通领用
+ A -> B : 核实实物，填写正领用量及用途
+ B -> K : 实际领用量及用途
+ K -> R : 核对当前领用可用性(实际日期)
+ break 4a 批次不可用、已过期或数量不足
+  K --> B : 拒绝领用，重新选择可用批次
+ end
+ K -> K : 本次库存变动=-领用量
+else 1a 未用退回
+ A -> B : 指定原领用，核实未用数量及实物质量
+ B -> K : 原领用及本次退回
+ K -> V : 核对原领用退回额度(已用与已退)
+ break 数量非正或超过原领用未用剩余量
+  K --> B : 返回原领用与已用已退明细，重新核实
+ end
+ K -> K : 退回原批次原位置，变动=退回量；退回不自动放行
+ opt 品质不明
+  ref over A,K : UC-18立即隔离，核实前不能普通领用
+ end
+else 1b 实际用料
+ A -> B : 原领用、同患者实际就诊、使用量及时间
+ B -> K : 实际使用事实
+ K -> U : 核对原领用剩余量(已用与已退)
+ break 数量非正、超过原领用剩余量或无真实就诊
+  K --> B : 返回原领用及就诊依据重新核实
+ end
+ K -> U : 登记实际就诊用料()
+ K -> K : 只保存用料事实，不再扣库存
+ K --> B : 用料记录；本分支结束
+else 1c 盘点
+ A -> B : 提交账面快照B、实点C及差异原因
+ B -> K : 原库存版本及实际盘点
+ K -> K : 保存待负责人确认的盘点记录
+ M -> BM : 核查实点与原因，选择同意或不予调整
+ BM -> K : 负责人决定及依据
+ K -> C : 核对确认时库存版本()
+ break 快照后库存已变化
+  K -> C : 记录待重新核对(原因)
+  K --> BM : 重新实点后再提交，不直接调账
+ end
+ K -> C : 记录负责人决定(同意或拒绝)
+ K -> C : 计算必要调整量()
+ K -> K : 变动D=C-B；不同意或D=0不形成库存流水
+ opt 不予调整或差异为0
+  K -> K : 保存负责人决定及盘点结果
+  K --> BM : 不予调整或零差异已记录，无库存流水
+ end
+end
+opt 本次需形成合法库存变动，非仅记用料或拒绝/零差异盘点
+ K -> V : 核对变动及前后量()
+ K -> V : 登记实际库存变动()
+ K -> S : 按合法变动更新余额()
+ K -> K : 共同保存流水、余额及办理结果，余额不得为负
+ K --> B : 流水编号及前后量；5a有变化重核，重复/未知先查原办理
+end
+deactivate K
+
+@enduml

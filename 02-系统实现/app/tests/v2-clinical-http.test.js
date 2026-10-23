@@ -32,7 +32,7 @@ test('clinical HTTP workflow preserves scope, exact signing result and independe
   const sign = command({ action: 'sign', recordId, expectedRevision: 2, confirmed: true });
   const results = await Promise.all([send('/clinical-record-signatures/sign', d, sign), send('/clinical-record-signatures/sign', d, sign)]);
   assert.ok(results.every(r => r.status === 200)); assert.equal(results.filter(r => !r.body.replayed).length, 1);
-  const signed = await send(readPath, d); assert.equal(signed.body.signedIntegrity, true); assert.equal(signed.body.visit.status, '诊疗结束');
+  const signed = await send(readPath, d); assert.equal(signed.body.signedIntegrity, true); assert.equal(signed.body.visit.status, '接诊中'); assert.equal(signed.body.visit.ended_at,null);
   const addendum = await send('/clinical-record-signatures/sign', d, command({ action: 'addendum', recordId, expectedRevision: 3, confirmed: true, content: '追加患者沟通说明', reason: '补充记录' })); assert.equal(addendum.status, 200);
   const last = await send(readPath, d); assert.equal(last.body.addenda.length, 1); assert.equal(last.body.record.content_hash, signed.body.record.content_hash);
 });

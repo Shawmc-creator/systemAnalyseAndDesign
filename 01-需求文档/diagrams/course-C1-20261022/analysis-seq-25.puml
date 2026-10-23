@@ -1,0 +1,44 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 145
+actor "牙医" as D
+actor "药学岗位" as P
+boundary "处方与取药接口" as B
+control "开立处方\n并衔接院内外取药控制" as C
+entity "处方" as R
+entity "实际发药" as F
+D -> B : 按诊断开立并确认处方
+B -> C : 核对患者、医师和用药内容
+C -> R : 保存有效处方及取药路径
+alt 院外取药
+ C --> B : 交付处方及用药指导
+else 具备条件的院内取药
+ P -> B : 审核处方并核对实际供药条件
+ B -> C : 审核意见与核对结果
+ alt 需要医师重新处理
+  C --> B : 保留审核意见交牙医核实
+ else 审核及供药条件符合
+  P -> B : 实际交付并完成用药交代
+  B -> C : 提交真实发药数量及批次
+  C -> F : 关联处方、库存流水和计费来源
+ end
+end
+C --> B : 分别展示开立、审核与实际发药结果
+
+@enduml

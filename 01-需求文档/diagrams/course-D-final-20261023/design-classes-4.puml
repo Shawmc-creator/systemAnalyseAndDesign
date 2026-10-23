@@ -1,0 +1,78 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam InterfaceBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 28
+hide circle
+top to bottom direction
+class "材料与库存接口" as UI <<controller>> {
+ 读取当前办理身份()
+ 校验输入并调用用例方法()
+ 展示业务结果()
+}
+class "物资应用服务" as S <<application>> {
+ UC-18 维护材料与批次资料(材料计量,批次状态及依据)
+ UC-19 登记基础采购与到货验收(采购,到货与验收数量)
+ UC-20 办理库存领用、退回与盘点(批次位置,原领用或盘点版本)
+}
+UI -down-> S
+class "材料批次" as E_material_batch <<entity>> {
+ 核对同材料批号及效期()
+ 核对当前领用可用性(实际日期)
+ 放行或恢复(负责人及依据)
+}
+S -right-> E_material_batch
+class "采购" as E_purchase_order <<entity>> {
+ 核对供应商及采购明细()
+ 确认采购(负责人)
+ 取消采购(原因)
+}
+S -right-> E_purchase_order
+class "验收项目" as E_purchase_receipt_item <<entity>> {
+ 核对到货数量分解()
+ 核对材料批次位置及采购支持量()
+ 确认待检后续结论(保留原到货)
+ 计算本次应入库增量()
+}
+S -right-> E_purchase_receipt_item
+class "批次存量" as E_batch_stock <<entity>> {
+ 核对批次位置唯一性()
+ 核对当前量及版本()
+ 按合法变动更新余额()
+}
+S -right-> E_batch_stock
+class "库存变动" as E_inventory_movement <<entity>> {
+ 核对变动及前后量()
+ 核对原领用退回额度(已用与已退)
+ 登记实际库存变动()
+}
+S -right-> E_inventory_movement
+class "盘点核实" as E_stock_count <<entity>> {
+ 核对确认时库存版本()
+ 记录待重新核对(原因)
+ 记录负责人决定(同意或拒绝)
+ 计算必要调整量()
+}
+S -right-> E_stock_count
+interface "物资存取接口" as R0 {
+ 读取材料、批次及位置存量(稳定键)
+ 保存计量与批次决定(版本)
+ 保存采购及负责人确认(办理号)
+ 保存验收增量、历史及入库(版本)
+ 保存领用、退回或实际用料(原单)
+ 保存盘点决定、历史和必要调整(版本)
+}
+S -down-> R0
+class "SQLite物资映射器" as M <<mapper>> {
+ 装配实体与历史(稳定键)
+ 核对原办理及写入版本()
+ 在本地事务内写关联和历史()
+}
+M .up.|> R0
+@enduml

@@ -140,7 +140,7 @@ test('mismatched actual amount or recipient is committed as unknown and keeps al
   assert.ok(observations.some(o => JSON.parse(o.authority_snapshot).observedActualCents === 20001));
 });
 test('noncash refunds need a stable unique transaction reference before any success is confirmed', t => {
-  const a = setupFees(t, { receivedCents: 200000 }), r = approved(a), first = a.begin(r.id, { channel: '微信' });
+  const a = setupFees(t, { receivedCents: 200000, channel:'微信' }), r = approved(a), first = a.begin(r.id, { channel: '微信' });
   assert.equal(a.finish(first.id).code, 'REFUND_REVIEW_REQUIRED');
   a.finish(first.id, { externalReference: 'WX-REFUND-ONE' });
   const next = a.request({ adjustmentCents: 0, refundCents: 10000 }); a.approve(next.id, { adjustmentCents: 0, refundCents: 10000, items: [], releases: [] });

@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 215
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 65
+hide circle
+hide empty members
+package "实际完成事实与费用衔接" as E {
+' @reference visit
+class "就诊" as visit_e <<entity>>
+' @reference plan_item
+class "方案项目" as plan_item_e <<entity>>
+' @reference service
+class "收费项目" as service_e <<entity>>
+' @reference bill_item
+class "应收项目" as bill_item_e <<entity>>
+class "诊疗执行" as treatment_execution <<entity>> {
+ 牙位牙面、实际完成数量
+ 操作经过、执行牙医、完成时间
+ 首次／更正、更正原因
+ --
+ +核对实际就诊及同意范围()
+ +核对累计完成量()
+ +登记实际完成()
+ +关联原执行更正(原因)
+}
+visit_e "1" -- "0..*" treatment_execution
+plan_item_e "0..1" -- "0..*" treatment_execution
+service_e "1" -- "0..*" treatment_execution
+treatment_execution "0..1" -- "1" bill_item_e
+' @reference treatment_execution
+class "诊疗执行" as previous_treatment_execution <<entity>>
+previous_treatment_execution "原执行\n0..1" -- "0..*" treatment_execution
+visit_e -[hidden]right- plan_item_e
+note bottom of treatment_execution
+只记真实完成量，累计不超有效同意范围。
+未执行计划不计费；缺价不能按零元结清。
+费用来源：诊疗执行或实际发药恰选其一。
+执行更正保留原事实；费用更正由UC-14办理。
+end note
+}
+@enduml

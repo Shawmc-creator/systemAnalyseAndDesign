@@ -1,0 +1,96 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam maxMessageSize 260
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+actor "收费人员" as A
+actor "诊所负责人" as MG
+boundary "费用更正与退费页面" as P
+control "收费与复诊应用服务" as S
+entity "费用申请" as Q
+entity "费用调整" as D
+entity "退款办理" as RF
+participant "费用存取接口" as R
+participant "SQLite费用随访映射器" as M
+participant "医保适配接口" as I
+participant "支付适配接口" as PAY
+group 提交或补正申请
+ A -> P : 选择原单，填写范围与证据
+ P -> S : 办理费用更正与退费(提交申请)
+ S -> R : 读取原账、付款、医保及有效用途(原单)
+ R --> S : 装配原业务及当前版本
+ S -> Q : 核对原单归属及申请额度()
+ S -> Q : 提交或补正重提()
+ S -> R : 保存申请及审核历史(阶段,版本)
+ R -> M : 保存申请及审核历史(阶段,版本)\n本次提交及原申请历史
+ M --> R : 本地事务已提交／冲突未保存
+ R --> S : 原申请编号与提交结果
+end
+group 负责人稍后审核原申请
+ MG -> P : 核实证据，填写批准／退回／拒绝
+ P -> S : 办理费用更正与退费(审核决定)
+ S -> R : 读取原账、付款、医保及有效用途(原单)
+ R --> S : 装配负责人当前审核的原申请版本
+ S -> Q : 记录批准退回或拒绝(审核依据)
+ S -> R : 保存申请及审核历史(阶段,版本)
+ R -> M : 保存申请及审核历史(阶段,版本)\n版本重查及原审核历史
+ M --> R : 当前决定及不可覆盖的历史
+ R --> S : 原申请真实审核结果
+end
+alt 已批准，且当前申请版本及必要医保处理可核对
+ opt 涉及已医保结算费用
+  S -> I : 按原号结算撤销或查询()
+  I --> S : 已完成／未知／未完成
+ end
+ alt 无需医保处理或必要医保处理已完成
+  S -> D : 核对申请已批准且未生效()
+  S -> D : 核对明细合计与批准额()
+  S -> D : 确认调整及必要用途释放()
+  S -> R : 保存调整及用途释放(版本)
+  R -> M : 保存调整及用途释放(版本)\n调整、明细和必要用途同事务
+  M --> R : 调整已生效或返回原结果
+  R --> S : 最新费用、有效用途及患者差额
+  alt 有可退患者原款
+   S -> RF : 核对批准额度及原款可用额()
+   S -> RF : 建立办理并占用额度()
+   S -> R : 保存退款占额或真实结果(原办理号)
+   R -> M : 保存退款占额或真实结果(原办理号)\n先提交本地待办及额度占用
+   M --> R : 恒定退款号与占用已保存
+   R --> S : 可进行实际退款
+   alt 原款电子渠道
+    S -> PAY : 原款退款或查询()
+    PAY --> S : 原笔成功／失败／待核实及凭据
+   else 原款现金
+    A -> P : 实际退回并核实接收方
+    P -> S : 提交真实交付凭据与实际额
+   end
+   alt 已核实成功
+    S -> RF : 确认实际退款(真实金额与凭据)
+   else 结果未知
+    S -> RF : 保留未知结果与占用()
+   else 明确失败
+    S -> RF : 确认失败并释放占用(依据)
+   end
+   S -> R : 保存退款占额或真实结果(原办理号)
+   R -> M : 保存退款占额或真实结果(原办理号)\n重核原笔、真实状态和额度
+   M --> R : 返回原退款记录，重复不再确认
+   R --> S : 退款实际结果及未完成额度
+  else 无应退或需要补收
+   S --> P : 返回真实差额；需补收交UC-13
+  end
+ else 医保处理未知或未完成
+  S --> P : 保留待办，不确认最终退补差额
+ end
+else 未批准、已处理或当前版本变化
+ S --> P : 返回真实决定、原结果或需重核原因
+end
+S --> P : 分别展示申请、调整及真实退款结果
+@enduml

@@ -1,11 +1,11 @@
 'use strict';
 const { setup, command } = require('./v2-treatment');
-function setupFees(t, { receivedCents = 100000, offsetCents = 0 } = {}) {
+function setupFees(t, { receivedCents = 100000, offsetCents = 0, channel='现金' } = {}) {
   const a = setup(t), service = a.service(); a.price(service.id);
   a.execution = a.execute(service.id, { quantity: 5, independentCheck: true, independentBasis: '隔离财务流程所需的实际检查依据' });
   let q = a.bills(), b = q.items[0]; a.billId = b.id; a.lineId = b.items[0].id;
   a.payment = a.payments.receive(a.c, command({ action: 'receive', patientId: 1, expectedFundsRevision: q.funds.revision,
-    receivedCents, changeCents: 0, channel: '现金', verification: 'confirmed', receivedAt: a.auth.now(), transactionEvidence: '隔离演示实收依据', keepAsPrepayment: true,
+    receivedCents, changeCents: 0, channel, ...(channel==='现金'?{}:{externalReference:'FEE-PAY-'+require('node:crypto').randomUUID()}), verification: 'confirmed', receivedAt: a.auth.now(), transactionEvidence: '隔离演示实收依据', keepAsPrepayment: true,
     allocations: [{ billId: b.id, expectedRevision: b.revision, amountCents: Math.min(receivedCents, 100000) - offsetCents, reason: '原付款用途' }] }));
   if (offsetCents) {
     q = a.bills(); b = q.items[0];
@@ -30,7 +30,7 @@ function setupFees(t, { receivedCents = 100000, offsetCents = 0 } = {}) {
     const q = a.bills(), r = a.db.prepare('SELECT * FROM fee_request WHERE id=?').get(requestId);
     return a.fees.refund(credentials, command({ action: 'initiate', patientId: 1, requestId, paymentId: a.payment.id, expectedApprovalRevision: r.revision,
       expectedFundsRevision: q.funds.revision, expectedBillRevision: q.items[0].revision, expectedPaymentRevision: 1,
-      amountCents: 20000, channel: '现金', recipientVerification: '核实原付款人及实际接收信息', ...extra }));
+      amountCents: 20000, channel, recipientVerification: '核实原付款人及实际接收信息', ...extra }));
   };
   a.finish = (refundId, extra = {}, credentials = a.c) => {
     const q = a.bills(), r = a.db.prepare('SELECT * FROM patient_refund WHERE id=?').get(refundId);

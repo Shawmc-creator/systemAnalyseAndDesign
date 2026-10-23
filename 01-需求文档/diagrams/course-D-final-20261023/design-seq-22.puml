@@ -1,0 +1,87 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam maxMessageSize 260
+skinparam sequenceMessageAlign center
+hide footbox
+autonumber
+
+actor "前台" as FD
+actor "收费人员" as CA
+boundary "医保办理页面" as P
+control "医保与药学应用服务" as S
+entity "医保身份核验" as ID
+entity "医保就诊办理" as C
+entity "医保费用明细" as F
+participant "医保存取接口" as R
+participant "SQLite医保药学映射器" as M
+participant "医保适配接口" as G
+participant "医保平台" as X
+group 前台核验登记
+ FD -> P : 选择患者及实际就诊，取得核验同意
+ P -> S : 核验医保身份并办理预结算(核验阶段)
+ S -> R : 读取身份、费用及原办理(患者,原单)
+ R --> S : 原办理号、当前资料及核验状态
+ S -> ID : 核对患者及核验适用条件()
+ S -> G : 按原号核验或预结算()
+ G -> X : 本阶段身份核验，沿稳定原号核实
+ X --> G : 通过／未通过／未知
+ G --> S : 核实依据及适用期
+ opt 核验结果已明确
+  S -> ID : 记录明确核验结果(原办理依据)
+ end
+ S -> R : 保存身份及登记(原办理号)
+ R -> M : 保存身份及登记(原办理号)\n仅当前身份和登记结果
+ M --> R : 本地登记结果
+ R --> S : 当前办理及后续待办
+end
+group 稍后诊疗核价完成，收费人员申请预结算
+ CA -> P : 核对原办理、诊断、费用版本及地区标识
+ P -> S : 核验医保身份并办理预结算(费用阶段)
+ S -> R : 读取身份、费用及原办理(患者,原单)
+ R --> S : 装配当前身份、原账及原提交
+ S -> C : 核对患者就诊身份及账目归属()
+ S -> C : 核对本次费用范围及适用条件()
+ S -> F : 核对实际费用及适用标识()
+ S -> F : 固定本次提交范围及快照()
+ alt 核验及费用适用，且无未决原提交
+  S -> R : 保存原提交与确切费用明细(办理号)
+  R -> M : 保存原提交与确切费用明细(办理号)\n提交历史与明细同事务
+  M --> R : 恒定原提交号已保存，事务结束
+  R --> S : 本次preestimate_request_id
+  S -> G : 按原号核验或预结算()
+  G -> X : 提交固定范围并请求本次预结算
+  X --> G : 平台真实结果／未知
+  G --> S : 原提交对应的核实结果
+  alt 取得有效成功预估
+   S -> C : 保存预估分摊(平台实际结果)
+   S -> R : 追加预估结果、失效或选择(原提交)
+   R -> M : 追加预估结果、失效或选择(原提交)\n本次真实结果和当前投影
+   M --> R : 本地结果已提交
+   R --> S : 当前预估及确切费用范围
+   S --> P : 展示基金、个账、其他自付及范围外自费
+   CA -> P : 向患者说明，记录其实际选择及确认时间
+   P -> S : 核验医保身份并办理预结算(患者选择)
+   S -> C : 核对本次费用范围及适用条件()
+   S -> C : 记录患者实际选择()
+   S -> R : 追加预估结果、失效或选择(原提交)
+   R -> M : 追加预估结果、失效或选择(原提交)\n重查有效性及实际选择
+   M --> R : 实际选择保存或提示须重新说明
+   R --> S : 仅有效且确认医保时提供UC-23入口
+  else 明确失败或结果未知
+   S -> R : 追加预估结果、失效或选择(原提交)
+   R -> M : 追加预估结果、失效或选择(原提交)\n核实结果与原提交明细保持
+   M --> R : 失败或待核实，不伪造成功金额
+   R --> S : 按原号查询；必要补正返回原费用阶段
+  end
+ else 条件变化、核验不适用或原结果未决
+  S --> P : 返回补正或原单查询入口；不另发重复请求
+ end
+end
+S --> P : 分阶段显示真实状态及可继续操作
+@enduml

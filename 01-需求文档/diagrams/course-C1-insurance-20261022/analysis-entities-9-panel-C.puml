@@ -1,0 +1,57 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 225
+skinparam linetype ortho
+skinparam nodesep 75
+skinparam ranksep 90
+hide circle
+hide empty members
+package "预结算办理及患者选择" as C {
+' @reference patient
+class "患者" as patient_c <<entity>>
+' @reference visit
+class "就诊" as visit_c <<entity>>
+' @reference bill
+class "应收账目" as bill_c <<entity>>
+' @reference insurance_identity
+class "医保身份核验" as identity_c <<entity>>
+' @reference insurance_case
+class "医保就诊办理" as previous_case_c <<entity>>
+class "医保就诊办理" as insurance_case <<entity>> {
+ 唯一业务号、机构及诊断标识
+ 费用版本、办理状态及结果依据
+ 预估基金／个账／其他自付
+ 患者选择及确认时间
+ --
+ +核对患者就诊身份及账目归属()
+ +核对本次费用范围及适用条件()
+ +保存预估分摊(平台实际结果)
+ +使旧预估失效(变更依据)
+ +记录患者实际选择()
+ +建立重新办理(原办理依据)
+}
+patient_c "1" -- "0..*" insurance_case
+visit_c "1" -- "0..*" insurance_case
+bill_c "0..1" -- "0..*" insurance_case
+identity_c "0..1" -- "0..*" insurance_case
+previous_case_c "原办理\n0..1" -- "0..*" insurance_case
+patient_c -[hidden]right- visit_c
+visit_c -[hidden]right- bill_c
+note bottom of insurance_case
+同一提交范围：总费＝预估基金＋个账＋其他自付，均非负。
+范围外自费另列；预估不抵最终待付，也不算正式到账。
+费用版本或适用条件变化，原预估失效并保留依据。
+患者选择医保后才能正式结算，未决定或自费不自动结算。
+end note
+}
+@enduml

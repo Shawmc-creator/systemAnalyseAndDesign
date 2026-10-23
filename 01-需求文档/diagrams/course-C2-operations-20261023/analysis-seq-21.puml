@@ -1,0 +1,68 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "收费人员" as A
+boundary "收费人员接口" as B
+actor "诊所负责人" as M
+boundary "诊所负责人接口" as BM
+control "核对日常经营与收付款控制" as K
+entity "应收账目" as G
+entity "患者付款" as P
+entity "医保结算" as I
+entity "医保结算款收付" as F
+entity "收退款核对" as Q
+
+A -> B : 选择营业日期、截止时点及核对范围
+B -> K : 查询及核对条件
+activate K
+K -> K : 核验权限；按本地营业日期及实际发生/生效时点读取业务
+K -> G : 汇总已核价应收(生效调整)
+K -> P : 核对实收找零与净收()
+K -> I : 核对明确正式结果及分摊()
+K -> F : 核对原结算及实际收付依据()
+K -> K : 读取到诊及已确认退款，分列费用、患者收付、医保结算和实际回款
+break 2a 查询范围内没有业务
+ K --> B : 显示范围及零业务；无渠道资料不能据此认定已核平
+end
+K --> B : 分类汇总及原单来源；预款抵扣不重复计入收款
+loop 本次选定的收退款原单
+ A -> B : 对照现金记录或正式渠道凭据核对原支付/退款单
+ B -> K : 原单、渠道实际额及正式依据
+ K -> Q : 核对收款或退款原单()
+ alt 3a 未取得正式渠道结果
+  K -> K : 保持待核对，取得依据后继续；未知不作到账
+  K --> B : 尚缺依据的原单及待办
+ else 已有真实依据
+  K -> Q : 记录核对结果(正式依据)
+  alt 金额及状态一致
+   K --> B : 已保存本次一致结果
+  else 4a 有差异
+   K -> K : 保存差异、原因、处理责任及日期，不直接改原费用和收付
+   ref over B,K : UC-13、14、23按原单补记或更正；医保核减不直接转患者欠费
+   opt 原业务已核实处理
+    K -> Q : 记录差异处理(原办理结果)
+   end
+   K --> B : 差异待处理或已处理，保留原单依据
+  end
+ end
+end
+deactivate K
+M -> BM : 查看相同日期范围及截止时点的经营结果
+BM -> K : 负责人查阅条件
+K -> K : 核验负责人查阅范围，读取分类及仍待核对项目
+K --> BM : 到诊、费用、患者净收付、医保及待处理项和原单
+BM --> M : 患者净收=确认收款-确认退款；可为负，不把应收当到账
+
+@enduml

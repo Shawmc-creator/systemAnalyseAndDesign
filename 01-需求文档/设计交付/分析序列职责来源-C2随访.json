@@ -1,0 +1,81 @@
+{
+  "source": "现行B的UC-15—17及其规则；按业务目标、岗位交接、基本流程和关键扩展表达",
+  "cases": [
+    {
+      "uc": 15,
+      "title": "提出复诊随访要求",
+      "entities": [
+        {
+          "alias": "R",
+          "name": "诊后要求",
+          "table": "followup_requirement"
+        }
+      ],
+      "branches": [
+        "2a",
+        "4a",
+        "5a",
+        "6a"
+      ],
+      "rules": [
+        "R15-1",
+        "R15-2"
+      ]
+    },
+    {
+      "uc": 16,
+      "title": "办理复诊联系与预约",
+      "entities": [
+        {
+          "alias": "R",
+          "name": "诊后要求",
+          "table": "followup_requirement"
+        },
+        {
+          "alias": "C",
+          "name": "联系经历",
+          "table": "contact_history"
+        }
+      ],
+      "branches": [
+        "1a",
+        "1b",
+        "3a",
+        "4a",
+        "5a"
+      ],
+      "rules": [
+        "R16-1",
+        "R16-2"
+      ]
+    },
+    {
+      "uc": 17,
+      "title": "记录复诊随访评估",
+      "entities": [
+        {
+          "alias": "R",
+          "name": "诊后要求",
+          "table": "followup_requirement"
+        },
+        {
+          "alias": "E",
+          "name": "临床评估",
+          "table": "clinical_assessment"
+        }
+      ],
+      "branches": [
+        "2a",
+        "4a",
+        "4b",
+        "5a"
+      ],
+      "rules": [
+        "R17-1",
+        "R17-2"
+      ]
+    }
+  ],
+  "C1_operations_added": [],
+  "simplification": "保留真实联系、独立预约、实际评估及关键状态；不在每张图重复展开版本竞争、本地事务和保存重试机制，通用失败要求仍适用。"
+}

@@ -1,0 +1,73 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 260
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as A
+boundary "牙医接口" as B
+control "查阅患者诊疗资料控制" as K
+entity "职员账号" as U
+entity "病历" as R
+entity "治疗方案" as T
+entity "处方" as P
+entity "诊疗文件" as D
+
+A -> B : 选择患者及日期、就诊或资料类别
+B -> K : 患者编号、筛选条件及当前账号
+activate K
+K -> U : 核验办理授权()
+break 2a 无诊疗查阅权限
+ K --> B : 拒绝正文及原件访问
+ B --> A : 本次结束
+end
+K -> K : 按稳定患者编号读取可见历史目录
+break 2b 没有历史资料
+ K --> B : 明确无记录，不推断无病史
+ B --> A : 展示空结果，本次结束
+end
+K --> B : 可查就诊与资料目录
+A -> B : 选择就诊及资料
+B -> K : 所选患者、就诊及资料编号
+K -> U : 核验办理授权()
+break 当前资料授权不满足
+ K --> B : 拒绝访问，本次结束
+end
+K -> R : 核对病历患者及就诊归属()
+R --> K : 原正文、所见及签署补充的归属与状态
+K -> T : 核对方案患者归属()
+T --> K : 所属患者及历版方案
+K -> P : 核对处方就诊归属()
+P --> K : 所属就诊及处方状态
+K -> D : 核对患者及诊疗归属()
+D --> K : 文件索引、历版及确认状态
+K -> K : 仅读同患者资料，关联实际治疗与实际发药
+K --> B : 来源、日期、版本及状态分开展示
+B --> A : 区分计划与实际、草稿与签署、处方与交付
+opt 牙医打开原件
+ B -> K : 文件及指定版本编号
+ K -> U : 核验办理授权()
+ K -> D : 核对患者及诊疗归属()
+ break 原件授权或归属不满足
+  K --> B : 拒绝原件，保留已授权目录
+ end
+ K -> K : 读取获准原件，不暴露存储位置
+ alt 4a 原件不可读
+  K --> B : 保留索引及失败原因，回资料选择
+ else 原件可读
+  K --> B : 返回原件内容
+ end
+end
+deactivate K
+
+@enduml

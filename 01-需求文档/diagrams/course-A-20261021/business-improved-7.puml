@@ -1,0 +1,57 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "收费人员" as C
+actor "诊所负责人" as M
+entity "诊所管理系统" as S
+participant "医保平台" as I
+participant "支付平台" as Pay
+P -> C : 提出费用异议或退费要求
+C -> S : 查原项目、原医保与原付款并提交依据
+S --> M : 提供原单和拟处理范围
+M -> S : 核实并记录批准或退回意见
+alt 已批准
+ opt 需要处理原医保结算
+  S -> I : 按规则办理更正或撤销并查询原笔
+  I --> S : 返回真实结果
+ end
+ alt 无需医保处理或必要处理已明确完成
+  S -> S : 按批准范围更正费用，核对最终分摊及退补
+  S --> C : 显示患者实际应退或待补金额
+  alt 有患者实际应退款
+   alt 原款为现金
+    C -> P : 实际退回并核实接收
+    C -> S : 登记真实退款及原款凭据
+   else 原款为电子支付
+    C -> S : 请求原款退款或查询原笔
+    S -> Pay : 办理原付款对应退款或回查
+    Pay --> S : 明确成功、失败或未知
+   end
+   S -> S : 分别保存费用与实际退款结果
+  else 无应退或需补收
+   S --> C : 展示差额，需补收时转BUC-05
+  end
+ else 医保处理尚未明确完成
+  S --> C : 保留待办，不确认最终患者退补
+ end
+else 未批准或需补充
+ S --> C : 保留原费用和处理意见
+end
+S --> C : 分别返回费用、医保及患者退款状态
+C -> P : 交付真实结果和后续安排
+@enduml

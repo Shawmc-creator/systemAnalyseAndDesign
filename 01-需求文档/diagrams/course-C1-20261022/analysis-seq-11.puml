@@ -1,0 +1,54 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 120
+actor "收费人员" as A
+boundary "收费人员接口" as B
+control "维护收费项目\n与价目控制" as K
+entity "收费项目" as E0
+entity "价目" as E1
+actor "诊所负责人" as M
+boundary "诊所负责人接口" as BM
+A -> B : 维护收费项目与价目
+B -> K : 提交对象编号及办理内容
+activate K
+K -> K : 核对岗位权限与必要资料
+alt 可以办理
+K -> E0 : 保存收费项目和计价单位
+activate E0
+E0 --> K : 项目编号
+deactivate E0
+K -> E1 : 录入价目并核对适用期间
+activate E1
+E1 --> K : 待确认价格
+deactivate E1
+K --> BM : 提供待审核内容及来源
+M -> BM : 核实并记录审核意见
+BM -> K : 提交负责人意见
+K -> E1 : 按负责人意见确认生效
+activate E1
+E1 --> K : 可用于新计费的价目
+deactivate E1
+K --> B : 返回本次结果
+else 权限资料或状态不符合
+K --> B : 返回核对原因且不改变原记录
+end
+B --> A : 展示结果
+deactivate K
+
+@enduml

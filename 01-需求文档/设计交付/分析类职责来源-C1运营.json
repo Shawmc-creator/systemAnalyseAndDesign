@@ -1,0 +1,862 @@
+{
+  "entities": [
+    {
+      "table": "followup_requirement",
+      "name": "诊后要求",
+      "attrs": [
+        "类型、目的、目标起止日期",
+        "是否需临床评估、负责前台",
+        "要求状态、下次联系日期",
+        "发布及变更依据、完成或撤销人和时间"
+      ],
+      "ops": [
+        "核对患者与诊疗来源()",
+        "暂存或发布要求()",
+        "调整未完成要求(原因)",
+        "撤销要求(牙医依据)",
+        "安排继续跟进(日期与责任人)",
+        "核对目的达成及完成依据()"
+      ],
+      "uc": [
+        15,
+        16,
+        17
+      ],
+      "rules": [
+        "R15-1",
+        "R15-2",
+        "R16-2",
+        "R17-2"
+      ]
+    },
+    {
+      "table": "contact_history",
+      "name": "联系经历",
+      "attrs": [
+        "实际方式、时间、前台",
+        "沟通事实、结果、下次联系日"
+      ],
+      "ops": [
+        "记录实际联系结果()",
+        "核对成功预约归属()",
+        "关联既有成功预约()",
+        "记录继续联系(日期)"
+      ],
+      "uc": [
+        16
+      ],
+      "rules": [
+        "R16-1",
+        "R16-2"
+      ]
+    },
+    {
+      "table": "clinical_assessment",
+      "name": "临床评估",
+      "attrs": [
+        "到诊检查或远程沟通、时间、牙医",
+        "结论、意见、来源及局限",
+        "下次日期、跟进责任人"
+      ],
+      "ops": [
+        "核对评估方式与实际依据()",
+        "追加实际评估()",
+        "判断原目的是否达到()",
+        "记录继续跟进(日期与责任人)"
+      ],
+      "uc": [
+        17
+      ],
+      "rules": [
+        "R17-1",
+        "R17-2"
+      ]
+    },
+    {
+      "table": "material",
+      "name": "材料",
+      "attrs": [
+        "名称、类别、规格、启用状态",
+        "基本单位、采购单位、换算分子分母",
+        "数量精度、批次及效期要求",
+        "计量确认人和时间"
+      ],
+      "ops": [
+        "核对单位换算及数量精度()",
+        "确认计量设置(负责人)",
+        "核对历史设置可修改性()"
+      ],
+      "uc": [
+        18
+      ],
+      "rules": [
+        "R18-1"
+      ]
+    },
+    {
+      "table": "material_batch",
+      "name": "材料批次",
+      "attrs": [
+        "实际批号、真实效期、来源",
+        "待检／可用／隔离／停用／过期"
+      ],
+      "ops": [
+        "核对同材料批号及效期()",
+        "核对当前领用可用性(实际日期)",
+        "放行或恢复(负责人及依据)",
+        "立即隔离(原因)",
+        "停用批次(负责人及依据)"
+      ],
+      "uc": [
+        18,
+        20
+      ],
+      "rules": [
+        "R18-2",
+        "R20-1"
+      ]
+    },
+    {
+      "table": "batch_change",
+      "name": "批次变更",
+      "attrs": [
+        "前后状态、原因",
+        "经办及确认身份、实际时间"
+      ],
+      "ops": [
+        "核对变更权限与原状态()",
+        "记录状态决定及依据()"
+      ],
+      "uc": [
+        18
+      ],
+      "rules": [
+        "R18-2"
+      ]
+    },
+    {
+      "table": "stock_location",
+      "name": "存放位置",
+      "attrs": [
+        "位置名称、用途、启用状态"
+      ],
+      "ops": [
+        "核对位置用途及可用性()"
+      ],
+      "uc": [
+        19,
+        20
+      ],
+      "rules": [
+        "R19-1",
+        "R20-1"
+      ]
+    },
+    {
+      "table": "batch_stock",
+      "name": "批次存量",
+      "attrs": [
+        "基本单位账面数量、库存版本"
+      ],
+      "ops": [
+        "核对批次位置唯一性()",
+        "核对当前量及版本()",
+        "按合法变动更新余额()"
+      ],
+      "uc": [
+        19,
+        20
+      ],
+      "rules": [
+        "R19-2",
+        "R20-1",
+        "R20-3"
+      ]
+    },
+    {
+      "table": "inventory_movement",
+      "name": "库存变动",
+      "attrs": [
+        "类型、正负变动量、前后量",
+        "实际时间、经办人、用途和依据"
+      ],
+      "ops": [
+        "核对变动及前后量()",
+        "核对原领用退回额度(已用与已退)",
+        "登记实际库存变动()"
+      ],
+      "uc": [
+        19,
+        20,
+        25
+      ],
+      "rules": [
+        "R19-2",
+        "R20-1",
+        "R20-2",
+        "R25-3"
+      ]
+    },
+    {
+      "table": "material_usage",
+      "name": "实际用料",
+      "attrs": [
+        "实际正数量、时间、就诊说明",
+        "登记助理"
+      ],
+      "ops": [
+        "核对原领用剩余量(已用与已退)",
+        "登记实际就诊用料()"
+      ],
+      "uc": [
+        20
+      ],
+      "rules": [
+        "R20-2"
+      ]
+    },
+    {
+      "table": "stock_count",
+      "name": "盘点核实",
+      "attrs": [
+        "账面快照B、实点C、库存版本",
+        "实点时间、助理、差异原因",
+        "负责人决定及时间、核实状态",
+        "/差异D＝C－B"
+      ],
+      "ops": [
+        "核对确认时库存版本()",
+        "记录待重新核对(原因)",
+        "记录负责人决定(同意或拒绝)",
+        "计算必要调整量()"
+      ],
+      "uc": [
+        20
+      ],
+      "rules": [
+        "R20-3"
+      ]
+    },
+    {
+      "table": "supplier",
+      "name": "供应商",
+      "attrs": [
+        "名称、联系人、电话、地址",
+        "启用状态"
+      ],
+      "ops": [
+        "核对供方及联系资料()"
+      ],
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1"
+      ]
+    },
+    {
+      "table": "purchase_order",
+      "name": "采购",
+      "attrs": [
+        "需求依据、交付约定",
+        "待确认／已确认／已取消",
+        "提出及确认人、时间、取消原因"
+      ],
+      "ops": [
+        "核对供应商及采购明细()",
+        "提交采购需求()",
+        "确认采购(负责人)",
+        "取消采购(原因)"
+      ],
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1",
+        "R19-2"
+      ]
+    },
+    {
+      "table": "purchase_order_item",
+      "name": "采购项目",
+      "attrs": [
+        "材料、正的采购数量",
+        "单位、换算、精度、单价快照"
+      ],
+      "ops": [
+        "核对采购量及计量()",
+        "固定确认时约定快照()",
+        "核对累计合格支持量()"
+      ],
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1",
+        "R19-2"
+      ]
+    },
+    {
+      "table": "purchase_receipt",
+      "name": "验收",
+      "attrs": [
+        "实际到货时间、随货单依据",
+        "验收状态、经办及确认时间"
+      ],
+      "ops": [
+        "核对已确认原采购()",
+        "登记本次实际到货()",
+        "确认验收结果(明细与依据)"
+      ],
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1",
+        "R19-2"
+      ]
+    },
+    {
+      "table": "purchase_receipt_item",
+      "name": "验收项目",
+      "attrs": [
+        "到货、合格、拒收、待检数量",
+        "批次位置、检验及差异依据",
+        "/本次新确认合格增量"
+      ],
+      "ops": [
+        "核对到货数量分解()",
+        "核对材料批次位置及采购支持量()",
+        "确认待检后续结论(保留原到货)",
+        "计算本次应入库增量()"
+      ],
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1",
+        "R19-2"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "a": "patient_r",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "followup_requirement",
+      "b_multiplicity": "0..*",
+      "uc": [
+        15
+      ],
+      "rules": [
+        "R15-1"
+      ],
+      "meaning": "要求属于唯一患者"
+    },
+    {
+      "a": "visit_r",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "followup_requirement",
+      "b_multiplicity": "0..*",
+      "uc": [
+        15
+      ],
+      "rules": [
+        "R15-1"
+      ],
+      "meaning": "可选来源就诊，同患者"
+    },
+    {
+      "a": "plan_r",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "followup_requirement",
+      "b_multiplicity": "0..*",
+      "uc": [
+        15
+      ],
+      "rules": [
+        "R15-1"
+      ],
+      "meaning": "可选来源方案版本，同患者"
+    },
+    {
+      "a": "requirement_c",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "contact_history",
+      "b_multiplicity": "0..*",
+      "uc": [
+        16
+      ],
+      "rules": [
+        "R16-1"
+      ],
+      "meaning": "实际联系逐次追加，失败也保留事实"
+    },
+    {
+      "a": "appointment_c",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "contact_history",
+      "b_multiplicity": "0..*",
+      "uc": [
+        16
+      ],
+      "rules": [
+        "R16-1"
+      ],
+      "meaning": "仅关联同患者成功预约，可尚无预约"
+    },
+    {
+      "a": "requirement_a",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "clinical_assessment",
+      "b_multiplicity": "0..*",
+      "uc": [
+        17
+      ],
+      "rules": [
+        "R17-2"
+      ],
+      "meaning": "评估逐次保留，原目的与新治疗分别判断"
+    },
+    {
+      "a": "visit_a",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "clinical_assessment",
+      "b_multiplicity": "0..*",
+      "uc": [
+        17
+      ],
+      "rules": [
+        "R17-1"
+      ],
+      "meaning": "到诊须同患者实际就诊，远程不伪造就诊"
+    },
+    {
+      "a": "material",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "material_batch",
+      "b_multiplicity": "0..*",
+      "uc": [
+        18
+      ],
+      "rules": [
+        "R18-1",
+        "R18-2"
+      ],
+      "meaning": "批次属于唯一材料，同材料批号不重复"
+    },
+    {
+      "a": "material_batch",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "batch_change",
+      "b_multiplicity": "0..*",
+      "uc": [
+        18
+      ],
+      "rules": [
+        "R18-2"
+      ],
+      "meaning": "变更独占批次，状态与变化共同保存并保留历史"
+    },
+    {
+      "a": "batch_s",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "batch_stock",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19,
+        20
+      ],
+      "rules": [
+        "R19-1",
+        "R20-1"
+      ],
+      "meaning": "同批次按实际位置分别计量"
+    },
+    {
+      "a": "stock_location",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "batch_stock",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19,
+        20
+      ],
+      "rules": [
+        "R19-1",
+        "R20-1"
+      ],
+      "meaning": "批次与位置组合唯一"
+    },
+    {
+      "a": "batch_stock",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "movement_s",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19,
+        20
+      ],
+      "rules": [
+        "R19-2",
+        "R20-1"
+      ],
+      "meaning": "数量变化有来源流水，与余额共同保存"
+    },
+    {
+      "a": "stock_u",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "inventory_movement",
+      "b_multiplicity": "0..*",
+      "uc": [
+        20
+      ],
+      "rules": [
+        "R20-1"
+      ],
+      "meaning": "流水归属批次位置，普通领用核对可用量"
+    },
+    {
+      "a": "original_u",
+      "a_multiplicity": "原领用\\n0..1",
+      "kind": "--",
+      "b": "inventory_movement",
+      "b_multiplicity": "0..*",
+      "uc": [
+        20
+      ],
+      "rules": [
+        "R20-2"
+      ],
+      "meaning": "未用退回关联原领用及原批次位置"
+    },
+    {
+      "a": "inventory_movement",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "material_usage",
+      "b_multiplicity": "0..*",
+      "uc": [
+        20
+      ],
+      "rules": [
+        "R20-2"
+      ],
+      "meaning": "实际用料引用领用流水，不二次扣库"
+    },
+    {
+      "a": "visit_u",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "material_usage",
+      "b_multiplicity": "0..*",
+      "uc": [
+        20
+      ],
+      "rules": [
+        "R20-2"
+      ],
+      "meaning": "实际用料关联真实就诊"
+    },
+    {
+      "a": "inventory_movement",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "dispense_u",
+      "b_multiplicity": "0..1",
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-3"
+      ],
+      "meaning": "院内实际发药形成唯一同源出库，不与普通用料重复扣量"
+    },
+    {
+      "a": "stock_c",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "stock_count",
+      "b_multiplicity": "0..*",
+      "uc": [
+        20
+      ],
+      "rules": [
+        "R20-3"
+      ],
+      "meaning": "每次盘点保留对应批次位置快照"
+    },
+    {
+      "a": "stock_count",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "movement_c",
+      "b_multiplicity": "0..1",
+      "uc": [
+        20
+      ],
+      "rules": [
+        "R20-3"
+      ],
+      "meaning": "盘点通过且非零差异时形成唯一必要调整流水"
+    },
+    {
+      "a": "supplier",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "purchase_order",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1"
+      ],
+      "meaning": "采购有确定供方及联系方式"
+    },
+    {
+      "a": "purchase_order",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "purchase_order_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1"
+      ],
+      "meaning": "待确认可不完整，确认前至少一项有效明细"
+    },
+    {
+      "a": "material_o",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "purchase_order_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R18-1",
+        "R19-1"
+      ],
+      "meaning": "采购采用已确认材料计量，快照保留"
+    },
+    {
+      "a": "order_i",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "purchase_receipt",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1"
+      ],
+      "meaning": "分批到货分别验收，依据同一已确认采购"
+    },
+    {
+      "a": "purchase_receipt",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "purchase_receipt_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1"
+      ],
+      "meaning": "每次验收按材料批次位置分别记录"
+    },
+    {
+      "a": "order_item_i",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "purchase_receipt_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1",
+        "R19-2"
+      ],
+      "meaning": "每项回溯原采购明细，累计合格入库有支持量"
+    },
+    {
+      "a": "batch_i",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "purchase_receipt_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1"
+      ],
+      "meaning": "批次未明可先待检，合格量正时批次必填且材料一致"
+    },
+    {
+      "a": "location_i",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "purchase_receipt_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-1"
+      ],
+      "meaning": "合格量正时位置必填，不同批次位置拆行"
+    },
+    {
+      "a": "purchase_receipt_item",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "movement_i",
+      "b_multiplicity": "0..*",
+      "uc": [
+        19
+      ],
+      "rules": [
+        "R19-2"
+      ],
+      "meaning": "仅新增合格增量形成正向入库，待检后续不重复入库"
+    }
+  ],
+  "references": [
+    {
+      "table": "patient",
+      "name": "患者",
+      "alias": "patient_r"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_r"
+    },
+    {
+      "table": "plan_version",
+      "name": "方案版本",
+      "alias": "plan_r"
+    },
+    {
+      "table": "followup_requirement",
+      "name": "诊后要求",
+      "alias": "requirement_c"
+    },
+    {
+      "table": "appointment",
+      "name": "预约",
+      "alias": "appointment_c"
+    },
+    {
+      "table": "followup_requirement",
+      "name": "诊后要求",
+      "alias": "requirement_a"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_a"
+    },
+    {
+      "table": "material_batch",
+      "name": "材料批次",
+      "alias": "batch_s"
+    },
+    {
+      "table": "inventory_movement",
+      "name": "库存变动",
+      "alias": "movement_s"
+    },
+    {
+      "table": "batch_stock",
+      "name": "批次存量",
+      "alias": "stock_u"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_u"
+    },
+    {
+      "table": "inventory_movement",
+      "name": "库存变动",
+      "alias": "original_u"
+    },
+    {
+      "table": "dispense_record",
+      "name": "实际发药",
+      "alias": "dispense_u"
+    },
+    {
+      "table": "batch_stock",
+      "name": "批次存量",
+      "alias": "stock_c"
+    },
+    {
+      "table": "inventory_movement",
+      "name": "库存变动",
+      "alias": "movement_c"
+    },
+    {
+      "table": "material",
+      "name": "材料",
+      "alias": "material_o"
+    },
+    {
+      "table": "purchase_order",
+      "name": "采购",
+      "alias": "order_i"
+    },
+    {
+      "table": "purchase_order_item",
+      "name": "采购项目",
+      "alias": "order_item_i"
+    },
+    {
+      "table": "material_batch",
+      "name": "材料批次",
+      "alias": "batch_i"
+    },
+    {
+      "table": "stock_location",
+      "name": "存放位置",
+      "alias": "location_i"
+    },
+    {
+      "table": "inventory_movement",
+      "name": "库存变动",
+      "alias": "movement_i"
+    }
+  ],
+  "source": "现行B用例UC-15—20及UC-25发药出库规则；原69表核对既有对象与关联，不替代B需求",
+  "physical_refinement_pending": [
+    "诊后要求发布人和发布时刻、调整前后内容及撤销依据须可追查；已有负责人与完成字段不代替发布历史",
+    "临床评估到诊须有同患者实际就诊，远程不关联虚构就诊；完成或继续跟进与要求状态共同生效",
+    "待检后续只追加新合格入库增量，同验收项目可分次入库，必须保留历次数量及确认依据，不能覆盖原到货事实",
+    "库存普通领用、实际发药、未用退回与实际用料区分来源及额度；原领用的累计用料和退回约束不可只逐行校验",
+    "盘点确认时比对快照版本，非零差异最多一条对应流水；重新实点的旧快照与决定须保留",
+    "采购取消及超供协调保留原因和负责人处理依据，按既有采购对象留存，不扩展复杂供货资金分配"
+  ],
+  "note": "本批16个完整实体定义；跨组同名者与原对象引用不是新实体或新表。数据层差异留待D同步。"
+}

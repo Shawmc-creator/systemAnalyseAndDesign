@@ -1,0 +1,867 @@
+{
+  "date": "2026-10-22",
+  "status": "第三批：UC-01—04规约修订完成；整体课程符合性仍待后续修订",
+  "pdf_pages": 180,
+  "figures": 153,
+  "system_usecases": 25,
+  "logical_tables": 69,
+  "fully_structured_usecase_specs": [
+    {
+      "usecase": "UC-01",
+      "pdf_pages": [
+        44,
+        45
+      ],
+      "standard_items": 12,
+      "main_steps": 7,
+      "branches": 5,
+      "field_groups": 5,
+      "rules": 3
+    },
+    {
+      "usecase": "UC-02",
+      "pdf_pages": [
+        46,
+        47
+      ],
+      "standard_items": 12,
+      "main_steps": 8,
+      "branches": 8,
+      "field_groups": 5,
+      "rules": 3
+    },
+    {
+      "usecase": "UC-03",
+      "pdf_pages": [
+        48,
+        49
+      ],
+      "standard_items": 12,
+      "main_steps": 7,
+      "branches": 6,
+      "field_groups": 4,
+      "rules": 3
+    },
+    {
+      "usecase": "UC-04",
+      "pdf_pages": [
+        50,
+        51
+      ],
+      "standard_items": 12,
+      "main_steps": 7,
+      "branches": 6,
+      "field_groups": 4,
+      "rules": 3
+    }
+  ],
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 74,
+    "D": 122
+  },
+  "layout_changes": [
+    "69张字段表按完整表块连续排版，去掉17个重复编号小节及强制分页",
+    "质量要求与验收场景同页",
+    "数据完整性与共享字段安排同页",
+    "页面权限与表单反馈同页"
+  ],
+  "validation": {
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "new_usecase_pages_rendered_and_reviewed": 8,
+    "layout_adjustment_pages_rendered_and_reviewed": true,
+    "A_source_unchanged": true,
+    "C_source_unchanged": true,
+    "UC05_through_UC25_source_unchanged": true,
+    "field_tables_preserved_verbatim": 69,
+    "figure_paths_and_captions_unchanged": 153,
+    "all_figure_page_locations_verified": true
+  },
+  "performance_target_status": "6岗位并发、100次查询中至少95次2秒内返回为本组验收目标，本轮未运行系统性能测试；其他质量需求继续随全组规约补充",
+  "remaining": [
+    "UC-05—25规约",
+    "全局需求来源与涉众平衡",
+    "全局质量与设计约束完善",
+    "C分析操作、关系、序列及状态同步",
+    "D键、约束及领域职责修订",
+    "真实机构现状与蓝图认可"
+  ],
+  "next_batch": "B UC-05—10临床资料、检查诊断、方案、实际治疗、病历签署及文书规约",
+  "whole_document_course_compliant": false,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "files": {
+    "tex_sha256": "a20c1490a5d7aed2b3e449cd9f0fc3c4ce2f7efd74b51f60f39e940fe90e973d",
+    "pdf_sha256": "81699942c0cdfd1e0566e2bbd1a93ef283f26e6d47167b7686d4b6750a0e6e86"
+  },
+  "figure_pages": [
+    {
+      "number": 1,
+      "pdf_page": 7,
+      "title": "诊所业务用例图"
+    },
+    {
+      "number": 2,
+      "pdf_page": 8,
+      "title": "BUC-01 预约与到诊业务用例图"
+    },
+    {
+      "number": 3,
+      "pdf_page": 8,
+      "title": "BUC-02 检查诊断与口腔治疗业务用例图"
+    },
+    {
+      "number": 4,
+      "pdf_page": 8,
+      "title": "BUC-03 处方与用药服务业务用例图"
+    },
+    {
+      "number": 5,
+      "pdf_page": 9,
+      "title": "BUC-04 复诊与随访业务用例图"
+    },
+    {
+      "number": 6,
+      "pdf_page": 9,
+      "title": "BUC-05 自费与自付缴费业务用例图"
+    },
+    {
+      "number": 7,
+      "pdf_page": 9,
+      "title": "BUC-06 医保门诊结算业务用例图"
+    },
+    {
+      "number": 8,
+      "pdf_page": 10,
+      "title": "BUC-07 费用更正与退费业务用例图"
+    },
+    {
+      "number": 9,
+      "pdf_page": 11,
+      "title": "内部支持工作的责任与服务衔接"
+    },
+    {
+      "number": 10,
+      "pdf_page": 13,
+      "title": "预约与到诊现状业务序列图"
+    },
+    {
+      "number": 11,
+      "pdf_page": 14,
+      "title": "检查诊断与口腔治疗现状业务序列图"
+    },
+    {
+      "number": 12,
+      "pdf_page": 15,
+      "title": "处方与用药服务现状业务序列图"
+    },
+    {
+      "number": 13,
+      "pdf_page": 16,
+      "title": "复诊与随访现状业务序列图"
+    },
+    {
+      "number": 14,
+      "pdf_page": 17,
+      "title": "自费与自付缴费现状业务序列图"
+    },
+    {
+      "number": 15,
+      "pdf_page": 18,
+      "title": "医保门诊结算现状业务序列图"
+    },
+    {
+      "number": 16,
+      "pdf_page": 19,
+      "title": "费用更正与退费现状业务序列图"
+    },
+    {
+      "number": 17,
+      "pdf_page": 20,
+      "title": "采购与库存保障现状业务序列图"
+    },
+    {
+      "number": 18,
+      "pdf_page": 21,
+      "title": "接诊资源准备与停用恢复现状业务序列图"
+    },
+    {
+      "number": 19,
+      "pdf_page": 22,
+      "title": "日常经营与款项核对现状业务序列图"
+    },
+    {
+      "number": 20,
+      "pdf_page": 23,
+      "title": "预约与到诊改进业务序列图"
+    },
+    {
+      "number": 21,
+      "pdf_page": 24,
+      "title": "检查诊断与口腔治疗改进业务序列图"
+    },
+    {
+      "number": 22,
+      "pdf_page": 25,
+      "title": "处方与用药服务改进业务序列图"
+    },
+    {
+      "number": 23,
+      "pdf_page": 26,
+      "title": "复诊与随访改进业务序列图"
+    },
+    {
+      "number": 24,
+      "pdf_page": 27,
+      "title": "自费与自付缴费改进业务序列图"
+    },
+    {
+      "number": 25,
+      "pdf_page": 28,
+      "title": "医保门诊结算改进业务序列图"
+    },
+    {
+      "number": 26,
+      "pdf_page": 29,
+      "title": "费用更正与退费改进业务序列图"
+    },
+    {
+      "number": 27,
+      "pdf_page": 30,
+      "title": "采购与库存保障改进业务序列图"
+    },
+    {
+      "number": 28,
+      "pdf_page": 31,
+      "title": "接诊资源准备与停用恢复改进业务序列图"
+    },
+    {
+      "number": 29,
+      "pdf_page": 32,
+      "title": "日常经营与款项核对改进业务序列图"
+    },
+    {
+      "number": 30,
+      "pdf_page": 34,
+      "title": "患者服务全过程"
+    },
+    {
+      "number": 31,
+      "pdf_page": 35,
+      "title": "接诊资源准备与占用协调"
+    },
+    {
+      "number": 32,
+      "pdf_page": 37,
+      "title": "开诊准备与日终业务协作"
+    },
+    {
+      "number": 33,
+      "pdf_page": 39,
+      "title": "系统总体用例图"
+    },
+    {
+      "number": 34,
+      "pdf_page": 40,
+      "title": "前台系统用例图"
+    },
+    {
+      "number": 35,
+      "pdf_page": 41,
+      "title": "牙医与助理系统用例图"
+    },
+    {
+      "number": 36,
+      "pdf_page": 42,
+      "title": "收费与负责人系统用例图"
+    },
+    {
+      "number": 37,
+      "pdf_page": 44,
+      "title": "UC-01 维护患者资料用例图"
+    },
+    {
+      "number": 38,
+      "pdf_page": 46,
+      "title": "UC-02 维护预约安排用例图"
+    },
+    {
+      "number": 39,
+      "pdf_page": 48,
+      "title": "UC-03 登记到诊用例图"
+    },
+    {
+      "number": 40,
+      "pdf_page": 50,
+      "title": "UC-04 维护排班与接诊安排用例图"
+    },
+    {
+      "number": 41,
+      "pdf_page": 52,
+      "title": "UC-05 查阅患者诊疗资料用例图"
+    },
+    {
+      "number": 42,
+      "pdf_page": 53,
+      "title": "UC-06 记录检查诊断与健康资料用例图"
+    },
+    {
+      "number": 43,
+      "pdf_page": 54,
+      "title": "UC-07 制定治疗方案并记录患者确认用例图"
+    },
+    {
+      "number": 44,
+      "pdf_page": 55,
+      "title": "UC-08 登记实际治疗与完成项目用例图"
+    },
+    {
+      "number": 45,
+      "pdf_page": 56,
+      "title": "UC-09 签署及补充病历用例图"
+    },
+    {
+      "number": 46,
+      "pdf_page": 57,
+      "title": "UC-10 管理影像与诊疗文书用例图"
+    },
+    {
+      "number": 47,
+      "pdf_page": 58,
+      "title": "UC-11 维护收费项目与价目用例图"
+    },
+    {
+      "number": 48,
+      "pdf_page": 59,
+      "title": "UC-12 查询账单与待结算费用用例图"
+    },
+    {
+      "number": 49,
+      "pdf_page": 60,
+      "title": "UC-13 办理患者付款与到账核实用例图"
+    },
+    {
+      "number": 50,
+      "pdf_page": 61,
+      "title": "UC-14 办理费用更正与退费用例图"
+    },
+    {
+      "number": 51,
+      "pdf_page": 62,
+      "title": "UC-15 提出复诊随访要求用例图"
+    },
+    {
+      "number": 52,
+      "pdf_page": 63,
+      "title": "UC-16 办理复诊联系与预约用例图"
+    },
+    {
+      "number": 53,
+      "pdf_page": 64,
+      "title": "UC-17 记录复诊随访评估用例图"
+    },
+    {
+      "number": 54,
+      "pdf_page": 65,
+      "title": "UC-18 维护材料与批次资料用例图"
+    },
+    {
+      "number": 55,
+      "pdf_page": 66,
+      "title": "UC-19 登记基础采购与到货验收用例图"
+    },
+    {
+      "number": 56,
+      "pdf_page": 67,
+      "title": "UC-20 办理库存领用、退回与盘点用例图"
+    },
+    {
+      "number": 57,
+      "pdf_page": 68,
+      "title": "UC-21 核对日常经营与收付款用例图"
+    },
+    {
+      "number": 58,
+      "pdf_page": 69,
+      "title": "UC-22 核验医保身份并办理预结算用例图"
+    },
+    {
+      "number": 59,
+      "pdf_page": 70,
+      "title": "UC-23 办理医保结算、撤销与回款核对用例图"
+    },
+    {
+      "number": 60,
+      "pdf_page": 71,
+      "title": "UC-24 协调诊椅设备准备与停用恢复用例图"
+    },
+    {
+      "number": 61,
+      "pdf_page": 72,
+      "title": "UC-25 开立处方并衔接院内外取药用例图"
+    },
+    {
+      "number": 62,
+      "pdf_page": 74,
+      "title": "前台边界类与控制类"
+    },
+    {
+      "number": 63,
+      "pdf_page": 75,
+      "title": "牙医边界类与控制类"
+    },
+    {
+      "number": 64,
+      "pdf_page": 76,
+      "title": "收费人员边界类与控制类"
+    },
+    {
+      "number": 65,
+      "pdf_page": 77,
+      "title": "诊疗助理、诊所负责人边界类与控制类"
+    },
+    {
+      "number": 66,
+      "pdf_page": 78,
+      "title": "处方与药学边界控制类"
+    },
+    {
+      "number": 67,
+      "pdf_page": 79,
+      "title": "外部支付医保接口与控制类"
+    },
+    {
+      "number": 68,
+      "pdf_page": 80,
+      "title": "身份与接诊分析实体类图"
+    },
+    {
+      "number": 69,
+      "pdf_page": 81,
+      "title": "病历与诊疗文书分析实体类图"
+    },
+    {
+      "number": 70,
+      "pdf_page": 82,
+      "title": "治疗方案与实际执行分析实体类图"
+    },
+    {
+      "number": 71,
+      "pdf_page": 83,
+      "title": "价目、账单与收款分析实体类图"
+    },
+    {
+      "number": 72,
+      "pdf_page": 84,
+      "title": "费用更正与退费分析实体类图"
+    },
+    {
+      "number": 73,
+      "pdf_page": 85,
+      "title": "复诊与随访分析实体类图"
+    },
+    {
+      "number": 74,
+      "pdf_page": 86,
+      "title": "材料与库存分析实体类图"
+    },
+    {
+      "number": 75,
+      "pdf_page": 87,
+      "title": "基础采购与验收分析实体类图"
+    },
+    {
+      "number": 76,
+      "pdf_page": 88,
+      "title": "门诊医保与结算款分析实体类图"
+    },
+    {
+      "number": 77,
+      "pdf_page": 91,
+      "title": "UC-01 维护患者资料分析序列图"
+    },
+    {
+      "number": 78,
+      "pdf_page": 92,
+      "title": "UC-02 维护预约安排分析序列图"
+    },
+    {
+      "number": 79,
+      "pdf_page": 93,
+      "title": "UC-03 登记到诊分析序列图"
+    },
+    {
+      "number": 80,
+      "pdf_page": 94,
+      "title": "UC-04 维护排班与接诊安排分析序列图"
+    },
+    {
+      "number": 81,
+      "pdf_page": 95,
+      "title": "UC-05 查阅患者诊疗资料分析序列图"
+    },
+    {
+      "number": 82,
+      "pdf_page": 96,
+      "title": "UC-06 记录检查诊断与健康资料分析序列图"
+    },
+    {
+      "number": 83,
+      "pdf_page": 97,
+      "title": "UC-07 制定治疗方案并记录患者确认分析序列图"
+    },
+    {
+      "number": 84,
+      "pdf_page": 98,
+      "title": "UC-08 登记实际治疗与完成项目分析序列图"
+    },
+    {
+      "number": 85,
+      "pdf_page": 99,
+      "title": "UC-09 签署及补充病历分析序列图"
+    },
+    {
+      "number": 86,
+      "pdf_page": 100,
+      "title": "UC-10 管理影像与诊疗文书分析序列图"
+    },
+    {
+      "number": 87,
+      "pdf_page": 101,
+      "title": "UC-11 维护收费项目与价目分析序列图"
+    },
+    {
+      "number": 88,
+      "pdf_page": 102,
+      "title": "UC-12 查询账单与待结算费用分析序列图"
+    },
+    {
+      "number": 89,
+      "pdf_page": 103,
+      "title": "UC-13 办理患者付款与到账核实分析序列图"
+    },
+    {
+      "number": 90,
+      "pdf_page": 104,
+      "title": "UC-14 办理费用更正与退费分析序列图"
+    },
+    {
+      "number": 91,
+      "pdf_page": 105,
+      "title": "UC-15 提出复诊随访要求分析序列图"
+    },
+    {
+      "number": 92,
+      "pdf_page": 106,
+      "title": "UC-16 办理复诊联系与预约分析序列图"
+    },
+    {
+      "number": 93,
+      "pdf_page": 107,
+      "title": "UC-17 记录复诊随访评估分析序列图"
+    },
+    {
+      "number": 94,
+      "pdf_page": 108,
+      "title": "UC-18 维护材料与批次资料分析序列图"
+    },
+    {
+      "number": 95,
+      "pdf_page": 109,
+      "title": "UC-19 登记基础采购与到货验收分析序列图"
+    },
+    {
+      "number": 96,
+      "pdf_page": 110,
+      "title": "UC-20 办理库存领用、退回与盘点分析序列图"
+    },
+    {
+      "number": 97,
+      "pdf_page": 111,
+      "title": "UC-21 核对日常经营与收付款分析序列图"
+    },
+    {
+      "number": 98,
+      "pdf_page": 112,
+      "title": "UC-22 核验医保身份并办理预结算分析序列图"
+    },
+    {
+      "number": 99,
+      "pdf_page": 113,
+      "title": "UC-23 办理医保结算、撤销与回款核对分析序列图"
+    },
+    {
+      "number": 100,
+      "pdf_page": 114,
+      "title": "UC-24 协调诊椅设备准备与停用恢复分析序列图"
+    },
+    {
+      "number": 101,
+      "pdf_page": 115,
+      "title": "UC-25 开立处方并衔接院内外取药分析序列图"
+    },
+    {
+      "number": 102,
+      "pdf_page": 116,
+      "title": "预约分析状态机图"
+    },
+    {
+      "number": 103,
+      "pdf_page": 116,
+      "title": "就诊分析状态机图"
+    },
+    {
+      "number": 104,
+      "pdf_page": 117,
+      "title": "病历分析状态机图"
+    },
+    {
+      "number": 105,
+      "pdf_page": 117,
+      "title": "方案版本分析状态机图"
+    },
+    {
+      "number": 106,
+      "pdf_page": 118,
+      "title": "复诊要求分析状态机图"
+    },
+    {
+      "number": 107,
+      "pdf_page": 118,
+      "title": "材料批次分析状态机图"
+    },
+    {
+      "number": 108,
+      "pdf_page": 119,
+      "title": "费用申请分析状态机图"
+    },
+    {
+      "number": 109,
+      "pdf_page": 119,
+      "title": "支付单分析状态机图"
+    },
+    {
+      "number": 110,
+      "pdf_page": 120,
+      "title": "医保办理分析状态机图"
+    },
+    {
+      "number": 111,
+      "pdf_page": 120,
+      "title": "设备占用分析状态机图"
+    },
+    {
+      "number": 112,
+      "pdf_page": 121,
+      "title": "处方分析状态机图"
+    },
+    {
+      "number": 113,
+      "pdf_page": 122,
+      "title": "三层职责及外部服务协作"
+    },
+    {
+      "number": 114,
+      "pdf_page": 127,
+      "title": "核心业务数据库关系总图"
+    },
+    {
+      "number": 115,
+      "pdf_page": 128,
+      "title": "身份与接诊数据库关系图"
+    },
+    {
+      "number": 116,
+      "pdf_page": 129,
+      "title": "病历与诊疗文书数据库关系图"
+    },
+    {
+      "number": 117,
+      "pdf_page": 130,
+      "title": "治疗方案与实际执行数据库关系图"
+    },
+    {
+      "number": 118,
+      "pdf_page": 131,
+      "title": "价目、账单与收款数据库关系图"
+    },
+    {
+      "number": 119,
+      "pdf_page": 132,
+      "title": "费用更正与退费数据库关系图"
+    },
+    {
+      "number": 120,
+      "pdf_page": 133,
+      "title": "复诊与随访数据库关系图"
+    },
+    {
+      "number": 121,
+      "pdf_page": 134,
+      "title": "材料与库存数据库关系图"
+    },
+    {
+      "number": 122,
+      "pdf_page": 135,
+      "title": "基础采购与验收数据库关系图"
+    },
+    {
+      "number": 123,
+      "pdf_page": 136,
+      "title": "门诊医保与结算款数据库关系图"
+    },
+    {
+      "number": 124,
+      "pdf_page": 155,
+      "title": "接诊服务设计类协作图"
+    },
+    {
+      "number": 125,
+      "pdf_page": 156,
+      "title": "临床服务设计类协作图"
+    },
+    {
+      "number": 126,
+      "pdf_page": 157,
+      "title": "收费与复诊服务设计类协作图"
+    },
+    {
+      "number": 127,
+      "pdf_page": 158,
+      "title": "物资与管理服务设计类协作图"
+    },
+    {
+      "number": 128,
+      "pdf_page": 159,
+      "title": "医保与药学服务设计类协作图"
+    },
+    {
+      "number": 129,
+      "pdf_page": 160,
+      "title": "维护预约安排设计序列图"
+    },
+    {
+      "number": 130,
+      "pdf_page": 161,
+      "title": "记录检查诊断与健康资料设计序列图"
+    },
+    {
+      "number": 131,
+      "pdf_page": 162,
+      "title": "制定治疗方案并记录患者确认设计序列图"
+    },
+    {
+      "number": 132,
+      "pdf_page": 163,
+      "title": "登记实际治疗与完成项目设计序列图"
+    },
+    {
+      "number": 133,
+      "pdf_page": 164,
+      "title": "办理患者付款与到账核实设计序列图"
+    },
+    {
+      "number": 134,
+      "pdf_page": 165,
+      "title": "UC-14 办理费用更正与退费设计序列图"
+    },
+    {
+      "number": 135,
+      "pdf_page": 166,
+      "title": "办理复诊联系与预约设计序列图"
+    },
+    {
+      "number": 136,
+      "pdf_page": 167,
+      "title": "登记基础采购与到货验收设计序列图"
+    },
+    {
+      "number": 137,
+      "pdf_page": 168,
+      "title": "办理库存领用、退回与盘点设计序列图"
+    },
+    {
+      "number": 138,
+      "pdf_page": 169,
+      "title": "UC-22 核验医保身份并办理预结算设计序列图"
+    },
+    {
+      "number": 139,
+      "pdf_page": 170,
+      "title": "协调诊椅设备准备与停用恢复设计序列图"
+    },
+    {
+      "number": 140,
+      "pdf_page": 171,
+      "title": "开立处方并衔接院内外取药设计序列图"
+    },
+    {
+      "number": 141,
+      "pdf_page": 173,
+      "title": "岗位导航与主要业务衔接"
+    },
+    {
+      "number": 142,
+      "pdf_page": 174,
+      "title": "患者与预约页面结构"
+    },
+    {
+      "number": 143,
+      "pdf_page": 174,
+      "title": "牙医接诊页面结构"
+    },
+    {
+      "number": 144,
+      "pdf_page": 175,
+      "title": "方案与影像页面结构"
+    },
+    {
+      "number": 145,
+      "pdf_page": 175,
+      "title": "账单与收款页面结构"
+    },
+    {
+      "number": 146,
+      "pdf_page": 176,
+      "title": "费用更正与退费页面结构"
+    },
+    {
+      "number": 147,
+      "pdf_page": 176,
+      "title": "复诊与随访页面结构"
+    },
+    {
+      "number": 148,
+      "pdf_page": 177,
+      "title": "材料与采购页面结构"
+    },
+    {
+      "number": 149,
+      "pdf_page": 177,
+      "title": "库存办理页面结构"
+    },
+    {
+      "number": 150,
+      "pdf_page": 178,
+      "title": "排班与经营页面结构"
+    },
+    {
+      "number": 151,
+      "pdf_page": 178,
+      "title": "医保办理页面结构"
+    },
+    {
+      "number": 152,
+      "pdf_page": 179,
+      "title": "接诊资源协调页面结构"
+    },
+    {
+      "number": 153,
+      "pdf_page": 179,
+      "title": "处方与取药页面结构"
+    }
+  ]
+}

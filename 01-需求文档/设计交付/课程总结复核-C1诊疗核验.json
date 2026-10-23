@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-22",
+  "status": "第十二批：C1病历文书处方及治疗方案执行；C仍未全部完成",
+  "pdf_pages": 173,
+  "figures": 143,
+  "logical_tables": 69,
+  "system_usecases": 25,
+  "entity_classes_revised_this_batch": 18,
+  "operations_this_batch": 46,
+  "core_associations_this_batch": 35,
+  "entity_classes_revised_total": 32,
+  "entity_classes_remaining": 37,
+  "operations_revised_total": 86,
+  "analysis_entity_groups_completed": [
+    1,
+    2,
+    3
+  ],
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 80,
+    "D": 128
+  },
+  "validation": {
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "svg_text_overlap_pairs": 0,
+    "updated_vector_figures": 2,
+    "plantuml_panels": 7,
+    "minimum_font_pt": 9.26,
+    "rendered_and_reviewed_pdf_pages": [
+      87,
+      88,
+      89
+    ],
+    "unchanged_page_text_count": 171,
+    "all_143_figure_titles_numbers_pages_preserved": true,
+    "canonical_69_classes_match_69_tables": true,
+    "reference_stubs_not_new_entities": true,
+    "A_B_C2_C3_D_sources_unchanged": true
+  },
+  "physical_attribute_refinement_pending": [
+    "处方补医师更正/作废原因与经办时刻、处方交付确认及用药指导；不把院外实际取药作为已知事实",
+    "决定—项目关联补可选确认数量及约束，显式表达UC-07/08数量限制；非仅自由文字",
+    "病历签署所用健康复核、文件误关联更正依据的固定方式需D明确",
+    "药品实际发药的唯一应收来源、药品单位换算与库存流水业务类型需D同步约束",
+    "方案版本混合项目决定状态须与C3核对，不用单一整体状态替代逐项同意范围"
+  ],
+  "whole_document_course_compliant": false,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "next_batch": "C1第四、五组：价目、账单、收款、费用更正与退费的职责及关联",
+  "remaining": [
+    "37实体的属性操作及跨组关系",
+    "25例分析序列的消息、分支及操作对应",
+    "分析状态机图同步",
+    "D数据访问、关系与约束、业务职责和表示组件",
+    "真实业务确认与验收"
+  ],
+  "files": {
+    "tex_sha256": "bc571741447309b499e4fffac0722232c83dc7c2095e5be7f816bd2801a04a15",
+    "pdf_sha256": "480884700a22d4c21c7538ace1c33b2533b7efb295b6f6d4a7c4009bfdf49198",
+    "logical_model_sha256": "68f5db36dfd9f3eaf9ca11b43ffb9a6abf039bf587ecf15f4f9c2b2b69e239e9"
+  }
+}

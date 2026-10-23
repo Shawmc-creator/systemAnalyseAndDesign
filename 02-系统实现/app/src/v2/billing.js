@@ -64,7 +64,8 @@ class Billing {
       if (input.action !== 'submit') fail(422, 'INVALID_ACTION', '价目录入动作无效');
       const price = row(this.db, 'service_price', input.priceId); revision(price, input.expectedRevision);
       if (!['价目草稿', '已退回'].includes(price.status)) fail(409, 'INVALID_STATE', '当前价目不能提交负责人确认');
-      this.db.prepare("UPDATE service_price SET status='待负责人确认',updated_at=?,revision=revision+1 WHERE id=?").run(now, price.id);
+      this.db.prepare("UPDATE service_price SET status='待负责人确认',review_note=NULL,confirmed_at=NULL,confirmed_by=NULL,updated_at=?,revision=revision+1 WHERE id=?").run(now, price.id);
+      this.unit.financialHistory.append('service_price',price.id,'提交',price.change_reason,ctx,input,now);
       return { kind: 'service_price', key: price.id, beforeRevision: price.revision, revision: price.revision + 1 };
     });
   }
@@ -83,7 +84,8 @@ class Billing {
         status = '不再用于新计费';
       } else fail(422, 'INVALID_ACTION', '价目确认动作无效');
       this.db.prepare('UPDATE service_price SET status=?,confirmed_at=?,confirmed_by=?,review_note=?,updated_at=?,revision=revision+1 WHERE id=?').run(
-        status, input.action === 'stop' ? price.confirmed_at : now, input.action === 'stop' ? price.confirmed_by : ctx.session.staff_id, note, now, price.id);
+        status, input.action === 'return'?null:input.action === 'stop' ? price.confirmed_at : now, input.action === 'return'?null:input.action === 'stop' ? price.confirmed_by : ctx.session.staff_id, note, now, price.id);
+      this.unit.financialHistory.append('service_price',price.id,{approve:'确认',return:'退回',stop:'停止适用'}[input.action],note,ctx,input,now);
       return { kind: 'service_price', key: price.id, beforeRevision: price.revision, revision: price.revision + 1, reason: '负责人处理价目；原计费快照不变' };
     });
   }
@@ -101,7 +103,7 @@ class Billing {
   }
   catalog(credentials) {
     const permission = credentials.role === 'dentist' ? 'uc04.execute' : credentials.role === 'manager' ? 'uc05.approve' : 'uc05.draft';
-    return this.unit.query(credentials, permission, () => ({ services: this.db.prepare('SELECT * FROM service ORDER BY id').all(), prices: this.db.prepare('SELECT * FROM service_price ORDER BY service_id,valid_from,id').all(),
+    return this.unit.query(credentials, permission, () => ({ services: this.db.prepare('SELECT * FROM service ORDER BY id').all(), prices: this.db.prepare('SELECT * FROM service_price ORDER BY service_id,valid_from,id').all().map(p=>({...p,...(credentials.role==='dentist'?{}:{history:this.unit.financialHistory.list('service_price',p.id),historyCoverage:'历史仅展示实际记录的提交及审核；未记录的早期内容不作推断。'})})),
       ...(credentials.role==='manager'?{pendingItems:this.lines().filter(i=>i.pricing_status==='待核价').slice(0,100)}: {}) }));
   }
   lines(billId=null){return this.db.prepare(`SELECT i.*,coalesce(e.service_id,pi.billing_service_id) service_id,

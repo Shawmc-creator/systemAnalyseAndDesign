@@ -1,0 +1,32 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "已预约" as Booked
+state "已到诊" as Arrived
+state "已取消" as Cancelled
+state "未到" as Missed
+[*] --> Booked : 前台确认新约 [患者意向及人员、\n诊椅和必要设备时段无冲突]\n/ 共同保存预约和必要预留
+Booked : 改约 [仍可办理且新安排有效]\n/ 保留原安排，原预留释放与新预留共同保存
+Booked --> Arrived : 前台登记实际到店\n[同患者且无同次就诊]\n/ 关联唯一候诊就诊
+Booked --> Cancelled : 前台确认取消\n[尚未到诊且原因已核实]\n/ 保存依据，释放预约预留
+Booked --> Missed : 前台核实未到\n[已过计划且无对应就诊]\n/ 保存依据，释放预约预留
+Arrived --> [*]
+Cancelled --> [*]
+Missed --> [*]
+
+@enduml

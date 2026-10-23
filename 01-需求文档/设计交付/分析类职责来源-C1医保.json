@@ -1,0 +1,465 @@
+{
+  "entities": [
+    {
+      "table": "insurance_identity",
+      "name": "医保身份核验",
+      "attrs": [
+        "必要人员编号、参保地区",
+        "实际核验结果、时刻及适用期",
+        "办理人员、结果依据"
+      ],
+      "ops": [
+        "核对患者及核验适用条件()",
+        "记录明确核验结果(原办理依据)"
+      ],
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ]
+    },
+    {
+      "table": "insurance_item_mapping",
+      "name": "医保项目对应",
+      "attrs": [
+        "地区、适用编码及起止日期",
+        "有效或停用状态"
+      ],
+      "ops": [
+        "核对项目或药品唯一归属()",
+        "核对本地区及日期适用性()"
+      ],
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ]
+    },
+    {
+      "table": "insurance_case",
+      "name": "医保就诊办理",
+      "attrs": [
+        "唯一业务号、机构及诊断标识",
+        "费用版本、办理状态及结果依据",
+        "预估基金／个账／其他自付",
+        "患者选择及确认时间"
+      ],
+      "ops": [
+        "核对患者就诊身份及账目归属()",
+        "核对本次费用范围及适用条件()",
+        "保存预估分摊(平台实际结果)",
+        "使旧预估失效(变更依据)",
+        "记录患者实际选择()",
+        "建立重新办理(原办理依据)"
+      ],
+      "uc": [
+        22,
+        23
+      ],
+      "rules": [
+        "R22-1",
+        "R22-2",
+        "R22-3",
+        "R23-1",
+        "R23-3"
+      ]
+    },
+    {
+      "table": "insurance_fee",
+      "name": "医保费用明细",
+      "attrs": [
+        "本次提交数量、分金额及费用版本",
+        "适用编码或自费标识",
+        "实际提交时刻、平台返回依据"
+      ],
+      "ops": [
+        "核对实际费用及适用标识()",
+        "固定本次提交范围及快照()"
+      ],
+      "uc": [
+        22,
+        23
+      ],
+      "rules": [
+        "R22-1",
+        "R22-2",
+        "R22-3",
+        "R23-1"
+      ]
+    },
+    {
+      "table": "insurance_settlement",
+      "name": "医保结算",
+      "attrs": [
+        "正式结算号、范围内总费T",
+        "基金F、个账A、其他自付P",
+        "有效／已撤销、实际确认时间",
+        "/应拨额、/净到账、/待收或待退"
+      ],
+      "ops": [
+        "核对明确正式结果及分摊()",
+        "确认有效正式结算()",
+        "按成功撤销停用原结算()",
+        "计算应拨及收退差额(实际收付)"
+      ],
+      "uc": [
+        12,
+        21,
+        23
+      ],
+      "rules": [
+        "R12-1",
+        "R21-2",
+        "R23-1",
+        "R23-2",
+        "R23-3",
+        "R23-4"
+      ]
+    },
+    {
+      "table": "insurance_reversal",
+      "name": "医保撤销办理",
+      "attrs": [
+        "唯一撤销号、原因及负责人依据",
+        "待办理／待核实／已成功／已失败",
+        "原笔结果、核实人及时间"
+      ],
+      "ops": [
+        "核对原结算及批准依据()",
+        "建立原单撤销待办()",
+        "保留未知或失败结果(真实依据)",
+        "确认平台撤销成功()"
+      ],
+      "uc": [
+        14,
+        23
+      ],
+      "rules": [
+        "R23-3",
+        "R14-2"
+      ]
+    },
+    {
+      "table": "insurance_fund_receipt",
+      "name": "医保结算款收付",
+      "attrs": [
+        "拨付或退回、实际正金额",
+        "实际时间、医保或银行凭据",
+        "经办人员"
+      ],
+      "ops": [
+        "核对原结算及实际收付依据()",
+        "核对重复收付(原单及凭据)",
+        "记录实际拨付或退回()"
+      ],
+      "uc": [
+        21,
+        23
+      ],
+      "rules": [
+        "R21-1",
+        "R21-2",
+        "R21-3",
+        "R23-4"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "a": "patient_i",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "insurance_identity",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ],
+      "meaning": "身份结果属于唯一患者，保留核验历史"
+    },
+    {
+      "a": "service_i",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "insurance_item_mapping",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ],
+      "meaning": "对应医疗服务项目时关联收费项目"
+    },
+    {
+      "a": "material_i",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "insurance_item_mapping",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ],
+      "meaning": "对应药品时关联材料目录中的药品"
+    },
+    {
+      "a": "patient_c",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "insurance_case",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ],
+      "meaning": "办理属于唯一患者"
+    },
+    {
+      "a": "visit_c",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "insurance_case",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ],
+      "meaning": "办理基于同患者实际就诊"
+    },
+    {
+      "a": "bill_c",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "insurance_case",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ],
+      "meaning": "初始可无账目，预结算前绑定并固定费用版本"
+    },
+    {
+      "a": "identity_c",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "insurance_case",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ],
+      "meaning": "初始可待核验，预结算前有有效通过结果"
+    },
+    {
+      "a": "previous_case_c",
+      "a_multiplicity": "原办理\\n0..1",
+      "kind": "--",
+      "b": "insurance_case",
+      "b_multiplicity": "0..*",
+      "uc": [
+        23
+      ],
+      "rules": [
+        "R23-3"
+      ],
+      "meaning": "撤销后重结算使用新办理，并保留原单依据"
+    },
+    {
+      "a": "case_f",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "insurance_fee",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1",
+        "R22-2"
+      ],
+      "meaning": "费用明细专属本次提交，历史范围保留"
+    },
+    {
+      "a": "bill_item_f",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "insurance_fee",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1",
+        "R22-3"
+      ],
+      "meaning": "费用回溯真实应收项目及当前费用版本"
+    },
+    {
+      "a": "mapping_f",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "insurance_fee",
+      "b_multiplicity": "0..*",
+      "uc": [
+        22
+      ],
+      "rules": [
+        "R22-1"
+      ],
+      "meaning": "有适用医保编码才引用对应；合法自费标识不编造映射"
+    },
+    {
+      "a": "case_s",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "insurance_settlement",
+      "b_multiplicity": "0..*",
+      "uc": [
+        23
+      ],
+      "rules": [
+        "R23-1",
+        "R23-2"
+      ],
+      "meaning": "正式结果回溯原办理，同一费用不重复参与有效结算"
+    },
+    {
+      "a": "insurance_settlement",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "insurance_reversal",
+      "b_multiplicity": "0..*",
+      "uc": [
+        23
+      ],
+      "rules": [
+        "R23-3"
+      ],
+      "meaning": "每次撤销引用原结算及独立原号，未知先查原笔"
+    },
+    {
+      "a": "request_s",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "insurance_reversal",
+      "b_multiplicity": "0..*",
+      "uc": [
+        14,
+        23
+      ],
+      "rules": [
+        "R14-2",
+        "R23-3"
+      ],
+      "meaning": "涉及费用更正时关联同患者已批准申请"
+    },
+    {
+      "a": "insurance_settlement",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "insurance_fund_receipt",
+      "b_multiplicity": "0..*",
+      "uc": [
+        21,
+        23
+      ],
+      "rules": [
+        "R21-2",
+        "R23-4"
+      ],
+      "meaning": "分次实际拨付及退回逐笔保留原结算来源"
+    }
+  ],
+  "references": [
+    {
+      "table": "patient",
+      "name": "患者",
+      "alias": "patient_i"
+    },
+    {
+      "table": "service",
+      "name": "收费项目",
+      "alias": "service_i"
+    },
+    {
+      "table": "material",
+      "name": "材料",
+      "alias": "material_i"
+    },
+    {
+      "table": "patient",
+      "name": "患者",
+      "alias": "patient_c"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_c"
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "alias": "bill_c"
+    },
+    {
+      "table": "insurance_identity",
+      "name": "医保身份核验",
+      "alias": "identity_c"
+    },
+    {
+      "table": "insurance_case",
+      "name": "医保就诊办理",
+      "alias": "previous_case_c"
+    },
+    {
+      "table": "insurance_case",
+      "name": "医保就诊办理",
+      "alias": "case_f"
+    },
+    {
+      "table": "bill_item",
+      "name": "应收项目",
+      "alias": "bill_item_f"
+    },
+    {
+      "table": "insurance_item_mapping",
+      "name": "医保项目对应",
+      "alias": "mapping_f"
+    },
+    {
+      "table": "insurance_case",
+      "name": "医保就诊办理",
+      "alias": "case_s"
+    },
+    {
+      "table": "fee_request",
+      "name": "费用申请",
+      "alias": "request_s"
+    }
+  ],
+  "source": "现行B的UC-22、23，及UC-12、14、21的正式分摊、费用更正和实际收付口径；七个对象沿用69表逻辑模型名称",
+  "physical_refinement_pending": [
+    "医保费用明细允许适用编码或明确自费标识，mapping_id须按场景可空；提交数量、金额、适用编码和费用版本需保留当时快照",
+    "医保重新办理须保留原办理引用；预结算历次结果、失效依据和患者重新确认不应只覆盖当前预估金额",
+    "正式结算的同费用有效唯一性及未决原单约束须与费用范围、版本一致；正式分摊与预估不得混存",
+    "医保撤销补负责人核实依据、核实经办人及时间，未知不使原结算失效；引用费用更正时核对同患者批准申请",
+    "结算款实际收付凭据及原款去重；已撤销结算仍保留历史拨付退回，差额不自动变更患者应付",
+    "临时认证凭证不持久保存；必要人员编号和原始返回仅向获准岗位提供"
+  ],
+  "note": "七项为本批实体定义；同名引用及原办理视图不新增表。图中0..*含历史结果，有效结果唯一性由同一费用范围规则限制。"
+}

@@ -1,0 +1,33 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam InterfaceBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 28
+top to bottom direction
+rectangle "个人登录／选择获准办理身份" as LOGIN
+rectangle "前台工作台\n患者资料／预约／到诊\n复诊联系与预约\n医保身份核验" as FD
+LOGIN --> FD
+rectangle "牙医工作台\n诊疗／方案／病历／原件确认\n复诊要求与临床评估\n处方开立／实际接诊结束" as DR
+LOGIN --> DR
+rectangle "助理工作台\n原件上传／材料批次／采购验收\n库存领退及用料／盘点提交\n资源准备与实际清洁核查" as AS
+LOGIN --> AS
+rectangle "收费工作台\n费用及付款核实／费用申请与退款\n医保预结算、结算及实际回款\n经营原单核对" as CA
+LOGIN --> CA
+rectangle "负责人工作台\n排班及影响协调／价目审核\n费用申请、采购及盘点确认\n故障恢复／医保撤销依据" as MG
+LOGIN --> MG
+rectangle "药学工作台（按条件启用）\n处方审核与意见\n实际调配、交付和用药交代" as PH
+LOGIN --> PH
+FD -[hidden]right-> DR
+AS -[hidden]right-> CA
+MG -[hidden]right-> PH
+FD -[hidden]down-> AS
+AS -[hidden]down-> MG
+DR -[hidden]down-> CA
+CA -[hidden]down-> PH
+@enduml

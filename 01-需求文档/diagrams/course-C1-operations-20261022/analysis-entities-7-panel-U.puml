@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 220
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+hide circle
+hide empty members
+package "领用、未用退回及实际用料" as U {
+' @reference batch_stock
+class "批次存量" as stock_u <<entity>>
+' @reference visit
+class "就诊" as visit_u <<entity>>
+' @reference inventory_movement
+class "库存变动" as original_u <<entity>>
+' @reference dispense_record
+class "实际发药" as dispense_u <<entity>>
+class "库存变动" as inventory_movement <<entity>> {
+ 类型、正负变动量、前后量
+ 实际时间、经办人、用途和依据
+ --
+ +核对变动及前后量()
+ +核对原领用退回额度(已用与已退)
+ +登记实际库存变动()
+}
+class "实际用料" as material_usage <<entity>> {
+ 实际正数量、时间、就诊说明
+ 登记助理
+ --
+ +核对原领用剩余量(已用与已退)
+ +登记实际就诊用料()
+}
+stock_u "1" -- "0..*" inventory_movement
+original_u "原领用\n0..1" -- "0..*" inventory_movement
+inventory_movement "1" -- "0..*" material_usage
+visit_u "1" -- "0..*" material_usage
+inventory_movement "1" -- "0..1" dispense_u
+stock_u -[hidden]right- original_u
+note bottom of material_usage
+同原领用：累计实际用料＋未用退回≤原领用量。
+未用退回增加原批次位置量，品质不明先隔离。
+发药按UC-25办理，开立处方不产生出库。
+end note
+}
+@enduml

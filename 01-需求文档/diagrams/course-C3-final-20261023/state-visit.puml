@@ -1,0 +1,27 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "候诊" as Waiting
+state "接诊中" as Active
+state "诊疗结束" as Ended
+[*] --> Waiting : 前台确认实际到诊\n[身份及安排已核对]\n/ 同时建立当次病历草稿
+Waiting --> Active : 牙医确认实际开始\n[接诊权限、安排及资源准备满足]\n/ 共同保存真实开始及实际占用
+Active --> Ended : 牙医确认实际使用结束\n[原就诊、资源及真实结束已核对]\n/ 保存实际结束、释放相应占用\n并衔接清洁准备限制
+Ended --> [*]
+
+@enduml

@@ -1,0 +1,56 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 220
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+hide circle
+hide empty members
+package "材料计量、批次可用性及变更" as M {
+class "材料" as material <<entity>> {
+ 名称、类别、规格、启用状态
+ 基本单位、采购单位、换算分子分母
+ 数量精度、批次及效期要求
+ 计量确认人和时间
+ --
+ +核对单位换算及数量精度()
+ +确认计量设置(负责人)
+ +核对历史设置可修改性()
+}
+class "材料批次" as material_batch <<entity>> {
+ 实际批号、真实效期、来源
+ 待检／可用／隔离／停用／过期
+ --
+ +核对同材料批号及效期()
+ +核对当前领用可用性(实际日期)
+ +放行或恢复(负责人及依据)
+ +立即隔离(原因)
+ +停用批次(负责人及依据)
+}
+class "批次变更" as batch_change <<entity>> {
+ 前后状态、原因
+ 经办及确认身份、实际时间
+ --
+ +核对变更权限与原状态()
+ +记录状态决定及依据()
+}
+material "1" -- "0..*" material_batch
+material_batch "1" *-- "0..*" batch_change
+note bottom of batch_change
+形成流水后单位、换算和精度固定。
+效期未知不默认无限，实际过期禁止普通领用。
+助理可立即隔离，恢复或停用由负责人确认。
+登记批次不形成库存，退回也不自动放行。
+end note
+}
+@enduml

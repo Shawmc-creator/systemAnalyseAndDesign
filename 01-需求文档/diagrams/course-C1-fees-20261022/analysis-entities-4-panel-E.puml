@@ -1,0 +1,59 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "电子原单与收退结果核对" as E {
+' @reference patient_funds
+class "患者资金" as funds_e <<entity>>
+' @reference bill
+class "应收账目" as bill_e <<entity>>
+' @reference patient_payment
+class "患者付款" as payment_e <<entity>>
+' @reference patient_refund
+class "退款办理" as refund_e <<entity>>
+class "电子支付单" as payment_order <<entity>> {
+ 唯一原单号、渠道、金额
+ 平台交易号、核实时间
+ 支付状态
+ --
+ +核对原单金额及渠道()
+ +记录受理或待核实()
+ +确认渠道结果(原单与交易号)
+}
+class "收退款核对" as payment_reconciliation <<entity>> {
+ 营业日期、原单金额
+ 渠道实际额、差异与状态
+ 核对人、处理依据
+ --
+ +核对收款或退款原单()
+ +记录核对结果(正式依据)
+ +记录差异处理(原办理结果)
+}
+funds_e "1" -- "0..*" payment_order
+bill_e "0..1" -- "0..*" payment_order
+payment_order "0..1" -- "0..1" payment_e
+payment_order "0..1" -- "0..*" payment_reconciliation
+payment_e "0..1" -- "0..*" payment_reconciliation
+refund_e "0..1" -- "0..*" payment_reconciliation
+funds_e -[hidden]right- bill_e
+note bottom of payment_reconciliation
+现金付款、电子支付单或退款办理恰选其一。
+受理、截图或金额相似不代表到账成功；
+差异处理引用原办理，不补造收款或退款。
+end note
+}
+@enduml

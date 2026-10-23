@@ -1,0 +1,41 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+start
+switch (本次支持事项)
+case (S-01)
+ :助理提出物资需求
+负责人确认采购;
+ :供应商交货
+助理验收合格量入库;
+ :提供可用物资
+支撑治疗与院内发药;
+case (S-02)
+ :助理报告资源问题
+负责人协调维修;
+ :维护单位反馈结果
+岗位复核准备条件;
+ :恢复可用资源
+支撑预约及实际接诊;
+case (S-03)
+ :收费人员核对原单
+渠道及医保收付;
+ :负责人核实差异
+确定责任与处理日期;
+ :跟进未完成事项
+支撑缴费与费用更正;
+endswitch
+stop
+@enduml

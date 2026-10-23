@@ -1,0 +1,60 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 120
+actor "牙医" as A
+boundary "牙医接口" as B
+control "查阅患者诊疗资料控制" as K
+entity "患者" as E0
+entity "就诊" as E1
+entity "病历" as E2
+entity "处方" as E3
+entity "诊疗文件" as E4
+A -> B : 查阅患者诊疗资料
+B -> K : 提交对象编号及办理内容
+activate K
+K -> K : 核对岗位权限与必要资料
+alt 可以办理
+K -> E0 : 核对所选患者
+activate E0
+E0 --> K : 患者身份
+deactivate E0
+K -> E1 : 查找患者历次就诊
+activate E1
+E1 --> K : 就诊列表
+deactivate E1
+K -> E2 : 查阅诊断及签署内容
+activate E2
+E2 --> K : 病历资料
+deactivate E2
+K -> E3 : 查阅既往处方和取药记录
+activate E3
+E3 --> K : 处方与实际发药
+deactivate E3
+K -> E4 : 查阅关联影像文书
+activate E4
+E4 --> K : 诊疗附件
+deactivate E4
+K --> B : 返回本次结果
+else 权限资料或状态不符合
+K --> B : 返回核对原因且不改变原记录
+end
+B --> A : 展示结果
+deactivate K
+
+@enduml

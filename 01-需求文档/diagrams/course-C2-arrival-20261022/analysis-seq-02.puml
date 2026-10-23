@@ -1,0 +1,127 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceGroupBackgroundColor white
+skinparam BoxPadding 8
+skinparam maxMessageSize 300
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "前台" as A
+boundary "前台接口" as B
+control "维护预约安排控制" as K
+entity "患者" as P
+entity "日期安排" as S
+entity "职员" as ST
+entity "诊椅" as C
+entity "诊疗设备" as E
+entity "资源停用时段" as RB
+entity "接诊占用" as RO
+entity "设备占用" as EO
+entity "预约" as AP
+entity "预约变更" as AH
+
+A -> B : 新建／改约／取消／核实未到
+B -> K : 患者、原预约及办理目的
+activate K
+K -> K : 核验授权；读取原安排与当前资源
+alt 1b取消或1c核实未到
+ K -> K : 核实患者原因；未到另查截止及无对应就诊
+ break 已到诊或状态不符／未到条件未满足
+  K --> B : 原预约及占用不变，先核实原业务
+ end
+ critical 仅处理仍可办理的预约预留
+  K -> K : 重核状态、版本和未到条件，查同次原结果
+  opt 仍可处理且本次尚未保存
+  alt 取消
+   K -> AP : 取消()
+  else 核实未到
+   K -> AP : 核实未到()
+  end
+  K -> AH : 保留原安排()
+  K -> AH : 记录变更及通知依据()
+  K -> RO : 释放预约预留()
+  opt 存在本预约设备预留
+   K -> EO : 释放预约预留()
+  end
+  K -> K : 状态、依据及预约预留释放共同保存
+  end
+ end
+ K --> B : 原结果或当前预约状态；实际使用占用不释放
+else 新建或1a改约
+ K -> S : 核对接诊时段()
+ S --> K : 已发布有效安排及可用范围
+ break 2a 无已发布可用安排
+  K --> B : 协调UC-04或改选日期，不建新约
+ end
+ A -> B : 选择牙医、诊椅、起止及必要设备时段
+ B -> K : 完整拟安排及所据版本
+ group 4 核对各自实际需要时段
+  K -> P : 核对辨识资料()
+  K -> ST : 核对在岗期间()
+  K -> C : 核对资源有效期间()
+  K -> RB : 核对当前限制()
+  K -> RO : 核对时段冲突()
+  opt 本次需要设备
+   K -> E : 核对适用设备()
+   K -> EO : 核对设备时段冲突()
+  end
+ end
+ break 4a 任一必要资源冲突或条件不符
+  K --> B : 指出资源及区间，返回步骤3协调
+ end
+ K --> B : 完整待确认安排
+ A -> B : 核实患者意向并确认
+ break 6a 患者不确认
+  B -> K : 终止本次确认
+  K --> B : 不保存；改约保留原安排
+ end
+ B -> K : 确认内容及办理号
+ critical 7 重核版本、限制及全部资源冲突
+  K -> K : 按步骤4重查；已存同次办理直接取原结果
+  alt 7a 当前条件已变化
+   K --> B : 拒绝本次变更，原安排与预留保持
+  else 可保存且本次尚未办理
+   alt 1a改约
+    K -> AH : 保留原安排()
+    K -> AP : 改约()
+    K -> RO : 释放预约预留()
+    opt 存在本预约设备预留
+     K -> EO : 释放预约预留()
+    end
+    K -> AH : 记录变更及通知依据()
+   else 新建
+    K -> AP : 确认预约()
+   end
+   K -> RO : 预留接诊时段()
+   opt 本次需要设备
+    K -> EO : 预留时段()
+   end
+   K -> K : 预约、必要预留及变更共同提交
+  end
+ end
+ K --> B : 已预约编号及安排，或返回步骤3的原因
+end
+opt 7b 保存结果未知／重复
+ K -> K : 查原办理；原结果复用，确认未存才重试
+ K --> B : 核实结果；不先释放原预留
+end
+B --> A : 展示本次结果和真实通知要求
+deactivate K
+note over S,EO
+时段为[start,end)，同时核对患者、牙医、诊椅和必要设备。
+设备只核其所需时段；实际使用未确认结束、清洁故障未解除，不能按计划终点放空。
+已到诊不按预约取消处理；预约预留释放与实际占用分别处理。
+end note
+
+@enduml

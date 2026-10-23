@@ -1,0 +1,91 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam InterfaceBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 28
+hide circle
+top to bottom direction
+class "医保与药学接口" as UI <<controller>> {
+ 读取当前办理身份()
+ 校验输入并调用用例方法()
+ 展示业务结果()
+}
+class "医保与药学应用服务" as S <<application>> {
+ UC-22 核验医保身份并办理预结算(原办理,原提交或患者选择)
+ UC-23 办理医保结算、撤销与回款核对(原结算,核实依据或回款)
+ UC-25 开立处方并衔接院内外取药(原处方,开立审核或实际交付)
+}
+UI -down-> S
+class "医保就诊办理" as E_insurance_case <<entity>> {
+ 核对患者就诊身份及账目归属()
+ 核对本次费用范围及适用条件()
+ 保存预估分摊(平台实际结果)
+ 记录患者实际选择()
+}
+S -right-> E_insurance_case
+class "医保费用明细" as E_insurance_fee <<entity>> {
+ 核对实际费用及适用标识()
+ 固定本次提交范围及快照()
+}
+S -right-> E_insurance_fee
+class "医保结算" as E_insurance_settlement <<entity>> {
+ 核对明确正式结果及分摊()
+ 确认有效正式结算()
+ 按成功撤销停用原结算()
+ 计算应拨及收退差额(实际收付)
+}
+S -right-> E_insurance_settlement
+class "医保撤销办理" as E_insurance_reversal <<entity>> {
+ 核对原结算及批准依据()
+ 建立原单撤销待办()
+ 保留未知或失败结果(真实依据)
+ 确认平台撤销成功()
+}
+S -right-> E_insurance_reversal
+class "处方" as E_prescription <<entity>> {
+ 开立处方(就诊与权限)
+ 记录审方结果(资格与意见)
+ 核对实际发药条件()
+ 作废未交付处方(原因)
+}
+S -right-> E_prescription
+class "实际发药" as E_dispense_record <<entity>> {
+ 核对批次效期及可用量()
+ 登记实际交付(数量与原单)
+}
+S -right-> E_dispense_record
+interface "医保存取接口" as R0 {
+ 读取身份、费用及原办理(患者,原单)
+ 保存身份及登记(原办理号)
+ 保存原提交与确切费用明细(办理号)
+ 追加预估结果、失效或选择(原提交)
+ 保存正式结算及采用原提交(办理号)
+ 保存撤销核实或实际回款(原单)
+}
+S -down-> R0
+interface "处方存取接口" as R1 {
+ 读取处方、审核及实际发药(原方)
+ 保存开立、交付或原方作废(版本)
+ 追加实际审方结果(办理号)
+ 保存实际发药、库存和应收来源(版本)
+}
+S -down-> R1
+class "SQLite医保药学映射器" as M <<mapper>> {
+ 装配实体与历史(稳定键)
+ 核对原办理及写入版本()
+ 在本地事务内写关联和历史()
+}
+M .up.|> R0
+M .up.|> R1
+interface "医保适配接口" as G {
+ 按原号核验或预结算()
+ 按原号结算撤销或查询()
+}
+S -left-> G
+@enduml

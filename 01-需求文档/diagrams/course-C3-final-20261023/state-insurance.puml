@@ -1,0 +1,43 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "待核验" as IdentityPending
+state "待预结算" as EstimatePending
+state "预结算完成" as Estimated
+state "结算待核实" as SettlementPending
+state "已结算" as Settled
+state "已撤销" as Reversed
+[*] --> IdentityPending : 医保启用且患者同意核验\n/ 保存原业务号及就诊归属
+IdentityPending : 失败补正或未知查原号\n/ 未取得明确通过不进入预结算
+IdentityPending --> EstimatePending : 核验登记明确通过\n[适用地区、日期及就诊条件满足]
+EstimatePending : 提交或查询预结算 [失败或未知]\n/ 保留实际依据，不生成有效预估
+EstimatePending --> Estimated : 平台返回有效预估\n[费用版本及分摊相符]\n/ 保存预估，另记患者实际选择
+Estimated : 患者选择医保、自费或待确认\n/ 保存说明与实际选择，不自动正式结算
+Estimated --> EstimatePending : 费用版本或条件变化\n/ 旧预估失效，重核并重新说明
+Estimated --> SettlementPending : 收费人员请求正式结算\n[预估有效、患者确认医保且无未决原单]\n/ 保留原号，未知先查
+SettlementPending : 平台或本地结果待核实\n/ 查原成功结果后补记，不重发
+SettlementPending --> Settled : 核实正式成功 [归属分摊正确\n且正式结果已确认保存]
+SettlementPending --> Estimated : 核实明确失败\n[原预估仍有效] / 保存失败依据
+SettlementPending --> EstimatePending : 核实明确失败\n[原预估已失效] / 补正后重核
+SettlementPending --> Reversed : 核实原正式单后撤销\n[负责人确认且平台撤销明确成功]\n/ 保留原结果及撤销依据
+Settled : 撤销失败或未知 [尚无明确成功]\n/ 保留原有效结算，另记撤销办理结果
+Settled : 逐笔核对实际拨付或退回\n/ 另记医保结算款，不把结算当作到账
+Settled --> Reversed : 核实平台撤销明确成功\n[负责人及原单依据齐全]\n/ 同步原结算失效，患者退款另办
+Reversed --> [*]
+
+@enduml

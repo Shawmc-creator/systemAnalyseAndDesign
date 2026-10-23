@@ -1,0 +1,43 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 220
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+hide circle
+hide empty members
+package "盘点差异与负责人确认" as C {
+' @reference batch_stock
+class "批次存量" as stock_c <<entity>>
+' @reference inventory_movement
+class "库存变动" as movement_c <<entity>>
+class "盘点核实" as stock_count <<entity>> {
+ 账面快照B、实点C、库存版本
+ 实点时间、助理、差异原因
+ 负责人决定及时间、核实状态
+ /差异D＝C－B
+ --
+ +核对确认时库存版本()
+ +记录待重新核对(原因)
+ +记录负责人决定(同意或拒绝)
+ +计算必要调整量()
+}
+stock_c "1" -- "0..*" stock_count
+stock_count "0..1" -- "0..1" movement_c
+note bottom of stock_count
+确认版本须等于原快照版本；变化先重新核对。
+负责人同意才按D调整，拒绝不改变库存。
+D＝0不造零流水；确认及必要变动共同保存。
+end note
+}
+@enduml

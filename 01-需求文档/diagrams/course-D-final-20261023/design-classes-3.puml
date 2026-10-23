@@ -1,0 +1,114 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam InterfaceBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 28
+hide circle
+top to bottom direction
+class "费用与随访接口" as UI <<controller>> {
+ 读取当前办理身份()
+ 校验输入并调用用例方法()
+ 展示业务结果()
+}
+class "收费与复诊应用服务" as S <<application>> {
+ UC-11 维护收费项目与价目(项目,单价期间,审核决定)
+ UC-12 查询账单与待结算费用(原账单,适用费用范围)
+ UC-13 办理患者付款与到账核实(原款,渠道,用途或核实依据)
+ UC-14 办理费用更正与退费(原申请原款,批准范围,真实结果)
+ UC-15 提出复诊随访要求(患者来源,目的日期,责任人)
+ UC-16 办理复诊联系与预约(原要求,实际联系,预约来源)
+ UC-17 记录复诊随访评估(原要求,实际评估,继续跟进)
+ UC-21 核对日常经营与收付款(营业日期,原单核对范围)
+}
+UI -down-> S
+class "价目" as E_service_price <<entity>> {
+ 核对适用区间(同项目价目)
+ 提交负责人确认()
+ 确认适用价目(当前版本)
+}
+S -right-> E_service_price
+class "应收账目" as E_bill <<entity>> {
+ 汇总已核价应收(生效调整)
+ 核对正式医保分摊()
+ 计算当前待付(有效抵付)
+}
+S -right-> E_bill
+class "患者付款" as E_patient_payment <<entity>> {
+ 核对实收找零与净收()
+ 确认实际到账(原单与依据)
+ 计算原款可用额(用途与退款)
+}
+S -right-> E_patient_payment
+class "费用申请" as E_fee_request <<entity>> {
+ 核对原单归属及申请额度()
+ 提交或补正重提()
+ 记录批准退回或拒绝(审核依据)
+ 计算剩余可办退款额度()
+}
+S -right-> E_fee_request
+class "费用调整" as E_fee_adjustment <<entity>> {
+ 核对申请已批准且未生效()
+ 核对明细合计与批准额()
+ 确认调整及必要用途释放()
+}
+S -right-> E_fee_adjustment
+class "退款办理" as E_patient_refund <<entity>> {
+ 核对批准额度及原款可用额()
+ 建立办理并占用额度()
+ 保留未知结果与占用()
+ 确认实际退款(真实金额与凭据)
+}
+S -right-> E_patient_refund
+class "诊后要求" as E_followup_requirement <<entity>> {
+ 核对患者与诊疗来源()
+ 调整未完成要求(原因)
+ 安排继续跟进(日期与责任人)
+ 核对目的达成及完成依据()
+}
+S -right-> E_followup_requirement
+class "临床评估" as E_clinical_assessment <<entity>> {
+ 核对评估方式与实际依据()
+ 追加实际评估()
+ 判断原目的是否达到()
+}
+S -right-> E_clinical_assessment
+interface "费用存取接口" as R0 {
+ 读取原账、付款、医保及有效用途(原单)
+ 保存价目和审核历史(版本)
+ 保存收款、用途及核对(原办理号)
+ 保存申请及审核历史(阶段,版本)
+ 保存调整及用途释放(版本)
+ 保存退款占额或真实结果(原办理号)
+ 查询经营原始事实(营业日)
+}
+S -down-> R0
+interface "随访存取接口" as R1 {
+ 读取诊后要求及联系评估(患者)
+ 保存要求、调整和转交历史(版本)
+ 保存联系与既有预约关联(办理号)
+ 保存临床评估及要求结果(办理号)
+}
+S -down-> R1
+class "SQLite费用随访映射器" as M <<mapper>> {
+ 装配实体与历史(稳定键)
+ 核对原办理及写入版本()
+ 在本地事务内写关联和历史()
+}
+M .up.|> R0
+M .up.|> R1
+interface "医保适配接口" as G {
+ 按原号核验或预结算()
+ 按原号结算撤销或查询()
+}
+S -left-> G
+interface "支付适配接口" as P {
+ 原款退款或查询()
+}
+S -left-> P
+@enduml

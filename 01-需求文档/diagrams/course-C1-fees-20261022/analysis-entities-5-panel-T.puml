@@ -1,0 +1,54 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "实际退款、未知核实及失败重办" as T {
+' @reference fee_request
+class "费用申请" as request_t <<entity>>
+' @reference patient_payment
+class "患者付款" as payment_t <<entity>>
+' @reference patient_funds
+class "患者资金" as funds_t <<entity>>
+' @reference patient_refund
+class "退款办理" as previous_refund_t <<entity>>
+class "退款办理" as patient_refund <<entity>> {
+ 唯一退款号、原渠道、接收方核实
+ 拟退额、实际额、办理时间
+ 待办理／待核实／已确认退款／已失败
+ 核实人、时间、凭据及失败依据
+ --
+ +核对批准额度及原款可用额()
+ +建立办理并占用额度()
+ +保留未知结果与占用()
+ +确认实际退款(真实金额与凭据)
+ +确认失败并释放占用(依据)
+ +关联失败原单重办()
+}
+request_t "1" -- "0..*" patient_refund
+payment_t "1" -- "0..*" patient_refund
+funds_t "1" -- "0..*" patient_refund
+previous_refund_t "原失败单\n0..1" -- "0..*" patient_refund
+request_t -[hidden]right- payment_t
+payment_t -[hidden]right- funds_t
+note bottom of patient_refund
+拟退不超批准剩余额及原款可用额。
+待办／未知占用拟退额；失败释放，成功扣实际额。
+0＜实际额≤拟退额，部分成功重核剩余额。
+查原笔后补记，不能因未知重发；医保款不退作现金。
+end note
+}
+@enduml

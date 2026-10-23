@@ -1,0 +1,500 @@
+{
+  "date": "2026-10-23",
+  "scope": "C3剩余8图；仅对照既有B/C2及状态枚举，不新增功能或状态",
+  "state_machines": [
+    {
+      "stem": "state-appointment",
+      "table": "appointment",
+      "field": "status",
+      "states": [
+        "已预约",
+        "已取消",
+        "已到诊",
+        "未到"
+      ],
+      "usecases": [
+        2,
+        3
+      ],
+      "rules": [
+        "R02-1",
+        "R03-1"
+      ],
+      "physical_refinement_pending": [],
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Booked",
+          "event": "前台确认新约 [患者意向及人员、\\n诊椅和必要设备时段无冲突]\\n/ 共同保存预约和必要预留"
+        },
+        {
+          "source": "Booked",
+          "target": "Arrived",
+          "event": "前台登记实际到店\\n[同患者且无同次就诊]\\n/ 关联唯一候诊就诊"
+        },
+        {
+          "source": "Booked",
+          "target": "Cancelled",
+          "event": "前台确认取消\\n[尚未到诊且原因已核实]\\n/ 保存依据，释放预约预留"
+        },
+        {
+          "source": "Booked",
+          "target": "Missed",
+          "event": "前台核实未到\\n[已过计划且无对应就诊]\\n/ 保存依据，释放预约预留"
+        },
+        {
+          "source": "Arrived",
+          "target": "[*]",
+          "event": ""
+        },
+        {
+          "source": "Cancelled",
+          "target": "[*]",
+          "event": ""
+        },
+        {
+          "source": "Missed",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    },
+    {
+      "stem": "state-visit",
+      "table": "visit",
+      "field": "status",
+      "states": [
+        "候诊",
+        "接诊中",
+        "诊疗结束"
+      ],
+      "usecases": [
+        3,
+        6,
+        9,
+        24
+      ],
+      "rules": [
+        "R06-2",
+        "R09-2",
+        "R24-2"
+      ],
+      "physical_refinement_pending": [
+        "D现行visit约束要求结束必须已签署病历，与R09-2及UC-24独立实际结束矛盾；D应改为真实结束、占用释放与清洁限制共同保存，病历签署独立判断，不能借签署自动结束。"
+      ],
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Waiting",
+          "event": "前台确认实际到诊\\n[身份及安排已核对]\\n/ 同时建立当次病历草稿"
+        },
+        {
+          "source": "Waiting",
+          "target": "Active",
+          "event": "牙医确认实际开始\\n[接诊权限、安排及资源准备满足]\\n/ 共同保存真实开始及实际占用"
+        },
+        {
+          "source": "Active",
+          "target": "Ended",
+          "event": "牙医确认实际使用结束\\n[原就诊、资源及真实结束已核对]\\n/ 保存实际结束、释放相应占用\\n并衔接清洁准备限制"
+        },
+        {
+          "source": "Ended",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    },
+    {
+      "stem": "state-record",
+      "table": "clinical_record",
+      "field": "status",
+      "states": [
+        "草稿",
+        "已签署"
+      ],
+      "usecases": [
+        3,
+        6,
+        9
+      ],
+      "rules": [
+        "R06-2",
+        "R09-1",
+        "R09-2"
+      ],
+      "physical_refinement_pending": [],
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Draft",
+          "event": "建立当次病历\\n[同患者唯一就诊]\\n/ 保留本次记录来源"
+        },
+        {
+          "source": "Draft",
+          "target": "Signed",
+          "event": "牙医确认签署 [必需内容齐全，\\n归属、权限与所据版本有效]\\n/ 保存签署依据，冻结正文及所见"
+        }
+      ]
+    },
+    {
+      "stem": "state-batch",
+      "table": "material_batch",
+      "field": "status",
+      "states": [
+        "待检",
+        "可用",
+        "隔离",
+        "停用",
+        "过期"
+      ],
+      "usecases": [
+        18,
+        19,
+        20,
+        25
+      ],
+      "rules": [
+        "R18-1",
+        "R18-2",
+        "R25-2"
+      ],
+      "physical_refinement_pending": [
+        "D落实待检隔离、负责人停用及实际效期判定，状态变更不造库存。"
+      ],
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Pending",
+          "event": "登记批次 [未过期或仍待核实]\\n/ 不增加库存"
+        },
+        {
+          "source": "[*]",
+          "target": "Expired",
+          "event": "登记实物批次 [已核实过期]"
+        },
+        {
+          "source": "Pending",
+          "target": "Available",
+          "event": "负责人放行 [验收依据、\\n材料计量及效期条件满足]"
+        },
+        {
+          "source": "Pending",
+          "target": "Quarantined",
+          "event": "助理发现异常 / 立即隔离"
+        },
+        {
+          "source": "Available",
+          "target": "Quarantined",
+          "event": "助理发现异常 / 立即隔离"
+        },
+        {
+          "source": "Quarantined",
+          "target": "Available",
+          "event": "负责人核实恢复\\n[异常消除且实际效期有效]"
+        },
+        {
+          "source": "Pending",
+          "target": "Disabled",
+          "event": "负责人确认停用 [依据齐全]"
+        },
+        {
+          "source": "Available",
+          "target": "Disabled",
+          "event": "负责人确认停用 [依据齐全]"
+        },
+        {
+          "source": "Quarantined",
+          "target": "Disabled",
+          "event": "负责人确认停用 [依据齐全]"
+        },
+        {
+          "source": "Pending",
+          "target": "Expired",
+          "event": "核实已过效期"
+        },
+        {
+          "source": "Available",
+          "target": "Expired",
+          "event": "达到实际失效条件"
+        },
+        {
+          "source": "Quarantined",
+          "target": "Expired",
+          "event": "核实已过效期"
+        },
+        {
+          "source": "Disabled",
+          "target": "[*]",
+          "event": ""
+        },
+        {
+          "source": "Expired",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    },
+    {
+      "stem": "state-payment",
+      "table": "payment_order",
+      "field": "status",
+      "states": [
+        "待支付",
+        "处理中",
+        "待核实",
+        "已成功",
+        "已失败",
+        "已关闭"
+      ],
+      "usecases": [
+        13,
+        21
+      ],
+      "rules": [
+        "R13-1",
+        "R13-3"
+      ],
+      "physical_refinement_pending": [
+        "D区分渠道成功与本地实际付款确认，原单及交易号去重；成功后本地待补记保留核实依据。"
+      ],
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Pending",
+          "event": "确认电子方式及金额\\n/ 建立唯一原支付单"
+        },
+        {
+          "source": "Pending",
+          "target": "Processing",
+          "event": "请求支付或登记终端原交易\\n[原单及金额、渠道已核对]"
+        },
+        {
+          "source": "Pending",
+          "target": "Closed",
+          "event": "核实关闭未付原单\\n[确认未受理、未扣款且无未决交易]"
+        },
+        {
+          "source": "Processing",
+          "target": "Unknown",
+          "event": "结果未知、归属金额待查\\n或成功后本地结果待补记\\n/ 保留原号，先查不重付"
+        },
+        {
+          "source": "Processing",
+          "target": "Succeeded",
+          "event": "核实原交易明确成功\\n[归属金额相符且本地确认保存]\\n/ 一次确认实际付款及适用用途"
+        },
+        {
+          "source": "Processing",
+          "target": "Failed",
+          "event": "原渠道证实未成功\\n/ 保存真实失败依据"
+        },
+        {
+          "source": "Unknown",
+          "target": "Succeeded",
+          "event": "查原交易核实成功\\n[归属金额相符且本地补记完成]\\n/ 复用原付款，不重复确认"
+        },
+        {
+          "source": "Unknown",
+          "target": "Failed",
+          "event": "查原交易证实失败\\n/ 保存依据，原单不重发"
+        },
+        {
+          "source": "Succeeded",
+          "target": "[*]",
+          "event": ""
+        },
+        {
+          "source": "Failed",
+          "target": "[*]",
+          "event": ""
+        },
+        {
+          "source": "Closed",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    },
+    {
+      "stem": "state-insurance",
+      "table": "insurance_case",
+      "field": "status",
+      "states": [
+        "待核验",
+        "待预结算",
+        "预结算完成",
+        "结算待核实",
+        "已结算",
+        "已撤销"
+      ],
+      "usecases": [
+        22,
+        23
+      ],
+      "rules": [
+        "R22-1",
+        "R22-2",
+        "R22-3",
+        "R23-1",
+        "R23-2",
+        "R23-3",
+        "R23-4"
+      ],
+      "physical_refinement_pending": [
+        "D按R23-3a区分明确失败时原预估仍适用/已失效，未知不退回重发；患者选择独立字段；实际回款与撤销结果分别持久化。"
+      ],
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "IdentityPending",
+          "event": "医保启用且患者同意核验\\n/ 保存原业务号及就诊归属"
+        },
+        {
+          "source": "IdentityPending",
+          "target": "EstimatePending",
+          "event": "核验登记明确通过\\n[适用地区、日期及就诊条件满足]"
+        },
+        {
+          "source": "EstimatePending",
+          "target": "Estimated",
+          "event": "平台返回有效预估\\n[费用版本及分摊相符]\\n/ 保存预估，另记患者实际选择"
+        },
+        {
+          "source": "Estimated",
+          "target": "EstimatePending",
+          "event": "费用版本或条件变化\\n/ 旧预估失效，重核并重新说明"
+        },
+        {
+          "source": "Estimated",
+          "target": "SettlementPending",
+          "event": "收费人员请求正式结算\\n[预估有效、患者确认医保且无未决原单]\\n/ 保留原号，未知先查"
+        },
+        {
+          "source": "SettlementPending",
+          "target": "Settled",
+          "event": "核实正式成功 [归属分摊正确\\n且正式结果已确认保存]"
+        },
+        {
+          "source": "SettlementPending",
+          "target": "Estimated",
+          "event": "核实明确失败\\n[原预估仍有效] / 保存失败依据"
+        },
+        {
+          "source": "SettlementPending",
+          "target": "EstimatePending",
+          "event": "核实明确失败\\n[原预估已失效] / 补正后重核"
+        },
+        {
+          "source": "SettlementPending",
+          "target": "Reversed",
+          "event": "核实原正式单后撤销\\n[负责人确认且平台撤销明确成功]\\n/ 保留原结果及撤销依据"
+        },
+        {
+          "source": "Settled",
+          "target": "Reversed",
+          "event": "核实平台撤销明确成功\\n[负责人及原单依据齐全]\\n/ 同步原结算失效，患者退款另办"
+        },
+        {
+          "source": "Reversed",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    },
+    {
+      "stem": "state-equipment",
+      "table": "equipment_occupancy",
+      "field": "status",
+      "states": [
+        "已预留",
+        "使用中",
+        "已释放"
+      ],
+      "usecases": [
+        2,
+        6,
+        24
+      ],
+      "rules": [
+        "R02-1",
+        "R24-1",
+        "R24-2",
+        "R24-3"
+      ],
+      "physical_refinement_pending": [
+        "D保持实际结束与清洁限制共同保存；已释放不等同于设备可用。"
+      ],
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Reserved",
+          "event": "保存必要设备时段\\n[设备适用且安排有效、无冲突]"
+        },
+        {
+          "source": "Reserved",
+          "target": "InUse",
+          "event": "牙医确认实际开始\\n[准备合格、无其他使用或限制]\\n/ 同时保存就诊及真实使用开始"
+        },
+        {
+          "source": "Reserved",
+          "target": "Released",
+          "event": "取消、改约或核实未到\\n[此笔仍是预约预留]\\n/ 保存释放依据，改约另建新预留"
+        },
+        {
+          "source": "InUse",
+          "target": "Released",
+          "event": "牙医确认实际使用结束\\n[原使用及结束事实已核实]\\n/ 实际释放与清洁限制共同保存"
+        },
+        {
+          "source": "Released",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    },
+    {
+      "stem": "state-prescription",
+      "table": "prescription",
+      "field": "status",
+      "states": [
+        "草稿",
+        "已开立",
+        "已作废"
+      ],
+      "usecases": [
+        25
+      ],
+      "rules": [
+        "R25-1",
+        "R25-2",
+        "R25-3"
+      ],
+      "physical_refinement_pending": [
+        "D处方效力status与review_status、实际发药量分别约束；已开立不是已审通过，累计量和库存需按实际交付核对；已发或院外取药不明不能直接作废抹去。"
+      ],
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Draft",
+          "event": "牙医新开或更正重开\\n[患者及实际就诊可核对]\\n/ 新处方保留原方和更正依据"
+        },
+        {
+          "source": "Draft",
+          "target": "Issued",
+          "event": "牙医确认并说明用药\\n[权限、内容及取药路径条件满足]\\n/ 保存开立依据和时间"
+        },
+        {
+          "source": "Issued",
+          "target": "Voided",
+          "event": "牙医核实更正或停止\\n[已确认尚未交付且允许作废]\\n/ 原内容保留，需要时另开处方"
+        },
+        {
+          "source": "Voided",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 215
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 65
+hide circle
+hide empty members
+package "影像文书及确切原件" as D {
+' @reference patient
+class "患者" as patient_d <<entity>>
+' @reference visit
+class "就诊" as visit_d <<entity>>
+' @reference plan_version
+class "方案版本" as plan_version_d <<entity>>
+class "诊疗文件" as clinical_document <<entity>> {
+ 类型、来源、归属说明
+ 上传经办身份
+ --
+ +核对患者及诊疗归属()
+ +登记文件索引()
+}
+class "文件版本" as document_version <<entity>> {
+ 版本号、原文件名、实际格式
+ 大小、摘要、原件索引
+ 形成时间、替换原因
+ 上传人／时间、核对状态
+ 确认牙医／时间／依据
+ --
+ +核对原件格式与大小()
+ +追加版本并保留原件()
+ +确认诊疗归属(牙医与依据)
+}
+patient_d "1" -- "0..*" clinical_document
+visit_d "0..1" -- "0..*" clinical_document
+plan_version_d "0..1" -- "0..*" clinical_document
+clinical_document "1" *-- "1..*" document_version
+' @reference document_version
+class "文件版本" as previous_document_version <<entity>>
+previous_document_version "前版\n0..1" -- "0..*" document_version
+patient_d -[hidden]right- visit_d
+visit_d -[hidden]right- plan_version_d
+note bottom of document_version
+上传成功后才登记原件及索引；
+待核对不能作为已确认诊疗依据。
+替换保留旧原件及既有确认引用。
+end note
+}
+@enduml

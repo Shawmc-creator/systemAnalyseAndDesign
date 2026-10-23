@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 215
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 65
+hide circle
+hide empty members
+package "同版本项目、决定范围及原件" as C {
+' @reference plan_version
+class "方案版本" as plan_version_c <<entity>>
+' @reference document_version
+class "文件版本" as document_version_c <<entity>>
+class "方案项目" as plan_item <<entity>> {
+ 项目内容、牙位牙面
+ 计划数量、实施顺序
+ 估算费用（未知可空）
+ --
+ +核对项目数量与牙位()
+ +核对估算状态()
+}
+class "患者决定" as patient_decision <<entity>> {
+ 同意／暂缓／拒绝／撤回
+ 决定时间、说明依据
+ 说明人、记录人、范围限制
+ --
+ +记录决定(项目范围)
+ +核对有效同意范围(时点)
+ +追加撤回决定(范围与时间)
+}
+class "患者决定—方案项目" as decision_plan_item <<entity>> {
+ 关联形成时间、记录牙医
+ 确认数量（限定时记录）
+ --
+ +核对同版本项目()
+ +限定本次决定范围()
+}
+class "患者决定—确认原件" as decision_file_version <<entity>> {
+ 关联形成时间、记录牙医
+ --
+ +核对原件归属及确认状态()
+ +固定确认时原件版本()
+}
+plan_version_c "1" *-- "0..*" plan_item
+plan_version_c "1" -- "0..*" patient_decision
+patient_decision "1" -- "0..*" decision_plan_item
+plan_item "1" -- "0..*" decision_plan_item
+patient_decision "1" -- "0..*" decision_file_version
+document_version_c "1" -- "0..*" decision_file_version
+plan_item -[hidden]right- patient_decision
+decision_plan_item -[hidden]right- decision_file_version
+note bottom of decision_plan_item
+决定只覆盖该版本所选项目和明确数量；
+文字范围限制不能代替项目关联。
+撤回只停止相应范围的后续执行；
+已有决定、原件及实际执行继续保留。
+end note
+}
+@enduml

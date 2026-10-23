@@ -1,0 +1,104 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam EntityBackgroundColor white
+skinparam EntityBorderColor black
+skinparam nodesep 28
+skinparam ranksep 38
+hide circle
+left to right direction
+entity "患者资金\npatient_funds" as patient_funds {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK,UK>>
+}
+entity "收费项目\nservice" as service {
+* id : INTEGER <<PK>>
+}
+entity "价目\nservice_price" as service_price {
+* id : INTEGER <<PK>>
+* service_id : INTEGER <<FK>>
+}
+entity "应收账目\nbill" as bill {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+* patient_funds_id : INTEGER <<FK>>
+}
+entity "应收项目\nbill_item" as bill_item {
+* id : INTEGER <<PK>>
+* bill_id : INTEGER <<FK>>
+ treatment_execution_id : INTEGER <<FK,UK>>
+ dispense_record_id : INTEGER <<FK,UK>>
+ service_price_id : INTEGER <<FK>>
+}
+entity "患者付款\npatient_payment" as patient_payment {
+* id : INTEGER <<PK>>
+* patient_funds_id : INTEGER <<FK>>
+}
+entity "付款分配\npayment_allocation" as payment_allocation {
+* id : INTEGER <<PK>>
+* patient_payment_id : INTEGER <<FK>>
+* bill_id : INTEGER <<FK>>
+ original_allocation_id : INTEGER <<FK>>
+ fee_request_id : INTEGER <<FK>>
+}
+entity "预付抵扣\nprepayment_offset" as prepayment_offset {
+* id : INTEGER <<PK>>
+* patient_payment_id : INTEGER <<FK>>
+* bill_id : INTEGER <<FK>>
+ original_offset_id : INTEGER <<FK>>
+ fee_request_id : INTEGER <<FK>>
+}
+entity "电子支付单\npayment_order" as payment_order {
+* id : INTEGER <<PK>>
+* patient_funds_id : INTEGER <<FK>>
+ bill_id : INTEGER <<FK>>
+ patient_payment_id : INTEGER <<FK,UK>>
+}
+entity "收退款核对\npayment_reconciliation" as payment_reconciliation {
+* id : INTEGER <<PK>>
+ patient_payment_id : INTEGER <<FK>>
+ payment_order_id : INTEGER <<FK>>
+ patient_refund_id : INTEGER <<FK>>
+}
+entity "实际发药（跨区引用）\ndispense_record" as dispense_record {
+* id : INTEGER <<PK>>
+}
+entity "费用申请（跨区引用）\nfee_request" as fee_request {
+* id : INTEGER <<PK>>
+}
+entity "患者（跨区引用）\npatient" as patient {
+* id : INTEGER <<PK>>
+}
+entity "退款办理（跨区引用）\npatient_refund" as patient_refund {
+* id : INTEGER <<PK>>
+}
+entity "诊疗执行（跨区引用）\ntreatment_execution" as treatment_execution {
+* id : INTEGER <<PK>>
+}
+patient ||--o| patient_funds
+service ||--o{ service_price
+patient ||--o{ bill
+patient_funds ||--o{ bill
+bill ||--o{ bill_item
+treatment_execution |o--o| bill_item
+dispense_record |o--o| bill_item
+service_price |o--o{ bill_item
+patient_funds ||--o{ patient_payment
+patient_payment ||--o{ payment_allocation
+bill ||--o{ payment_allocation
+payment_allocation |o--o{ payment_allocation
+fee_request |o--o{ payment_allocation
+patient_payment ||--o{ prepayment_offset
+bill ||--o{ prepayment_offset
+prepayment_offset |o--o{ prepayment_offset
+fee_request |o--o{ prepayment_offset
+patient_funds ||--o{ payment_order
+bill |o--o{ payment_order
+patient_payment |o--o| payment_order
+patient_payment |o--o{ payment_reconciliation
+payment_order |o--o{ payment_reconciliation
+patient_refund |o--o{ payment_reconciliation
+@enduml

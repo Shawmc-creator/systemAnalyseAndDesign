@@ -1,0 +1,52 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "诊疗助理" as A
+actor "诊所负责人" as M
+actor "供应商" as Sup
+entity "诊所管理系统" as S
+A -> S : 查余量、效期和未完成采购，提出需求
+S --> M : 展示需求依据及拟采购内容
+M -> S : 确认供应商、规格、数量与交付安排
+M -> Sup : 交付供货要求
+Sup --> M : 反馈供货约定
+loop 每次实际到货
+ Sup -> A : 交付实物与随货依据
+ A -> S : 按原采购登记到货、批次和验收结果
+ S -> S : 核对原采购、累计到货与重复验收\n区分合格、待检及拒收数量
+ alt 有本次合格量
+  S -> S : 关联验收来源、入库流水与批次余额
+ else 无合格量
+  S -> S : 保留待处理数量，不增加可用库存
+ end
+ S --> A : 返回本次验收及剩余待办
+ opt 有供货差异
+  S --> M : 提供原采购和差异
+  M -> Sup : 协调实际处理
+ end
+end
+opt 日常领用、用料或未用退回
+ A -> S : 按实际发生提交批次、数量及来源
+ S -> S : 核对可用性和数量，关联流水及余额
+end
+opt 盘点差异核实
+ A -> S : 提交实点数量及差异依据
+ S --> M : 展示原账面与盘点差异
+ M -> S : 核实并确认调整或不予调整
+ S -> S : 条件仍有效且批准时保存差异流水及余额
+end
+@enduml

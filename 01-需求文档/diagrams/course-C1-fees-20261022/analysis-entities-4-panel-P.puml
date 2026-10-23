@@ -1,0 +1,44 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "价目提出与负责人确认" as P {
+class "收费项目" as service <<entity>> {
+ 项目编号、名称、计价单位
+ 启用状态
+ --
+ +核对项目及计价单位()
+ +停用新计费(负责人确认)
+}
+class "价目" as service_price <<entity>> {
+ 非负单价、适用起止
+ 调价或零价原因、确认状态
+ 提出及确认人、时间、意见
+ --
+ +核对适用区间(同项目价目)
+ +提交负责人确认()
+ +确认适用价目(当前版本)
+ +退回修改(原因)
+}
+service "1" *-- "0..*" service_price
+note bottom of service_price
+适用期间左闭右开；已确认区间不重叠。
+零价有依据；调价不改原账单快照。
+已用项目换单位另建项目，停用保留历史。
+end note
+}
+@enduml

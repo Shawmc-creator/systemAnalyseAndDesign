@@ -50,7 +50,7 @@ class Pharmacy{
    const price=i.billing_service_id?this.db.prepare("SELECT p.* FROM service_price p JOIN service s ON s.id=p.service_id WHERE s.id=? AND s.is_active=1 AND p.status='已确认可适用' AND p.valid_from<=? AND (p.valid_until IS NULL OR p.valid_until>?) ORDER BY p.valid_from DESC LIMIT 1").get(i.billing_service_id,pricingAt,pricingAt):null;
    return {...i,dispenses,remainingQuantityScaled:Number(BigInt(i.quantity_scaled)-used),stocks,currentPrice:price||null};
   });
-  return {...p,items,latestHealthVersionId:health?.id||null,health:health?this.db.prepare('SELECT category,certainty,content FROM health_item WHERE health_version_id=? ORDER BY id').all(health.id):[],history:this.history(p.id)};
+  return {...p,items,latestHealthVersionId:health?.id||null,health:health?this.db.prepare('SELECT category,certainty,content FROM health_item WHERE health_version_id=? ORDER BY id').all(health.id):[],history:this.history(p.id),reviewHistory:this.unit.workflowHistory.list('prescription',p.id)};
  }
  history(prescriptionId){return this.db.prepare("SELECT a.occurred_at,a.reason,s.name staff_name FROM operation_audit a LEFT JOIN staff s ON s.id=a.staff_id WHERE a.object_kind='prescription' AND a.object_key=? AND a.event_type='变更' ORDER BY a.id").all(String(prescriptionId));}
  query(credentials,input={}){
@@ -69,6 +69,7 @@ class Pharmacy{
    const note=text(input.reviewNote,'审方意见',2000);let status;
    if(input.action==='approve'&&p.review_status==='院内待审')status='已通过';else if(input.action==='return')status='待医师处理';else fail(422,'INVALID_ACTION','审方操作无效');
    this.db.prepare('UPDATE prescription SET review_status=?,reviewer_id=?,review_note=?,reviewed_at=?,updated_at=?,revision=revision+1 WHERE id=?').run(status,ctx.session.staff_id,note,now,now,p.id);
+   this.unit.workflowHistory.append('prescription',p.id,'审方',note,ctx,input,now);
    ctx.authority.prescriptionId=p.id;return {kind:'prescription',key:p.id,beforeRevision:p.revision,revision:p.revision+1,reason:note,changes:[{field:'review_status',before:p.review_status,after:status},{field:'review_note',before:p.review_note,after:note}]};
   });
  }

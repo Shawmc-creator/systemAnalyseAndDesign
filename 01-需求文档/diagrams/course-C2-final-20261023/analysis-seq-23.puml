@@ -1,0 +1,95 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 260
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "收费人员" as A
+boundary "医保结算接口" as B
+actor "诊所负责人" as M
+boundary "诊所负责人接口" as BM
+control "办理医保结算、撤销\n与回款核对控制" as K
+entity "医保就诊办理" as C
+entity "医保结算" as S
+entity "医保撤销办理" as R
+entity "医保结算款收付" as F
+boundary "医保服务接口" as EB
+actor "医保平台" as X
+
+A -> B : 选原办理，选择正式结算、原单撤销或实际回款核对
+B -> K : 原业务及本次办理选择
+activate K
+K -> K : 核验医保启用条件、岗位权限及原业务归属
+alt 基本路径：正式结算
+ K -> C : 核对本次费用范围及适用条件()
+ break 2a 预估失效、患者未确认医保或有未决原笔
+  K --> B : 失效回UC-22；未决先查原笔，不重复结算
+ end
+ K -> EB : 按原稳定业务号请求正式结算或查询原结果
+ EB -> X : 本次正式结算请求或原单查询
+ X --> EB : 明确成功、失败或仍未知及正式分摊
+ EB --> K : 平台真实结果
+ alt 3b 平台成功与否未知
+  K --> B : 保留原号待核实，查原成功后补记，不重发
+ else 3a 明确失败
+  K --> B : 保存失败依据，不形成有效结算；补正后回原办理
+ else 明确成功
+  K -> S : 核对明确正式结果及分摊()
+  break 3c 归属或T=F+A+P等分摊关系异常
+   K --> B : 保留实际返回，核实前不输出患者最终待付
+  end
+  K -> S : 确认有效正式结算()
+  K -> K : 共同保存正式结算号、分摊及原办理已结算状态
+  alt 本地保存仍待核实
+   K --> B : 3b按原成功结果核对补记，不重复发起结算
+  else 本地已确认保存
+   K --> B : 正式结果；账单待付由UC-12，实际收款由UC-13办理
+  end
+  opt 5a 与预估不同或患者提出异议
+   A -> B : 如实说明正式结果，记录患者异议
+   B -> K : 说明及需负责人核实的问题
+   K --> B : 原正式分摊不改写，转负责人及UC-14核实
+  end
+ end
+else 1a 独立办理原单撤销
+ M -> BM : 核实原结算及原因，适用时引用UC-14批准依据
+ BM -> K : 负责人依据及原结算
+ K -> R : 核对原结算及批准依据()
+ K -> R : 建立原单撤销待办()
+ K -> EB : 按独立撤销号请求或查询原撤销
+ EB -> X : 原结算及本次撤销原号
+ X --> EB : 成功、失败或仍未知
+ EB --> K : 实际撤销结果
+ alt 明确成功
+  K -> R : 确认平台撤销成功()
+  K -> S : 按成功撤销停用原结算()
+  K -> K : 共同保存撤销成功及原结算、原办理已撤销
+  K --> B : 患者退款另办UC-14；重结算须UC-22重新预估并确认
+ else 未知或明确失败
+  K -> R : 保留未知或失败结果(真实依据)
+  K --> B : 未知先查原笔；失败保留原有效结算，不推定已退钱
+ end
+else 1b 独立核对医保实际回款
+ A -> B : 原结算、实际拨付或退回、正金额、时间及正式凭据
+ B -> K : 医保或银行真实收付依据
+ K -> F : 核对原结算及实际收付依据()
+ K -> F : 核对重复收付(原单及凭据)
+ break 无正式依据、金额不合法或已记原笔
+  K --> B : 补正或返回原结果，不重记回款
+ end
+ K -> F : 记录实际拨付或退回()
+ K -> S : 计算应拨及收退差额(实际收付)
+ K --> B : 应拨减净到账：正为待收、负为待退；差异不转患者欠费
+end
+deactivate K
+
+@enduml

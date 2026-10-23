@@ -1,0 +1,73 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 260
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as A
+boundary "牙医接口" as B
+control "签署及补充病历控制" as K
+entity "病历" as R
+entity "健康复核" as Q
+entity "病历补充" as A1
+
+A -> B : 打开当次病历并核实患者与就诊
+B -> K : 病历编号、当前版本及签署账号
+activate K
+K -> K : 核验病历归属和签署权限；读取原文、所见与复核
+K --> B : 原文及当前签署状态
+alt 1a 原病历已签署，需要补充
+ A -> B : 阅读原文，填写补充内容及原因，确认签署
+ B -> K : 原病历、补充内容、原因及本次办理号
+ K -> A1 : 核对原病历已签署()
+ critical 补充独立签署，共同保存
+  K -> K : 查原补充结果；重核原病历及签署授权
+  break 归属或签署授权不满足
+   K --> B : 拒绝补充，不改变原正文
+  end
+  opt 同次补充尚未保存
+   K -> A1 : 签署补充并保留原文()
+   K -> K : 保存补充内容、原因、签署人及时间
+  end
+ end
+else 基本路径：当前为草稿
+ K --> B : 主诉、检查所见、健康复核、诊断与处理意见
+ A -> B : 确认内容并请求签署
+ B -> K : 所据草稿版本及本次办理号
+ K -> R : 核对草稿可修改性()
+ K -> Q : 核对版本与就诊归属()
+ K -> R : 核对签署完整性(所见与复核)
+ break 4a 签署必需内容不完整
+  K --> B : 转UC-06补全后重开草稿，不伪造诊断
+ end
+ critical 重核版本与同次结果，签署并保存
+  K -> K : 查原签署；核对当前版本、完整性及授权
+  break 4b 已变化或已签署且本次无原结果
+   K --> B : 返回当前内容；已签署返回原结果，不覆盖
+  end
+  opt 当前草稿尚未签署且条件满足
+   K -> R : 签署并冻结正文()
+   K -> K : 冻结正文与所见，保存签署人、时间及版本
+  end
+ end
+end
+alt 5a 签署或补充结果未知
+ K -> K : 查原签署或补充；已有结果复用，未存才重试
+ K --> B : 原结果或待核实，不显示虚假成功
+else 已确认保存
+ K --> B : 签署版本或独立补充及签署人、时间
+end
+B --> A : 签署完成不等于实际结束、资源就绪或结清
+deactivate K
+
+@enduml

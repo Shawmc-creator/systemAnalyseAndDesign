@@ -1,0 +1,58 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 215
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 65
+hide circle
+hide empty members
+package "病历正文与签后补充" as R {
+' @reference visit
+class "就诊" as visit_r <<entity>>
+class "病历" as clinical_record <<entity>> {
+ 主诉、诊断、处理意见
+ 草稿／已签署、正文版本
+ 签署牙医、时间、冻结摘要
+ --
+ +核对草稿可修改性()
+ +更新草稿(当前版本)
+ +核对签署完整性(所见与复核)
+ +签署并冻结正文()
+ +建立当次草稿()
+ +核对病历患者及就诊归属()
+}
+class "检查所见" as clinical_finding <<entity>> {
+ 牙位、牙面、所见内容
+ 顺序、记录牙医
+ --
+ +核对牙位牙面()
+ +更新所见(原病历状态)
+}
+class "病历补充" as record_addendum <<entity>> {
+ 补充正文、原因
+ 签署牙医、补充时间
+ --
+ +核对原病历已签署()
+ +签署补充并保留原文()
+}
+visit_r "1" -- "1" clinical_record
+clinical_record "1" *-- "0..*" clinical_finding
+clinical_record "1" *-- "0..*" record_addendum
+clinical_finding -[hidden]right- record_addendum
+note bottom of clinical_record
+签署前核对所见和本次健康复核。
+签后仅追加独立补充，不改正文或所见；
+签署不代替实际结束、资源恢复或收费。
+end note
+}
+@enduml

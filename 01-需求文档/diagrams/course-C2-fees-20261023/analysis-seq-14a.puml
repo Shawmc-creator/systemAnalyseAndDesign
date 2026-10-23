@@ -1,0 +1,90 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "收费人员" as A
+boundary "费用办理接口" as B
+actor "诊所负责人" as M
+control "办理费用更正与退费控制" as K
+entity "费用申请" as F
+entity "费用调整" as J
+entity "付款分配" as U
+entity "预付抵扣" as O
+entity "患者付款" as P
+
+A -> B : 核对原账单及付款，或1a仅退未用预款
+B -> K : 同患者原单、项目、拟调整额及拟退上限、原因依据
+activate K
+K -> K : 核验申请权限，读取原费用、医保、用途及既有退款
+K -> F : 核对原单归属及申请额度()
+K -> F : 提交或补正重提()
+K -> K : 保存待审核申请及本次提交版本；1a调整额为0
+K --> B : 申请编号及待审核状态
+deactivate K
+... 负责人可稍后审核原申请 ...
+M -> B : 打开原申请，核对证据并记录审核意见
+B -> K : 原申请版本、批准调整额及退款上限，或5a其他决定
+activate K
+K -> K : 核验负责人及当前提交版本，保留每次提交审核依据
+alt 5a 退回、拒绝或未审核撤回
+ alt 申请人撤回未审核申请
+  A -> B : 申请人请求撤回原未审核申请
+  B -> K : 原申请、申请人及当前版本
+  K -> K : 核验撤回权限及尚未审核状态
+  K -> F : 撤回未审核申请()
+ else 负责人退回或拒绝
+  K -> F : 记录批准退回或拒绝(审核依据)
+ end
+ K --> B : 退回后步骤3补正；拒绝或撤回结束，不调整退款
+else 批准
+ K -> F : 记录批准退回或拒绝(审核依据)
+ K -> K : 保存负责人、人时、意见及批准范围
+ opt 6a 原费用已有医保结算且更正影响分摊
+  ref over B,K : UC-22、23：按批准明细撤销及重办，核实最终分摊
+  break 医保处理失败或仍未知
+   K --> B : 保留待处理，不确认最终退补差额
+  end
+ end
+ alt 1a 仅退未用预款
+  K -> P : 计算原款可用额(用途与退款)
+ else 更正账单费用
+  alt 同一申请调整已生效
+   K -> K : 复用原调整及释放，继续核实未完成退款
+  else 尚未生效
+   critical 重核批准及账目，一次性调整与用途释放
+   K -> J : 核对申请已批准且未生效()
+   K -> J : 核对明细合计与批准额()
+   K -> K : 按最终医保重算P；取当前S，释放max(S-P,0)
+   break 归属、批准或当前费用条件已变化
+    K --> B : 返回当前依据重核，不重复生效
+   end
+   opt 需要释放原付款分配
+    K -> U : 释放原用途(批准申请)
+   end
+   opt 需要释放原预款抵扣
+    K -> O : 释放原抵扣(批准申请)
+   end
+   K -> J : 确认调整及必要用途释放()
+   K -> K : 原项目、调整及必要释放共同保存；原账不覆盖
+   end
+  end
+ end
+ break 6b 无应退或需补收
+  K --> B : 无差额结束，需补收转UC-13，不强行退款
+ end
+ K --> B : 可退范围及原渠道，批准不等于实际退款
+end
+deactivate K
+@enduml

@@ -1,0 +1,157 @@
+{
+  "date": "2026-10-23",
+  "status": "第二十九批：8类业务历史落实具体物理存储和原单，其他字段来源及D2/D3继续",
+  "pdf_pages": 165,
+  "previous_pdf_pages": 164,
+  "figures": 144,
+  "core_tables": 69,
+  "history_tables": 8,
+  "physical_tables": 77,
+  "logical_fields": 986,
+  "new_core_fields": [
+    "insurance_case.current_preestimate_id",
+    "insurance_fee.preestimate_request_id",
+    "insurance_settlement.preestimate_request_id"
+  ],
+  "new_tables": [
+    {
+      "table": "fee_request_history",
+      "analysis_owner": "fee_request",
+      "owner_field": "fee_request_id",
+      "source_uc": [
+        "UC-14"
+      ],
+      "group": 5
+    },
+    {
+      "table": "service_price_history",
+      "analysis_owner": "service_price",
+      "owner_field": "service_price_id",
+      "source_uc": [
+        "UC-11"
+      ],
+      "group": 4
+    },
+    {
+      "table": "followup_history",
+      "analysis_owner": "followup_requirement",
+      "owner_field": "followup_requirement_id",
+      "source_uc": [
+        "UC-15",
+        "UC-16",
+        "UC-17"
+      ],
+      "group": 6
+    },
+    {
+      "table": "stock_count_history",
+      "analysis_owner": "stock_count",
+      "owner_field": "stock_count_id",
+      "source_uc": [
+        "UC-20"
+      ],
+      "group": 7
+    },
+    {
+      "table": "receipt_item_history",
+      "analysis_owner": "purchase_receipt_item",
+      "owner_field": "purchase_receipt_item_id",
+      "source_uc": [
+        "UC-19"
+      ],
+      "group": 8
+    },
+    {
+      "table": "insurance_preestimate_history",
+      "analysis_owner": "insurance_case",
+      "owner_field": "insurance_case_id",
+      "source_uc": [
+        "UC-22",
+        "UC-23"
+      ],
+      "group": 9
+    },
+    {
+      "table": "document_correction",
+      "analysis_owner": "document_version",
+      "owner_field": "document_version_id",
+      "source_uc": [
+        "UC-10"
+      ],
+      "group": 2
+    },
+    {
+      "table": "prescription_review_history",
+      "analysis_owner": "prescription",
+      "owner_field": "prescription_id",
+      "source_uc": [
+        "UC-25"
+      ],
+      "group": 2
+    }
+  ],
+  "modified_core_tables": [
+    "document_version",
+    "insurance_case",
+    "service_price",
+    "stock_count",
+    "clinical_document",
+    "prescription",
+    "followup_requirement",
+    "purchase_receipt_item",
+    "insurance_settlement",
+    "fee_request",
+    "insurance_fee"
+  ],
+  "diagram_main_relations_added": 16,
+  "history_physical_structure_defined": true,
+  "history_production_implemented": false,
+  "changed_pages_before_D2": [
+    2,
+    132,
+    134,
+    136,
+    137,
+    138,
+    139,
+    140,
+    141,
+    142,
+    149
+  ],
+  "history_summary_page": 150,
+  "D2_page": 151,
+  "D3_page": 158,
+  "selected_key_fields": 271,
+  "analysis_sources_unchanged": true,
+  "C1_classes": 69,
+  "C1_operations": 218,
+  "sqlite_isolated_rule_checks": 22,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "historical_sql_changed": false,
+  "github_synced": false,
+  "whole_document_course_compliant": false,
+  "remaining": [
+    "其他旧字段来源编号清理",
+    "D2具体服务实体与数据映射器接口、D3页面组件精化",
+    "历史结构尚未迁移至运行程序，真实验收另行进行"
+  ],
+  "validation": {
+    "model_foreign_keys": "passed",
+    "history_owner_class_mapping": "passed",
+    "main_history_source_relations": "passed",
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "visible_text_overlap_pairs": 0,
+    "minimum_font_pt": 9.22,
+    "all_144_figure_titles_numbers_preserved": true,
+    "figure_pages_after_D2_shift_one": true
+  },
+  "files": {
+    "tex_sha256": "52ffb3fb2e4a54ac238adc056c60f79206b8556118ecdcc8a4ac625b0e902c1c",
+    "pdf_sha256": "eefef2aba548f8a2362cc207fee6916a7fee67723519cf1e89cc9c30006ae4f7",
+    "logical_model_sha256": "cadede36d8b870fe56b64ab357a6854e39be26b432c7e4e855f3f84114b105eb"
+  }
+}

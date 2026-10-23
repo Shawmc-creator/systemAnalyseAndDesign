@@ -1,0 +1,75 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 215
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 65
+hide circle
+hide empty members
+package "处方与实际发药（院内按条件启用）" as P {
+' @reference patient
+class "患者" as patient_p <<entity>>
+' @reference visit
+class "就诊" as visit_p <<entity>>
+' @reference material
+class "材料" as material_p <<entity>>
+' @reference inventory_movement
+class "库存变动" as inventory_p <<entity>>
+' @reference bill_item
+class "应收项目" as bill_item_p <<entity>>
+class "处方" as prescription <<entity>> {
+ 开立牙医、时间、取药路径
+ 草稿／已开立／已作废
+ 审核状态、审核人及意见
+ 用药指导、交付与更正依据
+ --
+ +暂存处方草稿()
+ +开立处方(就诊与权限)
+ +记录审方结果(资格与意见)
+ +核对实际发药条件()
+ +作废未交付处方(原因)
+ +核对处方就诊归属()
+}
+class "处方明细" as prescription_item <<entity>> {
+ 开立时药名规格
+ 用法用量、疗程、单位
+ 开立数量
+ --
+ +核对药品规格与用法()
+ +计算剩余可发量(实际已发量)
+}
+class "实际发药" as dispense_record <<entity>> {
+ 实际正数量、交付时间
+ 核发人、用药交代
+ --
+ +核对批次效期及可用量()
+ +登记实际交付(数量与原单)
+}
+patient_p "1" -- "0..*" prescription
+visit_p "1" -- "0..*" prescription
+prescription "1" *-- "0..*" prescription_item
+material_p "1" -- "0..*" prescription_item
+prescription_item "1" -- "0..*" dispense_record
+inventory_p "1" -- "0..1" dispense_record
+dispense_record "0..1" -- "1" bill_item_p
+patient_p -[hidden]right- visit_p
+inventory_p -[hidden]right- bill_item_p
+note bottom of dispense_record
+院内：资质与审方通过后，才按实际量发药。
+累计发药量≤有效开立量，且不超可用库存。
+发药、同源出库及费用来源共同保存；
+缺价留待核价，不能补成零价。
+院外：不产生诊所发药、出库及药品应收。
+end note
+}
+@enduml

@@ -1,0 +1,266 @@
+{
+  "date": "2026-10-23",
+  "scope": "C3三类复杂对象；状态表示业务阶段，分项决定、实际评估与退款另以原实体记录",
+  "state_machines": [
+    {
+      "stem": "state-plan",
+      "table": "plan_version",
+      "field": "status",
+      "states": [
+        "草稿",
+        "待确认",
+        "已确认",
+        "暂缓",
+        "已拒绝",
+        "停止后续执行",
+        "本版执行完成"
+      ],
+      "usecases": [
+        7,
+        8
+      ],
+      "rules": [
+        "R07-1",
+        "R07-2",
+        "R08-1"
+      ],
+      "physical_refinement_pending": [
+        "D补方案状态汇总与分项决定、实际数量之间的约束；不新增状态枚举",
+        "已确认表示有有效同意范围，不代表整版所有项目获准；本版完成不能仅凭一个已同意项目完成推断"
+      ],
+      "compound_states_not_persisted": {
+        "Open": "本版可继续办理"
+      },
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Draft",
+          "event": ""
+        },
+        {
+          "source": "Draft",
+          "target": "Pending",
+          "event": "提交说明 [诊断及项目完整]"
+        },
+        {
+          "source": "Pending",
+          "target": "Agreed",
+          "event": "保存决定\\n[有有效同意范围]"
+        },
+        {
+          "source": "Pending",
+          "target": "Deferred",
+          "event": "保存决定 [无有效同意\\n且仍有暂缓项目]"
+        },
+        {
+          "source": "Pending",
+          "target": "Rejected",
+          "event": "保存决定 [无有效同意\\n且剩余项目均拒绝]"
+        },
+        {
+          "source": "Deferred",
+          "target": "Pending",
+          "event": "患者愿再决定\\n[内容未实质改变]\\n/ 重新说明"
+        },
+        {
+          "source": "Rejected",
+          "target": "Pending",
+          "event": "患者改变意向\\n[内容未实质改变]\\n/ 重新说明"
+        },
+        {
+          "source": "Agreed",
+          "target": "Pending",
+          "event": "重新说明 [无可执行同意\\n且仍有待决定项目]"
+        },
+        {
+          "source": "[*]",
+          "target": "Open",
+          "event": "新建或实质修订\\n/ 另建版本"
+        },
+        {
+          "source": "Open",
+          "target": "Stopped",
+          "event": "牙医停止本版\\n[新版替代，或全部撤回\\n且不再安排本版执行]\\n/ 记时间、原因"
+        },
+        {
+          "source": "Agreed",
+          "target": "Done",
+          "event": "核对实际执行\\n[同意范围完成，且无\\n待决定或暂缓项目]"
+        },
+        {
+          "source": "Stopped",
+          "target": "[*]",
+          "event": ""
+        },
+        {
+          "source": "Done",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    },
+    {
+      "stem": "state-followup",
+      "table": "followup_requirement",
+      "field": "status",
+      "states": [
+        "待发布",
+        "待联系",
+        "待到诊或评估",
+        "已完成",
+        "已撤销"
+      ],
+      "usecases": [
+        15,
+        16,
+        17
+      ],
+      "rules": [
+        "R15-1",
+        "R15-2",
+        "R16-1",
+        "R16-2",
+        "R17-1",
+        "R17-2"
+      ],
+      "physical_refinement_pending": [
+        "D补发布及变更历史、评估依据与完成共同保存；需评估不能仅凭联系完成"
+      ],
+      "compound_states_not_persisted": {},
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Draft",
+          "event": "牙医暂存"
+        },
+        {
+          "source": "[*]",
+          "target": "Contact",
+          "event": "牙医直接发布 [发布条件满足]"
+        },
+        {
+          "source": "Draft",
+          "target": "Contact",
+          "event": "牙医发布 [来源同患者，\\n目的、日期、评估要求\\n及负责前台齐全]"
+        },
+        {
+          "source": "Contact",
+          "target": "Attend",
+          "event": "衔接后续 [同患者预约成功关联\\n或交牙医实际评估] / 保留安排"
+        },
+        {
+          "source": "Attend",
+          "target": "Contact",
+          "event": "取消、未到或评估后需再联系\\n[要求仍有效] / 指定下次日期及责任"
+        },
+        {
+          "source": "Contact",
+          "target": "Done",
+          "event": "核实完成 [目的达到，且\\n牙医实际评估完整；或\\n目的达到、明确免评估且依据齐全]\\n/ 保存评估或事实、完成人时"
+        },
+        {
+          "source": "Attend",
+          "target": "Done",
+          "event": "核实完成 [目的达到，且\\n牙医实际评估完整；或\\n目的达到、明确免评估且依据齐全]\\n/ 保存评估或事实、完成人时"
+        },
+        {
+          "source": "Draft",
+          "target": "Cancel",
+          "event": "牙医撤销\\n[原因依据齐全]"
+        },
+        {
+          "source": "Contact",
+          "target": "Cancel",
+          "event": "牙医撤销\\n[原因依据齐全]"
+        },
+        {
+          "source": "Attend",
+          "target": "Cancel",
+          "event": "牙医撤销\\n[原因依据齐全]"
+        },
+        {
+          "source": "Done",
+          "target": "[*]",
+          "event": ""
+        },
+        {
+          "source": "Cancel",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    },
+    {
+      "stem": "state-refund",
+      "table": "fee_request",
+      "field": "status",
+      "states": [
+        "待审核",
+        "已退回",
+        "已拒绝",
+        "已同意",
+        "已撤回"
+      ],
+      "usecases": [
+        14
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2",
+        "R14-3",
+        "R14-4"
+      ],
+      "physical_refinement_pending": [
+        "D保留提交与审核快照，当前待审核提交方可撤回；批准与实际费用调整、退款办理分别持久化"
+      ],
+      "compound_states_not_persisted": {},
+      "transitions": [
+        {
+          "source": "[*]",
+          "target": "Pending",
+          "event": "收费人员提交申请 [原单同患者，\\n理由、金额和依据合法]\\n/ 保存本次提交版本及编号"
+        },
+        {
+          "source": "Pending",
+          "target": "Returned",
+          "event": "负责人退回 [需补充依据]\\n/ 保存意见、人和时间"
+        },
+        {
+          "source": "Returned",
+          "target": "Pending",
+          "event": "收费人员补正重提\\n[重新核对原单及额度]\\n/ 递增提交版本，保留原提交和审核"
+        },
+        {
+          "source": "Pending",
+          "target": "Approved",
+          "event": "负责人批准\\n[当前提交版本及支持额度核实]\\n/ 固定批准调整额、退款上限及审核依据"
+        },
+        {
+          "source": "Pending",
+          "target": "Rejected",
+          "event": "负责人拒绝\\n/ 保存原因、人和时间"
+        },
+        {
+          "source": "Pending",
+          "target": "Withdrawn",
+          "event": "申请人撤回\\n[当前提交仍待审核，尚未生效]\\n/ 保留原申请及撤回依据"
+        },
+        {
+          "source": "Approved",
+          "target": "[*]",
+          "event": ""
+        },
+        {
+          "source": "Rejected",
+          "target": "[*]",
+          "event": ""
+        },
+        {
+          "source": "Withdrawn",
+          "target": "[*]",
+          "event": ""
+        }
+      ]
+    }
+  ]
+}

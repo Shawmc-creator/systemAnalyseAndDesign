@@ -1,0 +1,68 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 225
+skinparam linetype ortho
+skinparam nodesep 75
+skinparam ranksep 90
+hide circle
+hide empty members
+package "正式结算、原单撤销及实际结算款" as S {
+' @reference insurance_case
+class "医保就诊办理" as case_s <<entity>>
+' @reference fee_request
+class "费用申请" as request_s <<entity>>
+class "医保结算" as insurance_settlement <<entity>> {
+ 正式结算号、范围内总费T
+ 基金F、个账A、其他自付P
+ 有效／已撤销、实际确认时间
+ /应拨额、/净到账、/待收或待退
+ --
+ +核对明确正式结果及分摊()
+ +确认有效正式结算()
+ +按成功撤销停用原结算()
+ +计算应拨及收退差额(实际收付)
+}
+class "医保撤销办理" as insurance_reversal <<entity>> {
+ 唯一撤销号、原因及负责人依据
+ 待办理／待核实／已成功／已失败
+ 原笔结果、核实人及时间
+ --
+ +核对原结算及批准依据()
+ +建立原单撤销待办()
+ +保留未知或失败结果(真实依据)
+ +确认平台撤销成功()
+}
+class "医保结算款收付" as insurance_fund_receipt <<entity>> {
+ 拨付或退回、实际正金额
+ 实际时间、医保或银行凭据
+ 经办人员
+ --
+ +核对原结算及实际收付依据()
+ +核对重复收付(原单及凭据)
+ +记录实际拨付或退回()
+}
+case_s "1" -- "0..*" insurance_settlement
+insurance_settlement "1" -- "0..*" insurance_reversal
+request_s "0..1" -- "0..*" insurance_reversal
+insurance_settlement "1" -- "0..*" insurance_fund_receipt
+insurance_reversal -[hidden]right- insurance_fund_receipt
+note bottom of insurance_settlement
+T＝F＋A＋P，均非负；正式结果与预估分开保存。
+同一费用不重复有效结算；未知或未决先查原号。
+撤销成功才改变原结算，患者退款另按UC-14。
+有效结算应拨＝F＋A，已撤销应拨＝0；
+净到账＝实际拨付－实际退回，差额＝应拨－净到账。
+差额正为待收、负为待退，不能自动转成患者欠费。
+end note
+}
+@enduml

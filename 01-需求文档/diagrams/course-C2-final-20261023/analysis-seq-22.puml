@@ -1,0 +1,79 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "前台" as A
+boundary "医保办理接口" as B
+actor "收费人员" as C
+control "核验医保身份并办理预结算控制" as K
+entity "医保身份核验" as I
+entity "医保就诊办理" as R
+entity "医保项目对应" as M
+entity "医保费用明细" as F
+boundary "医保服务接口" as EB
+actor "医保平台" as X
+
+A -> B : 选患者及实际就诊，核对凭证与办理意向
+B -> K : 必要身份资料及患者核验同意
+activate K
+K -> K : 核验定点联网启用条件、岗位权限及原办理号
+K -> I : 核对患者及核验适用条件()
+K -> EB : 按原业务号核验身份并登记；未知原笔仅查询
+EB -> X : 核验或查询原办理
+X --> EB : 实际结果、适用期及原办理依据
+EB --> K : 核验结果
+break 2b 结果未知
+ K --> B : 保留待核验及原号，先查原笔，不推定通过或失败
+end
+K -> I : 记录明确核验结果(原办理依据)
+break 2a 明确未通过
+ K --> B : 保存真实依据；补正回步骤1或终止
+end
+K -> K : 保存核验及办理依据，交收费人员继续
+... 诊疗及核价完成后 ...
+C -> B : 核对诊断、账单、费用版本及适用地区
+B -> K : 本次费用范围、项目编码或自费标识
+K -> R : 核对患者就诊身份及账目归属()
+K -> M : 核对本地区及日期适用性()
+K -> F : 核对实际费用及适用标识()
+K -> R : 核对本次费用范围及适用条件()
+break 3a 来源或标识不全
+ K --> B : 回查诊断、价目及编码后补正，不编造对应
+end
+K -> F : 固定本次提交范围及快照()
+K -> EB : 提交本次诊疗费用及原业务号，申请预结算
+EB -> X : 费用范围及预结算请求
+X --> EB : 实际预估或明确失败、待核实
+EB --> K : 平台实际结果
+break 4a 未知或4b明确失败
+ K --> B : 保持待预结算及原结果；未知查原笔，失败补正后回步骤3
+end
+K -> R : 保存预估分摊(平台实际结果)
+K --> B : 范围内总费、基金/个账/其他自付，范围外自费另列
+B --> C : 向患者说明本次预估及适用范围
+C -> B : 记录患者医保、自费或暂不决定的实际选择
+B -> K : 本次选择及确认时间
+break 5a 费用版本或适用条件已变化
+ K -> R : 使旧预估失效(变更依据)
+ K --> B : 回步骤3重核并重新说明确认
+end
+K -> R : 记录患者实际选择()
+alt 选择医保
+ K --> B : 预结算及选择已保存；正式结算另由UC-23办理
+else 6a 自费或暂不决定
+ K --> B : 保存真实选择，不发起医保正式结算
+end
+deactivate K
+
+@enduml

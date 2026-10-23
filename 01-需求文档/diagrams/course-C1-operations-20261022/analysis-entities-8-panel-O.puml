@@ -1,0 +1,56 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 220
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+hide circle
+hide empty members
+package "基础采购及负责人确认" as O {
+' @reference material
+class "材料" as material_o <<entity>>
+class "供应商" as supplier <<entity>> {
+ 名称、联系人、电话、地址
+ 启用状态
+ --
+ +核对供方及联系资料()
+}
+class "采购" as purchase_order <<entity>> {
+ 需求依据、交付约定
+ 待确认／已确认／已取消
+ 提出及确认人、时间、取消原因
+ --
+ +核对供应商及采购明细()
+ +提交采购需求()
+ +确认采购(负责人)
+ +取消采购(原因)
+}
+class "采购项目" as purchase_order_item <<entity>> {
+ 材料、正的采购数量
+ 单位、换算、精度、单价快照
+ --
+ +核对采购量及计量()
+ +固定确认时约定快照()
+ +核对累计合格支持量()
+}
+supplier "1" -- "0..*" purchase_order
+purchase_order "1" *-- "0..*" purchase_order_item
+material_o "1" -- "0..*" purchase_order_item
+supplier -[hidden]right- material_o
+note bottom of purchase_order_item
+助理提出，负责人确认；未确认不作验收依据。
+采购确认不代表到货、入库或实际付款。
+取消与超供协调保留依据，不删除原到货事实。
+end note
+}
+@enduml

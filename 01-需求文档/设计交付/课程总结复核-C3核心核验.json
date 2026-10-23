@@ -1,0 +1,45 @@
+{
+  "date": "2026-10-23",
+  "status": "第二十二批：C3核心三图完成，其余8图与D待修",
+  "pdf_pages": 164,
+  "figures": 144,
+  "logical_tables": 69,
+  "analysis_sequence_cases": 25,
+  "analysis_sequence_diagrams": 26,
+  "state_machines_revised": [
+    "plan_version",
+    "followup_requirement",
+    "fee_request"
+  ],
+  "state_machine_count": 11,
+  "state_machines_remaining": 8,
+  "changed_pdf_pages": [
+    124,
+    125,
+    126
+  ],
+  "unchanged_page_text_count": 161,
+  "states_match_existing_model": true,
+  "new_persisted_states": [],
+  "composite_states_are_groupings_only": true,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "whole_document_course_compliant": false,
+  "validation": {
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "visible_text_overlap_pairs": 0,
+    "minimum_font_pt": 9.04,
+    "all_144_figure_titles_numbers_pages_preserved": true,
+    "A_B_C1_C2_D_sources_unchanged": true,
+    "logical_model_and_historical_sql_unchanged": true
+  },
+  "next_batch": "C3其余8图：预约、就诊、病历、批次、支付、医保、占用及处方；之后D对应",
+  "files": {
+    "tex_sha256": "a1d986c6cc0496ab12b015a818305787c7a54ae8b9cbdeb3f31b7fee1cdde2cc",
+    "pdf_sha256": "663cbc278be8d975f1aa7950cd8dadc55664501237a158294304f03422110b66",
+    "logical_model_sha256": "68f5db36dfd9f3eaf9ca11b43ffb9a6abf039bf587ecf15f4f9c2b2b69e239e9"
+  }
+}

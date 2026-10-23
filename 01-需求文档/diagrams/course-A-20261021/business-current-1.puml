@@ -1,0 +1,47 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "前台" as F
+actor "牙医" as D
+actor "诊疗助理" as A
+entity "排班与预约记录" as R
+entity "到诊登记" as V
+P -> F : 提出预约需求或现场就诊
+F -> R : 查患者资料、出诊及原预约
+R --> F : 原档案和已安排时段
+F -> D : 核实接诊能力及延时情况
+D --> F : 可接诊安排及限制
+F -> A : 核实诊椅与必要设备条件
+A --> F : 占用、清洁及停用情况
+alt 能确认接诊安排
+ F -> P : 说明可用时间及接诊安排
+ P --> F : 确认安排
+ F -> R : 记录预约及资源预留
+else 暂无可用安排
+ F -> P : 协商其他时段或后续联系
+end
+... 患者实际到店时 ...
+P -> F : 报到并提供身份信息
+F -> V : 核对是否已登记，关联原预约
+alt 尚未到诊登记
+ F -> V : 记录实际到诊及候诊信息
+ F -> D : 交接患者与当次安排
+else 已有本次登记
+ F -> P : 核对已有候诊信息
+end
+@enduml

@@ -1,0 +1,62 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+entity "治疗方案\ntreatment_plan" as treatment_plan {
+* id : INTEGER <<PK>>
+}
+entity "方案版本\nplan_version" as plan_version {
+* id : INTEGER <<PK>>
+ treatment_plan_id : INTEGER <<FK>>
+ previous_version_id : INTEGER <<FK>>
+}
+entity "方案项目\nplan_item" as plan_item {
+* id : INTEGER <<PK>>
+ plan_version_id : INTEGER <<FK>>
+}
+entity "患者决定\npatient_decision" as patient_decision {
+* id : INTEGER <<PK>>
+ plan_version_id : INTEGER <<FK>>
+}
+entity "患者决定—方案项目\ndecision_plan_item" as decision_plan_item {
+* decision_id : INTEGER <<PK,FK>>
+* plan_item_id : INTEGER <<PK,FK>>
+}
+entity "患者决定—确认原件\ndecision_file_version" as decision_file_version {
+* decision_id : INTEGER <<PK,FK>>
+* document_version_id : INTEGER <<PK,FK>>
+}
+entity "诊疗执行\ntreatment_execution" as treatment_execution {
+* id : INTEGER <<PK>>
+ plan_item_id : INTEGER <<FK>>
+ original_execution_id : INTEGER <<FK>>
+}
+entity "文件版本（跨区引用）\ndocument_version" as document_version {
+* id : INTEGER <<PK>>
+}
+treatment_plan ||--o{ plan_version
+plan_version ||--o{ plan_item
+plan_version ||--o{ patient_decision
+patient_decision ||--o{ decision_plan_item
+plan_item ||--o{ decision_plan_item
+patient_decision ||--o{ decision_file_version
+document_version ||--o{ decision_file_version
+plan_item |o--o{ treatment_execution
+
+plan_version |o--o{ plan_version
+treatment_execution |o--o{ treatment_execution
+@enduml

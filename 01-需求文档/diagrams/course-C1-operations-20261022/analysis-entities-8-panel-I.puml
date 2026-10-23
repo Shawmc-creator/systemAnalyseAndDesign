@@ -1,0 +1,62 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 220
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+hide circle
+hide empty members
+package "到货验收及新增合格入库" as I {
+' @reference purchase_order
+class "采购" as order_i <<entity>>
+' @reference purchase_order_item
+class "采购项目" as order_item_i <<entity>>
+' @reference material_batch
+class "材料批次" as batch_i <<entity>>
+' @reference stock_location
+class "存放位置" as location_i <<entity>>
+' @reference inventory_movement
+class "库存变动" as movement_i <<entity>>
+class "验收" as purchase_receipt <<entity>> {
+ 实际到货时间、随货单依据
+ 验收状态、经办及确认时间
+ --
+ +核对已确认原采购()
+ +登记本次实际到货()
+ +确认验收结果(明细与依据)
+}
+class "验收项目" as purchase_receipt_item <<entity>> {
+ 到货、合格、拒收、待检数量
+ 批次位置、检验及差异依据
+ /本次新确认合格增量
+ --
+ +核对到货数量分解()
+ +核对材料批次位置及采购支持量()
+ +确认待检后续结论(保留原到货)
+ +计算本次应入库增量()
+}
+order_i "1" -- "0..*" purchase_receipt
+purchase_receipt "1" *-- "0..*" purchase_receipt_item
+order_item_i "1" -- "0..*" purchase_receipt_item
+batch_i "0..1" -- "0..*" purchase_receipt_item
+location_i "0..1" -- "0..*" purchase_receipt_item
+purchase_receipt_item "0..1" -- "0..*" movement_i
+batch_i -[hidden]right- location_i
+note bottom of purchase_receipt_item
+到货＝合格＋拒收＋待检；到货正，其余非负。
+待检沿用原到货记录，后续只补新合格增量。
+验收增量、流水与余额共同保存；拒收待检不计可领量。
+合格入库后，普通领用仍须批次已放行且未过期。
+end note
+}
+@enduml

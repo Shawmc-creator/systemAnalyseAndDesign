@@ -1,0 +1,244 @@
+{
+  "source": "现行B用例UC-11—14基本流程、主要扩展和R11—14；C1既有实体与操作",
+  "cases": [
+    {
+      "uc": 11,
+      "title": "维护收费项目与价目",
+      "entities": [
+        {
+          "alias": "S",
+          "name": "收费项目",
+          "table": "service"
+        },
+        {
+          "alias": "P",
+          "name": "价目",
+          "table": "service_price"
+        }
+      ],
+      "branches": [
+        "1a",
+        "3a",
+        "4a",
+        "5a"
+      ],
+      "rules": [
+        "R11-1",
+        "R11-2"
+      ]
+    },
+    {
+      "uc": 12,
+      "title": "查询账单与待结算费用",
+      "entities": [
+        {
+          "alias": "I",
+          "name": "应收项目",
+          "table": "bill_item"
+        },
+        {
+          "alias": "G",
+          "name": "应收账目",
+          "table": "bill"
+        },
+        {
+          "alias": "IS",
+          "name": "医保结算",
+          "table": "insurance_settlement"
+        },
+        {
+          "alias": "U",
+          "name": "付款分配",
+          "table": "payment_allocation"
+        },
+        {
+          "alias": "O",
+          "name": "预付抵扣",
+          "table": "prepayment_offset"
+        }
+      ],
+      "branches": [
+        "2a",
+        "3a",
+        "4a",
+        "5a"
+      ],
+      "rules": [
+        "R12-1",
+        "R12-2"
+      ]
+    },
+    {
+      "uc": 13,
+      "title": "办理患者付款与到账核实",
+      "entities": [
+        {
+          "alias": "P",
+          "name": "患者付款",
+          "table": "patient_payment"
+        },
+        {
+          "alias": "E",
+          "name": "电子支付单",
+          "table": "payment_order"
+        },
+        {
+          "alias": "U",
+          "name": "付款分配",
+          "table": "payment_allocation"
+        },
+        {
+          "alias": "O",
+          "name": "预付抵扣",
+          "table": "prepayment_offset"
+        }
+      ],
+      "branches": [
+        "1a",
+        "3a",
+        "3b",
+        "5a",
+        "5b"
+      ],
+      "rules": [
+        "R13-1",
+        "R13-2",
+        "R13-3"
+      ]
+    },
+    {
+      "uc": 14,
+      "title": "办理费用更正与退费",
+      "entities": [
+        {
+          "alias": "F",
+          "name": "费用申请",
+          "table": "fee_request"
+        },
+        {
+          "alias": "J",
+          "name": "费用调整",
+          "table": "fee_adjustment"
+        },
+        {
+          "alias": "U",
+          "name": "付款分配",
+          "table": "payment_allocation"
+        },
+        {
+          "alias": "O",
+          "name": "预付抵扣",
+          "table": "prepayment_offset"
+        },
+        {
+          "alias": "P",
+          "name": "患者付款",
+          "table": "patient_payment"
+        },
+        {
+          "alias": "R",
+          "name": "退款办理",
+          "table": "patient_refund"
+        }
+      ],
+      "branches": [
+        "1a",
+        "5a",
+        "6a",
+        "6b",
+        "7a",
+        "8a",
+        "8b"
+      ],
+      "rules": [
+        "R14-1",
+        "R14-2",
+        "R14-3",
+        "R14-4",
+        "R13-2"
+      ],
+      "diagram_parts": [
+        {
+          "stem": "analysis-seq-14a",
+          "stage": "申请与费用调整",
+          "entities": [
+            {
+              "alias": "F",
+              "name": "费用申请",
+              "table": "fee_request"
+            },
+            {
+              "alias": "J",
+              "name": "费用调整",
+              "table": "fee_adjustment"
+            },
+            {
+              "alias": "U",
+              "name": "付款分配",
+              "table": "payment_allocation"
+            },
+            {
+              "alias": "O",
+              "name": "预付抵扣",
+              "table": "prepayment_offset"
+            },
+            {
+              "alias": "P",
+              "name": "患者付款",
+              "table": "patient_payment"
+            }
+          ],
+          "branches": [
+            "1a",
+            "5a",
+            "6a",
+            "6b"
+          ]
+        },
+        {
+          "stem": "analysis-seq-14b",
+          "stage": "实际退款与结果核实",
+          "entities": [
+            {
+              "alias": "F",
+              "name": "费用申请",
+              "table": "fee_request"
+            },
+            {
+              "alias": "P",
+              "name": "患者付款",
+              "table": "patient_payment"
+            },
+            {
+              "alias": "R",
+              "name": "退款办理",
+              "table": "patient_refund"
+            }
+          ],
+          "branches": [
+            "7a",
+            "8a",
+            "8b"
+          ]
+        }
+      ]
+    }
+  ],
+  "C1_operations_added": [
+    {
+      "part": "费用",
+      "table": "payment_allocation",
+      "op": "汇总有效用途净额()",
+      "uc": 12,
+      "rule": "R12-2"
+    },
+    {
+      "part": "费用",
+      "table": "prepayment_offset",
+      "op": "汇总有效用途净额()",
+      "uc": 12,
+      "rule": "R12-2"
+    }
+  ],
+  "limits": "分析层不画SQLite或数据访问代码。支付与医保外部办理不能并入本地共同保存，未知先核原笔。"
+}

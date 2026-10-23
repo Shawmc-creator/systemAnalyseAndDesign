@@ -1,0 +1,31 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "草稿" as Draft
+state "已开立" as Issued
+state "已作废" as Voided
+[*] --> Draft : 牙医新开或更正重开\n[患者及实际就诊可核对]\n/ 新处方保留原方和更正依据
+Draft : 暂存或补正 [权限有效]\n/ 不作为有效处方交付
+Draft --> Issued : 牙医确认并说明用药\n[权限、内容及取药路径条件满足]\n/ 保存开立依据和时间
+Issued : 院外取药 / 交付处方及指导\n不冒充院内审方，不扣诊所库存或计药费
+Issued : 药学岗位审核 [院内待审]\n/ 另记已通过或待医师处理及实际依据
+Issued : 院内实际交付 [审方已通过且供药条件满足]\n/ 逐笔发药、同源出库及费用共同保存\n只记实际量，缺价保留待核价
+Issued --> Voided : 牙医核实更正或停止\n[已确认尚未交付且允许作废]\n/ 原内容保留，需要时另开处方
+Voided --> [*]
+
+@enduml

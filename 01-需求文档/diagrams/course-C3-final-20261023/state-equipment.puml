@@ -1,0 +1,29 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "已预留" as Reserved
+state "使用中" as InUse
+state "已释放" as Released
+[*] --> Reserved : 保存必要设备时段\n[设备适用且安排有效、无冲突]
+Reserved --> InUse : 牙医确认实际开始\n[准备合格、无其他使用或限制]\n/ 同时保存就诊及真实使用开始
+Reserved --> Released : 取消、改约或核实未到\n[此笔仍是预约预留]\n/ 保存释放依据，改约另建新预留
+InUse --> Released : 牙医确认实际使用结束\n[原使用及结束事实已核实]\n/ 实际释放与清洁限制共同保存
+InUse : 预计时间已到或发生故障\n/ 未核实结束仍保留实际使用，另登记限制
+Released --> [*]
+
+@enduml

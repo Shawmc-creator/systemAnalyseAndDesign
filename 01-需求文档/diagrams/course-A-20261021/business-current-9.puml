@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+
+actor "前台" as F
+actor "牙医" as D
+actor "诊疗助理" as A
+actor "诊所负责人" as M
+actor "维护服务单位" as X
+entity "资源安排与准备记录" as R
+A -> R : 核对诊椅、器械及必要设备准备
+opt 使用延时或资源不可用
+ D -> F : 反馈实际使用或延时情况
+ A -> M : 报告故障、清洁或准备问题
+ F -> R : 查受影响预约
+ F -> D : 协调候诊、替代资源或改期
+D --> F : 反馈可行安排
+F -> P : 说明影响并确认等待或改期
+F -> R : 留存患者确认与调整
+end
+opt 需要外部维修
+ M -> X : 交接故障与维修要求
+ X --> M : 反馈维修结果及仍有限制
+ M -> A : 安排复核并保留结果
+end
+opt 当前患者实际使用结束
+ D -> A : 确认操作结束并交接
+ A -> R : 记录实际结束与清洁准备中
+ A -> A : 完成器械处理、环境清洁与设备核查
+end
+alt 无实际占用且清洁合格且故障已解除
+ A -> R : 确认恢复可接诊条件
+ A -> F : 交接可用资源
+else 任一条件仍未满足
+ A -> R : 保持占用或停用，注明后续责任
+ A -> M : 交接未完成问题
+end
+@enduml

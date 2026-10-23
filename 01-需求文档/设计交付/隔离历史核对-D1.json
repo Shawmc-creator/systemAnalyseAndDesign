@@ -1,0 +1,96 @@
+{
+  "checks": 22,
+  "passed": 22,
+  "results": [
+    {
+      "name": "原申请提交快照",
+      "passed": true
+    },
+    {
+      "name": "退回保留原提交",
+      "passed": true
+    },
+    {
+      "name": "重新提交新快照",
+      "passed": true
+    },
+    {
+      "name": "同业务事件序号重复",
+      "passed": true
+    },
+    {
+      "name": "同办理号不得重复追加",
+      "passed": true
+    },
+    {
+      "name": "历史孤立原业务外键",
+      "passed": true
+    },
+    {
+      "name": "历史禁止覆盖",
+      "passed": true
+    },
+    {
+      "name": "历史禁止删除",
+      "passed": true
+    },
+    {
+      "name": "重提后原金额及旧审核仍在",
+      "passed": true
+    },
+    {
+      "name": "零增量不造入库流水",
+      "passed": true
+    },
+    {
+      "name": "正增量缺原入库流水",
+      "passed": true
+    },
+    {
+      "name": "正增量关联原入库流水",
+      "passed": true
+    },
+    {
+      "name": "同一入库流水不得重复支持增量",
+      "passed": true
+    },
+    {
+      "name": "建立预结算原提交",
+      "passed": true
+    },
+    {
+      "name": "费用固定原提交",
+      "passed": true
+    },
+    {
+      "name": "同提交原费用不得重复",
+      "passed": true
+    },
+    {
+      "name": "保存真实成功预估分摊",
+      "passed": true
+    },
+    {
+      "name": "预估合计与原提交范围不符",
+      "passed": true
+    },
+    {
+      "name": "结果不得引用另一个结果代替提交",
+      "passed": true
+    },
+    {
+      "name": "旧预估失效保留原结果",
+      "passed": true
+    },
+    {
+      "name": "失效后不能沿旧结果确认医保",
+      "passed": true
+    },
+    {
+      "name": "失效后原明细及分摊保持",
+      "passed": true
+    }
+  ],
+  "scope": "8张历史表使用模型字段、原业务FK、序号唯一及只追加保护的隔离样例；另核对预结算原提交/明细和成功分摊、失效确认、入库增量来源。",
+  "limits": "核心父表仅作id存根；触发器为设计表达样例，不是运行迁移或正式接口实现；未验证所有业务约束、并发、真实平台和备份恢复。"
+}

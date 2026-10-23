@@ -1,0 +1,76 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 40
+skinparam ranksep 50
+|负责人|
+start
+:确认牙医排班、诊椅和关键设备可用安排;
+|诊疗助理|
+:检查环境、器械准备和常用物资;
+if (设备、器械或物资不能满足接诊?) then (是)
+ :报告问题并限制相关资源使用;
+ |负责人|
+ :协调维修、补货或调整接诊安排;
+ if (受影响接诊准备已满足?) then (是)
+ else (否)
+  :保持限制，协调等待、替代或改期;
+ endif
+endif
+|前台|
+:核对预约、复诊待办与当天变更;
+|牙医|
+if (本次接诊资源准备满足?) then (是)
+ :完成诊疗、处方及实际项目记录;
+ |诊疗助理|
+ :领用和记录实际用料，办理未用退回;
+ :完成使用后器械处理与环境准备;
+else (否)
+ |前台|
+ :向患者说明等待或改期并交接;
+endif
+|诊疗助理|
+if (需要采购补货?) then (是)
+ :提出采购需求;
+ |负责人|
+ :核实采购内容和供货安排;
+ |诊疗助理|
+ :到货验收，合格量入库，异常量待处理;
+endif
+|收费人员|
+:核对账单、实际收款、退款和渠道记录;
+:分别核对医保已结算、待拨付与实际回款;
+|负责人|
+:核实差异、欠费、未完成治疗和待办;
+:安排后续责任人与处理日期;
+stop
+
+
+
+@enduml

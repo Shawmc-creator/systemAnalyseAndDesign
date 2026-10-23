@@ -1,0 +1,82 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceGroupBackgroundColor white
+skinparam BoxPadding 8
+skinparam maxMessageSize 300
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "前台" as A
+boundary "前台接口" as B
+control "维护患者资料控制" as K
+entity "患者" as P
+entity "患者资料变更" as H
+
+A -> B : 查找并核实患者
+B -> K : 姓名、已知生日及联系方式
+activate K
+K -> K : 核验授权；读取候选档案
+K -> P : 核对辨识资料()
+P --> K : 必要辨识信息
+K --> B : 候选及原患者编号
+B --> A : 不按同名或电话自动合并
+break 2a 前台已选原号且无需更正
+ K --> B : 原患者编号及必要档案资料
+ B --> A : 展示原档案，本次结束
+end
+break 3a 身份尚不能确定
+ A -> B : 继续核实，停止新建
+ B -> K : 结束本次办理
+ K --> B : 原档案不变
+end
+A -> B : 新建资料，或2a原号及更正原因
+B -> K : 资料、所据版本及本次办理号
+K -> P : 核对辨识资料()
+K -> P : 核对联系资料()
+break 5a 字段不合法或6a原版本变化
+ K --> B : 原因、当前资料及本次输入
+ B --> A : 补正或回到候选重新核实
+end
+K --> B : 可保存内容
+A -> B : 确认保存
+B -> K : 确认本次内容与版本
+critical 6 重核版本及同次办理，统一提交
+ K -> K : 查本次已存结果；无结果才继续
+ break 重核版本已变化且无原保存结果
+  K --> B : 返回当前版本并保留输入，回步骤2核实
+ end
+ opt 尚未保存且重核条件仍满足
+ alt 新建且身份已明确
+  K -> P : 建立患者档案()
+  K -> K : 分配唯一稳定号并保存新档案
+ else 2a 更正已有档案
+  K -> H : 核对实际变化()
+  opt 有真实变化
+   K -> H : 形成更正依据()
+   K -> P : 更正基本资料()
+   K -> K : 档案与前后值、原因、人时共同保存
+  end
+ end
+ end
+end
+alt 6b 结果未知或重复提交
+ K -> K : 查原办理；已有结果直接返回
+ K --> B : 未保存才重试；明确失败保留原资料
+else 保存成功
+ K --> B : 原号或新号、资料及当前版本
+end
+B --> A : 展示可核对的本次结果
+deactivate K
+
+@enduml

@@ -1,0 +1,115 @@
+{
+  "date": "2026-10-21",
+  "review_status": "全文复核完成；严格符合性尚未通过，按清单分批修订",
+  "reference_files": [
+    {
+      "path": "../../06-参考资料/课程资料/课程总结.txt",
+      "sha256": "9bce77de9f7f987e9ed4c8d124f496a37e012da30e4d976bd014757e188f80ea"
+    },
+    {
+      "path": "../../06-参考资料/课程资料/共享单车租赁系统-系统用例规约.txt",
+      "sha256": "a063590b17aad45004be5f119f6cda740ab2dd1011a499dc7c7fd4240a3bee73"
+    }
+  ],
+  "review_coverage": {
+    "pdf_pages": 179,
+    "referenced_plantuml_sources": 155,
+    "system_use_cases": 25,
+    "analysis_entity_classes": 69,
+    "core_logical_tables": 69,
+    "analysis_sequences": 25,
+    "state_diagrams": 11,
+    "detailed_findings": 25,
+    "finding_ids": [
+      "A-01",
+      "A-02",
+      "A-03",
+      "A-04",
+      "A-05",
+      "A-06",
+      "B-01",
+      "B-02",
+      "B-03",
+      "B-04",
+      "B-05",
+      "B-06",
+      "B-07",
+      "B-08",
+      "C-01",
+      "C-02",
+      "C-03",
+      "C-04",
+      "C-05",
+      "D-01",
+      "D-02",
+      "D-03",
+      "D-04",
+      "D-05",
+      "D-06"
+    ]
+  },
+  "confirmed_structural_findings": {
+    "use_cases_without_stakeholder_interests": 25,
+    "use_cases_without_step_anchored_extensions": 25,
+    "use_cases_without_key_data_section": [
+      "UC-01",
+      "UC-02",
+      "UC-03",
+      "UC-04",
+      "UC-05",
+      "UC-09",
+      "UC-10",
+      "UC-11",
+      "UC-12",
+      "UC-15",
+      "UC-16",
+      "UC-17",
+      "UC-21"
+    ],
+    "analysis_entity_classes_without_operations": 69,
+    "er_tables_with_invented_id_primary_key": [
+      "decision_plan_item",
+      "decision_file_version"
+    ]
+  },
+  "first_batch": {
+    "modified_sections": [
+      "封面日期",
+      "1.1.2愿景表与度量说明"
+    ],
+    "addressed": [
+      "A-01文档表述",
+      "A-02"
+    ],
+    "real_stakeholder_approval_verified": false,
+    "pdf_text_changed_pages": [
+      1,
+      4
+    ],
+    "remaining_body_unchanged": true,
+    "figures_unchanged": true
+  },
+  "validation": {
+    "offline_latex_compile": "passed",
+    "page_count": 179,
+    "missing_figure_or_source": 0,
+    "overfull_underfull_or_missing_character": 0,
+    "changed_page_visual_review": "passed",
+    "all_course_requirements_passed": false
+  },
+  "files": [
+    {
+      "path": "../牙科诊所管理系统-需求文档.tex",
+      "sha256": "e2d4858cd761e0506b6d1a812e059ddd342f5084d48f2163b01e9ceececb7f5a"
+    },
+    {
+      "path": "../牙科诊所管理系统-需求文档.pdf",
+      "sha256": "26851c6653256a7a5774d82db049e78727b1a5a4388aa2acd24b4ca839ea3731"
+    }
+  ],
+  "review_checklist": "../修订工作底稿/课程总结逐项复核与修订清单.md",
+  "next_batch": "A业务建模：外部价值与组织边界、业务用例名称、现状和改进业务序列图的真实交接与职责",
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced_this_batch": false
+}

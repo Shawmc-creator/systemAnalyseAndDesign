@@ -1,0 +1,141 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 215
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 65
+hide circle
+hide empty members
+package "方案、诊断来源与版本历史" as T {
+' @reference patient
+class "患者" as patient_t <<entity>>
+' @reference visit
+class "就诊" as visit_t <<entity>>
+class "治疗方案" as treatment_plan <<entity>> {
+ 治疗目标、建立时间
+ 进行中／已完成／已终止
+ 责任牙医、结束时间及原因
+ --
+ +建立方案(患者与目标)
+ +核对方案患者归属()
+}
+class "方案版本" as plan_version <<entity>> {
+ 版本号、诊断依据
+ 预计安排、变更原因
+ 说明牙医、时间及依据
+ 版本状态、停止时间及原因
+ --
+ +核对诊断与明细完整性()
+ +提交患者确认()
+ +建立修订版(原版本与原因)
+ +停止本版后续执行(依据)
+}
+patient_t "1" -- "0..*" treatment_plan
+treatment_plan "1" *-- "1..*" plan_version
+visit_t "0..1" -- "0..*" plan_version
+' @reference plan_version
+class "方案版本" as previous_plan_version <<entity>>
+previous_plan_version "前版\n0..1" -- "0..*" plan_version
+note bottom of plan_version
+实质变更建立新版并重新说明确认。
+停止旧版仅影响后续，保留既有执行。
+方案估算与预计安排不产生实际应收。
+end note
+}
+package "同版本项目、决定范围及原件" as C {
+' @reference plan_version
+class "方案版本" as plan_version_c <<entity>>
+' @reference document_version
+class "文件版本" as document_version_c <<entity>>
+class "方案项目" as plan_item <<entity>> {
+ 项目内容、牙位牙面
+ 计划数量、实施顺序
+ 估算费用（未知可空）
+ --
+ +核对项目数量与牙位()
+ +核对估算状态()
+}
+class "患者决定" as patient_decision <<entity>> {
+ 同意／暂缓／拒绝／撤回
+ 决定时间、说明依据
+ 说明人、记录人、范围限制
+ --
+ +记录决定(项目范围)
+ +核对有效同意范围(时点)
+ +追加撤回决定(范围与时间)
+}
+class "患者决定—方案项目" as decision_plan_item <<entity>> {
+ 关联形成时间、记录牙医
+ 确认数量（限定时记录）
+ --
+ +核对同版本项目()
+ +限定本次决定范围()
+}
+class "患者决定—确认原件" as decision_file_version <<entity>> {
+ 关联形成时间、记录牙医
+ --
+ +核对原件归属及确认状态()
+ +固定确认时原件版本()
+}
+plan_version_c "1" *-- "0..*" plan_item
+plan_version_c "1" -- "0..*" patient_decision
+patient_decision "1" -- "0..*" decision_plan_item
+plan_item "1" -- "0..*" decision_plan_item
+patient_decision "1" -- "0..*" decision_file_version
+document_version_c "1" -- "0..*" decision_file_version
+plan_item -[hidden]right- patient_decision
+decision_plan_item -[hidden]right- decision_file_version
+note bottom of decision_plan_item
+决定只覆盖该版本所选项目和明确数量；
+文字范围限制不能代替项目关联。
+撤回只停止相应范围的后续执行；
+已有决定、原件及实际执行继续保留。
+end note
+}
+package "实际完成事实与费用衔接" as E {
+' @reference visit
+class "就诊" as visit_e <<entity>>
+' @reference plan_item
+class "方案项目" as plan_item_e <<entity>>
+' @reference service
+class "收费项目" as service_e <<entity>>
+' @reference bill_item
+class "应收项目" as bill_item_e <<entity>>
+class "诊疗执行" as treatment_execution <<entity>> {
+ 牙位牙面、实际完成数量
+ 操作经过、执行牙医、完成时间
+ 首次／更正、更正原因
+ --
+ +核对实际就诊及同意范围()
+ +核对累计完成量()
+ +登记实际完成()
+ +关联原执行更正(原因)
+}
+visit_e "1" -- "0..*" treatment_execution
+plan_item_e "0..1" -- "0..*" treatment_execution
+service_e "1" -- "0..*" treatment_execution
+treatment_execution "0..1" -- "1" bill_item_e
+' @reference treatment_execution
+class "诊疗执行" as previous_treatment_execution <<entity>>
+previous_treatment_execution "原执行\n0..1" -- "0..*" treatment_execution
+visit_e -[hidden]right- plan_item_e
+note bottom of treatment_execution
+只记真实完成量，累计不超有效同意范围。
+未执行计划不计费；缺价不能按零元结清。
+费用来源：诊疗执行或实际发药恰选其一。
+执行更正保留原事实；费用更正由UC-14办理。
+end note
+}
+treatment_plan -[hidden]right-> plan_item
+plan_item -[hidden]right-> treatment_execution
+@enduml

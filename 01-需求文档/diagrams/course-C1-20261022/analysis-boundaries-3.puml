@@ -1,0 +1,42 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 45
+left to right direction
+actor "收费人员" as A
+boundary "收费人员接口" as B0
+A -- B0
+boundary "费用办理接口" as B1
+A -- B1
+boundary "医保办理接口" as B2
+A -- B2
+boundary "医保结算接口" as B3
+A -- B3
+control "UC-11\n维护收费项目\n与价目控制" as C11
+B0 ..> C11
+control "UC-12\n查询账单与\n待结算费用控制" as C12
+B0 ..> C12
+control "UC-13\n办理患者付款\n与到账核实控制" as C13
+B0 ..> C13
+control "UC-21\n核对日常经营\n与收付款控制" as C21
+B0 ..> C21
+control "UC-14\n办理费用更正\n与退费控制" as C14
+B1 ..> C14
+control "UC-22\n核验医保身份\n并办理预结算控制" as C22
+B2 ..> C22
+control "UC-23\n办理医保结算、撤销\n与回款核对控制" as C23
+B3 ..> C23
+
+@enduml

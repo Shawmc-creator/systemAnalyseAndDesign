@@ -1,0 +1,92 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as A
+actor "药学岗位" as P
+boundary "处方与取药接口" as B
+control "开立处方并衔接院内外取药控制" as K
+entity "处方" as R
+entity "处方明细" as I
+entity "实际发药" as D
+entity "库存变动" as V
+entity "批次存量" as S
+entity "应收项目" as F
+
+A -> B : 核实患者、实际就诊、诊断、过敏及相关用药
+B -> K : 就诊及本次处方、用法数量和取药路径；更正另有原因
+activate K
+K -> K : 核验医师处方权限及患者就诊归属
+break 2a 暂存草稿
+ K -> R : 暂存处方草稿()
+ K --> B : 草稿已存，不能作为有效处方交付
+end
+break 4a 更正或停止原处方
+ K -> K : 核实原处方及实际交付，已发或外取不明先由牙医核实后续
+ opt 已核实尚未交付，可以作废
+  K -> R : 作废未交付处方(原因)
+ end
+ K --> B : 原内容及交付保留；需重开另建处方，必要费用处理转UC-14
+end
+K -> I : 核对药品规格与用法()
+break 3a 内容或归属不符
+ K --> B : 指出缺项，牙医核实后修改，不替代专业处方判断
+end
+break 2b 选择院内但机构或人员启用条件不满足
+ K --> B : 与患者协调院外取药，返回路径选择
+end
+A -> B : 确认开立并说明用法及注意事项
+B -> K : 医师确认、指导内容及取药路径
+K -> R : 开立处方(就诊与权限)
+K -> K : 保存已开立处方；院内标待审，不自动扣库或计费
+alt 基本路径：院外取药
+ A -> B : 交付处方并确认实际指导
+ B -> K : 处方交付依据
+ K --> B : 院外处方及指导已记录，无诊所出库和药品应收
+else 2b、5a 院内审核及实际发药
+ P -> B : 实际审核处方，记录意见及依据
+ B -> K : 药学资格、审核结果及人时
+ K -> R : 记录审方结果(资格与意见)
+ break 5b 待医师处理或未通过
+  K --> B : 保存意见，不发药；牙医按4a核实重开并重新审核
+ end
+ P -> B : 选择原明细、药品批次位置及拟发量
+ B -> K : 本次供药内容及原交付记录
+ K -> K : 先核原交付事实；原笔不明先查，不重复交付
+ K -> R : 核对实际发药条件()
+ K -> I : 计算剩余可发量(实际已发量)
+ K -> D : 核对批次效期及可用量()
+ break 5c 条件不足、批次不可用或数量超过待发量/库存
+  K --> B : 未交付部分不记已发；协调实际供药或按4a改处方
+ end
+ P -> B : 实际调配核对、交付并交代用药
+ B -> K : 原处方、真实交付量、时间及核发人
+ K -> D : 登记实际交付(数量与原单)
+ K -> V : 核对变动及前后量()
+ K -> V : 登记实际库存变动()
+ K -> S : 按合法变动更新余额()
+ K -> F : 核对唯一实际来源()
+ K -> F : 建立实际来源(计价状态)
+ alt 已有适用确认价格
+  K -> F : 确认计价(适用价目与依据)
+  K -> F : 计算项目金额()
+ else 缺价
+  K -> K : 保留实际发药及待核价，不用零价代替
+ end
+ K -> K : 共同保存实际发药、同源出库及费用；只计真实交付
+ K --> B : 实际已发及未发量；5d结果不明先核原方、实物交接与流水，不重发重扣
+end
+deactivate K
+
+@enduml

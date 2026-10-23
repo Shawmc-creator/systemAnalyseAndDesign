@@ -1,0 +1,345 @@
+{
+  "date": "2026-10-23",
+  "scope": "D1方案与价目账单收付两组主要业务关系及既有自反引用",
+  "new_tables": [],
+  "new_fields": [
+    {
+      "table": "decision_plan_item",
+      "field": "scope_quantity",
+      "source": [
+        "UC-07",
+        "UC-08",
+        "R07-1",
+        "C1确认数量（限定时记录）"
+      ]
+    },
+    {
+      "table": "payment_order",
+      "field": "patient_funds_id",
+      "source": [
+        "UC-13",
+        "C1患者资金—电子支付单"
+      ]
+    }
+  ],
+  "modified_tables": [
+    "decision_plan_item",
+    "payment_order",
+    "bill_item"
+  ],
+  "region_details": [
+    {
+      "group": 3,
+      "name": "治疗方案与实际执行",
+      "main_tables": [
+        "treatment_plan",
+        "plan_version",
+        "plan_item",
+        "patient_decision",
+        "decision_plan_item",
+        "decision_file_version",
+        "treatment_execution"
+      ],
+      "reference_tables": [
+        "document_version",
+        "patient",
+        "service",
+        "visit"
+      ],
+      "business_relations": [
+        {
+          "parent": "patient",
+          "child": "treatment_plan",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "treatment_plan",
+          "child": "plan_version",
+          "field": "treatment_plan_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "plan_version",
+          "field": "source_visit_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "plan_version",
+          "child": "plan_version",
+          "field": "previous_version_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "plan_version",
+          "child": "plan_item",
+          "field": "plan_version_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "plan_version",
+          "child": "patient_decision",
+          "field": "plan_version_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient_decision",
+          "child": "decision_plan_item",
+          "field": "decision_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "plan_item",
+          "child": "decision_plan_item",
+          "field": "plan_item_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient_decision",
+          "child": "decision_file_version",
+          "field": "decision_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "document_version",
+          "child": "decision_file_version",
+          "field": "document_version_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "treatment_execution",
+          "field": "visit_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "plan_item",
+          "child": "treatment_execution",
+          "field": "plan_item_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "service",
+          "child": "treatment_execution",
+          "field": "service_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "treatment_execution",
+          "child": "treatment_execution",
+          "field": "original_execution_id",
+          "nullable": true,
+          "unique": false
+        }
+      ],
+      "common_staff_links": "经办人、编制确认及审核人员外键在逻辑模型统一保留，图不逐条重复。"
+    },
+    {
+      "group": 4,
+      "name": "价目、账单与收款",
+      "main_tables": [
+        "patient_funds",
+        "service",
+        "service_price",
+        "bill",
+        "bill_item",
+        "patient_payment",
+        "payment_allocation",
+        "prepayment_offset",
+        "payment_order",
+        "payment_reconciliation"
+      ],
+      "reference_tables": [
+        "dispense_record",
+        "fee_request",
+        "patient",
+        "patient_refund",
+        "treatment_execution"
+      ],
+      "business_relations": [
+        {
+          "parent": "patient",
+          "child": "patient_funds",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "parent": "service",
+          "child": "service_price",
+          "field": "service_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient",
+          "child": "bill",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient_funds",
+          "child": "bill",
+          "field": "patient_funds_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "bill",
+          "child": "bill_item",
+          "field": "bill_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "treatment_execution",
+          "child": "bill_item",
+          "field": "treatment_execution_id",
+          "nullable": true,
+          "unique": true
+        },
+        {
+          "parent": "dispense_record",
+          "child": "bill_item",
+          "field": "dispense_record_id",
+          "nullable": true,
+          "unique": true
+        },
+        {
+          "parent": "service_price",
+          "child": "bill_item",
+          "field": "service_price_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient_funds",
+          "child": "patient_payment",
+          "field": "patient_funds_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient_payment",
+          "child": "payment_allocation",
+          "field": "patient_payment_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "bill",
+          "child": "payment_allocation",
+          "field": "bill_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "payment_allocation",
+          "child": "payment_allocation",
+          "field": "original_allocation_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "fee_request",
+          "child": "payment_allocation",
+          "field": "fee_request_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient_payment",
+          "child": "prepayment_offset",
+          "field": "patient_payment_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "bill",
+          "child": "prepayment_offset",
+          "field": "bill_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "prepayment_offset",
+          "child": "prepayment_offset",
+          "field": "original_offset_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "fee_request",
+          "child": "prepayment_offset",
+          "field": "fee_request_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient_funds",
+          "child": "payment_order",
+          "field": "patient_funds_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "bill",
+          "child": "payment_order",
+          "field": "bill_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient_payment",
+          "child": "payment_order",
+          "field": "patient_payment_id",
+          "nullable": true,
+          "unique": true
+        },
+        {
+          "parent": "patient_payment",
+          "child": "payment_reconciliation",
+          "field": "patient_payment_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "payment_order",
+          "child": "payment_reconciliation",
+          "field": "payment_order_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient_refund",
+          "child": "payment_reconciliation",
+          "field": "patient_refund_id",
+          "nullable": true,
+          "unique": false
+        }
+      ],
+      "common_staff_links": "经办人、编制确认及审核人员外键在逻辑模型统一保留，图不逐条重复。"
+    }
+  ],
+  "remaining": [
+    "其余7组分区业务外键与基数",
+    "旧字段source编号与其他关键约束及状态引用",
+    "D-04数据访问选型、D2业务层及D3表示层",
+    "运行实现和真实验收另行对齐"
+  ]
+}

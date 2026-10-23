@@ -54,6 +54,8 @@ test('real HTTP workflow links price review, scoped consent, racing execution, i
   await send('/clinical-records/record', d, command({ ...context, action: 'save', recordId, expectedRevision: 1, chiefComplaint: '实际主诉', diagnosis: '实际牙医结论', treatmentAdvice: '实际处理意见', findings: [{ toothCode: '46', text: '实际检查所见' }] }));
   await send('/clinical-record-signatures/sign', d, command({ action: 'sign', recordId, expectedRevision: 2, confirmed: true }));
   const signed = await send(clinicalPath, d);
+  assert.equal(signed.visit.status,'接诊中');
+  await send('/resources/finish',d,command({visitId:visit.id,expectedVisitRevision:signed.visit.revision,expectedOccupancyRevision:signed.occupancy.revision,endedAt:a.auth.now(),confirmed:true,reason:'独立确认实际操作结束，交接清洁'}));
   const correction = await send('/executions/execute', d, command({ ...execution, expectedVisitRevision: 3, originalExecutionId: duplicate[0].id, quantity: 1, reason: '核实后独立更正数量' }));
   assert.equal(correction.code, 'EXECUTION_CORRECTED_FEE_REVIEW');
   const final = await send(clinicalPath, d); assert.equal(final.signedIntegrity, true); assert.equal(final.record.content_hash, signed.record.content_hash);

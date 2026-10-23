@@ -76,6 +76,8 @@ function financeRefund(request,previous=null){
  openEditor(previous?'按失败原办理重新受理':'建立普通退款办理',`<p>${esc(request.record_no)} · 批准剩余${clinicalMoney(request.remainingApprovedRefundCents)}</p>${previous?`<p>承接最近失败办理 ${esc(previous.record_no)}。</p>`:''}${select('paymentId','核对原付款','<option value="">请选择实际原付款</option>'+options(payments,p=>p.recordNo+' / '+p.channel+' / 可退'+clinicalMoney(p.availableCents)))}${input('amountYuan','本次拟退金额（元）')}${select('channel','实际退款渠道','<option value="">请选择实际渠道</option>'+options(['现金','银行卡','微信','支付宝'].map(x=>({id:x,name:x})),x=>x.name))}${clinicalText('recipientVerification','接收方身份、账户及原付款核实依据')}${clinicalConfirm('已核对原款、批准范围与接收方；先取得办理号，再办理和核实实际退款')}`,async value=>{
   await command('/patient-refunds/refund',{action:'initiate',requestId:request.id,expectedApprovalRevision:request.revision,...financeRefs(request.bill_id,Number(value.paymentId)),amountCents:yuanCents(value.amountYuan),channel:value.channel,recipientVerification:value.recipientVerification,...(previous?{previousAttemptId:previous.id}:{})},'finance-refund');
  });
+ const paymentSelector=$('#editor [name=paymentId]'),channelSelector=$('#editor [name=channel]');
+ const syncChannel=()=>{const original=payments.find(p=>p.id===Number(paymentSelector.value));channelSelector.innerHTML=original?`<option value="${esc(original.channel)}">${esc(original.channel)}（原付款渠道）</option>`:'<option value="">先选择原付款</option>';};paymentSelector.onchange=syncChannel;syncChannel();
 }
 function financeVerifyRefund(refund){
  const f=financeView.fees;
@@ -110,14 +112,16 @@ async function renderFinance(version){
   if(r.status==='已同意')html+=`<p>批准应收调整${clinicalMoney(r.approved_adjustment_cents)} / 退回${clinicalMoney(r.approved_refund_cents)} · 待办理批准余额${clinicalMoney(r.remainingApprovedRefundCents)}</p>`;
   html+='<div class="actions">';
   if(manager&&r.status==='待审核')for(const action of ['approve','return','reject'])html+=`<button data-fee-review="${r.id}" data-review-action="${action}">${{approve:'审核批准',return:'退回补充',reject:'拒绝申请'}[action]}</button>`;
-  if(!manager&&r.status==='待审核')html+=`<button data-fee-withdraw="${r.id}">撤回申请</button>`;
+  if(!manager&&r.status==='待审核'&&r.canWithdraw)html+=`<button data-fee-withdraw="${r.id}">撤回申请</button>`;
   if(!manager&&r.status==='已退回')html+=`<button data-fee-resubmit="${r.id}">修订重提</button>`;
   const last=r.refunds.at(-1);
   if(!manager&&r.status==='已同意'&&r.remainingApprovedRefundCents>0&&!r.refunds.some(x=>['待办理','待核实'].includes(x.status)))html+=`<button data-initiate-refund="${r.id}">${last?.status==='已失败'?'承接失败办理重新受理':'建立退款办理'}</button>`;
   html+='</div>';
   if(r.adjustment)html+=`<p>已另行登记费用调整，原收费明细保留。</p>`;
   if(r.refunds.length)html+=table(['办理号 / 渠道','拟退 / 实退','结果','办理'],r.refunds.map(x=>`<tr><td>${esc(x.record_no)}<small>${esc(x.channel)} / ${esc(x.external_reference||'无渠道号')}</small></td><td>${clinicalMoney(x.requested_cents)} / ${clinicalMoney(x.actual_cents)}</td><td>${esc(x.status)}<small>${esc(x.verification_note||'按办理号核实')}</small></td><td>${!manager&&['待办理','待核实'].includes(x.status)?`<button data-verify-refund="${x.id}">核实原退款</button>`:''}</td></tr>`));
-  if(r.history.length)html+='<details><summary>申请与处理历史</summary>'+r.history.map(h=>`<p>${esc(localDateTimeSeconds(h.occurredAt))} · ${esc(h.reason)}</p>`).join('')+'</details>';html+='</section>';
+  if(r.history.length)html+='<details data-fee-history="'+r.id+'"><summary>申请与审核完整快照（'+r.history.length+'次）</summary>'+table(['提交批次 / 阶段','当时申请及证据','当时审核结果'],r.history.map(h=>`<tr><td>第${h.submission_no}次提交 · ${esc(h.event_type)}<small>${esc(h.actor_name)} · ${esc(localDateTimeSeconds(h.occurred_at))}</small></td><td>拟调整${clinicalMoney(h.proposed_adjustment_cents)} / 拟退${clinicalMoney(h.proposed_refund_cents)}<small>${esc(h.proposalReason)}</small><small>证据：${esc(h.evidence)}</small></td><td>${esc(h.status)}<small>批准调整${clinicalMoney(h.approved_adjustment_cents)} / 退款上限${clinicalMoney(h.approved_refund_cents)}</small><small>${esc(h.review_note||h.event_reason)}</small></td></tr>`))+'</details>';
+  if(r.legacyHistory?.length)html+='<details><summary>早期审计记录（无完整快照）</summary>'+r.legacyHistory.map(h=>`<p>${esc(localDateTimeSeconds(h.occurredAt))} · ${esc(h.reason)}</p>`).join('')+'</details>';
+  html+='<p class="muted">'+esc(r.historyCoverage||'')+'</p></section>';
  }
  if(!fees.items.length)html+=empty('尚无费用调整或普通退款申请。');html+=financePagination('request',financeView.requestPage,fees.total,fees.pageSize);$('#content').innerHTML=html;
  $('#back-finance').onclick=()=>{resetFinance();clinicalAction(render);};$('#refresh-finance').onclick=()=>clinicalAction(render);

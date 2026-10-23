@@ -1,0 +1,42 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "牙医" as D
+actor "前台" as F
+entity "诊所管理系统" as S
+D -> S : 发布有诊疗来源的目的、日期和评估要求
+F -> S : 查询待联系事项
+S --> F : 展示患者、目的、日期及联系历史
+F -> P : 实际联系并核实复诊意向
+alt 已联系且确认时间
+ F -> S : 保存实际联系结果
+ ref over F,S : 按BUC-01确认可用安排并关联复诊预约
+else 未联系上或暂缓
+ F -> S : 保存真实结果与下次联系日期
+ S --> F : 保留未完成待办
+end
+... 获得实际复查或随访信息后 ...
+D -> P : 完成实际复查或临床随访沟通
+D -> S : 记录评估事实和后续处理意见
+alt 目的完成且必要评估齐全
+ S -> S : 保存完成结果与依据
+else 继续观察或治疗
+ S -> S : 保留后续目的、日期及责任待办
+end
+S --> D : 返回完成或继续跟进状态
+@enduml

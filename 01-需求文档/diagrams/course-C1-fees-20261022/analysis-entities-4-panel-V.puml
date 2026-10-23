@@ -1,0 +1,49 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "预付抵扣与批准释放" as V {
+' @reference patient_payment
+class "患者付款" as payment_V <<entity>>
+' @reference bill
+class "应收账目" as bill_V <<entity>>
+' @reference fee_request
+class "费用申请" as request_V <<entity>>
+class "预付抵扣" as prepayment_offset <<entity>> {
+ 带符号金额、生效时间
+ 经办人、抵扣或释放依据
+ --
+ +核对同患者原款与待付()
+ +登记预款抵扣()
+ +释放原抵扣(批准申请)
+ +汇总有效用途净额()
+}
+payment_V "1" -- "0..*" prepayment_offset
+bill_V "1" -- "0..*" prepayment_offset
+request_V "0..1" -- "0..*" prepayment_offset
+' @reference prepayment_offset
+class "预付抵扣" as offset_previous <<entity>>
+offset_previous "原用途\n0..1" -- "0..*" prepayment_offset
+payment_V -[hidden]right- bill_V
+bill_V -[hidden]right- request_V
+note bottom of prepayment_offset
+分配与抵扣仅记录资金用途，同一用途不重复入账。
+负数仅释放有依据的原正向用途，累计不超原额；
+与批准调整共同生效；退款另记录真实交付结果。
+end note
+}
+@enduml

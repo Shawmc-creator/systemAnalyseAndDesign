@@ -1,0 +1,46 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 225
+skinparam linetype ortho
+skinparam nodesep 75
+skinparam ranksep 90
+hide circle
+hide empty members
+package "实际费用范围与提交快照" as F {
+' @reference insurance_case
+class "医保就诊办理" as case_f <<entity>>
+' @reference bill_item
+class "应收项目" as bill_item_f <<entity>>
+' @reference insurance_item_mapping
+class "医保项目对应" as mapping_f <<entity>>
+class "医保费用明细" as insurance_fee <<entity>> {
+ 本次提交数量、分金额及费用版本
+ 适用编码或自费标识
+ 实际提交时刻、平台返回依据
+ --
+ +核对实际费用及适用标识()
+ +固定本次提交范围及快照()
+}
+case_f "1" *-- "0..*" insurance_fee
+bill_item_f "1" -- "0..*" insurance_fee
+mapping_f "0..1" -- "0..*" insurance_fee
+case_f -[hidden]right- bill_item_f
+bill_item_f -[hidden]right- mapping_f
+note bottom of insurance_fee
+提交范围来自真实已核价费用，保留本次数量、金额及版本。
+适用编码才关联对应，范围内自费项保存真实自费标识；
+缺编码或标识先补正，不编造映射，不混入范围外费用。
+同一费用不得重复参与有效正式结算。
+end note
+}
+@enduml

@@ -1,0 +1,80 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "诊疗助理" as A
+boundary "诊疗助理接口" as B
+actor "诊所负责人" as M
+boundary "诊所负责人接口" as BM
+control "登记基础采购与到货验收控制" as K
+entity "采购" as O
+entity "采购项目" as I
+entity "验收" as R
+entity "验收项目" as L
+entity "库存变动" as V
+entity "批次存量" as S
+
+A -> B : 选择供方、材料，填写需求、数量、单价及交付约定
+B -> K : 供方联系资料及采购明细
+activate K
+K -> K : 核验助理权限及已确认计量
+K -> O : 核对供应商及采购明细()
+K -> I : 核对采购量及计量()
+K -> O : 提交采购需求()
+K --> B : 已保存待确认采购，尚不入库
+M -> BM : 核对原采购及需求，确认或暂不处理
+BM -> K : 负责人决定及依据
+break 3a 未确认或取消
+ opt 负责人决定取消
+  K -> O : 取消采购(原因)
+ end
+ K --> BM : 保存待确认或取消结果，不虚构到货验收
+end
+K -> I : 固定确认时约定快照()
+K -> O : 确认采购(负责人)
+K -> K : 保存采购确认人及时间，确认本身不入库
+... 实物到货后，或原待检数量取得结论 ...
+A -> B : 核对原采购、实物及随货单
+B -> K : 实际到货记录或原待检验收编号
+K -> R : 核对已确认原采购()
+alt 本次新到货（分批分别登记）
+ K -> R : 登记本次实际到货()
+else 4a 原待检后续确认
+ K -> L : 确认待检后续结论(保留原到货)
+end
+A -> B : 按批次及位置填写到货、合格、拒收、待检及依据
+B -> K : 真实数量分解与确认内容
+K -> L : 核对到货数量分解()
+break 到货不等于合格、拒收、待检之和，或数量不合法
+ K --> B : 返回实物数量重新核对，不形成入库
+end
+K -> L : 核对材料批次位置及采购支持量()
+opt 5a 有超采购范围或其他差异
+ K -> K : 据实保留差异，交负责人协调；只确认有依据的部分
+end
+opt 6a 批次或效期尚未查明
+ K -> K : 相关数量保持待检，不放行、不作可领库存
+end
+K -> L : 计算本次应入库增量()
+opt 本次新确认合格增量大于0
+ K -> V : 核对变动及前后量()
+ K -> V : 登记实际库存变动()
+ K -> S : 按合法变动更新余额()
+end
+K -> R : 确认验收结果(明细与依据)
+K -> K : 共同保存验收、必要入库流水及余额；7a原结果已存则复用
+K --> B : 验收编号及新增入库量；拒收和待检不入可领库存
+deactivate K
+
+@enduml

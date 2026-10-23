@@ -74,7 +74,8 @@ class Followups {
         const source = this.source(ctx, input), fields = this.fields(input, now); this.duplicate(source, fields);
         const ready = sourceState(this.db, source).ready;
         const key = insert(this.db, 'followup_requirement', fact(now, { ...source, ...fields, cancellation_reason: null, closed_at: null, closure_basis: null,
-          created_by: ctx.session.staff_id, closed_by: null, status: ready ? '待联系' : '待发布', record_no: recordNo('FOLLOW') }));
+          created_by: ctx.session.staff_id, closed_by: null, published_by:ready?ctx.session.staff_id:null,published_at:ready?now:null,status: ready ? '待联系' : '待发布', record_no: recordNo('FOLLOW') }));
+        if(ready)this.unit.workflowHistory.append('followup_requirement',key,'发布','来源已确认，发布诊后要求',ctx,input,now);
         ctx.authority.followupId = key; ctx.authority.sourceVisitId = source.source_visit_id; ctx.authority.sourcePlanVersionId = source.source_plan_version_id;
         return { kind: 'followup_requirement', key, revision: 1, reason: '提出有来源和责任的诊后要求，不占用预约资源或修改费用' };
       }
@@ -84,12 +85,15 @@ class Followups {
         requireFrontdesk(this.db, this.unit.auth, f.responsible_frontdesk_id);
         const next = f.next_contact_date && f.next_contact_date >= day(now) ? f.next_contact_date : day(now);
         this.db.prepare("UPDATE followup_requirement SET status='待联系',next_contact_date=?,updated_at=?,revision=revision+1 WHERE id=?").run(next, now, f.id);
+        this.db.prepare('UPDATE followup_requirement SET published_by=?,published_at=? WHERE id=?').run(ctx.session.staff_id,now,f.id);
+        this.unit.workflowHistory.append('followup_requirement',f.id,'发布','核对来源与责任后发布',ctx,input,now);
         return { kind: 'followup_requirement', key: f.id, beforeRevision: f.revision, revision: f.revision + 1, reason: '核对来源与责任后发布', changes: changed(f, { ...f, status: '待联系', next_contact_date: next }) };
       }
       if (input.action === 'cancel') {
         if (!OPEN.includes(f.status)) fail(409, 'INVALID_STATE', '当前状态机只允许撤销已发布要求；待发布要求请先核对来源');
         const reason = text(input.reason, '牙医撤销依据', 2000);
         this.db.prepare("UPDATE followup_requirement SET status='已撤销',cancellation_reason=?,closed_at=?,closure_basis=?,closed_by=?,next_contact_date=NULL,updated_at=?,revision=revision+1 WHERE id=?").run(reason, now, reason, ctx.session.staff_id, now, f.id);
+        this.unit.workflowHistory.append('followup_requirement',f.id,'撤销',reason,ctx,input,now);
         return { kind: 'followup_requirement', key: f.id, beforeRevision: f.revision, revision: f.revision + 1, reason: '牙医有据撤销要求；预约另经预约业务办理', changes: changed(f, { ...f, status: '已撤销', next_contact_date: null }) };
       }
       if (input.action !== 'update') fail(422, 'INVALID_ACTION', '诊后要求操作无效');
@@ -101,6 +105,7 @@ class Followups {
         if (['已预约','已到诊'].includes(appointment.status) && (day(appointment.planned_start) < fields.target_start || day(appointment.planned_start) > fields.target_end)) fail(409, 'FOLLOWUP_APPOINTMENT_WINDOW', '关联的有效预约不在新目标窗口内，请先核对或改约');
       }
       this.db.prepare('UPDATE followup_requirement SET purpose=?,followup_type=?,target_start=?,target_end=?,requires_assessment=?,responsible_frontdesk_id=?,next_contact_date=?,updated_at=?,revision=revision+1 WHERE id=?').run(...Object.values(fields), now, f.id);
+      if(f.status!=='待发布')this.unit.workflowHistory.append('followup_requirement',f.id,'调整',text(input.reason,'变更依据',2000),ctx,input,now);
       return { kind: 'followup_requirement', key: f.id, beforeRevision: f.revision, revision: f.revision + 1, reason: text(input.reason, '变更依据', 2000), changes: changed(f, { ...f, ...fields }) };
     });
   }
@@ -113,6 +118,7 @@ class Followups {
         const owner = requireFrontdesk(this.db, this.unit.auth, input.responsibleFrontdeskId);
         if (owner === f.responsible_frontdesk_id) fail(422, 'FOLLOWUP_OWNER', '转交对象与原责任人相同');
         this.db.prepare('UPDATE followup_requirement SET responsible_frontdesk_id=?,updated_at=?,revision=revision+1 WHERE id=?').run(owner, now, f.id);
+        this.unit.workflowHistory.append('followup_requirement',f.id,'转交',text(input.reason,'责任转交依据',2000),ctx,input,now);
         return { kind: 'followup_requirement', key: f.id, beforeRevision: f.revision, revision: f.revision + 1, reason: text(input.reason, '责任转交依据', 2000), changes: changed(f, { ...f, responsible_frontdesk_id: owner }) };
       }
       if (input.action !== 'record' || !['已联系','未联系上','拒绝','待跟进'].includes(input.result) || !['continue','arrange','assess','complete'].includes(input.nextStep)) fail(422, 'FOLLOWUP_CONTACT', '请明确真实联系结果与后续办理动作');
@@ -147,6 +153,7 @@ class Followups {
       this.db.prepare('UPDATE followup_requirement SET status=?,requires_assessment=?,next_contact_date=?,closed_at=?,closure_basis=?,closed_by=?,updated_at=?,revision=revision+1 WHERE id=?').run(
         status, needs, next, closure ? now : null, closure, closure ? ctx.session.staff_id : null, now, f.id);
       ctx.authority.followupId = f.id; ctx.authority.followupBeforeRevision = f.revision; ctx.authority.followupAfterRevision = f.revision + 1;
+      this.unit.workflowHistory.append('followup_requirement',f.id,status==='已完成'?'完成':'联系更新',closure||'追加实际联系及后续安排',ctx,input,now);
       return { kind: 'contact_history', key, revision: 1, reason: '追加实际联系，临床结论仍由牙医评估', changes: changed(f, { ...f, status, requires_assessment: needs, next_contact_date: next }) };
     });
   }
@@ -183,6 +190,7 @@ class Followups {
         status, next, frontdesk, input.advice === '完成' ? now : null, input.advice === '完成' ? '依据临床评估编号' + key + '及牙医完成确认' : null,
         input.advice === '完成' ? ctx.session.staff_id : null, now, f.id);
       ctx.authority.followupId = f.id; ctx.authority.followupBeforeRevision = f.revision; ctx.authority.followupAfterRevision = f.revision + 1;
+      this.unit.workflowHistory.append('followup_requirement',f.id,status==='已完成'?'完成':'继续跟进','依据实际临床评估编号'+key+'记录处理意见',ctx,input,now);
       return { kind: 'clinical_assessment', key, revision: 1, reason: '牙医如实记录评估并决定完成或继续，费用状态独立',
         changes: changed(f, { ...f, status, next_contact_date: next, responsible_frontdesk_id: frontdesk }) };
     });
@@ -210,7 +218,7 @@ class Followups {
         const assessments = this.db.prepare('SELECT * FROM clinical_assessment WHERE followup_requirement_id=? ORDER BY assessed_at,id').all(f.id);
         const contacts = this.db.prepare(`SELECT c.*,a.status appointment_status,a.planned_start,a.planned_end,a.revision appointment_revision,v.id actual_visit_id
           FROM contact_history c LEFT JOIN appointment a ON a.id=c.appointment_id LEFT JOIN visit v ON v.appointment_id=a.id WHERE c.followup_requirement_id=? ORDER BY c.contacted_at,c.id`).all(f.id);
-        return { ...f, sourceReady: source.ready, sourceNeedsReview: f.status !== '待发布' && !source.ready,
+        return { ...f,history:this.unit.workflowHistory.list('followup_requirement',f.id),sourceReady: source.ready, sourceNeedsReview: f.status !== '待发布' && !source.ready,
           responsibleAvailable: staffRoles(this.db, this.unit.auth, f.responsible_frontdesk_id).includes('frontdesk'), source,
           patient: { id: patient.id, name: patient.name, recordNo: patient.record_no, phone: patient.phone, phoneOwner: patient.phone_owner,
             contactPreference: patient.contact_preference, contactUnavailableReason: patient.contact_unavailable_reason }, contacts,

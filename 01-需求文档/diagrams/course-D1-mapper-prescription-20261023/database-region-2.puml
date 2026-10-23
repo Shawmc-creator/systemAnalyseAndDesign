@@ -1,0 +1,113 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam EntityBackgroundColor white
+skinparam EntityBorderColor black
+skinparam nodesep 34
+skinparam ranksep 45
+hide circle
+left to right direction
+entity "健康版本\nhealth_version" as health_version {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+ previous_version_id : INTEGER <<FK>>
+}
+entity "健康条目\nhealth_item" as health_item {
+* id : INTEGER <<PK>>
+* health_version_id : INTEGER <<FK>>
+}
+entity "健康复核\nhealth_review" as health_review {
+* id : INTEGER <<PK>>
+* visit_id : INTEGER <<FK>>
+* health_version_id : INTEGER <<FK>>
+}
+entity "病历\nclinical_record" as clinical_record {
+* id : INTEGER <<PK>>
+* visit_id : INTEGER <<FK,UK>>
+ signed_health_review_id : INTEGER <<FK>>
+}
+entity "检查所见\nclinical_finding" as clinical_finding {
+* id : INTEGER <<PK>>
+* clinical_record_id : INTEGER <<FK>>
+}
+entity "病历补充\nrecord_addendum" as record_addendum {
+* id : INTEGER <<PK>>
+* clinical_record_id : INTEGER <<FK>>
+}
+entity "诊疗文件\nclinical_document" as clinical_document {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+ visit_id : INTEGER <<FK>>
+ plan_version_id : INTEGER <<FK>>
+}
+entity "文件版本\ndocument_version" as document_version {
+* id : INTEGER <<PK>>
+* clinical_document_id : INTEGER <<FK>>
+ previous_version_id : INTEGER <<FK>>
+}
+entity "处方\nprescription" as prescription {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+* visit_id : INTEGER <<FK>>
+* prescriber_id : INTEGER <<FK>>
+ original_prescription_id : INTEGER <<FK>>
+}
+entity "处方明细\nprescription_item" as prescription_item {
+* id : INTEGER <<PK>>
+* prescription_id : INTEGER <<FK>>
+* material_id : INTEGER <<FK>>
+ service_price_id : INTEGER <<FK>>
+}
+entity "实际发药\ndispense_record" as dispense_record {
+* id : INTEGER <<PK>>
+* prescription_item_id : INTEGER <<FK>>
+* inventory_movement_id : INTEGER <<FK,UK>>
+}
+entity "库存变动（跨区引用）\ninventory_movement" as inventory_movement {
+* id : INTEGER <<PK>>
+}
+entity "材料（跨区引用）\nmaterial" as material {
+* id : INTEGER <<PK>>
+}
+entity "患者（跨区引用）\npatient" as patient {
+* id : INTEGER <<PK>>
+}
+entity "方案版本（跨区引用）\nplan_version" as plan_version {
+* id : INTEGER <<PK>>
+}
+entity "价目（跨区引用）\nservice_price" as service_price {
+* id : INTEGER <<PK>>
+}
+entity "职员（跨区引用）\nstaff" as staff {
+* id : INTEGER <<PK>>
+}
+entity "就诊（跨区引用）\nvisit" as visit {
+* id : INTEGER <<PK>>
+}
+patient ||--o{ health_version
+health_version |o--o{ health_version
+health_version ||--o{ health_item
+visit ||--o{ health_review
+health_version ||--o{ health_review
+visit ||--o| clinical_record
+health_review |o--o{ clinical_record
+clinical_record ||--o{ clinical_finding
+clinical_record ||--o{ record_addendum
+patient ||--o{ clinical_document
+visit |o--o{ clinical_document
+plan_version |o--o{ clinical_document
+clinical_document ||--o{ document_version
+document_version |o--o{ document_version
+patient ||--o{ prescription
+visit ||--o{ prescription
+staff ||--o{ prescription
+prescription ||--o{ prescription_item
+material ||--o{ prescription_item
+service_price |o--o{ prescription_item
+prescription_item ||--o{ dispense_record
+inventory_movement ||--o| dispense_record
+prescription |o--o{ prescription
+@enduml

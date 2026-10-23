@@ -1,0 +1,40 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "牙医" as D
+actor "药学岗位" as A
+entity "处方与发药记录" as R
+D -> R : 核对诊断、过敏及既往用药
+R --> D : 本次诊疗及健康依据
+D -> P : 说明用药及取药安排
+D -> R : 开立并确认处方与用药指导
+alt 院外取药
+ D -> P : 交付有效处方及用药指导
+else 机构与人员满足院内发药条件
+ D -> A : 交接有效处方
+ A -> R : 核对处方、药品及可用批次
+ alt 审核及供药条件满足
+  A -> P : 核对患者后实际交付并交代用药
+  A -> R : 记录实际量、批次及库存费用依据
+ else 需医师处理或药品不足
+  A -> D : 交回问题及原处方
+  D -> P : 说明调整或院外取药安排
+  D -> R : 保留处理依据，未交付不记已发药
+ end
+end
+@enduml

@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-22",
+  "status": "第十三批：C1价目账单收付与退费；删除封面日期；C未全部完成",
+  "pdf_pages": 173,
+  "figures": 143,
+  "logical_tables": 69,
+  "system_usecases": 25,
+  "entity_classes_revised_this_batch": 14,
+  "operations_this_batch": 46,
+  "core_associations_this_batch": 36,
+  "entity_classes_revised_total": 46,
+  "entity_classes_remaining": 23,
+  "operations_revised_total": 132,
+  "analysis_entity_groups_completed": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 80,
+    "D": 128
+  },
+  "validation": {
+    "cover_date_removed": true,
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "svg_text_overlap_pairs": 0,
+    "updated_vector_figures": 2,
+    "plantuml_panels": 9,
+    "minimum_font_pt": 9.25,
+    "rendered_and_reviewed_pdf_pages": [
+      1,
+      89,
+      90
+    ],
+    "unchanged_page_text_count": 170,
+    "all_143_figure_titles_numbers_pages_preserved": true,
+    "canonical_69_classes_match_69_tables": true,
+    "reference_stubs_not_new_entities": true,
+    "A_B_C2_C3_D_sources_unchanged": true
+  },
+  "physical_attribute_refinement_pending": [
+    "电子支付单须明确患者资金归属，允许预收时账目为空；原单与确认付款匹配唯一且同患者、同渠道、同金额",
+    "收退款核对明确电子支付单或退款办理恰选其一，实际核实时间、结果及差异依据齐全",
+    "患者资金可用额按确认净收、用途净额、确认退款及未知占用推导；不得用可改余额替代，并发占额需要D明确",
+    "费用申请及价目退回重提保留原提交和审核结果，不把当前行覆盖作为完整历史",
+    "应收项目的实际执行或实际发药来源恰选其一且来源唯一；医保正式分摊、用途释放与退款分别核算",
+    "负向分配或抵扣指向原正向用途且同账同原款，累计释放不超原额；批准调整与释放共同生效"
+  ],
+  "whole_document_course_compliant": false,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "next_batch": "C1第六至八组：复诊随访、材料库存、基础采购验收",
+  "remaining": [
+    "23实体的属性操作及跨组关系",
+    "25例分析序列的消息、分支及操作对应",
+    "分析状态机图同步",
+    "D数据访问、关系与约束、业务职责和表示组件",
+    "真实业务确认与验收"
+  ],
+  "files": {
+    "tex_sha256": "2539d72769e962c5c7c10f4c06512c9d44f5b2c7e748a8114fd344fc0cd5e235",
+    "pdf_sha256": "487fdb595774361bfcbc5e05dd0bb454fb9cf52f7cf9fc21c7a61666ca30b4db",
+    "logical_model_sha256": "68f5db36dfd9f3eaf9ca11b43ffb9a6abf039bf587ecf15f4f9c2b2b69e239e9"
+  }
+}

@@ -1,0 +1,258 @@
+{
+  "cases": [
+    {
+      "uc": 1,
+      "title": "维护患者资料",
+      "entities": [
+        {
+          "alias": "P",
+          "name": "患者",
+          "table": "patient"
+        },
+        {
+          "alias": "H",
+          "name": "患者资料变更",
+          "table": "patient_change"
+        }
+      ],
+      "branches": [
+        "2a",
+        "3a",
+        "5a",
+        "6a",
+        "6b"
+      ],
+      "rules": [
+        "R01-1",
+        "R01-2",
+        "R01-3"
+      ]
+    },
+    {
+      "uc": 2,
+      "title": "维护预约安排",
+      "entities": [
+        {
+          "alias": "P",
+          "name": "患者",
+          "table": "patient"
+        },
+        {
+          "alias": "S",
+          "name": "日期安排",
+          "table": "dated_schedule"
+        },
+        {
+          "alias": "ST",
+          "name": "职员",
+          "table": "staff"
+        },
+        {
+          "alias": "C",
+          "name": "诊椅",
+          "table": "dental_chair"
+        },
+        {
+          "alias": "E",
+          "name": "诊疗设备",
+          "table": "clinical_equipment"
+        },
+        {
+          "alias": "RB",
+          "name": "资源停用时段",
+          "table": "resource_block"
+        },
+        {
+          "alias": "RO",
+          "name": "接诊占用",
+          "table": "resource_occupancy"
+        },
+        {
+          "alias": "EO",
+          "name": "设备占用",
+          "table": "equipment_occupancy"
+        },
+        {
+          "alias": "AP",
+          "name": "预约",
+          "table": "appointment"
+        },
+        {
+          "alias": "AH",
+          "name": "预约变更",
+          "table": "appointment_change"
+        }
+      ],
+      "branches": [
+        "1a",
+        "1b",
+        "1c",
+        "2a",
+        "4a",
+        "6a",
+        "7a",
+        "7b"
+      ],
+      "rules": [
+        "R02-1",
+        "R02-2",
+        "R02-3"
+      ]
+    },
+    {
+      "uc": 3,
+      "title": "登记到诊",
+      "entities": [
+        {
+          "alias": "P",
+          "name": "患者",
+          "table": "patient"
+        },
+        {
+          "alias": "S",
+          "name": "日期安排",
+          "table": "dated_schedule"
+        },
+        {
+          "alias": "AP",
+          "name": "预约",
+          "table": "appointment"
+        },
+        {
+          "alias": "E",
+          "name": "诊疗设备",
+          "table": "clinical_equipment"
+        },
+        {
+          "alias": "RB",
+          "name": "资源停用时段",
+          "table": "resource_block"
+        },
+        {
+          "alias": "RO",
+          "name": "接诊占用",
+          "table": "resource_occupancy"
+        },
+        {
+          "alias": "EO",
+          "name": "设备占用",
+          "table": "equipment_occupancy"
+        },
+        {
+          "alias": "V",
+          "name": "就诊",
+          "table": "visit"
+        },
+        {
+          "alias": "CR",
+          "name": "病历",
+          "table": "clinical_record"
+        }
+      ],
+      "branches": [
+        "2a",
+        "3a",
+        "4a",
+        "4b",
+        "5a",
+        "6a"
+      ],
+      "rules": [
+        "R03-1",
+        "R03-2",
+        "R03-3",
+        "R02-1"
+      ]
+    },
+    {
+      "uc": 4,
+      "title": "维护排班与接诊安排",
+      "entities": [
+        {
+          "alias": "ST",
+          "name": "职员",
+          "table": "staff"
+        },
+        {
+          "alias": "C",
+          "name": "诊椅",
+          "table": "dental_chair"
+        },
+        {
+          "alias": "S",
+          "name": "日期安排",
+          "table": "dated_schedule"
+        },
+        {
+          "alias": "RO",
+          "name": "接诊占用",
+          "table": "resource_occupancy"
+        },
+        {
+          "alias": "AH",
+          "name": "安排变更",
+          "table": "schedule_change"
+        }
+      ],
+      "branches": [
+        "1a",
+        "2a",
+        "2b",
+        "4a",
+        "5a",
+        "6a"
+      ],
+      "rules": [
+        "R04-1",
+        "R04-2",
+        "R04-3",
+        "R02-1"
+      ]
+    }
+  ],
+  "C1_operations_added": [
+    {
+      "part": "接诊",
+      "table": "patient",
+      "op": "建立患者档案()",
+      "uc": 1,
+      "rule": "R01-1"
+    },
+    {
+      "part": "接诊",
+      "table": "dated_schedule",
+      "op": "保存未发布草稿()",
+      "uc": 4,
+      "rule": "R04-3"
+    },
+    {
+      "part": "接诊",
+      "table": "resource_occupancy",
+      "op": "预留接诊时段()",
+      "uc": 2,
+      "rule": "R02-1"
+    },
+    {
+      "part": "接诊",
+      "table": "resource_block",
+      "op": "核对当前限制()",
+      "uc": 2,
+      "rule": "R02-2"
+    },
+    {
+      "part": "接诊",
+      "table": "equipment_occupancy",
+      "op": "核对设备时段冲突()",
+      "uc": 2,
+      "rule": "R02-1"
+    },
+    {
+      "part": "诊疗",
+      "table": "clinical_record",
+      "op": "建立当次草稿()",
+      "uc": 3,
+      "rule": "R03-2"
+    }
+  ],
+  "limits": "分析层由控制组织读取、协调与共同保存；未增加数据访问实现。外部临床和实物事实仍按B规约核实。"
+}

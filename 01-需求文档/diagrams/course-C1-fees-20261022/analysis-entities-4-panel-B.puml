@@ -1,0 +1,73 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "实际费用及账目核算" as B {
+' @reference patient
+class "患者" as patient_b <<entity>>
+' @reference patient_funds
+class "患者资金" as funds_b <<entity>>
+' @reference treatment_execution
+class "诊疗执行" as execution_b <<entity>>
+' @reference dispense_record
+class "实际发药" as dispense_b <<entity>>
+' @reference service_price
+class "价目" as price_b <<entity>>
+' @reference insurance_case
+class "医保就诊办理" as insurance_case_b <<entity>>
+' @reference insurance_settlement
+class "医保结算" as insurance_settlement_b <<entity>>
+class "应收账目" as bill <<entity>> {
+ 形成时间、计费期间
+ /G总应收、/I正式医保承担
+ /P患者应付、/S有效抵付
+ /待付、/不能最终结算原因
+ --
+ +汇总已核价应收(生效调整)
+ +核对正式医保分摊()
+ +计算当前待付(有效抵付)
+}
+class "应收项目" as bill_item <<entity>> {
+ 实际数量、单价快照
+ 核价状态、计费时点
+ 核价人及依据
+ --
+ +核对唯一实际来源()
+ +确认计价(适用价目与依据)
+ +计算项目金额()
+ +建立实际来源(计价状态)
+}
+patient_b "1" -- "0..*" bill
+funds_b "1" -- "0..*" bill
+bill "1" *-- "0..*" bill_item
+execution_b "0..1" -- "1" bill_item
+dispense_b "0..1" -- "1" bill_item
+price_b "0..1" -- "0..*" bill_item
+bill "0..1" -- "0..*" insurance_case_b
+insurance_case_b "1" -- "0..*" insurance_settlement_b
+patient_b -[hidden]right- funds_b
+execution_b -[hidden]right- dispense_b
+dispense_b -[hidden]right- price_b
+note bottom of bill_item
+应收来源：诊疗执行或实际发药恰选其一。
+G＝已核价金额＋生效调整；P＝G－I。
+I仅取有效正式医保基金及个账承担，自费为0。
+待付＝max(P－S,0)；缺价或医保未定不报最终数。
+释放计入S净额，实际退款不再次扣减S。
+end note
+}
+@enduml

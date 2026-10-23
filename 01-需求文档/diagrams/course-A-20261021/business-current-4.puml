@@ -1,0 +1,42 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "牙医" as D
+actor "前台" as F
+entity "复诊与联系记录" as R
+D -> P : 说明后续目的与建议日期
+D -> R : 记录诊疗来源、目的及评估要求
+D -> F : 交接需联系的患者与时间范围
+F -> R : 查找待联系事项及联系方式
+F -> P : 实际联系并核实复诊意向
+alt 联系成功且患者确认时间
+ F -> R : 保留联系结果
+ ref over F,R : 按BUC-01协调并登记实际预约
+else 未联系上或暂缓
+ F -> R : 记录实际结果和下次联系日期
+end
+... 获得实际复查或随访信息后 ...
+D -> P : 实际复查或临床随访沟通
+P --> D : 反馈恢复情况
+D -> R : 记录评估与后续处理意见
+alt 目的已完成
+ D -> R : 确认本次复诊随访完成
+else 仍需观察或继续治疗
+ D -> F : 交接下一次目的与日期
+end
+@enduml

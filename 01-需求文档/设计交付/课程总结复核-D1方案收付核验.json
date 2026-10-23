@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-23",
+  "status": "第二十五批：方案、价目账单收付两组业务外键及关键约束已修；D其余项继续",
+  "pdf_pages": 164,
+  "figures": 144,
+  "logical_tables": 69,
+  "logical_fields": 820,
+  "new_tables": [],
+  "new_fields": [
+    "decision_plan_item.scope_quantity",
+    "payment_order.patient_funds_id"
+  ],
+  "modified_tables": [
+    "decision_plan_item",
+    "payment_order",
+    "bill_item"
+  ],
+  "region_business_relations_checked": 37,
+  "core_regions_rebuilt": [
+    3,
+    4
+  ],
+  "core_regions_remaining": [
+    1,
+    2,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "overall_self_references": [
+    {
+      "table": "staff",
+      "field": "created_by"
+    },
+    {
+      "table": "health_version",
+      "field": "previous_version_id"
+    },
+    {
+      "table": "document_version",
+      "field": "previous_version_id"
+    },
+    {
+      "table": "plan_version",
+      "field": "previous_version_id"
+    },
+    {
+      "table": "treatment_execution",
+      "field": "original_execution_id"
+    },
+    {
+      "table": "payment_allocation",
+      "field": "original_allocation_id"
+    },
+    {
+      "table": "prepayment_offset",
+      "field": "original_offset_id"
+    },
+    {
+      "table": "patient_refund",
+      "field": "previous_attempt_id"
+    },
+    {
+      "table": "inventory_movement",
+      "field": "original_movement_id"
+    }
+  ],
+  "changed_pdf_pages": [
+    132,
+    135,
+    136,
+    144,
+    149
+  ],
+  "unchanged_page_text_count": 159,
+  "selected_key_fields": 271,
+  "analysis_sources_unchanged": true,
+  "C1_classes": 69,
+  "C1_operations": 218,
+  "sqlite_isolated_rule_checks": 27,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "historical_sql_changed": false,
+  "github_synced": false,
+  "whole_document_course_compliant": false,
+  "remaining": [
+    "其余7组分区业务外键与基数",
+    "旧字段source编号与其他关键约束及状态引用",
+    "D-04数据访问选型、D2业务层及D3表示层",
+    "运行实现和真实验收另行对齐"
+  ],
+  "validation": {
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "visible_text_overlap_pairs": 0,
+    "minimum_font_pt": 9.37,
+    "all_144_figure_titles_numbers_pages_preserved": true
+  },
+  "files": {
+    "tex_sha256": "8a606b4466aa1c409a1132b87353d41c8af9c5e80031e3f1b6c0fdc17aa01ebd",
+    "pdf_sha256": "3f757b9341f9b0c6bb0765c41cc12b13390401050d4207c6457ead7cb88b6ec7",
+    "logical_model_sha256": "fc19903aa286309241f85716b6ccedd3689a22f00bffe28c61e448f981fd3b6a",
+    "previous_model_sha256": "efaefd03971c97d9613173eface48132eb180e617a1fdd15a28181c23c79f9d3"
+  }
+}

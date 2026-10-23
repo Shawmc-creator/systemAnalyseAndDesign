@@ -1,0 +1,69 @@
+{
+  "date": "2026-10-23",
+  "status": "第二十四批：D-01、D-07、D-08设计对应已修，D其余项继续",
+  "pdf_pages": 164,
+  "figures": 144,
+  "logical_tables": 69,
+  "logical_fields": 818,
+  "new_tables": [],
+  "new_fields": [
+    "payment_reconciliation.patient_payment_id"
+  ],
+  "corrected_issues": [
+    "D-01",
+    "D-07",
+    "D-08"
+  ],
+  "changed_pdf_pages": [
+    129,
+    130,
+    132,
+    135,
+    136,
+    142,
+    143,
+    149
+  ],
+  "unchanged_page_text_count": 156,
+  "analysis_sources_unchanged": true,
+  "C1_classes": 69,
+  "C1_operations": 218,
+  "compound_key_tables": {
+    "decision_plan_item": [
+      "decision_id",
+      "plan_item_id"
+    ],
+    "decision_file_version": [
+      "decision_id",
+      "document_version_id"
+    ]
+  },
+  "sqlite_isolated_key_checks": 22,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "historical_sql_changed": false,
+  "github_synced": false,
+  "whole_document_course_compliant": false,
+  "remaining": [
+    "D-02其余关系与基数",
+    "D-03必要约束、字段来源与状态引用",
+    "D-04数据访问选型",
+    "D-05业务层、D-06表示层",
+    "运行代码及真实验收另行对齐"
+  ],
+  "validation": {
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "visible_text_overlap_pairs": 0,
+    "minimum_font_pt": 9.6,
+    "all_144_figure_titles_numbers_pages_preserved": true,
+    "one_diagram_paper_enlarged_for_legibility": true
+  },
+  "files": {
+    "tex_sha256": "5b36757e52d94380b9117e2f164d0ab1394ec76d5ab930ef3b649493ea746106",
+    "pdf_sha256": "cf8a388ba484315b7b060d0ad8f0ed59b70b11ca84e1a214e9b41eef11ab2196",
+    "logical_model_sha256": "efaefd03971c97d9613173eface48132eb180e617a1fdd15a28181c23c79f9d3",
+    "previous_model_sha256": "68f5db36dfd9f3eaf9ca11b43ffb9a6abf039bf587ecf15f4f9c2b2b69e239e9"
+  }
+}

@@ -1,0 +1,38 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "待支付" as Pending
+state "处理中" as Processing
+state "待核实" as Unknown
+state "已成功" as Succeeded
+state "已失败" as Failed
+state "已关闭" as Closed
+[*] --> Pending : 确认电子方式及金额\n/ 建立唯一原支付单
+Pending --> Processing : 请求支付或登记终端原交易\n[原单及金额、渠道已核对]
+Pending --> Closed : 核实关闭未付原单\n[确认未受理、未扣款且无未决交易]
+Processing --> Unknown : 结果未知、归属金额待查\n或成功后本地结果待补记\n/ 保留原号，先查不重付
+Processing --> Succeeded : 核实原交易明确成功\n[归属金额相符且本地确认保存]\n/ 一次确认实际付款及适用用途
+Processing --> Failed : 原渠道证实未成功\n/ 保存真实失败依据
+Unknown --> Succeeded : 查原交易核实成功\n[归属金额相符且本地补记完成]\n/ 复用原付款，不重复确认
+Unknown --> Failed : 查原交易证实失败\n/ 保存依据，原单不重发
+Unknown : 继续查原号 [仍未知] / 保持待核实
+Succeeded --> [*]
+Failed --> [*]
+Closed --> [*]
+
+@enduml

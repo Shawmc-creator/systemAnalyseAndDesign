@@ -1,0 +1,49 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 120
+actor "牙医" as A
+boundary "牙医接口" as B
+control "记录复诊随访评估控制" as K
+entity "诊后要求" as E0
+entity "临床评估" as E1
+A -> B : 记录复诊随访评估
+B -> K : 提交对象编号及办理内容
+activate K
+K -> K : 核对岗位权限与必要资料
+alt 可以办理
+K -> E0 : 核对原复诊目的和来源
+activate E0
+E0 --> K : 待评估事项
+deactivate E0
+K -> E1 : 记录实际评估和处理意见
+activate E1
+E1 --> K : 临床结论及后续建议
+deactivate E1
+K -> E0 : 完成要求或继续安排跟进
+activate E0
+E0 --> K : 完成或继续跟进状态
+deactivate E0
+K --> B : 返回本次结果
+else 权限资料或状态不符合
+K --> B : 返回核对原因且不改变原记录
+end
+B --> A : 展示结果
+deactivate K
+
+@enduml

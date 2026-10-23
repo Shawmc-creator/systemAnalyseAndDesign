@@ -105,7 +105,7 @@ test('physical end before signing preserves unsigned clinical work and cannot be
   const a=setup(t),s=a.schedule(),b=a.book(s);a.clock('2026-10-19T01:35:00Z');const v=a.arrive(b);a.start(v);
   const block=a.finish(v);
   assert.equal(a.db.prepare('SELECT status FROM clinical_record WHERE visit_id=?').get(v.id).status,'草稿');
-  assert.equal(a.db.prepare('SELECT status FROM visit WHERE id=?').get(v.id).status,'接诊中');
+  assert.equal(a.db.prepare('SELECT status FROM visit WHERE id=?').get(v.id).status,'诊疗结束');
   a.restore(block);a.sign(v);
   assert.equal(a.db.prepare('SELECT status FROM visit WHERE id=?').get(v.id).status,'诊疗结束');
 });

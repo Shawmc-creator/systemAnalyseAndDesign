@@ -63,8 +63,9 @@ class Resources {
       this.db.prepare("UPDATE equipment_occupancy SET status='已释放',actual_ended_at=?,release_reason=?,updated_at=?,revision=revision+1 WHERE visit_id=? AND status='使用中'").run(end,reason,now,visit.id);
       const key=insert(this.db,'resource_block',fact(now,{dental_chair_id:schedule.dental_chair_id,equipment_id:null,starts_at:end,ends_at:null,
         reason:'诊后清洁与准备待核验：'+visit.record_no,released_at:null,status:'生效中',operator_id:ctx.session.staff_id}));
+      this.db.prepare("UPDATE visit SET status='诊疗结束',ended_at=?,updated_at=?,revision=revision+1 WHERE id=?").run(end,now,visit.id);
       ctx.authority.visitId=visit.id;ctx.authority.occupancyId=o.id;
-      return {kind:'resource_block',key,revision:1,reason,relatedChanges:[{kind:'resource_occupancy',key:o.id,beforeRevision:o.revision,revision:o.revision+1,reason:PHYSICAL_END}]};
+      return {kind:'resource_block',key,revision:1,reason,relatedChanges:[{kind:'resource_occupancy',key:o.id,beforeRevision:o.revision,revision:o.revision+1,reason:PHYSICAL_END},{kind:'visit',key:visit.id,beforeRevision:visit.revision,revision:visit.revision+1,reason:'牙医确认实际结束并交接清洁'}]};
     });
   }
   query(credentials,input={}) {

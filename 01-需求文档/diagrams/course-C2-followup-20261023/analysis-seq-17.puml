@@ -1,0 +1,60 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as A
+boundary "牙医接口" as B
+control "记录复诊随访评估控制" as K
+entity "诊后要求" as R
+entity "临床评估" as E
+
+A -> B : 选择患者原要求，查阅目的、来源及历史跟进
+B -> K : 患者、原要求及本次评估方式
+activate K
+K -> K : 核验牙医权限及原要求未关闭，读取前次诊疗资料
+K --> B : 原目的及历史依据
+alt 实际到诊检查
+ A -> B : 核对当次实际就诊并实施复查
+ B -> K : 同患者就诊及实际检查依据
+else 2a 远程随访
+ A -> B : 据实际沟通评估，说明来源和局限
+ B -> K : 实际沟通依据，不虚构就诊号
+end
+K -> E : 核对评估方式与实际依据()
+A -> B : 填写评估时间、结论和意见，判断目的是否达到
+B -> K : 实际评估及完成或继续跟进选择
+K -> E : 判断原目的是否达到()
+opt 4b 需要继续治疗
+ ref over A,K : UC-06、07记录诊疗及方案，UC-16协调后续；原目标另行判断
+end
+break 5a 缺项或原要求状态已变化
+ K --> B : 缺项回评估内容；状态变化重核，重复返回原结果
+end
+K -> E : 追加实际评估()
+alt 原目的实际达到，且选择完成
+ K -> R : 核对目的达成及完成依据()
+ K -> K : 共同保存评估、完成依据及人时，保留历史
+ K --> B : 已完成
+else 4a 尚需跟进
+ A -> B : 明确下次日期、责任人及已有安排
+ B -> K : 后续跟进安排
+ K -> E : 记录继续跟进(日期与责任人)
+ K -> R : 安排继续跟进(日期与责任人)
+ K -> K : 共同保存评估及后续安排
+ K --> B : 需联系则待联系；已有安排则待到诊或评估
+end
+B --> A : 结论限于实际依据，不能判断时安排到诊
+deactivate K
+
+@enduml

@@ -1,0 +1,122 @@
+{
+  "scope": "只验证本批键/引用/来源数量的隔离SQLite样例；不创建69表运行库，不验证跨记录业务条件",
+  "sqlite_version": "3.53.1",
+  "checks": 22,
+  "passed": 22,
+  "results": [
+    {
+      "name": "decision_plan_item首对",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "decision_plan_item同决定另一项目或原件",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "decision_plan_item同项目或原件另一决定",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "decision_plan_item组合重复",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "decision_plan_item缺失联合键",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "decision_plan_item孤立引用",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "decision_file_version首对",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "decision_file_version同决定另一项目或原件",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "decision_file_version同项目或原件另一决定",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "decision_file_version组合重复",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "decision_file_version缺失联合键",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "decision_file_version孤立引用",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "核对来源1",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "核对来源2",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "核对来源3",
+      "passed": true,
+      "expected": "accept"
+    },
+    {
+      "name": "核对来源4",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "核对来源5",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "核对来源6",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "核对来源7",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "核对来源8",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "核对来源9",
+      "passed": true,
+      "expected": "reject"
+    },
+    {
+      "name": "已引用现金原付款不可删除",
+      "passed": true,
+      "expected": "reject"
+    }
+  ],
+  "limitations": [
+    "现金渠道、患者归属及共同保存需后续领域和数据访问职责落实",
+    "未测试生产程序、运行库、迁移或全部业务规则"
+  ]
+}

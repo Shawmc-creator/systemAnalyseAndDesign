@@ -1,0 +1,26 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 45
+left to right direction
+actor "牙医" as D
+actor "药学岗位" as P
+boundary "处方与取药接口" as B
+control "UC-25\n开立处方\n并衔接院内外取药控制" as C25
+D -- B
+P -- B
+B ..> C25
+
+@enduml

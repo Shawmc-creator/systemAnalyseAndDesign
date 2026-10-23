@@ -1,0 +1,381 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide circle
+left to right direction
+skinparam defaultFontSize 16
+package "身份与接诊" {
+entity "患者\npatient" as patient {
+* id <<PK>>
+}
+entity "职员\nstaff" as staff {
+* id <<PK>>
+}
+entity "患者资料变更\npatient_change" as patient_change {
+* id <<PK>>
+}
+entity "职员账号\nuser_account" as user_account {
+* id <<PK>>
+}
+entity "诊椅\ndental_chair" as dental_chair {
+* id <<PK>>
+}
+entity "日期安排\ndated_schedule" as dated_schedule {
+* id <<PK>>
+}
+entity "安排变更\nschedule_change" as schedule_change {
+* id <<PK>>
+}
+entity "接诊占用\nresource_occupancy" as resource_occupancy {
+* id <<PK>>
+}
+entity "预约\nappointment" as appointment {
+* id <<PK>>
+}
+entity "预约变更\nappointment_change" as appointment_change {
+* id <<PK>>
+}
+entity "就诊\nvisit" as visit {
+* id <<PK>>
+}
+entity "诊疗设备\nclinical_equipment" as clinical_equipment {
+* id <<PK>>
+}
+entity "资源停用时段\nresource_block" as resource_block {
+* id <<PK>>
+}
+entity "设备占用\nequipment_occupancy" as equipment_occupancy {
+* id <<PK>>
+}
+}
+package "病历与诊疗文书" {
+entity "健康版本\nhealth_version" as health_version {
+* id <<PK>>
+}
+entity "健康条目\nhealth_item" as health_item {
+* id <<PK>>
+}
+entity "健康复核\nhealth_review" as health_review {
+* id <<PK>>
+}
+entity "病历\nclinical_record" as clinical_record {
+* id <<PK>>
+}
+entity "检查所见\nclinical_finding" as clinical_finding {
+* id <<PK>>
+}
+entity "病历补充\nrecord_addendum" as record_addendum {
+* id <<PK>>
+}
+entity "诊疗文件\nclinical_document" as clinical_document {
+* id <<PK>>
+}
+entity "文件版本\ndocument_version" as document_version {
+* id <<PK>>
+}
+entity "处方\nprescription" as prescription {
+* id <<PK>>
+}
+entity "处方明细\nprescription_item" as prescription_item {
+* id <<PK>>
+}
+entity "实际发药\ndispense_record" as dispense_record {
+* id <<PK>>
+}
+}
+package "治疗方案与实际执行" {
+entity "治疗方案\ntreatment_plan" as treatment_plan {
+* id <<PK>>
+}
+entity "方案版本\nplan_version" as plan_version {
+* id <<PK>>
+}
+entity "方案项目\nplan_item" as plan_item {
+* id <<PK>>
+}
+entity "患者决定\npatient_decision" as patient_decision {
+* id <<PK>>
+}
+entity "患者决定—方案项目\ndecision_plan_item" as decision_plan_item {
+* decision_id : INTEGER <<PK,FK>>
+* plan_item_id : INTEGER <<PK,FK>>
+}
+entity "患者决定—确认原件\ndecision_file_version" as decision_file_version {
+* decision_id : INTEGER <<PK,FK>>
+* document_version_id : INTEGER <<PK,FK>>
+}
+entity "诊疗执行\ntreatment_execution" as treatment_execution {
+* id <<PK>>
+}
+}
+package "价目、账单与收款" {
+entity "患者资金\npatient_funds" as patient_funds {
+* id <<PK>>
+}
+entity "收费项目\nservice" as service {
+* id <<PK>>
+}
+entity "价目\nservice_price" as service_price {
+* id <<PK>>
+}
+entity "应收账目\nbill" as bill {
+* id <<PK>>
+}
+entity "应收项目\nbill_item" as bill_item {
+* id <<PK>>
+}
+entity "患者付款\npatient_payment" as patient_payment {
+* id <<PK>>
+}
+entity "付款分配\npayment_allocation" as payment_allocation {
+* id <<PK>>
+}
+entity "预付抵扣\nprepayment_offset" as prepayment_offset {
+* id <<PK>>
+}
+entity "电子支付单\npayment_order" as payment_order {
+* id <<PK>>
+}
+entity "收退款核对\npayment_reconciliation" as payment_reconciliation {
+* id <<PK>>
+}
+}
+package "费用更正与退费" {
+entity "费用申请\nfee_request" as fee_request {
+* id <<PK>>
+}
+entity "费用调整\nfee_adjustment" as fee_adjustment {
+* id <<PK>>
+}
+entity "调整项目\nfee_adjustment_item" as fee_adjustment_item {
+* id <<PK>>
+}
+entity "退款办理\npatient_refund" as patient_refund {
+* id <<PK>>
+}
+}
+package "复诊与随访" {
+entity "诊后要求\nfollowup_requirement" as followup_requirement {
+* id <<PK>>
+}
+entity "联系经历\ncontact_history" as contact_history {
+* id <<PK>>
+}
+entity "临床评估\nclinical_assessment" as clinical_assessment {
+* id <<PK>>
+}
+}
+package "材料与库存" {
+entity "材料\nmaterial" as material {
+* id <<PK>>
+}
+entity "材料批次\nmaterial_batch" as material_batch {
+* id <<PK>>
+}
+entity "批次变更\nbatch_change" as batch_change {
+* id <<PK>>
+}
+entity "存放位置\nstock_location" as stock_location {
+* id <<PK>>
+}
+entity "批次存量\nbatch_stock" as batch_stock {
+* id <<PK>>
+}
+entity "库存变动\ninventory_movement" as inventory_movement {
+* id <<PK>>
+}
+entity "实际用料\nmaterial_usage" as material_usage {
+* id <<PK>>
+}
+entity "盘点核实\nstock_count" as stock_count {
+* id <<PK>>
+}
+}
+package "基础采购与验收" {
+entity "供应商\nsupplier" as supplier {
+* id <<PK>>
+}
+entity "采购\npurchase_order" as purchase_order {
+* id <<PK>>
+}
+entity "采购项目\npurchase_order_item" as purchase_order_item {
+* id <<PK>>
+}
+entity "验收\npurchase_receipt" as purchase_receipt {
+* id <<PK>>
+}
+entity "验收项目\npurchase_receipt_item" as purchase_receipt_item {
+* id <<PK>>
+}
+}
+package "门诊医保与结算款" {
+entity "医保身份核验\ninsurance_identity" as insurance_identity {
+* id <<PK>>
+}
+entity "医保项目对应\ninsurance_item_mapping" as insurance_item_mapping {
+* id <<PK>>
+}
+entity "医保就诊办理\ninsurance_case" as insurance_case {
+* id <<PK>>
+}
+entity "医保费用明细\ninsurance_fee" as insurance_fee {
+* id <<PK>>
+}
+entity "医保结算\ninsurance_settlement" as insurance_settlement {
+* id <<PK>>
+}
+entity "医保撤销办理\ninsurance_reversal" as insurance_reversal {
+* id <<PK>>
+}
+entity "医保结算款收付\ninsurance_fund_receipt" as insurance_fund_receipt {
+* id <<PK>>
+}
+}
+patient ||--o{ patient_change
+staff ||--o| user_account
+staff ||--o{ dated_schedule
+dental_chair ||--o{ dated_schedule
+dated_schedule ||--o{ schedule_change
+dental_chair ||--o{ schedule_change
+dated_schedule ||--o{ resource_occupancy
+appointment |o--o{ resource_occupancy
+visit |o--o{ resource_occupancy
+patient ||--o{ appointment
+appointment ||--o{ appointment_change
+dated_schedule ||--o{ appointment_change : old_schedule_id
+dated_schedule |o--o{ appointment_change : new_schedule_id
+patient ||--o{ visit
+appointment |o--o| visit
+staff ||--o{ visit
+dental_chair |o--o{ clinical_equipment
+dental_chair |o--o{ resource_block
+clinical_equipment |o--o{ resource_block
+clinical_equipment ||--o{ equipment_occupancy
+appointment |o--o{ equipment_occupancy
+visit |o--o{ equipment_occupancy
+patient ||--o{ health_version
+health_version ||--o{ health_item
+visit ||--o{ health_review
+health_version ||--o{ health_review
+visit ||--o| clinical_record
+clinical_record ||--o{ clinical_finding
+clinical_record ||--o{ record_addendum
+patient ||--o{ clinical_document
+visit |o--o{ clinical_document
+plan_version |o--o{ clinical_document
+clinical_document ||--o{ document_version
+patient ||--o{ prescription
+visit ||--o{ prescription
+prescription ||--o{ prescription_item
+material ||--o{ prescription_item
+service_price |o--o{ prescription_item
+prescription_item ||--o{ dispense_record
+inventory_movement ||--o| dispense_record
+patient ||--o{ treatment_plan
+treatment_plan ||--o{ plan_version
+visit |o--o{ plan_version
+plan_version ||--o{ plan_item
+plan_version ||--o{ patient_decision
+patient_decision ||--o{ decision_plan_item
+plan_item ||--o{ decision_plan_item
+patient_decision ||--o{ decision_file_version
+document_version ||--o{ decision_file_version
+visit ||--o{ treatment_execution
+plan_item |o--o{ treatment_execution
+service ||--o{ treatment_execution
+patient ||--o| patient_funds
+service ||--o{ service_price
+patient ||--o{ bill
+patient_funds ||--o{ bill
+bill ||--o{ bill_item
+treatment_execution |o--o| bill_item
+dispense_record |o--o| bill_item
+service_price |o--o{ bill_item
+patient_funds ||--o{ patient_payment
+patient_payment ||--o{ payment_allocation
+bill ||--o{ payment_allocation
+fee_request |o--o{ payment_allocation
+patient_payment ||--o{ prepayment_offset
+bill ||--o{ prepayment_offset
+fee_request |o--o{ prepayment_offset
+bill |o--o{ payment_order
+patient_funds ||--o{ payment_order
+patient_payment |o--o| payment_order
+patient_payment |o--o{ payment_reconciliation
+payment_order |o--o{ payment_reconciliation
+patient_refund |o--o{ payment_reconciliation
+patient_funds ||--o{ fee_request
+bill |o--o{ fee_request
+patient_payment |o--o{ fee_request
+fee_request ||--o| fee_adjustment
+bill ||--o{ fee_adjustment
+fee_adjustment ||--o{ fee_adjustment_item
+bill_item ||--o{ fee_adjustment_item
+fee_request ||--o{ patient_refund
+patient_payment ||--o{ patient_refund
+patient_funds ||--o{ patient_refund
+patient ||--o{ followup_requirement
+visit |o--o{ followup_requirement
+plan_version |o--o{ followup_requirement
+followup_requirement ||--o{ contact_history
+appointment |o--o{ contact_history
+followup_requirement ||--o{ clinical_assessment
+visit |o--o{ clinical_assessment
+material ||--o{ material_batch
+material_batch ||--o{ batch_change
+material_batch ||--o{ batch_stock
+stock_location ||--o{ batch_stock
+batch_stock ||--o{ inventory_movement
+stock_count |o--o| inventory_movement
+purchase_receipt_item |o--o{ inventory_movement
+inventory_movement ||--o{ material_usage
+visit ||--o{ material_usage
+batch_stock ||--o{ stock_count
+supplier ||--o{ purchase_order
+purchase_order ||--o{ purchase_order_item
+material ||--o{ purchase_order_item
+purchase_order ||--o{ purchase_receipt
+purchase_receipt ||--o{ purchase_receipt_item
+purchase_order_item ||--o{ purchase_receipt_item
+material_batch |o--o{ purchase_receipt_item
+stock_location |o--o{ purchase_receipt_item
+patient ||--o{ insurance_identity
+service |o--o{ insurance_item_mapping
+material |o--o{ insurance_item_mapping
+patient ||--o{ insurance_case
+visit ||--o{ insurance_case
+bill |o--o{ insurance_case
+insurance_identity |o--o{ insurance_case
+insurance_case ||--o{ insurance_fee
+bill_item ||--o{ insurance_fee
+insurance_item_mapping |o--o{ insurance_fee
+insurance_case ||--o{ insurance_settlement
+insurance_settlement ||--o{ insurance_reversal
+fee_request |o--o{ insurance_reversal
+insurance_settlement ||--o{ insurance_fund_receipt
+
+staff |o--o{ staff
+health_version |o--o{ health_version
+document_version |o--o{ document_version
+plan_version |o--o{ plan_version
+treatment_execution |o--o{ treatment_execution
+payment_allocation |o--o{ payment_allocation
+prepayment_offset |o--o{ prepayment_offset
+patient_refund |o--o{ patient_refund
+inventory_movement |o--o{ inventory_movement
+health_review |o--o{ clinical_record
+insurance_case |o--o{ insurance_case
+@enduml

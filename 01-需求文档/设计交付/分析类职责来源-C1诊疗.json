@@ -1,0 +1,1014 @@
+{
+  "entities": [
+    {
+      "table": "health_version",
+      "name": "健康版本",
+      "attrs": [
+        "版本号、形成时间",
+        "变更原因、形成牙医"
+      ],
+      "ops": [
+        "建立新版(变更原因)",
+        "核对患者及前版本()"
+      ],
+      "uc": [
+        6
+      ],
+      "rules": [
+        "R06-1",
+        "R06-2"
+      ]
+    },
+    {
+      "table": "health_item",
+      "name": "健康条目",
+      "attrs": [
+        "类别、内容",
+        "有／无／未知、来源",
+        "报告时间、发生时间"
+      ],
+      "ops": [
+        "核对类别及确认程度()"
+      ],
+      "uc": [
+        6
+      ],
+      "rules": [
+        "R06-1"
+      ]
+    },
+    {
+      "table": "health_review",
+      "name": "健康复核",
+      "attrs": [
+        "复核结论",
+        "复核牙医、实际时间"
+      ],
+      "ops": [
+        "核对版本与就诊归属()",
+        "记录当次复核()"
+      ],
+      "uc": [
+        6,
+        9
+      ],
+      "rules": [
+        "R06-2",
+        "R09-1"
+      ]
+    },
+    {
+      "table": "clinical_record",
+      "name": "病历",
+      "attrs": [
+        "主诉、诊断、处理意见",
+        "草稿／已签署、正文版本",
+        "签署牙医、时间、冻结摘要"
+      ],
+      "ops": [
+        "核对草稿可修改性()",
+        "更新草稿(当前版本)",
+        "核对签署完整性(所见与复核)",
+        "签署并冻结正文()",
+        "建立当次草稿()",
+        "核对病历患者及就诊归属()"
+      ],
+      "uc": [
+        6,
+        9,
+        3,
+        5
+      ],
+      "rules": [
+        "R06-2",
+        "R09-1",
+        "R09-2",
+        "R03-2",
+        "R05-1"
+      ]
+    },
+    {
+      "table": "clinical_finding",
+      "name": "检查所见",
+      "attrs": [
+        "牙位、牙面、所见内容",
+        "顺序、记录牙医"
+      ],
+      "ops": [
+        "核对牙位牙面()",
+        "更新所见(原病历状态)"
+      ],
+      "uc": [
+        6,
+        9
+      ],
+      "rules": [
+        "R06-2",
+        "R09-2"
+      ]
+    },
+    {
+      "table": "record_addendum",
+      "name": "病历补充",
+      "attrs": [
+        "补充正文、原因",
+        "签署牙医、补充时间"
+      ],
+      "ops": [
+        "核对原病历已签署()",
+        "签署补充并保留原文()"
+      ],
+      "uc": [
+        9
+      ],
+      "rules": [
+        "R09-2"
+      ]
+    },
+    {
+      "table": "clinical_document",
+      "name": "诊疗文件",
+      "attrs": [
+        "类型、来源、归属说明",
+        "上传经办身份"
+      ],
+      "ops": [
+        "核对患者及诊疗归属()",
+        "登记文件索引()"
+      ],
+      "uc": [
+        10
+      ],
+      "rules": [
+        "R10-1"
+      ]
+    },
+    {
+      "table": "document_version",
+      "name": "文件版本",
+      "attrs": [
+        "版本号、原文件名、实际格式",
+        "大小、摘要、原件索引",
+        "形成时间、替换原因",
+        "上传人／时间、核对状态",
+        "确认牙医／时间／依据"
+      ],
+      "ops": [
+        "核对原件格式与大小()",
+        "追加版本并保留原件()",
+        "确认诊疗归属(牙医与依据)"
+      ],
+      "uc": [
+        10
+      ],
+      "rules": [
+        "R10-1",
+        "R10-2"
+      ]
+    },
+    {
+      "table": "prescription",
+      "name": "处方",
+      "attrs": [
+        "开立牙医、时间、取药路径",
+        "草稿／已开立／已作废",
+        "审核状态、审核人及意见",
+        "用药指导、交付与更正依据"
+      ],
+      "ops": [
+        "暂存处方草稿()",
+        "开立处方(就诊与权限)",
+        "记录审方结果(资格与意见)",
+        "核对实际发药条件()",
+        "作废未交付处方(原因)",
+        "核对处方就诊归属()"
+      ],
+      "uc": [
+        25,
+        5
+      ],
+      "rules": [
+        "R25-1",
+        "R25-2",
+        "R25-3",
+        "R05-2"
+      ]
+    },
+    {
+      "table": "prescription_item",
+      "name": "处方明细",
+      "attrs": [
+        "开立时药名规格",
+        "用法用量、疗程、单位",
+        "开立数量"
+      ],
+      "ops": [
+        "核对药品规格与用法()",
+        "计算剩余可发量(实际已发量)"
+      ],
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-1",
+        "R25-2"
+      ]
+    },
+    {
+      "table": "dispense_record",
+      "name": "实际发药",
+      "attrs": [
+        "实际正数量、交付时间",
+        "核发人、用药交代"
+      ],
+      "ops": [
+        "核对批次效期及可用量()",
+        "登记实际交付(数量与原单)"
+      ],
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-2",
+        "R25-3"
+      ]
+    },
+    {
+      "table": "treatment_plan",
+      "name": "治疗方案",
+      "attrs": [
+        "治疗目标、建立时间",
+        "进行中／已完成／已终止",
+        "责任牙医、结束时间及原因"
+      ],
+      "ops": [
+        "建立方案(患者与目标)",
+        "核对方案患者归属()"
+      ],
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1",
+        "R07-2"
+      ]
+    },
+    {
+      "table": "plan_version",
+      "name": "方案版本",
+      "attrs": [
+        "版本号、诊断依据",
+        "预计安排、变更原因",
+        "说明牙医、时间及依据",
+        "版本状态、停止时间及原因"
+      ],
+      "ops": [
+        "核对诊断与明细完整性()",
+        "提交患者确认()",
+        "建立修订版(原版本与原因)",
+        "停止本版后续执行(依据)"
+      ],
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1",
+        "R07-2"
+      ]
+    },
+    {
+      "table": "plan_item",
+      "name": "方案项目",
+      "attrs": [
+        "项目内容、牙位牙面",
+        "计划数量、实施顺序",
+        "估算费用（未知可空）"
+      ],
+      "ops": [
+        "核对项目数量与牙位()",
+        "核对估算状态()"
+      ],
+      "uc": [
+        7,
+        8
+      ],
+      "rules": [
+        "R07-1",
+        "R07-2",
+        "R08-1"
+      ]
+    },
+    {
+      "table": "patient_decision",
+      "name": "患者决定",
+      "attrs": [
+        "同意／暂缓／拒绝／撤回",
+        "决定时间、说明依据",
+        "说明人、记录人、范围限制"
+      ],
+      "ops": [
+        "记录决定(项目范围)",
+        "核对有效同意范围(时点)",
+        "追加撤回决定(范围与时间)"
+      ],
+      "uc": [
+        7,
+        8
+      ],
+      "rules": [
+        "R07-1",
+        "R07-2",
+        "R08-1"
+      ]
+    },
+    {
+      "table": "decision_plan_item",
+      "name": "患者决定—方案项目",
+      "attrs": [
+        "关联形成时间、记录牙医",
+        "确认数量（限定时记录）"
+      ],
+      "ops": [
+        "核对同版本项目()",
+        "限定本次决定范围()"
+      ],
+      "uc": [
+        7,
+        8
+      ],
+      "rules": [
+        "R07-1",
+        "R08-1"
+      ]
+    },
+    {
+      "table": "decision_file_version",
+      "name": "患者决定—确认原件",
+      "attrs": [
+        "关联形成时间、记录牙医"
+      ],
+      "ops": [
+        "核对原件归属及确认状态()",
+        "固定确认时原件版本()"
+      ],
+      "uc": [
+        7,
+        10
+      ],
+      "rules": [
+        "R07-1",
+        "R10-1",
+        "R10-2"
+      ]
+    },
+    {
+      "table": "treatment_execution",
+      "name": "诊疗执行",
+      "attrs": [
+        "牙位牙面、实际完成数量",
+        "操作经过、执行牙医、完成时间",
+        "首次／更正、更正原因"
+      ],
+      "ops": [
+        "核对实际就诊及同意范围()",
+        "核对累计完成量()",
+        "登记实际完成()",
+        "关联原执行更正(原因)"
+      ],
+      "uc": [
+        8
+      ],
+      "rules": [
+        "R08-1",
+        "R08-2"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "a": "patient_h",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "health_version",
+      "b_multiplicity": "0..*",
+      "uc": [
+        6
+      ],
+      "rules": [
+        "R06-1"
+      ],
+      "meaning": "健康版本属于唯一患者"
+    },
+    {
+      "a": "health_version",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "health_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        6
+      ],
+      "rules": [
+        "R06-1"
+      ],
+      "meaning": "版本及其健康条目整体形成并保留"
+    },
+    {
+      "a": "health_version",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "health_review",
+      "b_multiplicity": "0..*",
+      "uc": [
+        6
+      ],
+      "rules": [
+        "R06-2"
+      ],
+      "meaning": "每次复核引用确切健康版本"
+    },
+    {
+      "a": "visit_h",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "health_review",
+      "b_multiplicity": "0..*",
+      "uc": [
+        6,
+        9
+      ],
+      "rules": [
+        "R06-2",
+        "R09-1"
+      ],
+      "meaning": "本次就诊可追加多次复核"
+    },
+    {
+      "a": "health_version",
+      "a_multiplicity": "前版\\n0..1",
+      "kind": "--",
+      "b": "health_version",
+      "b_multiplicity": "后版\\n0..*",
+      "uc": [
+        6
+      ],
+      "rules": [
+        "R06-1"
+      ],
+      "meaning": "首版无前版，后版同患者且时间递增"
+    },
+    {
+      "a": "visit_r",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "clinical_record",
+      "b_multiplicity": "1",
+      "uc": [
+        6,
+        9
+      ],
+      "rules": [
+        "R06-2"
+      ],
+      "meaning": "已建立就诊有唯一病历"
+    },
+    {
+      "a": "clinical_record",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "clinical_finding",
+      "b_multiplicity": "0..*",
+      "uc": [
+        6,
+        9
+      ],
+      "rules": [
+        "R06-2",
+        "R09-2"
+      ],
+      "meaning": "所见独占归属病历，签后冻结"
+    },
+    {
+      "a": "clinical_record",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "record_addendum",
+      "b_multiplicity": "0..*",
+      "uc": [
+        9
+      ],
+      "rules": [
+        "R09-2"
+      ],
+      "meaning": "补充独占原病历且不覆盖原文"
+    },
+    {
+      "a": "patient_d",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "clinical_document",
+      "b_multiplicity": "0..*",
+      "uc": [
+        10
+      ],
+      "rules": [
+        "R10-1"
+      ],
+      "meaning": "文件有唯一患者归属"
+    },
+    {
+      "a": "visit_d",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "clinical_document",
+      "b_multiplicity": "0..*",
+      "uc": [
+        10
+      ],
+      "rules": [
+        "R10-1"
+      ],
+      "meaning": "文件可关联同患者就诊"
+    },
+    {
+      "a": "plan_version_d",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "clinical_document",
+      "b_multiplicity": "0..*",
+      "uc": [
+        10
+      ],
+      "rules": [
+        "R10-1"
+      ],
+      "meaning": "文件可关联同患者方案版本"
+    },
+    {
+      "a": "clinical_document",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "document_version",
+      "b_multiplicity": "1..*",
+      "uc": [
+        10
+      ],
+      "rules": [
+        "R10-2"
+      ],
+      "meaning": "成功登记的文件有至少一个实际原件版本"
+    },
+    {
+      "a": "document_version",
+      "a_multiplicity": "前版\\n0..1",
+      "kind": "--",
+      "b": "document_version",
+      "b_multiplicity": "后版\\n0..*",
+      "uc": [
+        10
+      ],
+      "rules": [
+        "R10-2"
+      ],
+      "meaning": "替换追加同文件新版本，不重定向既有引用"
+    },
+    {
+      "a": "patient_p",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "prescription",
+      "b_multiplicity": "0..*",
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-1"
+      ],
+      "meaning": "处方患者与就诊患者一致"
+    },
+    {
+      "a": "visit_p",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "prescription",
+      "b_multiplicity": "0..*",
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-1"
+      ],
+      "meaning": "处方有实际就诊依据"
+    },
+    {
+      "a": "prescription",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "prescription_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-1"
+      ],
+      "meaning": "草稿可不完整，开立至少一项有效明细"
+    },
+    {
+      "a": "material_p",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "prescription_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-1"
+      ],
+      "meaning": "引用药品目录及计量设置；不要求院内有库存"
+    },
+    {
+      "a": "prescription_item",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "dispense_record",
+      "b_multiplicity": "0..*",
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-2"
+      ],
+      "meaning": "分次分批据实发药，累计不超有效开立量"
+    },
+    {
+      "a": "inventory_p",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "dispense_record",
+      "b_multiplicity": "0..1",
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-3"
+      ],
+      "meaning": "每笔实际发药对应唯一同源出库流水"
+    },
+    {
+      "a": "dispense_record",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "bill_item_p",
+      "b_multiplicity": "1",
+      "uc": [
+        25
+      ],
+      "rules": [
+        "R25-3"
+      ],
+      "meaning": "实际发药形成唯一应收明细，缺价仍留待核价"
+    },
+    {
+      "a": "patient_t",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "treatment_plan",
+      "b_multiplicity": "0..*",
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1"
+      ],
+      "meaning": "方案有唯一患者"
+    },
+    {
+      "a": "treatment_plan",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "plan_version",
+      "b_multiplicity": "1..*",
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1"
+      ],
+      "meaning": "成功建立方案同时形成首版"
+    },
+    {
+      "a": "visit_t",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "plan_version",
+      "b_multiplicity": "0..*",
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1"
+      ],
+      "meaning": "有来源就诊时须同患者；外院依据另留说明"
+    },
+    {
+      "a": "plan_version",
+      "a_multiplicity": "前版\\n0..1",
+      "kind": "--",
+      "b": "plan_version",
+      "b_multiplicity": "后版\\n0..*",
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1"
+      ],
+      "meaning": "实质调整形成同方案新版，旧版执行保留"
+    },
+    {
+      "a": "plan_version_c",
+      "a_multiplicity": "1",
+      "kind": "*--",
+      "b": "plan_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1"
+      ],
+      "meaning": "草稿允许不完整，待确认前明细完整"
+    },
+    {
+      "a": "plan_version_c",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "patient_decision",
+      "b_multiplicity": "0..*",
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1"
+      ],
+      "meaning": "不同时间患者决定分别保留"
+    },
+    {
+      "a": "patient_decision",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "decision_plan_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1"
+      ],
+      "meaning": "有效同意至少一项范围关联"
+    },
+    {
+      "a": "plan_item",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "decision_plan_item",
+      "b_multiplicity": "0..*",
+      "uc": [
+        7
+      ],
+      "rules": [
+        "R07-1"
+      ],
+      "meaning": "同版本多对多范围分解"
+    },
+    {
+      "a": "patient_decision",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "decision_file_version",
+      "b_multiplicity": "0..*",
+      "uc": [
+        7,
+        10
+      ],
+      "rules": [
+        "R07-1",
+        "R10-2"
+      ],
+      "meaning": "有证明文件时保存确切版本关联"
+    },
+    {
+      "a": "document_version_c",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "decision_file_version",
+      "b_multiplicity": "0..*",
+      "uc": [
+        7,
+        10
+      ],
+      "rules": [
+        "R10-1",
+        "R10-2"
+      ],
+      "meaning": "原件同患者且已确认，不随替换改变"
+    },
+    {
+      "a": "visit_e",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "treatment_execution",
+      "b_multiplicity": "0..*",
+      "uc": [
+        8
+      ],
+      "rules": [
+        "R08-1"
+      ],
+      "meaning": "执行属于实际就诊"
+    },
+    {
+      "a": "plan_item_e",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "treatment_execution",
+      "b_multiplicity": "0..*",
+      "uc": [
+        8
+      ],
+      "rules": [
+        "R08-1"
+      ],
+      "meaning": "方案执行有明细来源，常规检查可无方案明细但须当次依据"
+    },
+    {
+      "a": "service_e",
+      "a_multiplicity": "1",
+      "kind": "--",
+      "b": "treatment_execution",
+      "b_multiplicity": "0..*",
+      "uc": [
+        8
+      ],
+      "rules": [
+        "R08-2"
+      ],
+      "meaning": "完成内容对应收费项目，价格单独确认"
+    },
+    {
+      "a": "treatment_execution",
+      "a_multiplicity": "0..1",
+      "kind": "--",
+      "b": "bill_item_e",
+      "b_multiplicity": "1",
+      "uc": [
+        8
+      ],
+      "rules": [
+        "R08-2"
+      ],
+      "meaning": "每笔执行保存唯一费用来源，缺价留待核价"
+    },
+    {
+      "a": "treatment_execution",
+      "a_multiplicity": "原执行\\n0..1",
+      "kind": "--",
+      "b": "treatment_execution",
+      "b_multiplicity": "更正\\n0..*",
+      "uc": [
+        8
+      ],
+      "rules": [
+        "R08-2"
+      ],
+      "meaning": "更正引用原事实，不能并列形成有效替代"
+    }
+  ],
+  "references": [
+    {
+      "table": "patient",
+      "name": "患者",
+      "alias": "patient_h"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_h"
+    },
+    {
+      "table": "health_version",
+      "name": "健康版本",
+      "alias": "previous_health_version"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_r"
+    },
+    {
+      "table": "patient",
+      "name": "患者",
+      "alias": "patient_d"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_d"
+    },
+    {
+      "table": "plan_version",
+      "name": "方案版本",
+      "alias": "plan_version_d"
+    },
+    {
+      "table": "document_version",
+      "name": "文件版本",
+      "alias": "previous_document_version"
+    },
+    {
+      "table": "patient",
+      "name": "患者",
+      "alias": "patient_p"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_p"
+    },
+    {
+      "table": "material",
+      "name": "材料",
+      "alias": "material_p"
+    },
+    {
+      "table": "inventory_movement",
+      "name": "库存变动",
+      "alias": "inventory_p"
+    },
+    {
+      "table": "bill_item",
+      "name": "应收项目",
+      "alias": "bill_item_p"
+    },
+    {
+      "table": "patient",
+      "name": "患者",
+      "alias": "patient_t"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_t"
+    },
+    {
+      "table": "plan_version",
+      "name": "方案版本",
+      "alias": "previous_plan_version"
+    },
+    {
+      "table": "plan_version",
+      "name": "方案版本",
+      "alias": "plan_version_c"
+    },
+    {
+      "table": "document_version",
+      "name": "文件版本",
+      "alias": "document_version_c"
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "alias": "visit_e"
+    },
+    {
+      "table": "plan_item",
+      "name": "方案项目",
+      "alias": "plan_item_e"
+    },
+    {
+      "table": "service",
+      "name": "收费项目",
+      "alias": "service_e"
+    },
+    {
+      "table": "bill_item",
+      "name": "应收项目",
+      "alias": "bill_item_e"
+    },
+    {
+      "table": "treatment_execution",
+      "name": "诊疗执行",
+      "alias": "previous_treatment_execution"
+    }
+  ],
+  "source": "现行B用例UC-03、05—10及UC-25；本轮按UC-03补建立当次草稿；原69表仅用于核对既有对象与关系",
+  "physical_refinement_pending": [
+    "处方补医师更正/作废原因与经办时刻、处方交付确认及用药指导；不把院外实际取药作为已知事实",
+    "决定—项目关联补可选确认数量及约束，显式表达UC-07/08数量限制；非仅自由文字",
+    "病历签署所用健康复核、文件误关联更正依据的固定方式需D明确",
+    "药品实际发药的唯一应收来源、药品单位换算与库存流水业务类型需D同步约束",
+    "方案版本混合项目决定状态须与C3核对，不用单一整体状态替代逐项同意范围"
+  ],
+  "note": "跨组引用及分区内同名者为同一既有实体；只有带属性操作的18项为本批修订定义，未增加表"
+}

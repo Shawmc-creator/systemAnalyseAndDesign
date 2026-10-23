@@ -1,0 +1,496 @@
+{
+  "date": "2026-10-23",
+  "scope": "D1身份接诊、病历文书、复诊随访关系",
+  "new_tables": [],
+  "new_fields": [
+    "clinical_record.signed_health_review_id",
+    "followup_requirement.published_by",
+    "followup_requirement.published_at"
+  ],
+  "modified_tables": [
+    "clinical_record",
+    "resource_block",
+    "equipment_occupancy",
+    "followup_requirement",
+    "clinical_assessment"
+  ],
+  "region_details": [
+    {
+      "group": 1,
+      "name": "身份与接诊",
+      "main_tables": [
+        "patient",
+        "staff",
+        "patient_change",
+        "user_account",
+        "dental_chair",
+        "dated_schedule",
+        "schedule_change",
+        "resource_occupancy",
+        "appointment",
+        "appointment_change",
+        "visit",
+        "clinical_equipment",
+        "resource_block",
+        "equipment_occupancy"
+      ],
+      "reference_tables": [],
+      "business_relations": [
+        {
+          "parent": "patient",
+          "child": "patient_change",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "staff",
+          "child": "user_account",
+          "field": "staff_id",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "parent": "staff",
+          "child": "dated_schedule",
+          "field": "dentist_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "dental_chair",
+          "child": "dated_schedule",
+          "field": "dental_chair_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "dated_schedule",
+          "child": "schedule_change",
+          "field": "dated_schedule_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "staff",
+          "child": "schedule_change",
+          "field": "old_dentist_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "staff",
+          "child": "schedule_change",
+          "field": "new_dentist_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "dental_chair",
+          "child": "schedule_change",
+          "field": "old_chair_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "dental_chair",
+          "child": "schedule_change",
+          "field": "new_chair_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "dated_schedule",
+          "child": "resource_occupancy",
+          "field": "dated_schedule_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "appointment",
+          "child": "resource_occupancy",
+          "field": "appointment_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "resource_occupancy",
+          "field": "visit_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient",
+          "child": "appointment",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "appointment",
+          "child": "appointment_change",
+          "field": "appointment_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "dated_schedule",
+          "child": "appointment_change",
+          "field": "old_schedule_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "dated_schedule",
+          "child": "appointment_change",
+          "field": "new_schedule_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient",
+          "child": "visit",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "appointment",
+          "child": "visit",
+          "field": "appointment_id",
+          "nullable": true,
+          "unique": true
+        },
+        {
+          "parent": "staff",
+          "child": "visit",
+          "field": "dentist_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "dental_chair",
+          "child": "clinical_equipment",
+          "field": "dental_chair_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "dental_chair",
+          "child": "resource_block",
+          "field": "dental_chair_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "clinical_equipment",
+          "child": "resource_block",
+          "field": "equipment_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "clinical_equipment",
+          "child": "equipment_occupancy",
+          "field": "equipment_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "appointment",
+          "child": "equipment_occupancy",
+          "field": "appointment_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "equipment_occupancy",
+          "field": "visit_id",
+          "nullable": true,
+          "unique": false
+        }
+      ],
+      "common_staff_links": "岗位归属、接诊牙医、处方开立及跟进责任显式表示；其他编制、上传、发布、确认及经办身份外键在完整模型保留。"
+    },
+    {
+      "group": 2,
+      "name": "病历与诊疗文书",
+      "main_tables": [
+        "health_version",
+        "health_item",
+        "health_review",
+        "clinical_record",
+        "clinical_finding",
+        "record_addendum",
+        "clinical_document",
+        "document_version",
+        "prescription",
+        "prescription_item",
+        "dispense_record"
+      ],
+      "reference_tables": [
+        "inventory_movement",
+        "material",
+        "patient",
+        "plan_version",
+        "service_price",
+        "staff",
+        "visit"
+      ],
+      "business_relations": [
+        {
+          "parent": "patient",
+          "child": "health_version",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "health_version",
+          "child": "health_version",
+          "field": "previous_version_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "health_version",
+          "child": "health_item",
+          "field": "health_version_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "health_review",
+          "field": "visit_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "health_version",
+          "child": "health_review",
+          "field": "health_version_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "clinical_record",
+          "field": "visit_id",
+          "nullable": false,
+          "unique": true
+        },
+        {
+          "parent": "health_review",
+          "child": "clinical_record",
+          "field": "signed_health_review_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "clinical_record",
+          "child": "clinical_finding",
+          "field": "clinical_record_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "clinical_record",
+          "child": "record_addendum",
+          "field": "clinical_record_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "patient",
+          "child": "clinical_document",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "clinical_document",
+          "field": "visit_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "plan_version",
+          "child": "clinical_document",
+          "field": "plan_version_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "clinical_document",
+          "child": "document_version",
+          "field": "clinical_document_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "document_version",
+          "child": "document_version",
+          "field": "previous_version_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "patient",
+          "child": "prescription",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "prescription",
+          "field": "visit_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "staff",
+          "child": "prescription",
+          "field": "prescriber_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "prescription",
+          "child": "prescription_item",
+          "field": "prescription_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "material",
+          "child": "prescription_item",
+          "field": "material_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "service_price",
+          "child": "prescription_item",
+          "field": "service_price_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "prescription_item",
+          "child": "dispense_record",
+          "field": "prescription_item_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "inventory_movement",
+          "child": "dispense_record",
+          "field": "inventory_movement_id",
+          "nullable": false,
+          "unique": true
+        }
+      ],
+      "common_staff_links": "岗位归属、接诊牙医、处方开立及跟进责任显式表示；其他编制、上传、发布、确认及经办身份外键在完整模型保留。"
+    },
+    {
+      "group": 6,
+      "name": "复诊与随访",
+      "main_tables": [
+        "followup_requirement",
+        "contact_history",
+        "clinical_assessment"
+      ],
+      "reference_tables": [
+        "appointment",
+        "patient",
+        "plan_version",
+        "staff",
+        "visit"
+      ],
+      "business_relations": [
+        {
+          "parent": "patient",
+          "child": "followup_requirement",
+          "field": "patient_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "followup_requirement",
+          "field": "source_visit_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "plan_version",
+          "child": "followup_requirement",
+          "field": "source_plan_version_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "staff",
+          "child": "followup_requirement",
+          "field": "responsible_frontdesk_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "followup_requirement",
+          "child": "contact_history",
+          "field": "followup_requirement_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "appointment",
+          "child": "contact_history",
+          "field": "appointment_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "followup_requirement",
+          "child": "clinical_assessment",
+          "field": "followup_requirement_id",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "visit",
+          "child": "clinical_assessment",
+          "field": "visit_id",
+          "nullable": true,
+          "unique": false
+        },
+        {
+          "parent": "staff",
+          "child": "clinical_assessment",
+          "field": "assessed_by",
+          "nullable": false,
+          "unique": false
+        },
+        {
+          "parent": "staff",
+          "child": "clinical_assessment",
+          "field": "responsible_staff_id",
+          "nullable": true,
+          "unique": false
+        }
+      ],
+      "common_staff_links": "岗位归属、接诊牙医、处方开立及跟进责任显式表示；其他编制、上传、发布、确认及经办身份外键在完整模型保留。"
+    }
+  ],
+  "remaining": [
+    "其余4组费用更正、材料库存、采购、医保关系",
+    "处方更正作废及交付字段、文件误关联依据、随访调整前后历史的保存方式",
+    "旧字段source编号、其余业务约束、D-04及D2/D3",
+    "运行实现和真实验收另行对齐"
+  ]
+}

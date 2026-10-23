@@ -10,12 +10,18 @@ const legacyScope=require('./legacy-scope');
 const {validatePrescriptions}=require('./prescriptions');
 const {validatePharmacy}=require('./pharmacy');
 const {validateSettlements}=require('./settlement-rules');
+const {FinancialHistoryRepository,snapshotFinancialHistory,validateFinancialHistory}=require('./financial-history');
+const {WorkflowHistoryRepository}=require('./workflow-history');
 const RESULT_TABLES = new Set(['patient', 'dated_schedule', 'appointment', 'visit', 'health_review', 'clinical_record', 'record_addendum',
   'treatment_plan', 'plan_version', 'patient_decision', 'treatment_execution', 'service', 'service_price', 'bill_item', 'patient_payment', 'patient_funds', 'fee_request', 'patient_refund',
   'followup_requirement', 'contact_history', 'clinical_assessment', 'material', 'material_batch', 'stock_location', 'inventory_movement', 'material_usage', 'stock_count', 'supplier', 'purchase_order', 'purchase_receipt', 'purchase_issue', 'supplier_funds', 'supplier_payment', 'supplier_refund',
   'clinical_equipment','resource_block','equipment_occupancy','clinical_document','document_version','prescription','dispense_record','staff_role_qualification',
   'payment_order','payment_reconciliation','cash_reconciliation','issue_followup','insurance_identity','insurance_item_mapping','insurance_case','insurance_settlement','insurance_reversal','insurance_fund_receipt']);
 const SQL_ERRORS = {
+  workflow_history_frozen:['WORKFLOW_HISTORY_FROZEN','已形成的业务历史只能追加，不能修改或删除'],
+  workflow_history_context:['WORKFLOW_HISTORY_CONTEXT','历史与原业务、顺序或来源不一致，已拒绝保存'],
+  financial_history_frozen:['FINANCIAL_HISTORY_FROZEN','已形成的业务历史只能追加，不能覆盖或删除'],
+  financial_history_context:['FINANCIAL_HISTORY_CONTEXT','历史快照与原业务、事件或顺序不一致，已拒绝保存'],
   dispense_quantity:['DISPENSE_QUANTITY','实际发药累计数量超过原处方剩余量'],
   dispense_context:['DISPENSE_CONTEXT','发药处方、患者、批次出库或计费来源不一致'],
   dispense_frozen:['DISPENSE_FROZEN','实际发药事实不能覆盖或删除'],
@@ -67,7 +73,7 @@ function mapError(error) {
   return error;
 }
 class UnitOfWork {
-  constructor(db, auth) { this.db = db; this.auth = auth; }
+  constructor(db, auth) { this.db = db; this.auth = auth;this.financialHistory=new FinancialHistoryRepository(db);this.workflowHistory=new WorkflowHistoryRepository(db); }
   audit(ctx, event, outcome, object, submission = null, reason = '按岗位办理', correlation = crypto.randomUUID()) {
     return insert(this.db, 'operation_audit', { account_id: ctx.session.account_id, staff_id: ctx.session.staff_id,
       session_id: ctx.session.id, submission_id: submission, permission_id: ctx.permission.id,
@@ -103,11 +109,18 @@ class UnitOfWork {
       const clinicalBefore = clinicalSnapshot(this.db);
       const treatmentBefore = treatmentSnapshot(this.db);
       const feeBefore = feeSnapshot(this.db);
+      const financialHistoryBefore=snapshotFinancialHistory(this.db);
+      const workflowHistoryBefore=this.workflowHistory.snapshot();
       const followupBefore = followupSnapshot(this.db);
       const inventoryBefore = inventorySnapshot(this.db);
       const legacyBefore = legacyScope.snapshot(this.db);
       const output = handler(ctx, this.auth.now());
       const related = [...(output.relatedChanges || []), ...publishSourceFollowups(this.db, this.auth, permission, input, output, this.auth.now())];
+      for(const r of related.filter(r=>r.code==='FOLLOWUP_PUBLISHED')){
+        this.db.prepare('UPDATE followup_requirement SET published_by=?,published_at=? WHERE id=?').run(ctx.session.staff_id,this.auth.now(),r.key);
+        this.workflowHistory.append('followup_requirement',r.key,'发布',r.reason,ctx,input,this.auth.now());
+      }
+      for(const r of related.filter(r=>r.code==='FOLLOWUP_CONTACT_RESTORED'))this.workflowHistory.append('followup_requirement',r.key,'继续跟进',r.reason,ctx,input,this.auth.now());
       if (related.length) {
         ctx.authority.relatedFollowupIds = related.filter(r=>r.kind==='followup_requirement').map(r => r.key);
         ctx.authority.relatedObjects = related.map(r=>({kind:r.kind,id:r.key}));
@@ -116,12 +129,14 @@ class UnitOfWork {
       validateClinical(this.db, clinicalBefore);
       validateTreatment(this.db, treatmentBefore);
       validateFees(this.db, feeBefore);
+      validateFinancialHistory(this.db,financialHistoryBefore);
       validateFollowups(this.db, followupBefore);
       validateInventory(this.db, inventoryBefore);
       legacyScope.validate(this.db, legacyBefore);
       validatePrescriptions(this.db);
       validatePharmacy(this.db);
       validateSettlements(this.db);
+      this.workflowHistory.validate(workflowHistoryBefore,permission);
       const now = this.auth.now();
       const sid = insert(this.db, 'request_submission', { account_id: ctx.session.account_id, permission_id: ctx.permission.id,
         request_key: requestKey, payload_digest: digest, command_version: 1, status: '已提交', created_at: now, committed_at: now,

@@ -1,0 +1,260 @@
+{
+  "source": "现行B用例UC-05—10基本流程、主要扩展及R05—10；C1既有69类",
+  "cases": [
+    {
+      "uc": 5,
+      "title": "查阅患者诊疗资料",
+      "entities": [
+        {
+          "alias": "U",
+          "name": "职员账号",
+          "table": "user_account"
+        },
+        {
+          "alias": "R",
+          "name": "病历",
+          "table": "clinical_record"
+        },
+        {
+          "alias": "T",
+          "name": "治疗方案",
+          "table": "treatment_plan"
+        },
+        {
+          "alias": "P",
+          "name": "处方",
+          "table": "prescription"
+        },
+        {
+          "alias": "D",
+          "name": "诊疗文件",
+          "table": "clinical_document"
+        }
+      ],
+      "branches": [
+        "2a",
+        "2b",
+        "4a"
+      ],
+      "rules": [
+        "R05-1",
+        "R05-2"
+      ]
+    },
+    {
+      "uc": 6,
+      "title": "记录检查诊断与健康资料",
+      "entities": [
+        {
+          "alias": "V",
+          "name": "就诊",
+          "table": "visit"
+        },
+        {
+          "alias": "O",
+          "name": "接诊占用",
+          "table": "resource_occupancy"
+        },
+        {
+          "alias": "E",
+          "name": "设备占用",
+          "table": "equipment_occupancy"
+        },
+        {
+          "alias": "H",
+          "name": "健康版本",
+          "table": "health_version"
+        },
+        {
+          "alias": "I",
+          "name": "健康条目",
+          "table": "health_item"
+        },
+        {
+          "alias": "Q",
+          "name": "健康复核",
+          "table": "health_review"
+        },
+        {
+          "alias": "R",
+          "name": "病历",
+          "table": "clinical_record"
+        },
+        {
+          "alias": "F",
+          "name": "检查所见",
+          "table": "clinical_finding"
+        }
+      ],
+      "branches": [
+        "2a",
+        "3a",
+        "5a",
+        "6a"
+      ],
+      "rules": [
+        "R06-1",
+        "R06-2"
+      ]
+    },
+    {
+      "uc": 7,
+      "title": "制定治疗方案并记录患者确认",
+      "entities": [
+        {
+          "alias": "T",
+          "name": "治疗方案",
+          "table": "treatment_plan"
+        },
+        {
+          "alias": "V",
+          "name": "方案版本",
+          "table": "plan_version"
+        },
+        {
+          "alias": "I",
+          "name": "方案项目",
+          "table": "plan_item"
+        },
+        {
+          "alias": "D",
+          "name": "患者决定",
+          "table": "patient_decision"
+        },
+        {
+          "alias": "L",
+          "name": "患者决定—方案项目",
+          "table": "decision_plan_item"
+        },
+        {
+          "alias": "F",
+          "name": "患者决定—确认原件",
+          "table": "decision_file_version"
+        }
+      ],
+      "branches": [
+        "1a",
+        "3a",
+        "5a",
+        "5b",
+        "6a"
+      ],
+      "rules": [
+        "R07-1",
+        "R07-2"
+      ]
+    },
+    {
+      "uc": 8,
+      "title": "登记实际治疗与完成项目",
+      "entities": [
+        {
+          "alias": "D",
+          "name": "患者决定",
+          "table": "patient_decision"
+        },
+        {
+          "alias": "E",
+          "name": "诊疗执行",
+          "table": "treatment_execution"
+        },
+        {
+          "alias": "F",
+          "name": "应收项目",
+          "table": "bill_item"
+        }
+      ],
+      "branches": [
+        "2a",
+        "3a",
+        "4a",
+        "5a",
+        "5b"
+      ],
+      "rules": [
+        "R08-1",
+        "R08-2"
+      ]
+    },
+    {
+      "uc": 9,
+      "title": "签署及补充病历",
+      "entities": [
+        {
+          "alias": "R",
+          "name": "病历",
+          "table": "clinical_record"
+        },
+        {
+          "alias": "Q",
+          "name": "健康复核",
+          "table": "health_review"
+        },
+        {
+          "alias": "A1",
+          "name": "病历补充",
+          "table": "record_addendum"
+        }
+      ],
+      "branches": [
+        "1a",
+        "4a",
+        "4b",
+        "5a"
+      ],
+      "rules": [
+        "R09-1",
+        "R09-2"
+      ]
+    },
+    {
+      "uc": 10,
+      "title": "管理影像与诊疗文书",
+      "entities": [
+        {
+          "alias": "D",
+          "name": "诊疗文件",
+          "table": "clinical_document"
+        },
+        {
+          "alias": "V",
+          "name": "文件版本",
+          "table": "document_version"
+        }
+      ],
+      "branches": [
+        "3a",
+        "4a",
+        "4b"
+      ],
+      "rules": [
+        "R10-1",
+        "R10-2"
+      ]
+    }
+  ],
+  "C1_operations_added": [
+    {
+      "part": "诊疗",
+      "table": "clinical_record",
+      "op": "核对病历患者及就诊归属()",
+      "uc": 5,
+      "rule": "R05-1"
+    },
+    {
+      "part": "诊疗",
+      "table": "prescription",
+      "op": "核对处方就诊归属()",
+      "uc": 5,
+      "rule": "R05-2"
+    },
+    {
+      "part": "费用",
+      "table": "bill_item",
+      "op": "建立实际来源(计价状态)",
+      "uc": 8,
+      "rule": "R08-2"
+    }
+  ],
+  "limits": "控制协调读取授权版本和共同保存；实体落实业务规则。无存储接口或代码实现，未改变B范围。"
+}

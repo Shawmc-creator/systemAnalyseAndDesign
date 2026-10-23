@@ -1,0 +1,69 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "收费人员" as A
+boundary "收费人员接口" as B
+control "查询账单与待结算费用控制" as K
+entity "应收项目" as I
+entity "应收账目" as G
+entity "医保结算" as IS
+entity "付款分配" as U
+entity "预付抵扣" as O
+
+A -> B : 选定患者与账单，请求核对费用
+B -> K : 患者、账单及当前查询条件
+activate K
+K -> K : 核验查询授权与同患者归属，按同一查询时点读取费用事实
+K -> I : 核对唯一实际来源()
+K -> K : 读取实际执行或发药、单价快照及已生效调整
+break 2a 无费用记录
+ K --> B : 明确无记录；本次查询结束
+end
+break 2a 存在待核价项目
+ K --> B : 列缺价及已核价小计；转UC-11后回步骤2
+end
+K -> G : 汇总已核价应收(生效调整)
+alt 患者选择医保
+ K -> IS : 核对明确正式结果及分摊()
+ break 3a 无同账有效正式结果
+  K --> B : 明确待处理；转UC-22、23后回步骤3
+ end
+ K -> G : 核对正式医保分摊()
+else 自费
+ K -> K : 医保承担I=0，不将预估或待拨款抵费
+end
+K -> U : 汇总有效用途净额()
+U --> K : 仅本账正向用途及已批准负向释放
+K -> O : 汇总有效用途净额()
+O --> K : 仅本账有效预款抵扣及释放
+K -> K : G=已核价金额+生效调整；P=G-I；S=两类用途净额
+break G、I或P为负或来源不一致
+ K --> B : 明确需核实原因，不输出最终待收
+end
+K -> G : 计算当前待付(有效抵付)
+break 4a S超过P
+ K --> B : 列出待核原用途，交UC-14；不自动退款
+end
+K --> B : 来源、G/I/P/S、待付max(P-S,0)及查询时点
+B --> A : 原款和退款另列；未分配预款不计入本账抵付
+opt 5a 患者提出异议
+ A -> B : 指出异议项目或收付
+ B -> K : 原查询条件及争议范围
+ K --> B : 保留原明细，转UC-14核实；查询结束
+end
+deactivate K
+
+@enduml

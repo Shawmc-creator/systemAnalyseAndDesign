@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-23",
+  "status": "第二十六批：身份接诊、病历文书、复诊随访数据关系与关键约束已修；D其余项继续",
+  "pdf_pages": 164,
+  "figures": 144,
+  "logical_tables": 69,
+  "logical_fields": 823,
+  "new_tables": [],
+  "new_fields": [
+    "clinical_record.signed_health_review_id",
+    "followup_requirement.published_by",
+    "followup_requirement.published_at"
+  ],
+  "modified_tables": [
+    "clinical_record",
+    "resource_block",
+    "equipment_occupancy",
+    "followup_requirement",
+    "clinical_assessment"
+  ],
+  "region_business_relations_checked": 57,
+  "core_regions_rebuilt": [
+    1,
+    2,
+    6
+  ],
+  "cumulative_regions_rebuilt": [
+    1,
+    2,
+    3,
+    4,
+    6
+  ],
+  "core_regions_remaining": [
+    5,
+    7,
+    8,
+    9
+  ],
+  "changed_pdf_pages": [
+    129,
+    132,
+    133,
+    134,
+    138,
+    149
+  ],
+  "text_changed_pages": [
+    129,
+    133,
+    134,
+    138,
+    149
+  ],
+  "unchanged_page_text_count": 159,
+  "selected_key_fields": 271,
+  "analysis_sources_unchanged": true,
+  "C1_classes": 69,
+  "C1_operations": 218,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "historical_sql_changed": false,
+  "github_synced": false,
+  "whole_document_course_compliant": false,
+  "remaining": [
+    "其余4组费用更正、材料库存、采购、医保关系",
+    "处方更正作废及交付字段、文件误关联依据、随访调整前后历史的保存方式",
+    "旧字段source编号、其余业务约束、D-04及D2/D3",
+    "运行实现和真实验收另行对齐"
+  ],
+  "validation": {
+    "model_foreign_keys": "passed",
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "visible_text_overlap_pairs": 0,
+    "minimum_font_pt": 9.82,
+    "all_144_figure_titles_numbers_pages_preserved": true
+  },
+  "files": {
+    "tex_sha256": "a81a46b91db14195ede265f44a84446477ffb0bec68ece1de1d0ac1f9f4306ce",
+    "pdf_sha256": "e4960744535fc233c8b00c0988e7dc86545c64ea7b5e8eb2b2041021c13715e3",
+    "logical_model_sha256": "bab18e5b609c3f5120794c6eefc3dd50851646a72b8bfba0cc439d5751ad1e45"
+  }
+}

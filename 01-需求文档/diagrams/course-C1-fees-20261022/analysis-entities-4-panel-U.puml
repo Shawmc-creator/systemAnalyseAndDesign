@@ -1,0 +1,49 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "付款分配与批准释放" as U {
+' @reference patient_payment
+class "患者付款" as payment_U <<entity>>
+' @reference bill
+class "应收账目" as bill_U <<entity>>
+' @reference fee_request
+class "费用申请" as request_U <<entity>>
+class "付款分配" as payment_allocation <<entity>> {
+ 带符号金额、生效时间
+ 经办人、分配或释放原因
+ --
+ +核对可分配原款与待付()
+ +登记本账用途()
+ +释放原用途(批准申请)
+ +汇总有效用途净额()
+}
+payment_U "1" -- "0..*" payment_allocation
+bill_U "1" -- "0..*" payment_allocation
+request_U "0..1" -- "0..*" payment_allocation
+' @reference payment_allocation
+class "付款分配" as allocation_previous <<entity>>
+allocation_previous "原用途\n0..1" -- "0..*" payment_allocation
+payment_U -[hidden]right- bill_U
+bill_U -[hidden]right- request_U
+note bottom of payment_allocation
+分配与抵扣仅记录资金用途，同一用途不重复入账。
+负数仅释放有依据的原正向用途，累计不超原额；
+与批准调整共同生效；退款另记录真实交付结果。
+end note
+}
+@enduml

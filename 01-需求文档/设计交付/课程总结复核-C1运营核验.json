@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-22",
+  "status": "第十四批：C1复诊随访、材料库存及采购验收；C未全部完成",
+  "pdf_pages": 173,
+  "figures": 143,
+  "logical_tables": 69,
+  "system_usecases": 25,
+  "entity_classes_revised_this_batch": 16,
+  "operations_this_batch": 52,
+  "core_associations_this_batch": 28,
+  "entity_classes_revised_total": 62,
+  "entity_classes_remaining": 7,
+  "operations_revised_total": 184,
+  "analysis_entity_groups_completed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 80,
+    "D": 128
+  },
+  "validation": {
+    "cover_remains_without_date": true,
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "svg_text_overlap_pairs": 0,
+    "updated_vector_figures": 3,
+    "plantuml_panels": 9,
+    "minimum_font_pt": 9.55,
+    "rendered_and_reviewed_pdf_pages": [
+      91,
+      92,
+      93
+    ],
+    "unchanged_page_text_count": 170,
+    "all_143_figure_titles_numbers_pages_preserved": true,
+    "canonical_69_classes_match_69_tables": true,
+    "reference_stubs_not_new_entities": true,
+    "A_B_C2_C3_D_sources_unchanged": true
+  },
+  "physical_attribute_refinement_pending": [
+    "诊后要求发布人和发布时刻、调整前后内容及撤销依据须可追查；已有负责人与完成字段不代替发布历史",
+    "临床评估到诊须有同患者实际就诊，远程不关联虚构就诊；完成或继续跟进与要求状态共同生效",
+    "待检后续只追加新合格入库增量，同验收项目可分次入库，必须保留历次数量及确认依据，不能覆盖原到货事实",
+    "库存普通领用、实际发药、未用退回与实际用料区分来源及额度；原领用的累计用料和退回约束不可只逐行校验",
+    "盘点确认时比对快照版本，非零差异最多一条对应流水；重新实点的旧快照与决定须保留",
+    "采购取消及超供协调保留原因和负责人处理依据，按既有采购对象留存，不扩展复杂供货资金分配"
+  ],
+  "whole_document_course_compliant": false,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "next_batch": "C1第九组：医保身份、项目对应、预结算、正式结算、撤销及结算款核对",
+  "remaining": [
+    "7个医保实体的属性操作及跨组关系",
+    "25例分析序列的消息、分支及操作对应",
+    "分析状态机图同步",
+    "D数据访问、关系与约束、业务职责和表示组件",
+    "真实业务确认与验收"
+  ],
+  "files": {
+    "tex_sha256": "cf207cef9cea3579c975153e312116b352e73f40f698a917cdadf8516b5e8b5c",
+    "pdf_sha256": "0bd63cbc428d88ce71a61243064164b934de46217a397d5a0e4c817ea261d3a1",
+    "logical_model_sha256": "68f5db36dfd9f3eaf9ca11b43ffb9a6abf039bf587ecf15f4f9c2b2b69e239e9"
+  }
+}

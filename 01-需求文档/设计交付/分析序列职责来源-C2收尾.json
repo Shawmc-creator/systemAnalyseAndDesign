@@ -1,0 +1,181 @@
+{
+  "source": "现行B用例UC-22—25基本流程及主要扩展；C1既有实体操作",
+  "cases": [
+    {
+      "uc": 22,
+      "title": "核验医保身份并办理预结算",
+      "entities": [
+        {
+          "alias": "I",
+          "name": "医保身份核验",
+          "table": "insurance_identity"
+        },
+        {
+          "alias": "R",
+          "name": "医保就诊办理",
+          "table": "insurance_case"
+        },
+        {
+          "alias": "M",
+          "name": "医保项目对应",
+          "table": "insurance_item_mapping"
+        },
+        {
+          "alias": "F",
+          "name": "医保费用明细",
+          "table": "insurance_fee"
+        }
+      ],
+      "branches": [
+        "2a",
+        "2b",
+        "3a",
+        "4a",
+        "4b",
+        "5a",
+        "6a"
+      ],
+      "rules": [
+        "R22-1",
+        "R22-2",
+        "R22-3"
+      ]
+    },
+    {
+      "uc": 23,
+      "title": "办理医保结算、撤销与回款核对",
+      "entities": [
+        {
+          "alias": "C",
+          "name": "医保就诊办理",
+          "table": "insurance_case"
+        },
+        {
+          "alias": "S",
+          "name": "医保结算",
+          "table": "insurance_settlement"
+        },
+        {
+          "alias": "R",
+          "name": "医保撤销办理",
+          "table": "insurance_reversal"
+        },
+        {
+          "alias": "F",
+          "name": "医保结算款收付",
+          "table": "insurance_fund_receipt"
+        }
+      ],
+      "branches": [
+        "1a",
+        "1b",
+        "2a",
+        "3a",
+        "3b",
+        "3c",
+        "5a"
+      ],
+      "rules": [
+        "R23-1",
+        "R23-2",
+        "R23-3",
+        "R23-4"
+      ]
+    },
+    {
+      "uc": 24,
+      "title": "协调诊椅设备准备与停用恢复",
+      "entities": [
+        {
+          "alias": "V",
+          "name": "就诊",
+          "table": "visit"
+        },
+        {
+          "alias": "O",
+          "name": "接诊占用",
+          "table": "resource_occupancy"
+        },
+        {
+          "alias": "E",
+          "name": "设备占用",
+          "table": "equipment_occupancy"
+        },
+        {
+          "alias": "R",
+          "name": "资源停用时段",
+          "table": "resource_block"
+        },
+        {
+          "alias": "Q",
+          "name": "诊疗设备",
+          "table": "clinical_equipment"
+        }
+      ],
+      "branches": [
+        "1a",
+        "1b",
+        "3a",
+        "5a"
+      ],
+      "rules": [
+        "R24-1",
+        "R24-2",
+        "R24-3"
+      ]
+    },
+    {
+      "uc": 25,
+      "title": "开立处方并衔接院内外取药",
+      "entities": [
+        {
+          "alias": "R",
+          "name": "处方",
+          "table": "prescription"
+        },
+        {
+          "alias": "I",
+          "name": "处方明细",
+          "table": "prescription_item"
+        },
+        {
+          "alias": "D",
+          "name": "实际发药",
+          "table": "dispense_record"
+        },
+        {
+          "alias": "V",
+          "name": "库存变动",
+          "table": "inventory_movement"
+        },
+        {
+          "alias": "S",
+          "name": "批次存量",
+          "table": "batch_stock"
+        },
+        {
+          "alias": "F",
+          "name": "应收项目",
+          "table": "bill_item"
+        }
+      ],
+      "branches": [
+        "2a",
+        "2b",
+        "3a",
+        "4a",
+        "5a",
+        "5b",
+        "5c",
+        "5d"
+      ],
+      "rules": [
+        "R25-1",
+        "R25-2",
+        "R25-3"
+      ]
+    }
+  ],
+  "C1_operations_added": [],
+  "simplification": "以身份到费用交接、正式结果、真实资源交接及实际供药为主；通用错误重试按共用需求，不逐图展开代码或底层事务。"
+}

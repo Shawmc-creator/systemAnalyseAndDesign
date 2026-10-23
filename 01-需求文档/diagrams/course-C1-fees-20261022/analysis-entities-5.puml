@@ -1,0 +1,117 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "原单申请与负责人审核" as R {
+' @reference patient_funds
+class "患者资金" as funds_r <<entity>>
+' @reference bill
+class "应收账目" as bill_r <<entity>>
+' @reference patient_payment
+class "患者付款" as payment_r <<entity>>
+class "费用申请" as fee_request <<entity>> {
+ 原因、证据、提交版本及时间
+ 拟调整额、拟退上限
+ 申请状态、批准调整及退款上限
+ 审核人、时间及意见
+ --
+ +核对原单归属及申请额度()
+ +提交或补正重提()
+ +记录批准退回或拒绝(审核依据)
+ +撤回未审核申请()
+ +计算剩余可办退款额度()
+}
+funds_r "1" -- "0..*" fee_request
+bill_r "0..1" -- "0..*" fee_request
+payment_r "0..1" -- "0..*" fee_request
+funds_r -[hidden]right- bill_r
+bill_r -[hidden]right- payment_r
+note bottom of fee_request
+原账或原付款至少一项；都属于同一患者。
+未批准不生效调整或退款；退回补正保留原提交。
+批准额与真实退款分开，撤回仅限未审核申请。
+end note
+}
+package "批准调整与原费用明细" as A {
+' @reference fee_request
+class "费用申请" as request_a <<entity>>
+' @reference bill
+class "应收账目" as bill_a <<entity>>
+' @reference bill_item
+class "应收项目" as item_a <<entity>>
+class "费用调整" as fee_adjustment <<entity>> {
+ 调整依据、生效时间
+ 批准负责人
+ --
+ +核对申请已批准且未生效()
+ +核对明细合计与批准额()
+ +确认调整及必要用途释放()
+}
+class "调整项目" as fee_adjustment_item <<entity>> {
+ 带符号调整额、原项说明
+ --
+ +核对同账原项目()
+ +核对调整后应收非负()
+}
+request_a "1" -- "0..1" fee_adjustment
+bill_a "1" -- "0..*" fee_adjustment
+fee_adjustment "1" *-- "1..*" fee_adjustment_item
+item_a "1" -- "0..*" fee_adjustment_item
+request_a -[hidden]right- bill_a
+note bottom of fee_adjustment_item
+批准调整与必要原用途释放共同生效。
+已医保结算费用先核实撤销及最终重新分摊；
+未知不确定最终退补差额，需补收转UC-13。
+仅退未用预款不形成费用调整。
+end note
+}
+package "实际退款、未知核实及失败重办" as T {
+' @reference fee_request
+class "费用申请" as request_t <<entity>>
+' @reference patient_payment
+class "患者付款" as payment_t <<entity>>
+' @reference patient_funds
+class "患者资金" as funds_t <<entity>>
+' @reference patient_refund
+class "退款办理" as previous_refund_t <<entity>>
+class "退款办理" as patient_refund <<entity>> {
+ 唯一退款号、原渠道、接收方核实
+ 拟退额、实际额、办理时间
+ 待办理／待核实／已确认退款／已失败
+ 核实人、时间、凭据及失败依据
+ --
+ +核对批准额度及原款可用额()
+ +建立办理并占用额度()
+ +保留未知结果与占用()
+ +确认实际退款(真实金额与凭据)
+ +确认失败并释放占用(依据)
+ +关联失败原单重办()
+}
+request_t "1" -- "0..*" patient_refund
+payment_t "1" -- "0..*" patient_refund
+funds_t "1" -- "0..*" patient_refund
+previous_refund_t "原失败单\n0..1" -- "0..*" patient_refund
+request_t -[hidden]right- payment_t
+payment_t -[hidden]right- funds_t
+note bottom of patient_refund
+拟退不超批准剩余额及原款可用额。
+待办／未知占用拟退额；失败释放，成功扣实际额。
+0＜实际额≤拟退额，部分成功重核剩余额。
+查原笔后补记，不能因未知重发；医保款不退作现金。
+end note
+}
+@enduml

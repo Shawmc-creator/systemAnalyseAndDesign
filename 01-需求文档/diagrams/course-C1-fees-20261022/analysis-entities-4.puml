@@ -1,0 +1,230 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "价目提出与负责人确认" as P {
+class "收费项目" as service <<entity>> {
+ 项目编号、名称、计价单位
+ 启用状态
+ --
+ +核对项目及计价单位()
+ +停用新计费(负责人确认)
+}
+class "价目" as service_price <<entity>> {
+ 非负单价、适用起止
+ 调价或零价原因、确认状态
+ 提出及确认人、时间、意见
+ --
+ +核对适用区间(同项目价目)
+ +提交负责人确认()
+ +确认适用价目(当前版本)
+ +退回修改(原因)
+}
+service "1" *-- "0..*" service_price
+note bottom of service_price
+适用期间左闭右开；已确认区间不重叠。
+零价有依据；调价不改原账单快照。
+已用项目换单位另建项目，停用保留历史。
+end note
+}
+package "患者资金与真实到账" as F {
+' @reference patient
+class "患者" as patient_f <<entity>>
+' @reference patient_refund
+class "退款办理" as refund_f <<entity>>
+class "患者资金" as patient_funds <<entity>> {
+ 建立时间、归属经办人
+ /同患者资金收付汇总
+ --
+ +核对唯一患者归属()
+ +汇总确认收付与未用款()
+}
+class "患者付款" as patient_payment <<entity>> {
+ 实收、找零、渠道、核实状态
+ 到账时间、核实人及凭据
+ /净收、/原款可用额
+ --
+ +核对实收找零与净收()
+ +确认实际到账(原单与依据)
+ +记录未到账核实(依据)
+ +计算原款可用额(用途与退款)
+}
+patient_f "1" -- "1" patient_funds
+patient_funds "1" -- "0..*" patient_payment
+patient_payment "1" -- "0..*" refund_f
+note bottom of patient_payment
+净收＝实收－找零＞0；电子支付找零为0。
+原款可用＝确认净收－用途净额－已确认退款
+－待办或待核实退款占用；未知不记到账。
+未分配预收不计本账抵付，抵扣不增加实收。
+end note
+}
+package "电子原单与收退结果核对" as E {
+' @reference patient_funds
+class "患者资金" as funds_e <<entity>>
+' @reference bill
+class "应收账目" as bill_e <<entity>>
+' @reference patient_payment
+class "患者付款" as payment_e <<entity>>
+' @reference patient_refund
+class "退款办理" as refund_e <<entity>>
+class "电子支付单" as payment_order <<entity>> {
+ 唯一原单号、渠道、金额
+ 平台交易号、核实时间
+ 支付状态
+ --
+ +核对原单金额及渠道()
+ +记录受理或待核实()
+ +确认渠道结果(原单与交易号)
+}
+class "收退款核对" as payment_reconciliation <<entity>> {
+ 营业日期、原单金额
+ 渠道实际额、差异与状态
+ 核对人、处理依据
+ --
+ +核对收款或退款原单()
+ +记录核对结果(正式依据)
+ +记录差异处理(原办理结果)
+}
+funds_e "1" -- "0..*" payment_order
+bill_e "0..1" -- "0..*" payment_order
+payment_order "0..1" -- "0..1" payment_e
+payment_order "0..1" -- "0..*" payment_reconciliation
+payment_e "0..1" -- "0..*" payment_reconciliation
+refund_e "0..1" -- "0..*" payment_reconciliation
+funds_e -[hidden]right- bill_e
+note bottom of payment_reconciliation
+现金付款、电子支付单或退款办理恰选其一。
+受理、截图或金额相似不代表到账成功；
+差异处理引用原办理，不补造收款或退款。
+end note
+}
+package "实际费用及账目核算" as B {
+' @reference patient
+class "患者" as patient_b <<entity>>
+' @reference patient_funds
+class "患者资金" as funds_b <<entity>>
+' @reference treatment_execution
+class "诊疗执行" as execution_b <<entity>>
+' @reference dispense_record
+class "实际发药" as dispense_b <<entity>>
+' @reference service_price
+class "价目" as price_b <<entity>>
+' @reference insurance_case
+class "医保就诊办理" as insurance_case_b <<entity>>
+' @reference insurance_settlement
+class "医保结算" as insurance_settlement_b <<entity>>
+class "应收账目" as bill <<entity>> {
+ 形成时间、计费期间
+ /G总应收、/I正式医保承担
+ /P患者应付、/S有效抵付
+ /待付、/不能最终结算原因
+ --
+ +汇总已核价应收(生效调整)
+ +核对正式医保分摊()
+ +计算当前待付(有效抵付)
+}
+class "应收项目" as bill_item <<entity>> {
+ 实际数量、单价快照
+ 核价状态、计费时点
+ 核价人及依据
+ --
+ +核对唯一实际来源()
+ +确认计价(适用价目与依据)
+ +计算项目金额()
+ +建立实际来源(计价状态)
+}
+patient_b "1" -- "0..*" bill
+funds_b "1" -- "0..*" bill
+bill "1" *-- "0..*" bill_item
+execution_b "0..1" -- "1" bill_item
+dispense_b "0..1" -- "1" bill_item
+price_b "0..1" -- "0..*" bill_item
+bill "0..1" -- "0..*" insurance_case_b
+insurance_case_b "1" -- "0..*" insurance_settlement_b
+patient_b -[hidden]right- funds_b
+execution_b -[hidden]right- dispense_b
+dispense_b -[hidden]right- price_b
+note bottom of bill_item
+应收来源：诊疗执行或实际发药恰选其一。
+G＝已核价金额＋生效调整；P＝G－I。
+I仅取有效正式医保基金及个账承担，自费为0。
+待付＝max(P－S,0)；缺价或医保未定不报最终数。
+释放计入S净额，实际退款不再次扣减S。
+end note
+}
+package "付款分配与批准释放" as U {
+' @reference patient_payment
+class "患者付款" as payment_U <<entity>>
+' @reference bill
+class "应收账目" as bill_U <<entity>>
+' @reference fee_request
+class "费用申请" as request_U <<entity>>
+class "付款分配" as payment_allocation <<entity>> {
+ 带符号金额、生效时间
+ 经办人、分配或释放原因
+ --
+ +核对可分配原款与待付()
+ +登记本账用途()
+ +释放原用途(批准申请)
+ +汇总有效用途净额()
+}
+payment_U "1" -- "0..*" payment_allocation
+bill_U "1" -- "0..*" payment_allocation
+request_U "0..1" -- "0..*" payment_allocation
+' @reference payment_allocation
+class "付款分配" as allocation_previous <<entity>>
+allocation_previous "原用途\n0..1" -- "0..*" payment_allocation
+payment_U -[hidden]right- bill_U
+bill_U -[hidden]right- request_U
+note bottom of payment_allocation
+分配与抵扣仅记录资金用途，同一用途不重复入账。
+负数仅释放有依据的原正向用途，累计不超原额；
+与批准调整共同生效；退款另记录真实交付结果。
+end note
+}
+package "预付抵扣与批准释放" as V {
+' @reference patient_payment
+class "患者付款" as payment_V <<entity>>
+' @reference bill
+class "应收账目" as bill_V <<entity>>
+' @reference fee_request
+class "费用申请" as request_V <<entity>>
+class "预付抵扣" as prepayment_offset <<entity>> {
+ 带符号金额、生效时间
+ 经办人、抵扣或释放依据
+ --
+ +核对同患者原款与待付()
+ +登记预款抵扣()
+ +释放原抵扣(批准申请)
+ +汇总有效用途净额()
+}
+payment_V "1" -- "0..*" prepayment_offset
+bill_V "1" -- "0..*" prepayment_offset
+request_V "0..1" -- "0..*" prepayment_offset
+' @reference prepayment_offset
+class "预付抵扣" as offset_previous <<entity>>
+offset_previous "原用途\n0..1" -- "0..*" prepayment_offset
+payment_V -[hidden]right- bill_V
+bill_V -[hidden]right- request_V
+note bottom of prepayment_offset
+分配与抵扣仅记录资金用途，同一用途不重复入账。
+负数仅释放有依据的原正向用途，累计不超原额；
+与批准调整共同生效；退款另记录真实交付结果。
+end note
+}
+@enduml

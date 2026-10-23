@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-23",
+  "status": "第二十三批：C3余8图及11图统一核对完成；D继续修订",
+  "pdf_pages": 164,
+  "figures": 144,
+  "logical_tables": 69,
+  "analysis_sequence_cases": 25,
+  "analysis_sequence_diagrams": 26,
+  "state_machines_revised": [
+    "plan_version",
+    "followup_requirement",
+    "fee_request",
+    "appointment",
+    "visit",
+    "clinical_record",
+    "material_batch",
+    "payment_order",
+    "insurance_case",
+    "equipment_occupancy",
+    "prescription"
+  ],
+  "state_machine_count": 11,
+  "state_machines_remaining": 0,
+  "persisted_states_checked": 49,
+  "changed_pdf_pages": [
+    123,
+    124,
+    125,
+    126,
+    127,
+    128
+  ],
+  "unchanged_page_text_count": 158,
+  "states_match_existing_model_enums": true,
+  "new_persisted_states": [],
+  "constraints_all_aligned": false,
+  "known_constraint_conflicts": [
+    "visit结束必须已签署的旧约束与R09-2、UC-24独立实际结束不符，D-08待改"
+  ],
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "whole_document_course_compliant": false,
+  "validation": {
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "visible_text_overlap_pairs": 0,
+    "minimum_font_pt": 8.84,
+    "all_144_figure_titles_numbers_pages_preserved": true,
+    "A_B_C1_C2_D_sources_unchanged": true,
+    "logical_model_and_historical_sql_unchanged": true
+  },
+  "next_batch": "D1：类表键与关联，先联合主键、现金核对来源和实际结束约束，随后D2/D3",
+  "files": {
+    "tex_sha256": "5c5f01f08abfcf899e43ee104eea097d7266f05de2018d1f7a700c2a769ef797",
+    "pdf_sha256": "62989ec766685bd6e8caf2aafb7a72d7e8a33891a902fd2f93141614be6dff1b",
+    "logical_model_sha256": "68f5db36dfd9f3eaf9ca11b43ffb9a6abf039bf587ecf15f4f9c2b2b69e239e9"
+  }
+}

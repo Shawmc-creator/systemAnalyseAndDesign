@@ -1,0 +1,54 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as A
+boundary "牙医接口" as B
+control "提出复诊随访要求控制" as K
+entity "诊后要求" as R
+
+A -> B : 选择患者、来源就诊或方案；查看既有要求
+B -> K : 患者、来源及原要求编号
+activate K
+K -> K : 核验牙医权限，读取原来源及当前要求
+K -> R : 核对患者与诊疗来源()
+K --> B : 来源、既有要求及当前状态
+opt 2a 调整或撤销原要求
+ A -> B : 说明原要求及变更原因
+ B -> K : 本次选择与原因
+ break 撤销
+  K -> R : 撤销要求(牙医依据)
+  K -> K : 保存撤销依据、人时；原预约另由UC-02协调
+  K --> B : 已撤销，保留历史；本次结束
+ end
+ K -> R : 调整未完成要求(原因)
+ K --> B : 原联系及未完成安排，继续核对新要求
+end
+A -> B : 填复诊或随访目的、目标日期、是否评估及负责前台
+B -> K : 要求内容，选择暂存或发布
+K -> K : 核对日期、目的、责任人及临床评估要求
+break 5a 缺项、归属不符或6a当前要求已变化
+ K --> B : 指出问题，回原来源或内容核对；不覆盖完成及撤销结果
+end
+K -> R : 暂存或发布要求()
+K -> K : 保存本次要求；同次重复返回已有结果
+alt 4a 暂不发布
+ K --> B : 待发布，不进入前台正式联系待办
+else 发布
+ K --> B : 要求编号、待联系、目标日期及负责前台
+end
+B --> A : 后续由UC-16联系，发布本身不产生预约
+deactivate K
+
+@enduml

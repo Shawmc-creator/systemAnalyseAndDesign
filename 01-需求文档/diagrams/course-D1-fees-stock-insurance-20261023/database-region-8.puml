@@ -1,0 +1,53 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam EntityBackgroundColor white
+skinparam EntityBorderColor black
+skinparam nodesep 34
+skinparam ranksep 45
+hide circle
+left to right direction
+entity "供应商\nsupplier" as supplier {
+* id : INTEGER <<PK>>
+}
+entity "采购\npurchase_order" as purchase_order {
+* id : INTEGER <<PK>>
+* supplier_id : INTEGER <<FK>>
+}
+entity "采购项目\npurchase_order_item" as purchase_order_item {
+* id : INTEGER <<PK>>
+* purchase_order_id : INTEGER <<FK>>
+* material_id : INTEGER <<FK>>
+}
+entity "验收\npurchase_receipt" as purchase_receipt {
+* id : INTEGER <<PK>>
+* purchase_order_id : INTEGER <<FK>>
+}
+entity "验收项目\npurchase_receipt_item" as purchase_receipt_item {
+* id : INTEGER <<PK>>
+* purchase_receipt_id : INTEGER <<FK>>
+* purchase_order_item_id : INTEGER <<FK>>
+ material_batch_id : INTEGER <<FK>>
+ stock_location_id : INTEGER <<FK>>
+}
+entity "材料（跨区引用）\nmaterial" as material {
+* id : INTEGER <<PK>>
+}
+entity "材料批次（跨区引用）\nmaterial_batch" as material_batch {
+* id : INTEGER <<PK>>
+}
+entity "存放位置（跨区引用）\nstock_location" as stock_location {
+* id : INTEGER <<PK>>
+}
+supplier ||--o{ purchase_order
+purchase_order ||--o{ purchase_order_item
+material ||--o{ purchase_order_item
+purchase_order ||--o{ purchase_receipt
+purchase_receipt ||--o{ purchase_receipt_item
+purchase_order_item ||--o{ purchase_receipt_item
+material_batch |o--o{ purchase_receipt_item
+stock_location |o--o{ purchase_receipt_item
+@enduml

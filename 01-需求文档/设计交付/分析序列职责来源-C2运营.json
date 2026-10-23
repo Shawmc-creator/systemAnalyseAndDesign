@@ -1,0 +1,170 @@
+{
+  "source": "现行B的UC-18—21；主要成功流程及编号扩展",
+  "cases": [
+    {
+      "uc": 18,
+      "title": "维护材料与批次资料",
+      "entities": [
+        {
+          "alias": "T",
+          "name": "材料",
+          "table": "material"
+        },
+        {
+          "alias": "R",
+          "name": "材料批次",
+          "table": "material_batch"
+        },
+        {
+          "alias": "H",
+          "name": "批次变更",
+          "table": "batch_change"
+        }
+      ],
+      "branches": [
+        "1a",
+        "1b",
+        "2a",
+        "5a",
+        "5b"
+      ],
+      "rules": [
+        "R18-1",
+        "R18-2"
+      ]
+    },
+    {
+      "uc": 19,
+      "title": "登记基础采购与到货验收",
+      "entities": [
+        {
+          "alias": "O",
+          "name": "采购",
+          "table": "purchase_order"
+        },
+        {
+          "alias": "I",
+          "name": "采购项目",
+          "table": "purchase_order_item"
+        },
+        {
+          "alias": "R",
+          "name": "验收",
+          "table": "purchase_receipt"
+        },
+        {
+          "alias": "L",
+          "name": "验收项目",
+          "table": "purchase_receipt_item"
+        },
+        {
+          "alias": "V",
+          "name": "库存变动",
+          "table": "inventory_movement"
+        },
+        {
+          "alias": "S",
+          "name": "批次存量",
+          "table": "batch_stock"
+        }
+      ],
+      "branches": [
+        "3a",
+        "4a",
+        "5a",
+        "6a",
+        "7a"
+      ],
+      "rules": [
+        "R19-1",
+        "R19-2"
+      ]
+    },
+    {
+      "uc": 20,
+      "title": "办理库存领用、退回与盘点",
+      "entities": [
+        {
+          "alias": "R",
+          "name": "材料批次",
+          "table": "material_batch"
+        },
+        {
+          "alias": "S",
+          "name": "批次存量",
+          "table": "batch_stock"
+        },
+        {
+          "alias": "V",
+          "name": "库存变动",
+          "table": "inventory_movement"
+        },
+        {
+          "alias": "U",
+          "name": "实际用料",
+          "table": "material_usage"
+        },
+        {
+          "alias": "C",
+          "name": "盘点核实",
+          "table": "stock_count"
+        }
+      ],
+      "branches": [
+        "1a",
+        "1b",
+        "1c",
+        "4a",
+        "5a"
+      ],
+      "rules": [
+        "R20-1",
+        "R20-2",
+        "R20-3"
+      ]
+    },
+    {
+      "uc": 21,
+      "title": "核对日常经营与收付款",
+      "entities": [
+        {
+          "alias": "G",
+          "name": "应收账目",
+          "table": "bill"
+        },
+        {
+          "alias": "P",
+          "name": "患者付款",
+          "table": "patient_payment"
+        },
+        {
+          "alias": "I",
+          "name": "医保结算",
+          "table": "insurance_settlement"
+        },
+        {
+          "alias": "F",
+          "name": "医保结算款收付",
+          "table": "insurance_fund_receipt"
+        },
+        {
+          "alias": "Q",
+          "name": "收退款核对",
+          "table": "payment_reconciliation"
+        }
+      ],
+      "branches": [
+        "2a",
+        "3a",
+        "4a"
+      ],
+      "rules": [
+        "R21-1",
+        "R21-2",
+        "R21-3"
+      ]
+    }
+  ],
+  "C1_operations_added": [],
+  "simplification": "只展开岗位交接、真实数量及主要分支；保存重试和底层事务不逐图重复。"
+}

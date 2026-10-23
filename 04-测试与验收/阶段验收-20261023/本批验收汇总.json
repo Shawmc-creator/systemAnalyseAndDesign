@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-23",
+  "status": "本阶段业务历史收尾完成；完整设计仍有明确后续",
+  "runtimeVersion": 2026102303,
+  "runtimeTables": 108,
+  "documentTables": 77,
+  "matchingTableNames": 77,
+  "historyTablesAdded": 6,
+  "automatedTests": 334,
+  "automatedPassed": 334,
+  "newTests": 14,
+  "uiScenarios": {
+    "workflow": 7,
+    "financial": 12,
+    "total": 19
+  },
+  "oldTablesPreserved": 102,
+  "legacyFactsBackfilled": false,
+  "requirementsChanged": false,
+  "remainingFieldNames": 18,
+  "remainingFieldDefinitions": 10,
+  "wholeDesignImplemented": false,
+  "githubSync": "发布核验回执单独保存，不以本汇总代替远端确认"
+}

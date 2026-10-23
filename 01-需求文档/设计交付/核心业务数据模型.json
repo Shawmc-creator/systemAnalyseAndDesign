@@ -1,12 +1,14 @@
 {
-  "version": "2026-10-19-integrated-ABCD",
+  "version": "2026-10-23-course-summary-D-final",
   "document": "../牙科诊所管理系统-需求文档.pdf",
-  "purpose": "现行需求文档的69表核心逻辑模型；类图别名与表名一一对应，外键目标全部包含在本模型内。",
-  "implementation_status": "本次仅更新设计。历史85表SQL与运行程序保持原样，不能直接视为本模型的可执行建表文件。",
+  "purpose": "69个分析实体的主业务映射与8张必要历史存储表；每张历史表有明确analysis_owner和原业务外键，保持对象及事件来源。",
+  "implementation_status": "77表设计保持；当前字段来源已核对现行25用例，D2服务/实体/映射器和D3页面组件按文档精化，运行代码与历史SQL未改。",
   "counts": {
-    "tables": 69,
+    "tables": 77,
     "retained_tables": 54,
-    "newly_designed_tables": 15
+    "newly_designed_tables": 23,
+    "core_tables": 69,
+    "history_tables": 8
   },
   "groups": [
     [
@@ -41,7 +43,9 @@
         "document_version",
         "prescription",
         "prescription_item",
-        "dispense_record"
+        "dispense_record",
+        "document_correction",
+        "prescription_review_history"
       ]
     ],
     [
@@ -68,7 +72,8 @@
         "payment_allocation",
         "prepayment_offset",
         "payment_order",
-        "payment_reconciliation"
+        "payment_reconciliation",
+        "service_price_history"
       ]
     ],
     [
@@ -77,7 +82,8 @@
         "fee_request",
         "fee_adjustment",
         "fee_adjustment_item",
-        "patient_refund"
+        "patient_refund",
+        "fee_request_history"
       ]
     ],
     [
@@ -85,7 +91,8 @@
       [
         "followup_requirement",
         "contact_history",
-        "clinical_assessment"
+        "clinical_assessment",
+        "followup_history"
       ]
     ],
     [
@@ -98,7 +105,8 @@
         "batch_stock",
         "inventory_movement",
         "material_usage",
-        "stock_count"
+        "stock_count",
+        "stock_count_history"
       ]
     ],
     [
@@ -108,7 +116,8 @@
         "purchase_order",
         "purchase_order_item",
         "purchase_receipt",
-        "purchase_receipt_item"
+        "purchase_receipt_item",
+        "receipt_item_history"
       ]
     ],
     [
@@ -120,7 +129,8 @@
         "insurance_fee",
         "insurance_settlement",
         "insurance_reversal",
-        "insurance_fund_receipt"
+        "insurance_fund_receipt",
+        "insurance_preestimate_history"
       ]
     ]
   ],
@@ -139,7 +149,15 @@
     "insurance_fee",
     "insurance_settlement",
     "insurance_reversal",
-    "insurance_fund_receipt"
+    "insurance_fund_receipt",
+    "fee_request_history",
+    "service_price_history",
+    "followup_history",
+    "stock_count_history",
+    "receipt_item_history",
+    "insurance_preestimate_history",
+    "document_correction",
+    "prescription_review_history"
   ],
   "planned_existing_changes": [
     "material新增材料/药品分类。",
@@ -208,7 +226,7 @@
           "type": "TEXT",
           "nullable": true,
           "description": "无可用电话时说明原因",
-          "source": "UC-08"
+          "source": "UC-01；联系资料缺失的实际原因"
         },
         {
           "name": "created_by",
@@ -347,6 +365,7 @@
       ],
       "historical_source_uc": "01—32",
       "source_uc": [
+        "UC-02",
         "UC-04"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
@@ -368,8 +387,8 @@
           "name": "patient_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient.id；来源 R001。",
-          "source": "R001",
+          "description": "引用 patient.id。",
+          "source": "UC-01；患者资料变更与患者的归属关联",
           "foreign_key": "patient",
           "unique": false
         },
@@ -406,7 +425,7 @@
           "type": "TEXT",
           "nullable": false,
           "description": "限定为患者资料可维护字段；禁止临床字段",
-          "source": "UC-08"
+          "source": "UC-01；更正字段与前后值"
         },
         {
           "name": "operator_id",
@@ -559,6 +578,31 @@
       ],
       "historical_source_uc": "",
       "source_uc": [
+        "UC-01",
+        "UC-02",
+        "UC-03",
+        "UC-04",
+        "UC-05",
+        "UC-06",
+        "UC-07",
+        "UC-08",
+        "UC-09",
+        "UC-10",
+        "UC-11",
+        "UC-12",
+        "UC-13",
+        "UC-14",
+        "UC-15",
+        "UC-16",
+        "UC-17",
+        "UC-18",
+        "UC-19",
+        "UC-20",
+        "UC-21",
+        "UC-22",
+        "UC-23",
+        "UC-24",
+        "UC-25",
         "全部岗位用例的登录与权限前提"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
@@ -645,6 +689,7 @@
       ],
       "historical_source_uc": "01、03、15、16",
       "source_uc": [
+        "UC-02",
         "UC-04",
         "UC-24"
       ],
@@ -667,8 +712,8 @@
           "name": "dentist_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 staff.id；来源 R006。",
-          "source": "R006",
+          "description": "引用 staff.id。",
+          "source": "UC-02、UC-04；日期安排与职员的归属关联",
           "foreign_key": "staff",
           "unique": false
         },
@@ -676,8 +721,8 @@
           "name": "dental_chair_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 dental_chair.id；来源 R007。",
-          "source": "R007",
+          "description": "引用 dental_chair.id。",
+          "source": "UC-02、UC-04；日期安排与诊椅的归属关联",
           "foreign_key": "dental_chair",
           "unique": false
         },
@@ -798,8 +843,8 @@
           "name": "dated_schedule_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 dated_schedule.id；来源 R008。",
-          "source": "R008",
+          "description": "引用 dated_schedule.id。",
+          "source": "UC-04；安排变更与日期安排的归属关联",
           "foreign_key": "dated_schedule",
           "unique": false
         },
@@ -864,14 +909,14 @@
           "type": "TEXT",
           "nullable": false,
           "description": "调整或停诊；不以空时间表达停诊",
-          "source": "UC-15"
+          "source": "UC-04；排班调整或停诊种类"
         },
         {
           "name": "affected_handling",
           "type": "TEXT",
           "nullable": false,
           "description": "受影响预约的处理依据；逐项进度追溯预约变更与通知经历",
-          "source": "UC-15"
+          "source": "UC-04；受影响预约及实际协调依据"
         },
         {
           "name": "operator_id",
@@ -966,8 +1011,8 @@
           "name": "dated_schedule_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 dated_schedule.id；来源 R009。",
-          "source": "R009",
+          "description": "引用 dated_schedule.id。",
+          "source": "UC-02、UC-03、UC-04、UC-06、UC-24；接诊占用与日期安排的归属关联",
           "foreign_key": "dated_schedule",
           "unique": false
         },
@@ -975,8 +1020,8 @@
           "name": "appointment_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 appointment.id；来源 R010。",
-          "source": "R010",
+          "description": "引用 appointment.id。",
+          "source": "UC-02、UC-03、UC-04、UC-06、UC-24；接诊占用与预约的归属关联",
           "foreign_key": "appointment",
           "unique": false
         },
@@ -984,8 +1029,8 @@
           "name": "visit_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 visit.id；来源 R011。",
-          "source": "R011",
+          "description": "引用 visit.id。",
+          "source": "UC-02、UC-03、UC-04、UC-06、UC-24；接诊占用与就诊的归属关联",
           "foreign_key": "visit",
           "unique": false
         },
@@ -1015,14 +1060,14 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "所据安排版本；正整数",
-          "source": "UC-01、03"
+          "source": "UC-02、UC-03、UC-04；接诊安排版本"
         },
         {
           "name": "release_reason",
           "type": "TEXT",
           "nullable": true,
           "description": "释放时必填",
-          "source": "UC-01、03"
+          "source": "UC-02、UC-24；取消预留或实际结束释放依据"
         },
         {
           "name": "created_by",
@@ -1075,6 +1120,7 @@
         "UC-02",
         "UC-03",
         "UC-04",
+        "UC-06",
         "UC-24"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
@@ -1096,8 +1142,8 @@
           "name": "patient_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient.id；来源 R012。",
-          "source": "R012",
+          "description": "引用 patient.id。",
+          "source": "UC-02、UC-03、UC-16；预约与患者的归属关联",
           "foreign_key": "patient",
           "unique": false
         },
@@ -1134,21 +1180,21 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "安排版本；默认1，改约时递增",
-          "source": "UC-01"
+          "source": "UC-02；所用日期安排版本"
         },
         {
           "name": "status_reason",
           "type": "TEXT",
           "nullable": true,
           "description": "取消或未到核实依据",
-          "source": "UC-01"
+          "source": "UC-02；改约、取消或未到的真实原因"
         },
         {
           "name": "notified_at",
           "type": "TEXT",
           "nullable": true,
           "description": "实际完成通知时刻；未通知为空",
-          "source": "UC-01"
+          "source": "UC-02；实际通知患者时间"
         },
         {
           "name": "created_by",
@@ -1242,8 +1288,8 @@
           "name": "appointment_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 appointment.id；来源 R013。",
-          "source": "R013",
+          "description": "引用 appointment.id。",
+          "source": "UC-02；预约变更与预约的归属关联",
           "foreign_key": "appointment",
           "unique": false
         },
@@ -1308,7 +1354,7 @@
           "type": "TEXT",
           "nullable": false,
           "description": "改约、取消或通知；状态变更不得覆盖既往记录",
-          "source": "UC-01"
+          "source": "UC-02；新建以外的预约变更种类"
         },
         {
           "name": "operator_id",
@@ -1387,8 +1433,8 @@
           "name": "patient_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient.id；来源 R014。",
-          "source": "R014",
+          "description": "引用 patient.id。",
+          "source": "UC-03、UC-05、UC-06、UC-08、UC-09、UC-15、UC-17、UC-21、UC-24；就诊与患者的归属关联",
           "foreign_key": "patient",
           "unique": false
         },
@@ -1396,8 +1442,8 @@
           "name": "appointment_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 appointment.id；唯一。来源 R015。",
-          "source": "R015",
+          "description": "引用 appointment.id；唯一。。",
+          "source": "UC-03、UC-05、UC-06、UC-08、UC-09、UC-15、UC-17、UC-21、UC-24；就诊与预约的归属关联",
           "foreign_key": "appointment",
           "unique": true
         },
@@ -1405,8 +1451,8 @@
           "name": "dentist_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 staff.id；来源 R016。",
-          "source": "R016",
+          "description": "引用 staff.id。",
+          "source": "UC-03、UC-05、UC-06、UC-08、UC-09、UC-15、UC-17、UC-21、UC-24；就诊与职员的归属关联",
           "foreign_key": "staff",
           "unique": false
         },
@@ -1421,15 +1467,15 @@
           "name": "started_at",
           "type": "TEXT",
           "nullable": true,
-          "description": "开始接诊后必填",
-          "source": "接诊开始"
+          "description": "牙医确认实际开始后必填，不早于实际到诊时刻。",
+          "source": "UC-06步骤1—2"
         },
         {
           "name": "ended_at",
           "type": "TEXT",
           "nullable": true,
-          "description": "诊疗结束后必填",
-          "source": "诊疗结束"
+          "description": "牙医确认实际结束后必填，不早于开始；不以病历签署或收费时间代替。",
+          "source": "UC-24步骤1—2；R09-2、R24-2"
         },
         {
           "name": "arrival_source",
@@ -1494,7 +1540,7 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "appointment_id可空且唯一；来源为预约时必须有值，为现场时为空。接诊中必须有started_at，结束必须有ended_at及已签署病历，时间顺序不得倒置。"
+        "appointment_id可空且唯一；来源为预约时必须有值，为现场时为空。候诊时started_at和ended_at为空；接诊中须有started_at且ended_at为空；诊疗结束须有started_at及ended_at，arrived_at<=started_at<=ended_at。实际结束与相应占用释放、清洁准备限制共同保存；病历签署独立办理，不作为实际结束条件，也不自动结束接诊或结清费用。"
       ],
       "historical_source_uc": "03、04、09—14",
       "source_uc": [
@@ -1505,7 +1551,8 @@
         "UC-09",
         "UC-15",
         "UC-17",
-        "UC-21"
+        "UC-21",
+        "UC-24"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -1658,6 +1705,10 @@
       "source_uc": [
         "UC-02",
         "UC-24"
+      ],
+      "constraints": [
+        "CHECK((dental_chair_id IS NOT NULL)+(equipment_id IS NOT NULL)=1)；开始时间必填，预计结束为空或晚于开始。预计结束不解除停用。",
+        "有效中released_at为空；已解除须有真实核验恢复时间且不早于开始。解除停用与原记录版本核对共同保存；恢复不覆盖停用原因及历史。"
       ]
     },
     {
@@ -1745,7 +1796,13 @@
       "historical_source_uc": "02、06、24",
       "source_uc": [
         "UC-02",
+        "UC-06",
         "UC-24"
+      ],
+      "constraints": [
+        "appointment_id、visit_id至少一项非空；两项都有时，预约须与就诊的appointment_id一致，且患者一致。",
+        "ends_at>starts_at；设备有效、准备完成且未停用才可开始使用。预留时间与其他有效占用不得重叠；尚未实际结束的使用继续阻止冲突安排，不因ends_at到达自动释放。",
+        "已预留或使用中actual_ended_at为空；实际使用后释放须有真实actual_ended_at及release_reason。取消未开始预留仅记释放原因，不伪造实际使用结束；实际结束不得早于本次就诊开始。"
       ]
     },
     {
@@ -1765,8 +1822,8 @@
           "name": "patient_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient.id；来源 R017。",
-          "source": "R017",
+          "description": "引用 patient.id。",
+          "source": "UC-06；健康版本与患者的归属关联",
           "foreign_key": "patient",
           "unique": false
         },
@@ -1789,14 +1846,14 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "患者内递增版本号",
-          "source": "UC-21"
+          "source": "UC-06；健康资料版本号"
         },
         {
           "name": "effective_at",
           "type": "TEXT",
           "nullable": false,
           "description": "该健康版本生效时刻",
-          "source": "UC-21"
+          "source": "UC-06；实际形成的健康版本时间"
         },
         {
           "name": "created_by",
@@ -1867,8 +1924,8 @@
           "name": "health_version_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 health_version.id；来源 R018。",
-          "source": "R018",
+          "description": "引用 health_version.id。",
+          "source": "UC-06；健康条目与健康版本的归属关联",
           "foreign_key": "health_version",
           "unique": false
         },
@@ -1912,7 +1969,7 @@
           "type": "TEXT",
           "nullable": true,
           "description": "病史/反应实际发生时刻；未知允许NULL",
-          "source": "UC-21"
+          "source": "UC-06；患者报告事项实际发生时间"
         },
         {
           "name": "created_at",
@@ -1967,8 +2024,8 @@
           "name": "visit_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 visit.id；来源 R019。",
-          "source": "R019",
+          "description": "引用 visit.id。",
+          "source": "UC-06、UC-09；健康复核与就诊的归属关联",
           "foreign_key": "visit",
           "unique": false
         },
@@ -1976,8 +2033,8 @@
           "name": "health_version_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 health_version.id；来源 R020。",
-          "source": "R020",
+          "description": "引用 health_version.id。",
+          "source": "UC-06、UC-09；健康复核与健康版本的归属关联",
           "foreign_key": "health_version",
           "unique": false
         },
@@ -2035,7 +2092,8 @@
       ],
       "historical_source_uc": "10、21",
       "source_uc": [
-        "UC-06"
+        "UC-06",
+        "UC-09"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -2056,8 +2114,8 @@
           "name": "visit_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 visit.id；唯一。来源 R021。",
-          "source": "R021",
+          "description": "引用 visit.id；唯一。。",
+          "source": "UC-03、UC-05、UC-06、UC-09；病历与就诊的归属关联",
           "foreign_key": "visit",
           "unique": true
         },
@@ -2094,14 +2152,14 @@
           "type": "INTEGER",
           "nullable": true,
           "description": "签署时冻结的正文版本",
-          "source": "UC-11"
+          "source": "UC-09；签署采用的病历正文版本"
         },
         {
           "name": "content_hash",
           "type": "TEXT",
           "nullable": true,
           "description": "签署正文及所见集合的SHA-256；签署前可空",
-          "source": "UC-11"
+          "source": "UC-09；冻结签署正文摘要"
         },
         {
           "name": "signed_by",
@@ -2154,11 +2212,20 @@
           "source": "公共持久化字段",
           "common": true,
           "default": 1
+        },
+        {
+          "name": "signed_health_review_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "签署时采用的确切健康复核；草稿可空，签署后必填并冻结，须属于本病历就诊。",
+          "source": "UC-09步骤2—4、R09-1；C1签署完整性（所见与复核）",
+          "foreign_key": "health_review"
         }
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "visit_id非空且唯一；新建就诊同时建立草稿。签署要求主诉、诊断、处理意见、检查所见及本次健康复核完整，并保存签署人、时刻、版本及摘要；签后正文和所见冻结。"
+        "visit_id非空且唯一；新建就诊同时建立草稿。签署要求主诉、诊断、处理意见、检查所见及本次健康复核完整，并保存签署人、时刻、版本及摘要；签后正文和所见冻结。",
+        "草稿signed_health_review_id、signed_by、signed_at、signed_revision、content_hash均为空；签署时共同填齐，采用复核的visit_id等于病历visit_id。签后固定该复核及正文版本，不随后续新增健康版本或复核改变。"
       ],
       "historical_source_uc": "10、11",
       "source_uc": [
@@ -2186,8 +2253,8 @@
           "name": "clinical_record_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 clinical_record.id；来源 R022。",
-          "source": "R022",
+          "description": "引用 clinical_record.id。",
+          "source": "UC-05、UC-06、UC-09；检查所见与病历的归属关联",
           "foreign_key": "clinical_record",
           "unique": false
         },
@@ -2217,7 +2284,7 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "病历内显示顺序；正整数",
-          "source": "UC-10"
+          "source": "UC-06、UC-09；当次检查所见顺序"
         },
         {
           "name": "recorded_by",
@@ -2282,8 +2349,8 @@
           "name": "clinical_record_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 clinical_record.id；来源 R023。",
-          "source": "R023",
+          "description": "引用 clinical_record.id。",
+          "source": "UC-09；病历补充与病历的归属关联",
           "foreign_key": "clinical_record",
           "unique": false
         },
@@ -2313,7 +2380,7 @@
           "type": "TEXT",
           "nullable": false,
           "description": "补充正文校验值；签署后只追加",
-          "source": "UC-11"
+          "source": "UC-09；独立签署补充的内容摘要"
         },
         {
           "name": "signed_by",
@@ -2376,8 +2443,8 @@
           "name": "patient_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient.id；来源 R024。",
-          "source": "R024",
+          "description": "引用 patient.id。",
+          "source": "UC-05、UC-10；诊疗文件与患者的归属关联",
           "foreign_key": "patient",
           "unique": false
         },
@@ -2385,8 +2452,8 @@
           "name": "visit_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 visit.id；来源 R026。",
-          "source": "R026",
+          "description": "引用 visit.id。",
+          "source": "UC-05、UC-10；诊疗文件与就诊的归属关联",
           "foreign_key": "visit",
           "unique": false
         },
@@ -2394,8 +2461,8 @@
           "name": "plan_version_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 plan_version.id；来源 R034。",
-          "source": "R034",
+          "description": "引用 plan_version.id。",
+          "source": "UC-05、UC-10；诊疗文件与方案版本的归属关联",
           "foreign_key": "plan_version",
           "unique": false
         },
@@ -2464,7 +2531,8 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "可只归属患者；关联就诊和方案版本时均须同患者。类型从既定类别选择，不接受无归属文件。"
+        "可只归属患者；关联就诊和方案版本时均须同患者。类型从既定类别选择，不接受无归属文件。",
+        "已有原件版本及业务引用的归属不静默改写；误关联更正建立正确归属的新索引和版本，由document_correction关联原错误版本，原患者/就诊/方案及原件保持。"
       ],
       "historical_source_uc": "09、22、23",
       "source_uc": [
@@ -2490,8 +2558,8 @@
           "name": "clinical_document_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 clinical_document.id；来源 R025。",
-          "source": "R025",
+          "description": "引用 clinical_document.id。",
+          "source": "UC-10；文件版本与诊疗文件的归属关联",
           "foreign_key": "clinical_document",
           "unique": false
         },
@@ -2542,28 +2610,28 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "诊疗文件内递增版本号",
-          "source": "UC-23"
+          "source": "UC-10步骤3—4及R10-2"
         },
         {
           "name": "storage_key",
           "type": "TEXT",
           "nullable": false,
           "description": "受控存储相对标识；唯一；禁止任意路径",
-          "source": "UC-23"
+          "source": "UC-10步骤3—4及R10-2"
         },
         {
           "name": "media_type",
           "type": "TEXT",
           "nullable": false,
           "description": "与内容校验一致的允许MIME类型",
-          "source": "UC-23"
+          "source": "UC-10步骤3—4及R10-2"
         },
         {
           "name": "verification_note",
           "type": "TEXT",
           "nullable": true,
-          "description": "退回、缺失及恢复核实说明",
-          "source": "UC-23"
+          "description": "牙医确认归属的实际依据，或退回、误关联、缺失及恢复核实说明；确认时必填，原依据不以后续说明覆盖。",
+          "source": "UC-10步骤4及扩展4a；C1确认牙医/时间/依据"
         },
         {
           "name": "uploaded_by",
@@ -2593,8 +2661,8 @@
           "name": "status",
           "type": "TEXT",
           "nullable": false,
-          "description": "限定：原件待确认、原件已确认、退回核对、缺失或不可读；按C状态机转移，无隐式成功默认。",
-          "source": "C分析状态机",
+          "description": "限定：原件待确认、原件已确认、退回核对、缺失或不可读；按对应规约事件更新，无隐式成功默认。",
+          "source": "UC-10字段与规则；简单状态不另设C3图",
           "enum": [
             "原件待确认",
             "原件已确认",
@@ -2630,7 +2698,10 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "UNIQUE(clinical_document_id,version_no)及UNIQUE(storage_key)。上传内容、大小、类型和摘要一致才形成记录；确认须有牙医与时刻。旧版本内容不覆盖，缺失恢复必须匹配原摘要。"
+        "UNIQUE(clinical_document_id,version_no)及UNIQUE(storage_key)。上传内容、大小、类型和摘要一致才形成记录；确认须有牙医与时刻。旧版本内容不覆盖，缺失恢复必须匹配原摘要。",
+        "原件已确认须confirmed_by、confirmed_at及verification_note齐全。误关联更正须保留原归属、确认依据及受影响引用，再由牙医核实正确关联；既有决定引用的确切版本不静默转指。",
+        "每次误关联更正共同追加document_correction，保留每次内容、经办时间和决定；当前行不是完整历史，旧快照不得覆盖。",
+        "误关联采用document_correction保留原确认和正确索引；原文件、原归属及既有引用保持，退回核对后不再当作已确认诊疗依据。"
       ],
       "historical_source_uc": "23",
       "source_uc": [
@@ -2710,7 +2781,13 @@
           "type": "TEXT",
           "nullable": false,
           "description": "院内待审、已通过、待医师处理或院外取药",
-          "source": "本次核心业务补全"
+          "source": "本次核心业务补全",
+          "enum": [
+            "院内待审",
+            "已通过",
+            "待医师处理",
+            "院外取药"
+          ]
         },
         {
           "name": "reviewer_id",
@@ -2726,12 +2803,80 @@
           "nullable": true,
           "description": "审方及医师重新确认依据",
           "source": "本次核心业务补全"
+        },
+        {
+          "name": "guidance_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "开立牙医实际向患者说明的用药指导与注意事项；草稿可空，开立时保存。",
+          "source": "UC-25步骤4—5、扩展4a/5a/5b；C1用药指导、交付与更正依据"
+        },
+        {
+          "name": "handed_over_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "院外取药处方文件的实际交付确认时间；未交付为空，不表示院外药品已领取。",
+          "source": "UC-25步骤4—5、扩展4a/5a/5b；C1用药指导、交付与更正依据"
+        },
+        {
+          "name": "handed_over_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "实际确认院外处方文件交付的牙医；与交付时间成组保存。",
+          "source": "UC-25步骤4—5、扩展4a/5a/5b；C1用药指导、交付与更正依据",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "void_reason",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "牙医核实停止原处方的原因与药品交付事实；作废时必填，原内容保留。",
+          "source": "UC-25步骤4—5、扩展4a/5a/5b；C1用药指导、交付与更正依据"
+        },
+        {
+          "name": "voided_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "牙医确认原处方作废的实际时刻，未作废为空。",
+          "source": "UC-25步骤4—5、扩展4a/5a/5b；C1用药指导、交付与更正依据"
+        },
+        {
+          "name": "voided_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "确认作废的获准牙医；与作废原因及时刻共同保存。",
+          "source": "UC-25步骤4—5、扩展4a/5a/5b；C1用药指导、交付与更正依据",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "original_prescription_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "更正后另建处方引用原处方；首方为空，同患者同就诊，原方与实际发药不覆盖。",
+          "source": "UC-25步骤4—5、扩展4a/5a/5b；C1用药指导、交付与更正依据",
+          "foreign_key": "prescription"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "药学岗位实际审方时间；院内已通过或待医师处理时与审核人及意见保存。",
+          "source": "UC-25步骤4—5、扩展4a/5a/5b；C1用药指导、交付与更正依据"
         }
       ],
       "historical_source_uc": "25",
       "source_uc": [
         "UC-05",
         "UC-25"
+      ],
+      "constraints": [
+        "患者与实际就诊一致，开立牙医有处方权限。草稿允许待补内容；已开立须issued_at、guidance_note及至少一项完整有效明细，开立后的原正文和明细保留。",
+        "院外取药处方交付时handed_over_by和handed_over_at成组保存，须为已开立院外处方；未交付为空，不以处方文件交付推定患者已在院外取药。院外取药不形成诊所发药、出库或药品应收。",
+        "院内待审不发药；已通过或待医师处理须reviewer_id、reviewed_at和review_note齐全并核对岗位条件；院外取药不冒充院内审核通过。",
+        "已作废须void_reason、voided_by、voided_at齐全，其他状态不填作废结果。牙医核实尚未交付药品才可作废；院外取药事实不明或已有实际发药须先核实后续，不能删除或倒改既有交付事实。",
+        "更正重开引用original_prescription_id，同患者同实际就诊，禁止自身或循环引用。新方按新医嘱重新开立及适用审方，原内容、处方交付和发药记录保留；不自动将原未发量视作新方已发量。",
+        "每次实际审方共同追加prescription_review_history，保留每次内容、经办时间和决定；当前行不是完整历史，旧快照不得覆盖。",
+        "重复审方的实际意见追加prescription_review_history，与当前审核人、时间及结论共同保存；重开仍关联原方，原方历史保持。"
       ]
     },
     {
@@ -2807,6 +2952,10 @@
       "historical_source_uc": "25",
       "source_uc": [
         "UC-25"
+      ],
+      "constraints": [
+        "开立数量quantity_scaled>0，药名规格和directions非空；材料为药品目录，单位为开立时已确认基本单位快照，放大量遵循材料固定精度。不同包装按R18-1换算，不把用法剂量单位与库存数量混算。",
+        "有效处方明细累计实际发药量不超该明细有效开立量，实际发药药品材料与原明细一致；已开立明细更正按原方处理并另开，保持既有引用。"
       ]
     },
     {
@@ -2876,6 +3025,11 @@
       "historical_source_uc": "25",
       "source_uc": [
         "UC-25"
+      ],
+      "constraints": [
+        "院内启用条件满足、原方有效且适用审核通过，quantity_scaled>0，实际核发人、时间、用药交代齐全；累计实际量不超原明细有效开立量。",
+        "inventory_movement_id唯一，所引流水为处方发药，批次材料与原明细一致，delta_scaled=-quantity_scaled且批次可用、效期和库存均满足；实际交付、库存流水及唯一应收来源共同保存，缺价保留待核价。",
+        "实际发药与原方关联为既有事实，不因原方后续更正被删除或改作普通领用；保存不明先核实原实物交接和流水，不重复发药或扣库。"
       ]
     },
     {
@@ -2895,8 +3049,8 @@
           "name": "patient_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient.id；来源 R027。",
-          "source": "R027",
+          "description": "引用 patient.id。",
+          "source": "UC-05、UC-07；治疗方案与患者的归属关联",
           "foreign_key": "patient",
           "unique": false
         },
@@ -2926,7 +3080,7 @@
           "type": "TEXT",
           "nullable": true,
           "description": "完成或终止的确认时刻",
-          "source": "UC-22"
+          "source": "UC-07；方案结束及原因"
         },
         {
           "name": "created_by",
@@ -3018,8 +3172,8 @@
           "name": "treatment_plan_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 treatment_plan.id；来源 R028。",
-          "source": "R028",
+          "description": "引用 treatment_plan.id。",
+          "source": "UC-07、UC-15；方案版本与治疗方案的归属关联",
           "foreign_key": "treatment_plan",
           "unique": false
         },
@@ -3027,8 +3181,8 @@
           "name": "source_visit_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 visit.id；来源 R111。",
-          "source": "R111",
+          "description": "引用 visit.id。",
+          "source": "UC-07、UC-15；方案版本与就诊的归属关联",
           "foreign_key": "visit",
           "unique": false
         },
@@ -3065,21 +3219,21 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "方案内递增版本号",
-          "source": "UC-22"
+          "source": "UC-07；方案修订版本"
         },
         {
           "name": "stopped_at",
           "type": "TEXT",
           "nullable": true,
           "description": "停止后续执行时刻",
-          "source": "UC-22"
+          "source": "UC-07；停止原版后续执行时间"
         },
         {
           "name": "stop_reason",
           "type": "TEXT",
           "nullable": true,
           "description": "被新版本替代或撤回的依据",
-          "source": "UC-22"
+          "source": "UC-07；停止或修订依据"
         },
         {
           "name": "created_by",
@@ -3175,8 +3329,8 @@
           "name": "plan_version_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 plan_version.id；来源 R029。",
-          "source": "R029",
+          "description": "引用 plan_version.id。",
+          "source": "UC-07、UC-08；方案项目与方案版本的归属关联",
           "foreign_key": "plan_version",
           "unique": false
         },
@@ -3276,8 +3430,8 @@
           "name": "plan_version_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 plan_version.id；来源 R030。",
-          "source": "R030",
+          "description": "引用 plan_version.id。",
+          "source": "UC-07、UC-08；患者决定与方案版本的归属关联",
           "foreign_key": "plan_version",
           "unique": false
         },
@@ -3307,7 +3461,7 @@
           "type": "TEXT",
           "nullable": false,
           "description": "范围限制的文字补充；不代替明细关联",
-          "source": "UC-22"
+          "source": "UC-07；本次患者决定和范围限制"
         },
         {
           "name": "explained_by",
@@ -3357,7 +3511,8 @@
       ],
       "historical_source_uc": "22、23",
       "source_uc": [
-        "UC-07"
+        "UC-07",
+        "UC-08"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -3371,7 +3526,7 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "联合主键组成；引用patient_decision.id。",
-          "source": "R031",
+          "source": "UC-07、UC-08；患者决定—方案项目与患者决定的归属关联",
           "foreign_key": "patient_decision",
           "primary_key": true
         },
@@ -3380,9 +3535,16 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "联合主键组成；引用plan_item.id。",
-          "source": "R031",
+          "source": "UC-07、UC-08；患者决定—方案项目与方案项目的归属关联",
           "foreign_key": "plan_item",
           "primary_key": true
+        },
+        {
+          "name": "scope_quantity",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "本次决定限定的项目数量；仅明确选择该版本整项范围时为NULL，不表示未知或零，未选择范围不得默认整项同意。",
+          "source": "UC-07步骤5—6、R07-1；UC-08数量核对；C1确认数量（限定时记录）"
         },
         {
           "name": "linked_at",
@@ -3401,12 +3563,15 @@
         }
       ],
       "constraints": [
-        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "复合主键(decision_id,plan_item_id)；两端同方案版本，生效确认至少有一项；确认后冻结集合。"
+        "已生效决定及其范围禁止覆盖或级联删除；撤回、变更另存决定，保留原执行和原件。",
+        "PRIMARY KEY(decision_id,plan_item_id)；两列非空且分别外键引用patient_decision、plan_item；两端属于同一方案版本。",
+        "CHECK(scope_quantity IS NULL OR scope_quantity>0)；非空时不得超过所关联项目planned_quantity。NULL仅用于牙医明确记录整项范围；未填写范围不得自动视为同意，字段不默认0。",
+        "有效同意至少一项；办理执行时结合生效决定、撤回范围和既有实际完成核对余量，不将历次同意数量简单累加；累计实际完成不超过有效同意范围。"
       ],
       "historical_source_uc": "22、23",
       "source_uc": [
-        "UC-07"
+        "UC-07",
+        "UC-08"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -3420,7 +3585,7 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "联合主键组成；引用patient_decision.id。",
-          "source": "R033",
+          "source": "UC-07、UC-10；患者决定—确认原件与患者决定的归属关联",
           "foreign_key": "patient_decision",
           "primary_key": true
         },
@@ -3429,7 +3594,7 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "联合主键组成；引用document_version.id。",
-          "source": "R033",
+          "source": "UC-07、UC-10；患者决定—确认原件与文件版本的归属关联",
           "foreign_key": "document_version",
           "primary_key": true
         },
@@ -3477,8 +3642,8 @@
           "name": "visit_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 visit.id；来源 R035。",
-          "source": "R035",
+          "description": "引用 visit.id。",
+          "source": "UC-08；诊疗执行与就诊的归属关联",
           "foreign_key": "visit",
           "unique": false
         },
@@ -3486,8 +3651,8 @@
           "name": "plan_item_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 plan_item.id；来源 R036。",
-          "source": "R036",
+          "description": "引用 plan_item.id。",
+          "source": "UC-08；诊疗执行与方案项目的归属关联",
           "foreign_key": "plan_item",
           "unique": false
         },
@@ -3495,8 +3660,8 @@
           "name": "service_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 service.id；来源 R037。",
-          "source": "R037",
+          "description": "引用 service.id。",
+          "source": "UC-08；诊疗执行与收费项目的归属关联",
           "foreign_key": "service",
           "unique": false
         },
@@ -3504,8 +3669,8 @@
           "name": "original_execution_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 treatment_execution.id；来源 R038。",
-          "source": "R038",
+          "description": "引用 treatment_execution.id。",
+          "source": "UC-08；诊疗执行与诊疗执行的归属关联",
           "foreign_key": "treatment_execution",
           "unique": false
         },
@@ -3556,7 +3721,7 @@
           "type": "TEXT",
           "nullable": false,
           "description": "首次记录或更正记录；更正不删除原执行",
-          "source": "UC-04"
+          "source": "UC-08；首次实际执行或关联原执行的更正"
         },
         {
           "name": "performed_by",
@@ -3627,8 +3792,8 @@
           "name": "patient_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient.id；唯一。来源 R044。",
-          "source": "R044",
+          "description": "引用 patient.id；唯一。。",
+          "source": "UC-12、UC-13、UC-14；患者资金与患者的归属关联",
           "foreign_key": "patient",
           "unique": true
         },
@@ -3679,7 +3844,9 @@
       ],
       "historical_source_uc": "06、07、24—26",
       "source_uc": [
-        "UC-13"
+        "UC-12",
+        "UC-13",
+        "UC-14"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -3715,7 +3882,7 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "0或1；默认1；停用后旧费用保持",
-          "source": "UC-05"
+          "source": "UC-11；项目用于新计费的启用状态"
         },
         {
           "name": "created_by",
@@ -3785,8 +3952,8 @@
           "name": "service_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 service.id；来源 R039。",
-          "source": "R039",
+          "description": "引用 service.id。",
+          "source": "UC-08、UC-11；价目与收费项目的归属关联",
           "foreign_key": "service",
           "unique": false
         },
@@ -3830,7 +3997,7 @@
           "type": "TEXT",
           "nullable": true,
           "description": "退回/停止适用原因",
-          "source": "UC-05"
+          "source": "UC-11；负责人退回或停止适用依据"
         },
         {
           "name": "created_by",
@@ -3852,8 +4019,8 @@
           "name": "status",
           "type": "TEXT",
           "nullable": false,
-          "description": "限定：价目草稿、待负责人确认、已确认可适用、已退回、不再用于新计费；按C状态机转移，无隐式成功默认。",
-          "source": "C分析状态机",
+          "description": "限定：价目草稿、待负责人确认、已确认可适用、已退回、不再用于新计费；按对应规约事件更新，无隐式成功默认。",
+          "source": "UC-11字段与规则；简单状态不另设C3图",
           "enum": [
             "价目草稿",
             "待负责人确认",
@@ -3890,7 +4057,8 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "金额非负；有效结束晚于开始，已确认区间同项目不重叠。发布必须有确认人时间；有效价不反改既有快照。"
+        "金额非负；有效结束晚于开始，已确认区间同项目不重叠。发布必须有确认人时间；有效价不反改既有快照。",
+        "提交/发布和有效变更共同追加service_price_history，保留每次内容、经办时间和决定；当前行不是完整历史，旧快照不得覆盖。"
       ],
       "historical_source_uc": "04、05",
       "source_uc": [
@@ -3916,8 +4084,8 @@
           "name": "patient_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient.id；来源 R040。",
-          "source": "R040",
+          "description": "引用 patient.id。",
+          "source": "UC-12、UC-13、UC-14、UC-21；应收账目与患者的归属关联",
           "foreign_key": "patient",
           "unique": false
         },
@@ -3925,8 +4093,8 @@
           "name": "patient_funds_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient_funds.id；来源 R110。",
-          "source": "R110",
+          "description": "引用 patient_funds.id。",
+          "source": "UC-12、UC-13、UC-14、UC-21；应收账目与患者资金的归属关联",
           "foreign_key": "patient_funds",
           "unique": false
         },
@@ -4023,8 +4191,8 @@
           "name": "bill_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 bill.id；来源 R041。",
-          "source": "R041",
+          "description": "引用 bill.id。",
+          "source": "UC-08、UC-11、UC-12、UC-21、UC-25；应收项目与应收账目的归属关联",
           "foreign_key": "bill",
           "unique": false
         },
@@ -4033,9 +4201,9 @@
           "type": "INTEGER",
           "nullable": true,
           "description": "实际诊疗来源；与实际发药来源择一。",
-          "source": "R042",
+          "source": "UC-08、UC-11、UC-12、UC-21、UC-25；应收项目与诊疗执行的归属关联",
           "foreign_key": "treatment_execution",
-          "unique": false
+          "unique": true
         },
         {
           "name": "dispense_record_id",
@@ -4050,8 +4218,8 @@
           "name": "service_price_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 service_price.id；来源 R043。",
-          "source": "R043",
+          "description": "引用 service_price.id。",
+          "source": "UC-08、UC-11、UC-12、UC-21、UC-25；应收项目与价目的归属关联",
           "foreign_key": "service_price",
           "unique": false
         },
@@ -4088,7 +4256,7 @@
           "type": "TEXT",
           "nullable": false,
           "description": "待核价或已核价；已核价必须有明确单价",
-          "source": "UC-04、06"
+          "source": "UC-08、UC-11、UC-12、UC-25；实际来源的已核价或待核价状态"
         },
         {
           "name": "priced_by",
@@ -4126,7 +4294,8 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "一个实际执行只生成一项有效应收，UNIQUE(treatment_execution_id)。执行与账目同患者；已核价必须有单价，价目可空仅用于缺价/明确免收依据。确认计价人及说明齐全后才进入可结算应收。"
+        "一个实际执行只生成一项有效应收，UNIQUE(treatment_execution_id)。执行与账目同患者；已核价必须有单价，价目可空仅用于缺价/明确免收依据。确认计价人及说明齐全后才进入可结算应收。",
+        "CHECK((treatment_execution_id IS NOT NULL)+(dispense_record_id IS NOT NULL)=1)；两个来源外键分别可空且分别唯一，一次实际治疗或发药只形成一个应收来源；缺价保留待核价，不删实际来源。"
       ],
       "rules": [
         "诊疗执行和实际发药来源恰好一个；计划项目或未发药处方不直接形成已执行费用。"
@@ -4134,6 +4303,7 @@
       "historical_source_uc": "04、06",
       "source_uc": [
         "UC-08",
+        "UC-11",
         "UC-12",
         "UC-21",
         "UC-25"
@@ -4157,8 +4327,8 @@
           "name": "patient_funds_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient_funds.id；来源 R045。",
-          "source": "R045",
+          "description": "引用 patient_funds.id。",
+          "source": "UC-12、UC-13、UC-14、UC-21；患者付款与患者资金的归属关联",
           "foreign_key": "patient_funds",
           "unique": false
         },
@@ -4210,14 +4380,14 @@
           "type": "TEXT",
           "nullable": true,
           "description": "非现金确认时必填；按渠道唯一",
-          "source": "UC-07"
+          "source": "UC-13；原渠道实际到账的交易依据"
         },
         {
           "name": "verified_at",
           "type": "TEXT",
           "nullable": true,
           "description": "结果核实时刻；确认/失败时必填",
-          "source": "UC-07"
+          "source": "UC-13；核实原付款真实结果时间"
         },
         {
           "name": "operator_id",
@@ -4239,8 +4409,8 @@
           "name": "status",
           "type": "TEXT",
           "nullable": false,
-          "description": "限定：待核实、到账已确认、未到账已核实；按C状态机转移，无隐式成功默认。",
-          "source": "C分析状态机",
+          "description": "限定：待核实、到账已确认、未到账已核实；按对应规约事件更新，无隐式成功默认。",
+          "source": "UC-13字段与规则；简单状态不另设C3图",
           "enum": [
             "待核实",
             "到账已确认",
@@ -4311,8 +4481,8 @@
           "name": "patient_payment_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient_payment.id；来源 R046。",
-          "source": "R046",
+          "description": "引用 patient_payment.id。",
+          "source": "UC-12、UC-13、UC-14；付款分配与患者付款的归属关联",
           "foreign_key": "patient_payment",
           "unique": false
         },
@@ -4320,8 +4490,8 @@
           "name": "bill_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 bill.id；来源 R047。",
-          "source": "R047",
+          "description": "引用 bill.id。",
+          "source": "UC-12、UC-13、UC-14；付款分配与应收账目的归属关联",
           "foreign_key": "bill",
           "unique": false
         },
@@ -4403,7 +4573,8 @@
       "historical_source_uc": "07、25",
       "source_uc": [
         "UC-12",
-        "UC-13"
+        "UC-13",
+        "UC-14"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -4424,8 +4595,8 @@
           "name": "patient_payment_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient_payment.id；来源 R048。",
-          "source": "R048",
+          "description": "引用 patient_payment.id。",
+          "source": "UC-12、UC-13、UC-14；预付抵扣与患者付款的归属关联",
           "foreign_key": "patient_payment",
           "unique": false
         },
@@ -4433,8 +4604,8 @@
           "name": "bill_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 bill.id；来源 R049。",
-          "source": "R049",
+          "description": "引用 bill.id。",
+          "source": "UC-12、UC-13、UC-14；预付抵扣与应收账目的归属关联",
           "foreign_key": "bill",
           "unique": false
         },
@@ -4457,7 +4628,7 @@
           "type": "TEXT",
           "nullable": false,
           "description": "抵扣/释放依据；不改变实际收款",
-          "source": "UC-07、25"
+          "source": "UC-13；同患者原预款用于本账的依据"
         },
         {
           "name": "operator_id",
@@ -4515,7 +4686,9 @@
       ],
       "historical_source_uc": "07",
       "source_uc": [
-        "UC-13"
+        "UC-12",
+        "UC-13",
+        "UC-14"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -4537,19 +4710,27 @@
           "primary_key": true
         },
         {
-          "name": "bill_id",
+          "name": "patient_funds_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "关联bill",
-          "source": "本次核心业务补全",
+          "description": "本次电子收款的患者资金归属；预收和账单付款均必填。",
+          "source": "UC-13步骤1—3及1a预收；C1患者资金—电子支付单1:n关联",
+          "foreign_key": "patient_funds"
+        },
+        {
+          "name": "bill_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "账单付款引用原账目；预收时为空，不为收款伪造账单。",
+          "source": "UC-13基本路径及1a预收",
           "foreign_key": "bill"
         },
         {
           "name": "patient_payment_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "关联patient_payment",
-          "source": "本次核心业务补全",
+          "description": "确认成功后关联唯一实际付款，须同资金归属、同渠道及同金额；待核实可空。",
+          "source": "UC-13步骤5；R13-3；C1原单—付款0..1:0..1",
           "foreign_key": "patient_payment",
           "unique": true
         },
@@ -4610,6 +4791,12 @@
         "UC-13",
         "UC-14",
         "UC-21"
+      ],
+      "constraints": [
+        "patient_funds_id非空外键；bill_id可空。账单付款时bill.patient_funds_id必须等于本单归属，预收时bill_id为空；预收不建立虚假账单或自动分配费用。",
+        "CHECK(amount_cents>0)；UNIQUE(business_no)；UNIQUE(channel,external_reference)；patient_payment_id可空且唯一。核对原单、渠道及交易号，不重复确认实际到账。",
+        "已成功须实际付款已确认、平台交易号和核实时间齐全，原付款归属、渠道及净收金额与原单一致；受理、未知或本地待补记不记已成功，先查原号。",
+        "实际付款和适用账单用途共同保存；预收仅保留未分配的原款，日后抵扣另由UC-13办理，不新增实收；已用资金可用额按R13-2核对。"
       ]
     },
     {
@@ -4618,7 +4805,7 @@
       "table": "payment_reconciliation",
       "design_status": "随主要业务新增的设计，尚未写入运行程序",
       "rules": [
-        "对应支付或退款原单之一；核对差异不直接修改原收付款金额。"
+        "现金患者付款、电子支付单或退款办理三种原单恰选其一；核对差异不直接修改原收付款金额。"
       ],
       "fields": [
         {
@@ -4628,6 +4815,14 @@
           "description": "稳定主键，唯一标识本记录。",
           "source": "本次核心业务补全",
           "primary_key": true
+        },
+        {
+          "name": "patient_payment_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "原现金患者付款；与电子支付单、退款办理外键恰选其一。",
+          "source": "UC-21步骤3；R21-2、R21-3；C1现金付款核对关联",
+          "foreign_key": "patient_payment"
         },
         {
           "name": "payment_order_id",
@@ -4698,7 +4893,12 @@
       "historical_source_uc": "13、14、21",
       "source_uc": [
         "UC-13",
+        "UC-14",
         "UC-21"
+      ],
+      "constraints": [
+        "CHECK((patient_payment_id IS NOT NULL)+(payment_order_id IS NOT NULL)+(patient_refund_id IS NOT NULL)=1)；三项均为可空外键，分别引用patient_payment、payment_order、patient_refund的稳定id，不允许零来源或多来源。",
+        "引用patient_payment时须为现金原付款；电子支付按payment_order原单核对，退款按patient_refund核对。核对归属及正式依据，差异只记录处理结果，不倒改原金额；外键RESTRICT保留原业务。"
       ]
     },
     {
@@ -4718,8 +4918,8 @@
           "name": "patient_funds_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient_funds.id；来源 R050。",
-          "source": "R050",
+          "description": "引用 patient_funds.id。",
+          "source": "UC-14；费用申请与患者资金的归属关联",
           "foreign_key": "patient_funds",
           "unique": false
         },
@@ -4727,8 +4927,8 @@
           "name": "bill_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 bill.id；来源 R051。",
-          "source": "R051",
+          "description": "引用 bill.id。",
+          "source": "UC-14；费用申请与应收账目的归属关联",
           "foreign_key": "bill",
           "unique": false
         },
@@ -4736,8 +4936,8 @@
           "name": "patient_payment_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 patient_payment.id；来源 R052。",
-          "source": "R052",
+          "description": "引用 patient_payment.id。",
+          "source": "UC-14；费用申请与患者付款的归属关联",
           "foreign_key": "patient_payment",
           "unique": false
         },
@@ -4788,28 +4988,28 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "申请内递增提交版本；默认1",
-          "source": "UC-24、25"
+          "source": "UC-14；退回重提的提交版本"
         },
         {
           "name": "approved_adjustment_cents",
           "type": "INTEGER",
           "nullable": true,
           "description": "批准调整额；批准前为NULL",
-          "source": "UC-25"
+          "source": "UC-14；负责人批准调整额"
         },
         {
           "name": "approved_refund_cents",
           "type": "INTEGER",
           "nullable": true,
           "description": "批准退款上限；批准前为NULL",
-          "source": "UC-25"
+          "source": "UC-14；负责人批准退款上限"
         },
         {
           "name": "reviewed_at",
           "type": "TEXT",
           "nullable": true,
           "description": "审核时刻",
-          "source": "UC-25"
+          "source": "UC-14；实际负责人审核时间"
         },
         {
           "name": "created_by",
@@ -4877,7 +5077,9 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "原账目与原预付款至少一个，且都同资金归属。拟调整与拟退不可同时为0；退回重提递增submission_no，原提交与审核快照必须由运行审计保留。批准额、审核人时间和意见成组，批准退款不超过支持额度。"
+        "原账目与原预付款至少一个，且都同资金归属。拟调整与拟退不可同时为0；退回重提递增submission_no，原提交与审核快照由fee_request_history追加保留。批准额、审核人时间和意见成组，批准退款不超过支持额度。",
+        "拟退额、批准退款上限均非负；拟调整与拟退不同时为0，批准的调整方向与原申请一致且不扩大申请范围。单一批准下确认实际退款及待办理/待核实拟退占用合计不得超剩余批准上限。",
+        "提交/发布和有效变更共同追加fee_request_history，保留每次内容、经办时间和决定；当前行不是完整历史，旧快照不得覆盖。"
       ],
       "historical_source_uc": "24、25",
       "source_uc": [
@@ -4902,8 +5104,8 @@
           "name": "fee_request_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 fee_request.id；唯一。来源 R053。",
-          "source": "R053",
+          "description": "引用 fee_request.id；唯一。。",
+          "source": "UC-12、UC-14；费用调整与费用申请的归属关联",
           "foreign_key": "fee_request",
           "unique": true
         },
@@ -4911,8 +5113,8 @@
           "name": "bill_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 bill.id；来源 R054。",
-          "source": "R054",
+          "description": "引用 bill.id。",
+          "source": "UC-12、UC-14；费用调整与应收账目的归属关联",
           "foreign_key": "bill",
           "unique": false
         },
@@ -4992,8 +5194,8 @@
           "name": "fee_adjustment_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 fee_adjustment.id；来源 R055。",
-          "source": "R055",
+          "description": "引用 fee_adjustment.id。",
+          "source": "UC-12、UC-14；调整项目与费用调整的归属关联",
           "foreign_key": "fee_adjustment",
           "unique": false
         },
@@ -5001,8 +5203,8 @@
           "name": "bill_item_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 bill_item.id；来源 R056。",
-          "source": "R056",
+          "description": "引用 bill_item.id。",
+          "source": "UC-12、UC-14；调整项目与应收项目的归属关联",
           "foreign_key": "bill_item",
           "unique": false
         },
@@ -5074,8 +5276,8 @@
           "name": "fee_request_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 fee_request.id；来源 R057。",
-          "source": "R057",
+          "description": "引用 fee_request.id。",
+          "source": "UC-14、UC-21；退款办理与费用申请的归属关联",
           "foreign_key": "fee_request",
           "unique": false
         },
@@ -5083,8 +5285,8 @@
           "name": "patient_payment_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient_payment.id；来源 R058。",
-          "source": "R058",
+          "description": "引用 patient_payment.id。",
+          "source": "UC-14、UC-21；退款办理与患者付款的归属关联",
           "foreign_key": "patient_payment",
           "unique": false
         },
@@ -5092,8 +5294,8 @@
           "name": "patient_funds_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient_funds.id；来源 R059。",
-          "source": "R059",
+          "description": "引用 patient_funds.id。",
+          "source": "UC-14、UC-21；退款办理与患者资金的归属关联",
           "foreign_key": "patient_funds",
           "unique": false
         },
@@ -5144,21 +5346,21 @@
           "type": "TEXT",
           "nullable": true,
           "description": "非现金已确认时必填；渠道内唯一",
-          "source": "UC-26"
+          "source": "UC-14；原渠道退款交易依据"
         },
         {
           "name": "verified_at",
           "type": "TEXT",
           "nullable": true,
           "description": "确认或失败时刻",
-          "source": "UC-26"
+          "source": "UC-14；核实原退款真实结果时间"
         },
         {
           "name": "recipient_verification",
           "type": "TEXT",
           "nullable": false,
           "description": "收款接收方核实依据",
-          "source": "UC-26"
+          "source": "UC-14；实际接收方及原渠道核对依据"
         },
         {
           "name": "operator_id",
@@ -5188,8 +5390,8 @@
           "name": "status",
           "type": "TEXT",
           "nullable": false,
-          "description": "限定：待办理、待核实、已确认退款、已失败；按C状态机转移，无隐式成功默认。",
-          "source": "C分析状态机",
+          "description": "限定：待办理、待核实、已确认退款、已失败；按对应规约事件更新，无隐式成功默认。",
+          "source": "UC-14字段与规则；简单状态不另设C3图",
           "enum": [
             "待办理",
             "待核实",
@@ -5233,7 +5435,8 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "申请、原付款、患者资金同归属。待办理/待核实占用拟退额；成功占用实际额，剩余释放；失败释放全部未执行占用。确认/失败必须有核实人时间及凭据，成功实际额>0且不超过拟退额；同一批准累计不超额度。"
+        "申请、原付款、患者资金同归属。待办理/待核实占用拟退额；成功占用实际额，剩余释放；失败释放全部未执行占用。确认/失败必须有核实人时间及凭据，成功实际额>0且不超过拟退额；同一批准累计不超额度。",
+        "requested_cents>0；待办理/待核实actual_cents为空，不填0冒充结果。退款同时核对批准上限和原款可用额；已确认退款按实际额计，已失败不占额。重办只引用同申请同原款的明确失败单，不得以未知单为失败重发；渠道及平台退款号去重。"
       ],
       "historical_source_uc": "26",
       "source_uc": [
@@ -5259,8 +5462,8 @@
           "name": "patient_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 patient.id；来源 R060。",
-          "source": "R060",
+          "description": "引用 patient.id。",
+          "source": "UC-15、UC-16、UC-17；诊后要求与患者的归属关联",
           "foreign_key": "patient",
           "unique": false
         },
@@ -5268,8 +5471,8 @@
           "name": "source_visit_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 visit.id；来源 R061。",
-          "source": "R061",
+          "description": "引用 visit.id。",
+          "source": "UC-15、UC-16、UC-17；诊后要求与就诊的归属关联",
           "foreign_key": "visit",
           "unique": false
         },
@@ -5277,8 +5480,8 @@
           "name": "source_plan_version_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 plan_version.id；来源 R062。",
-          "source": "R062",
+          "description": "引用 plan_version.id。",
+          "source": "UC-15、UC-16、UC-17；诊后要求与方案版本的归属关联",
           "foreign_key": "plan_version",
           "unique": false
         },
@@ -5329,21 +5532,21 @@
           "type": "TEXT",
           "nullable": true,
           "description": "继续联系时的明确日期",
-          "source": "UC-12—14"
+          "source": "UC-15、UC-16、UC-17；继续联系或跟进日期"
         },
         {
           "name": "closed_at",
           "type": "TEXT",
           "nullable": true,
           "description": "完成/撤销时刻",
-          "source": "UC-12—14"
+          "source": "UC-15、UC-16、UC-17；完成或撤销的真实时间"
         },
         {
           "name": "closure_basis",
           "type": "TEXT",
           "nullable": true,
           "description": "完成或撤销依据",
-          "source": "UC-12—14"
+          "source": "UC-15、UC-16、UC-17；按原目的完成或牙医撤销的依据"
         },
         {
           "name": "created_by",
@@ -5415,11 +5618,28 @@
           "source": "公共持久化字段",
           "common": true,
           "default": 1
+        },
+        {
+          "name": "published_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "实际发布要求的牙医；待发布为空，发布后保留，不以创建人或负责前台代替。",
+          "source": "UC-15、R15-1；C1暂存或发布要求",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "published_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "实际发布时间；待发布为空，后续联系、评估或关闭不改写首次发布时间。",
+          "source": "UC-15、R15-1；C1发布及变更依据"
         }
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "就诊与方案版本至少一项且同患者；目标日期有序，负责前台必填。继续跟进须日期与责任；撤销有牙医依据，需临床评估者不能仅凭联系成功完成。转交责任与前后值由运行审计保留。"
+        "就诊与方案版本至少一项且同患者；目标日期有序，负责前台必填。继续跟进须日期与责任；撤销有牙医依据，需临床评估者不能仅凭联系成功完成。转交责任与前后值由followup_history追加保留。",
+        "待发布时published_by、published_at均为空；发布时同时填齐牙医及实际时刻，并检查同患者来源、目标日期与负责前台；后续状态均保留原发布信息。关闭须closed_by、closed_at、closure_basis齐全；撤销另有牙医依据和cancellation_reason。",
+        "提交/发布和有效变更共同追加followup_history，保留每次内容、经办时间和决定；当前行不是完整历史，旧快照不得覆盖。"
       ],
       "historical_source_uc": "12—14",
       "source_uc": [
@@ -5446,8 +5666,8 @@
           "name": "followup_requirement_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 followup_requirement.id；来源 R063。",
-          "source": "R063",
+          "description": "引用 followup_requirement.id。",
+          "source": "UC-16；联系经历与诊后要求的归属关联",
           "foreign_key": "followup_requirement",
           "unique": false
         },
@@ -5455,8 +5675,8 @@
           "name": "appointment_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 appointment.id；来源 R065。",
-          "source": "R065",
+          "description": "引用 appointment.id。",
+          "source": "UC-16；联系经历与预约的归属关联",
           "foreign_key": "appointment",
           "unique": false
         },
@@ -5493,7 +5713,7 @@
           "type": "TEXT",
           "nullable": false,
           "description": "沟通事实、预约衔接或临床问题转交说明",
-          "source": "UC-13"
+          "source": "UC-16；本次真实联系事实及沟通内容"
         },
         {
           "name": "operator_id",
@@ -5556,8 +5776,8 @@
           "name": "followup_requirement_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 followup_requirement.id；来源 R064。",
-          "source": "R064",
+          "description": "引用 followup_requirement.id。",
+          "source": "UC-17；临床评估与诊后要求的归属关联",
           "foreign_key": "followup_requirement",
           "unique": false
         },
@@ -5565,8 +5785,8 @@
           "name": "visit_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 visit.id；来源 R066。",
-          "source": "R066",
+          "description": "引用 visit.id。",
+          "source": "UC-17；临床评估与就诊的归属关联",
           "foreign_key": "visit",
           "unique": false
         },
@@ -5603,7 +5823,7 @@
           "type": "TEXT",
           "nullable": true,
           "description": "继续跟进时必填",
-          "source": "UC-14"
+          "source": "UC-17；牙医要求继续跟进的日期"
         },
         {
           "name": "assessed_by",
@@ -5649,7 +5869,8 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "关联到诊须同患者；远程沟通不伪造就诊。继续跟进必须同时有next_date和responsible_staff_id。"
+        "关联到诊须同患者；远程沟通不伪造就诊。继续跟进必须同时有next_date和responsible_staff_id。",
+        "到诊检查必须引用同患者实际就诊并有真实检查依据；远程沟通不填虚构visit_id，结论注明来源及局限。继续跟进时next_date及responsible_staff_id同时必填；完成评估与要求完成共同保存，是否完成按原目的及requires_assessment核对。"
       ],
       "historical_source_uc": "14",
       "source_uc": [
@@ -5742,21 +5963,21 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "0或1；按该材料实际效期管理要求指定",
-          "source": "UC-32"
+          "source": "UC-18；材料是否必须取得效期"
         },
         {
           "name": "confirmed_at",
           "type": "TEXT",
           "nullable": true,
           "description": "负责人确认材料计量与追溯设置的时刻",
-          "source": "UC-32"
+          "source": "UC-18；负责人确认计量设置时间"
         },
         {
           "name": "is_active",
           "type": "INTEGER",
           "nullable": false,
           "description": "0或1；默认1",
-          "source": "UC-32"
+          "source": "UC-18；新业务使用的启用状态"
         },
         {
           "name": "created_by",
@@ -5839,8 +6060,8 @@
           "name": "material_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 material.id；来源 R067。",
-          "source": "R067",
+          "description": "引用 material.id。",
+          "source": "UC-18、UC-20；材料批次与材料的归属关联",
           "foreign_key": "material",
           "unique": false
         },
@@ -5941,8 +6162,8 @@
           "name": "material_batch_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 material_batch.id；来源 R068。",
-          "source": "R068",
+          "description": "引用 material_batch.id。",
+          "source": "UC-18；批次变更与材料批次的归属关联",
           "foreign_key": "material_batch",
           "unique": false
         },
@@ -6058,7 +6279,7 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "0或1；默认1",
-          "source": "UC-17、28"
+          "source": "UC-18、UC-19、UC-20；批次存放位置可用性"
         },
         {
           "name": "created_by",
@@ -6107,7 +6328,9 @@
       ],
       "historical_source_uc": "17、18、28",
       "source_uc": [
-        "UC-18"
+        "UC-18",
+        "UC-19",
+        "UC-20"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -6128,8 +6351,8 @@
           "name": "material_batch_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 material_batch.id；来源 R069。",
-          "source": "R069",
+          "description": "引用 material_batch.id。",
+          "source": "UC-19、UC-20；批次存量与材料批次的归属关联",
           "foreign_key": "material_batch",
           "unique": false
         },
@@ -6137,8 +6360,8 @@
           "name": "stock_location_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 stock_location.id；来源 R070。",
-          "source": "R070",
+          "description": "引用 stock_location.id。",
+          "source": "UC-19、UC-20；批次存量与存放位置的归属关联",
           "foreign_key": "stock_location",
           "unique": false
         },
@@ -6177,10 +6400,12 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "UNIQUE(material_batch_id,stock_location_id)；账面数与流水同事务更新，版本比对；初始数量只能由有依据入库形成。"
+        "UNIQUE(material_batch_id,stock_location_id)；账面数与流水同事务更新，版本比对；初始数量只能由有依据入库形成。",
+        "quantity_scaled>=0；同批次位置唯一，余额只能由已核对的有据变动更新，不能直接改余额代替实际业务。"
       ],
       "historical_source_uc": "17、18、28",
       "source_uc": [
+        "UC-19",
         "UC-20"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
@@ -6202,8 +6427,8 @@
           "name": "batch_stock_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 batch_stock.id；来源 R071。",
-          "source": "R071",
+          "description": "引用 batch_stock.id。",
+          "source": "UC-19、UC-20、UC-25；库存变动与批次存量的归属关联",
           "foreign_key": "batch_stock",
           "unique": false
         },
@@ -6211,8 +6436,8 @@
           "name": "original_movement_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 inventory_movement.id；来源 R072。",
-          "source": "R072",
+          "description": "引用 inventory_movement.id。",
+          "source": "UC-19、UC-20、UC-25；库存变动与库存变动的归属关联",
           "foreign_key": "inventory_movement",
           "unique": false
         },
@@ -6220,8 +6445,8 @@
           "name": "stock_count_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 stock_count.id；唯一。来源 R075。",
-          "source": "R075",
+          "description": "引用 stock_count.id；唯一。。",
+          "source": "UC-19、UC-20、UC-25；库存变动与盘点核实的归属关联",
           "foreign_key": "stock_count",
           "unique": true
         },
@@ -6229,8 +6454,8 @@
           "name": "purchase_receipt_item_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 purchase_receipt_item.id；来源 R083。",
-          "source": "R083",
+          "description": "引用 purchase_receipt_item.id。",
+          "source": "UC-19、UC-20、UC-25；库存变动与验收项目的归属关联",
           "foreign_key": "purchase_receipt_item",
           "unique": false
         },
@@ -6238,8 +6463,15 @@
           "name": "movement_type",
           "type": "TEXT",
           "nullable": false,
-          "description": "验收入库、领用、未用退回、盘点或退供",
-          "source": "类型"
+          "description": "验收入库、普通领用、未用退回、盘点或处方实际发药；实际用料不是再次扣库类型。",
+          "source": "UC-19、UC-20、UC-25；C1库存变动及实际发药",
+          "enum": [
+            "验收入库",
+            "领用",
+            "未用退回",
+            "盘点",
+            "处方发药"
+          ]
         },
         {
           "name": "delta_scaled",
@@ -6312,10 +6544,14 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "after_scaled=before_scaled+delta_scaled且非负。入库正、领用/退供负；未用退回正且引用原领用；退供须采购差异依据。stock_count_id可空且唯一；原流水、采购、批次位置一致。"
+        "delta_scaled非零；before_scaled、after_scaled非负，after_scaled=before_scaled+delta_scaled；余额与流水共同保存并比对库存版本。验收入库正、领用及处方发药负、未用退回正，盘点按实际差异定正负。",
+        "验收入库须purchase_receipt_item_id非空且原流水/盘点引用为空；同验收项目累计入库不超确认合格量，批次位置同验收。普通领用、处方发药不引用验收、原领用或盘点；发药还须与实际发药记录一一对应。",
+        "未用退回须original_movement_id指向同批次位置的普通领用，采购及盘点引用为空；同原领用累计实际用料+未用退回不超原领用量，禁止引用退回、发药或自身。退回不自动恢复批次可用状态。",
+        "盘点须stock_count_id非空且原流水/采购引用为空，stock_count_id唯一；同一批次位置、负责人已确认且版本未变，变动等于实点减快照；零差异不生成流水。"
       ],
       "historical_source_uc": "18、28",
       "source_uc": [
+        "UC-19",
         "UC-20",
         "UC-25"
       ],
@@ -6338,8 +6574,8 @@
           "name": "inventory_movement_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 inventory_movement.id；来源 R073。",
-          "source": "R073",
+          "description": "引用 inventory_movement.id。",
+          "source": "UC-20；实际用料与库存变动的归属关联",
           "foreign_key": "inventory_movement",
           "unique": false
         },
@@ -6347,8 +6583,8 @@
           "name": "visit_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 visit.id；来源 R074。",
-          "source": "R074",
+          "description": "引用 visit.id。",
+          "source": "UC-20；实际用料与就诊的归属关联",
           "foreign_key": "visit",
           "unique": false
         },
@@ -6409,7 +6645,8 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "引用领用流水；累计实际使用加已退回不得超过可分配领用量，同就诊与经办责任可追踪。实际使用不再扣第二次库存。"
+        "引用领用流水；累计实际使用加已退回不得超过可分配领用量，同就诊与经办责任可追踪。实际使用不再扣第二次库存。",
+        "quantity_scaled>0；只分配普通领用的原数量，与所有已用及未用退回累计核对，不可将处方发药流水再次分配作普通用料；保存用料不改变库存余额。"
       ],
       "historical_source_uc": "18",
       "source_uc": [
@@ -6434,8 +6671,8 @@
           "name": "batch_stock_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 batch_stock.id；来源 R108。",
-          "source": "R108",
+          "description": "引用 batch_stock.id。",
+          "source": "UC-20；盘点核实与批次存量的归属关联",
           "foreign_key": "batch_stock",
           "unique": false
         },
@@ -6472,21 +6709,21 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "取快照时库存版本",
-          "source": "UC-18"
+          "source": "UC-20；盘点当时库存版本快照"
         },
         {
           "name": "counted_at",
           "type": "TEXT",
           "nullable": false,
           "description": "实点时刻",
-          "source": "UC-18"
+          "source": "UC-20；实际实点时间"
         },
         {
           "name": "review_note",
           "type": "TEXT",
           "nullable": true,
           "description": "负责人确认或拒绝意见",
-          "source": "UC-18"
+          "source": "UC-20；负责人同意、拒绝或要求重核的依据"
         },
         {
           "name": "operator_id",
@@ -6508,8 +6745,8 @@
           "name": "status",
           "type": "TEXT",
           "nullable": false,
-          "description": "限定：待确认差异、待重新核对、差异已确认、不予调整；按C状态机转移，无隐式成功默认。",
-          "source": "C分析状态机",
+          "description": "限定：待确认差异、待重新核对、差异已确认、不予调整；按对应规约事件更新，无隐式成功默认。",
+          "source": "UC-20字段与规则；简单状态不另设C3图",
           "enum": [
             "待确认差异",
             "待重新核对",
@@ -6545,7 +6782,8 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "确认时库存revision仍等于stock_revision，否则重新核实并保留旧快照审计；同意和差异流水同事务。零差异不生成零数量变动。确认/拒绝有负责人及时间。"
+        "确认时库存revision仍等于stock_revision，否则重新核实并保留旧快照至stock_count_history；同意和差异流水同事务。零差异不生成零数量变动。确认/拒绝有负责人及时间。",
+        "提交/发布和有效变更共同追加stock_count_history，保留每次内容、经办时间和决定；当前行不是完整历史，旧快照不得覆盖。"
       ],
       "historical_source_uc": "18",
       "source_uc": [
@@ -6595,32 +6833,17 @@
           "source": "联系资料"
         },
         {
-          "name": "settlement_basis",
-          "type": "TEXT",
-          "nullable": false,
-          "description": "付款约定及账户核实依据",
-          "source": "结算依据"
-        },
-        {
           "name": "is_active",
           "type": "INTEGER",
           "nullable": false,
           "description": "0或1；默认1，停用不删除历史",
-          "source": "UC-27"
+          "source": "UC-19；新采购可选供方状态"
         },
         {
           "name": "created_by",
           "type": "INTEGER",
           "nullable": false,
           "description": "负责人；引用staff.id；核对当时岗位资格。",
-          "source": "用例责任分配",
-          "foreign_key": "staff"
-        },
-        {
-          "name": "verified_by",
-          "type": "INTEGER",
-          "nullable": false,
-          "description": "结算依据核实负责人；引用staff.id；核对当时岗位资格。",
           "source": "用例责任分配",
           "foreign_key": "staff"
         },
@@ -6659,8 +6882,8 @@
         }
       ],
       "constraints": [
-        "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "结算依据变更保留前后值、核实人及依据的审计快照；历史付款必须保存当时账户核实凭据，不能只读取现供应商资料。"
+        "已引用的供应商限制删除；停用不影响原采购和到货事实。",
+        "is_active为0或1；名称不作为唯一身份。只保存供货联系资料和启用状态，不承担供应商付款及账户核验。"
       ],
       "historical_source_uc": "27、29",
       "source_uc": [
@@ -6685,8 +6908,8 @@
           "name": "supplier_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 supplier.id；来源 R076。",
-          "source": "R076",
+          "description": "引用 supplier.id。",
+          "source": "UC-19；采购与供应商的归属关联",
           "foreign_key": "supplier",
           "unique": false
         },
@@ -6716,7 +6939,7 @@
           "type": "TEXT",
           "nullable": false,
           "description": "采购需求依据",
-          "source": "UC-27"
+          "source": "UC-19；采购需求依据"
         },
         {
           "name": "created_by",
@@ -6778,11 +7001,19 @@
           "source": "公共持久化字段",
           "common": true,
           "default": 1
+        },
+        {
+          "name": "cancellation_reason",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "取消采购时必填的真实原因；取消不抹去已到货及原验收。",
+          "source": "UC-19扩展3a；C1取消采购（原因）"
         }
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "确认必须有负责人时间及至少一条采购项目；约定不形成库存或实际资金流。"
+        "确认必须有负责人时间及至少一条采购项目；约定不形成库存或实际资金流。",
+        "已取消须cancellation_reason非空；已确认须确认人、时间和至少一个有效采购项目齐全。取消只阻止未发生部分，既有到货、验收及入库保留，不自动冲销库存。"
       ],
       "historical_source_uc": "27",
       "source_uc": [
@@ -6807,8 +7038,8 @@
           "name": "purchase_order_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 purchase_order.id；来源 R077。",
-          "source": "R077",
+          "description": "引用 purchase_order.id。",
+          "source": "UC-19；采购项目与采购的归属关联",
           "foreign_key": "purchase_order",
           "unique": false
         },
@@ -6816,8 +7047,8 @@
           "name": "material_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 material.id；来源 R078。",
-          "source": "R078",
+          "description": "引用 material.id。",
+          "source": "UC-19；采购项目与材料的归属关联",
           "foreign_key": "material",
           "unique": false
         },
@@ -6847,35 +7078,35 @@
           "type": "INTEGER",
           "nullable": false,
           "description": "当时换算分子；正整数",
-          "source": "UC-27、28"
+          "source": "UC-19；确认时计量换算快照"
         },
         {
           "name": "conversion_denominator",
           "type": "INTEGER",
           "nullable": false,
           "description": "当时换算分母；正整数",
-          "source": "UC-27、28"
+          "source": "UC-19；确认时计量换算快照"
         },
         {
           "name": "quantity_scale",
           "type": "INTEGER",
           "nullable": false,
           "description": "当时材料精度快照",
-          "source": "UC-27、28"
+          "source": "UC-19；确认时数量精度快照"
         },
         {
           "name": "sequence_no",
           "type": "INTEGER",
           "nullable": false,
           "description": "采购内行号；正整数",
-          "source": "UC-27、28"
+          "source": "UC-19；原采购明细顺序"
         },
         {
           "name": "status",
           "type": "TEXT",
           "nullable": false,
-          "description": "限定：待交付、履行中、待差异处理、履行已完成、剩余已取消；按C状态机转移，无隐式成功默认。",
-          "source": "C分析状态机",
+          "description": "限定：待交付、履行中、待差异处理、履行已完成、剩余已取消；按对应规约事件更新，无隐式成功默认。",
+          "source": "UC-19字段与规则；简单状态不另设C3图",
           "enum": [
             "待交付",
             "履行中",
@@ -6937,8 +7168,8 @@
           "name": "purchase_order_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 purchase_order.id；来源 R079。",
-          "source": "R079",
+          "description": "引用 purchase_order.id。",
+          "source": "UC-19；验收与采购的归属关联",
           "foreign_key": "purchase_order",
           "unique": false
         },
@@ -7052,8 +7283,8 @@
           "name": "purchase_receipt_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 purchase_receipt.id；来源 R080。",
-          "source": "R080",
+          "description": "引用 purchase_receipt.id。",
+          "source": "UC-19；验收项目与验收的归属关联",
           "foreign_key": "purchase_receipt",
           "unique": false
         },
@@ -7061,8 +7292,8 @@
           "name": "purchase_order_item_id",
           "type": "INTEGER",
           "nullable": false,
-          "description": "引用 purchase_order_item.id；来源 R081。",
-          "source": "R081",
+          "description": "引用 purchase_order_item.id。",
+          "source": "UC-19；验收项目与采购项目的归属关联",
           "foreign_key": "purchase_order_item",
           "unique": false
         },
@@ -7070,8 +7301,8 @@
           "name": "material_batch_id",
           "type": "INTEGER",
           "nullable": true,
-          "description": "引用 material_batch.id；来源 R082。",
-          "source": "R082",
+          "description": "引用 material_batch.id。",
+          "source": "UC-19；验收项目与材料批次的归属关联",
           "foreign_key": "material_batch",
           "unique": false
         },
@@ -7104,18 +7335,11 @@
           "source": "待检量"
         },
         {
-          "name": "accepted_amount_cents",
-          "type": "INTEGER",
-          "nullable": true,
-          "description": "认可应付快照，按采购换算计算；验收确认时必填",
-          "source": "UC-28、29"
-        },
-        {
           "name": "inspection_note",
           "type": "TEXT",
           "nullable": false,
           "description": "验收事实、待检原因及后续处理依据",
-          "source": "UC-28"
+          "source": "UC-19；真实验收、待检或差异结论依据"
         },
         {
           "name": "stock_location_id",
@@ -7153,7 +7377,10 @@
       ],
       "constraints": [
         "已生效事实限制删除；外键采用RESTRICT，不级联清空历史。",
-        "到货=合格+拒收+待检。批次必须属于采购项目材料；合格量>0须批次和位置。不同批次/位置拆行。仅新确认合格增量形成一次入库。认可应付=合格放大量×换算分母×采购单位分单价÷（10的精度次方×换算分子），逐行四舍五入到分后冻结；变更留审计。"
+        "arrived_quantity_scaled>0，其余三类数量非负且到货=合格+拒收+待检；引用项目属于本验收原采购，批次材料与采购项目一致。合格量>0须有批次及存放位置，不同批次/位置拆行。",
+        "只将本次新确认合格增量入库；同验收项目可有多笔历次增量，累计入库不得超过当前确认合格量，累计合格不超原采购支持量；超供先由负责人协调。待检转合格沿用原到货，不再加到货量。",
+        "数量及结论的历次变更保留原版本和确认依据，入库流水与余额共同保存；不生成供应商应付或付款分配。",
+        "提交/发布和有效变更共同追加receipt_item_history，保留每次内容、经办时间和决定；当前行不是完整历史，旧快照不得覆盖。"
       ],
       "historical_source_uc": "28",
       "source_uc": [
@@ -7189,9 +7416,9 @@
         {
           "name": "insured_person_no",
           "type": "TEXT",
-          "nullable": false,
-          "description": "办理必要的医保人员编号，按岗位保护",
-          "source": "本次核心业务补全"
+          "nullable": true,
+          "description": "核验通过后必填的必要医保人员编号；未通过且平台未返回时可空，不编造编号。",
+          "source": "UC-22扩展2a；R22-1"
         },
         {
           "name": "insured_area",
@@ -7244,6 +7471,9 @@
       "historical_source_uc": "22",
       "source_uc": [
         "UC-22"
+      ],
+      "constraints": [
+        "核验通过须必要人员编号、实际核验时间及结果依据齐全；未通过不伪造人员编号或适用期。未知保留原办理待核验，不生成通过/未通过结果；不保存一次性原始认证凭证。"
       ]
     },
     {
@@ -7322,6 +7552,10 @@
       "historical_source_uc": "11、22",
       "source_uc": [
         "UC-22"
+      ],
+      "constraints": [
+        "service_id、material_id恰有一个非空；药品对应材料目录中的药品。适用期终点为空或不早于起点；同地区同对象的有效对应期不重叠。",
+        "编码表示项目对应，不表示固定报销比例；使用时核对地区、日期及启用状态，历史提交固定当时编码。"
       ]
     },
     {
@@ -7465,12 +7699,35 @@
           "nullable": true,
           "description": "平台返回及患者选择依据",
           "source": "本次核心业务补全"
+        },
+        {
+          "name": "previous_case_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "撤销后新办理引用原办理；首办为空，须同患者及实际就诊，保留旧结算与撤销事实。",
+          "source": "UC-23扩展1a；C1建立重新办理（原办理依据）",
+          "foreign_key": "insurance_case"
+        },
+        {
+          "name": "current_preestimate_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当前有效或待核实预结算的提交记录；初始可空，切换前保留旧历史。",
+          "source": "UC-22步骤4—6及R22-3",
+          "foreign_key": "insurance_preestimate_history"
         }
       ],
       "historical_source_uc": "22、23",
       "source_uc": [
         "UC-22",
         "UC-23"
+      ],
+      "constraints": [
+        "患者、就诊、可选账单及身份同归属；待核验可缺身份、账单、诊断和费用版本，预结算前必须齐全且核验适用。",
+        "本次预估三额须同一平台结果、同一费用范围，均非负且合计等于本次提交总费用；旧预估失效不得作为有效结果复用，须重新说明并取得患者实际选择。",
+        "正式结算前须有效预结算及患者医保选择和确认时间；未决原办理先查，不以新号绕过。previous_case_id不得指向自身或形成循环，且须同患者同就诊；撤销后重办必须先核实原撤销成功。",
+        "每次预结算提交、结果、失效或患者选择共同追加insurance_preestimate_history，保留每次内容、经办时间和决定；当前行不是完整历史，旧快照不得覆盖。",
+        "current_preestimate_id有值时属于本办理且为提交事件；当前预估及选择仅是由该提交历史投影的查询值。新提交重置本次选择和有效预估，保留旧提交、失效、说明及选择。"
       ]
     },
     {
@@ -7509,9 +7766,9 @@
         {
           "name": "mapping_id",
           "type": "INTEGER",
-          "nullable": false,
-          "description": "关联insurance_item_mapping",
-          "source": "本次核心业务补全",
+          "nullable": true,
+          "description": "有适用医保编码时引用原对应；明确自费标识时为空，不伪造映射。",
+          "source": "UC-22步骤3—4及扩展3a；C1适用编码或自费标识",
           "foreign_key": "insurance_item_mapping"
         },
         {
@@ -7541,11 +7798,47 @@
           "nullable": false,
           "description": "项目核对和平台返回依据",
           "source": "本次核心业务补全"
+        },
+        {
+          "name": "is_self_pay",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次提交是否明确标为自费（0或1）；由实际项目标识确定，不能因缺编码自动设为自费。",
+          "source": "UC-22字段本次提交；R22-1"
+        },
+        {
+          "name": "insurance_code_snapshot",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "本次提交采用的医保编码快照；自费时为空，不能读取后来变更的目录覆盖历史。",
+          "source": "UC-22步骤4；C1固定本次提交范围及快照"
+        },
+        {
+          "name": "fee_revision",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次提交采用的原费用正版本，须与所属医保办理一致；历史提交不覆盖。",
+          "source": "UC-22、R22-3；C1费用版本"
+        },
+        {
+          "name": "preestimate_request_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "该明细所属确切预结算提交记录；历史明细固定原请求。",
+          "source": "UC-22本次提交字段及R22-1/3",
+          "foreign_key": "insurance_preestimate_history"
         }
       ],
       "historical_source_uc": "22",
       "source_uc": [
-        "UC-22"
+        "UC-22",
+        "UC-23"
+      ],
+      "constraints": [
+        "quantity>0、amount_cents>=0、fee_revision>0；明细所属原账单、患者与医保办理一致，费用版本等于preestimate_request_id对应原提交版本。提交数量、金额、标识和实际时间保留当次快照。",
+        "is_self_pay为0或1；为1时mapping_id与insurance_code_snapshot均为空，为0时两者非空且编码等于提交时适用映射。缺标识须补正，不以自动自费绕过核对。",
+        "本次提交范围中同一原应收项目不重复计入；已有未决原单先核实，相同费用不得重复参与有效正式结算，取消或撤销前保留原范围。",
+        "preestimate_request_id指向所属医保办理的提交事件；UNIQUE(preestimate_request_id,bill_item_id)。费用版本与原提交一致，历史明细冻结，不以主办理后来的费用版本重写。"
       ]
     },
     {
@@ -7626,6 +7919,14 @@
             "有效",
             "已撤销"
           ]
+        },
+        {
+          "name": "preestimate_request_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "正式结算实际采用且经患者确认的预结算提交，后续不随当前指针改变。",
+          "source": "UC-23步骤1—4及R23-1/2",
+          "foreign_key": "insurance_preestimate_history"
         }
       ],
       "historical_source_uc": "23",
@@ -7634,6 +7935,12 @@
         "UC-14",
         "UC-21",
         "UC-23"
+      ],
+      "constraints": [
+        "total_cents、fund_cents、account_cents、patient_due_cents均非负，total_cents=fund_cents+account_cents+patient_due_cents，须与平台明确正式结果及该办理固定提交范围一致。",
+        "external_reference唯一；一个办理最多一份有效正式结算，跨办理同一费用范围也不得重复参与有效结算，未决先核实。保存正式结果与办理已结算状态共同生效。",
+        "仅平台明确撤销成功才将原结算停用并保留原分摊；未知或失败不改有效性。正式结算不代表患者付款或医保实际回款。",
+        "所引预结算提交与本结算医保办理及费用范围一致，并有有效成功预估及患者医保确认；最终正式分摊仍以平台正式结果独立保存。"
       ]
     },
     {
@@ -7710,12 +8017,53 @@
             "已成功",
             "已失败"
           ]
+        },
+        {
+          "name": "approved_by",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "核实并批准本次原单撤销的负责人；不以收费经办人代替。",
+          "source": "UC-23扩展1a；C1核对原结算及批准依据",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "approved_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "负责人核实批准撤销的实际时间。",
+          "source": "UC-23扩展1a；C1负责人依据"
+        },
+        {
+          "name": "approval_basis",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "负责人核实原因及允许撤销的依据；涉及费用更正时回溯已批准申请。",
+          "source": "UC-23扩展1a；R23-3"
+        },
+        {
+          "name": "verified_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "核实平台原笔真实结果的获准人员；最终成功或失败时必填。",
+          "source": "UC-23；C1原笔结果、核实人及时间",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "verification_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "查询原撤销的实际结果依据；未知保持待核实，明确失败仍保留原结算。",
+          "source": "UC-23扩展1a及R23-3"
         }
       ],
       "historical_source_uc": "14、23",
       "source_uc": [
         "UC-14",
         "UC-23"
+      ],
+      "constraints": [
+        "建立待办前已有负责人、人时及核实依据；fee_request_id有值时为同患者已批准费用申请。独立业务号唯一，核实原结算及同原单未决撤销，不重复发起。",
+        "已成功/已失败须verified_by、verified_at、verification_note齐全；成功还须有平台明确撤销依据，不因超时判成功或失败。成功与原结算停用、原办理已撤销共同保存，失败或待核实保留原结算效力。"
       ]
     },
     {
@@ -7784,7 +8132,1476 @@
       "source_uc": [
         "UC-21",
         "UC-23"
+      ],
+      "constraints": [
+        "amount_cents>0，flow_type为拨付或退回；据真实收付记录，原结算和医保/银行凭据齐全；同结算、方向及原收付凭据去重，一笔原收付不得以改写说明再次确认。",
+        "分次收付分别保存，已撤销结算仍保留已拨及实际退回；差额按有效应拨额减净到账推导，不自动增加患者应付。"
       ]
+    },
+    {
+      "key": "Request_HistoryStorage",
+      "name": "费用申请历史",
+      "table": "fee_request_history",
+      "physical_role": "history",
+      "analysis_owner": "fee_request",
+      "owner_field": "fee_request_id",
+      "source_uc": [
+        "UC-14"
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定历史主键。",
+          "source": "UC-14；fee_request的历次办理保存",
+          "primary_key": true
+        },
+        {
+          "name": "fee_request_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "对应原业务对象，不使用多态表名/对象号代替外键。",
+          "source": "UC-14；fee_request的历次办理保存",
+          "foreign_key": "fee_request"
+        },
+        {
+          "name": "event_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同原业务内递增序号；前一条历史保持。",
+          "source": "UC-14；fee_request的历次办理保存"
+        },
+        {
+          "name": "operation_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次办理前确定的恒定办理标识，重复请求沿用原号，不因重试生成第二份历史。",
+          "source": "UC-14；fee_request的历次办理保存",
+          "unique": true
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "真实业务事件种类，不另造主业务状态。",
+          "source": "UC-14；fee_request的历次办理保存",
+          "enum": [
+            "提交",
+            "退回",
+            "同意",
+            "拒绝",
+            "撤回"
+          ]
+        },
+        {
+          "name": "event_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "提交、决定或更正的业务原因和依据。",
+          "source": "UC-14；fee_request的历次办理保存"
+        },
+        {
+          "name": "actor_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次实际办理责任人员，按事件核对授权；自动返回沿原请求责任身份记录，不冒充新的人工确认。",
+          "source": "UC-14；fee_request的历次办理保存",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "实际办理时刻。",
+          "source": "UC-14；fee_request的历次办理保存"
+        },
+        {
+          "name": "patient_funds_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：引用 patient_funds.id；来源 R050。",
+          "source": "UC-14；fee_request.patient_funds_id的当次快照",
+          "foreign_key": "patient_funds",
+          "snapshot": true
+        },
+        {
+          "name": "bill_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：引用 bill.id；来源 R051。",
+          "source": "UC-14；fee_request.bill_id的当次快照",
+          "foreign_key": "bill",
+          "snapshot": true
+        },
+        {
+          "name": "patient_payment_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：引用 patient_payment.id；来源 R052。",
+          "source": "UC-14；fee_request.patient_payment_id的当次快照",
+          "foreign_key": "patient_payment",
+          "snapshot": true
+        },
+        {
+          "name": "submission_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：申请内递增提交版本；默认1",
+          "source": "UC-14；fee_request.submission_no的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：费用更正或退费理由",
+          "source": "UC-14；fee_request.reason的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "proposed_adjustment_cents",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：带符号分金额；默认0，负数减少应收",
+          "source": "UC-14；fee_request.proposed_adjustment_cents的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "proposed_refund_cents",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：非负分金额；默认0",
+          "source": "UC-14；fee_request.proposed_refund_cents的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "evidence",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：原单、说明及附件保存依据",
+          "source": "UC-14；fee_request.evidence的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "submitted_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：本次提交时刻",
+          "source": "UC-14；fee_request.submitted_at的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：限定：待审核、已退回、已拒绝、已同意、已撤回；按C状态机转移，无隐式成功默认。",
+          "source": "UC-14；fee_request.status的当次快照",
+          "enum": [
+            "待审核",
+            "已退回",
+            "已拒绝",
+            "已同意",
+            "已撤回"
+          ],
+          "snapshot": true
+        },
+        {
+          "name": "approved_adjustment_cents",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：批准调整额；批准前为NULL",
+          "source": "UC-14；fee_request.approved_adjustment_cents的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "approved_refund_cents",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：批准退款上限；批准前为NULL",
+          "source": "UC-14；fee_request.approved_refund_cents的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "review_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：审核决定形成时必填",
+          "source": "UC-14；fee_request.review_note的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "reviewed_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：审核负责人；引用staff.id；核对当时岗位资格。",
+          "source": "UC-14；fee_request.reviewed_by的当次快照",
+          "foreign_key": "staff",
+          "snapshot": true
+        },
+        {
+          "name": "reviewed_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：审核时刻",
+          "source": "UC-14；fee_request.reviewed_at的当次快照",
+          "snapshot": true
+        }
+      ],
+      "constraints": [
+        "UNIQUE(fee_request_id,event_no)及UNIQUE(operation_no)；event_no>0；历史主键和原业务外键恒定；只追加，禁止更新、删除或级联清除。",
+        "每次所列真实业务事件追加对应快照；主表当前结果、对应历史及必要资金/库存结果在同一本地事务保存。序号分配及前一结果核对在写事务内完成；相邻快照保留前后内容，重复同次办理沿operation_no返回原结果。",
+        "actor_id、occurred_at、event_reason及事件类型必填；快照字段遵循原业务有效性，查询历史按原对象及event_no排序。"
+      ],
+      "design_status": "同一分析实体的历史存储映射；未新增系统用例或业务类，未写入运行程序。"
+    },
+    {
+      "key": "Price_HistoryStorage",
+      "name": "价目审核历史",
+      "table": "service_price_history",
+      "physical_role": "history",
+      "analysis_owner": "service_price",
+      "owner_field": "service_price_id",
+      "source_uc": [
+        "UC-11"
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定历史主键。",
+          "source": "UC-11；service_price的历次办理保存",
+          "primary_key": true
+        },
+        {
+          "name": "service_price_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "对应原业务对象，不使用多态表名/对象号代替外键。",
+          "source": "UC-11；service_price的历次办理保存",
+          "foreign_key": "service_price"
+        },
+        {
+          "name": "event_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同原业务内递增序号；前一条历史保持。",
+          "source": "UC-11；service_price的历次办理保存"
+        },
+        {
+          "name": "operation_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次办理前确定的恒定办理标识，重复请求沿用原号，不因重试生成第二份历史。",
+          "source": "UC-11；service_price的历次办理保存",
+          "unique": true
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "真实业务事件种类，不另造主业务状态。",
+          "source": "UC-11；service_price的历次办理保存",
+          "enum": [
+            "提交",
+            "退回",
+            "确认",
+            "停止适用"
+          ]
+        },
+        {
+          "name": "event_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "提交、决定或更正的业务原因和依据。",
+          "source": "UC-11；service_price的历次办理保存"
+        },
+        {
+          "name": "actor_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次实际办理责任人员，按事件核对授权；自动返回沿原请求责任身份记录，不冒充新的人工确认。",
+          "source": "UC-11；service_price的历次办理保存",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "实际办理时刻。",
+          "source": "UC-11；service_price的历次办理保存"
+        },
+        {
+          "name": "service_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：引用 service.id；来源 R039。",
+          "source": "UC-11；service_price.service_id的当次快照",
+          "foreign_key": "service",
+          "snapshot": true
+        },
+        {
+          "name": "unit_price_cents",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：非负分金额；零价须说明免收依据",
+          "source": "UC-11；service_price.unit_price_cents的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "valid_from",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：适用起点",
+          "source": "UC-11；service_price.valid_from的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "valid_until",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：适用终点；左闭右开",
+          "source": "UC-11；service_price.valid_until的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "change_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：调价或免收依据",
+          "source": "UC-11；service_price.change_reason的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "review_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：退回/停止适用原因",
+          "source": "UC-11；service_price.review_note的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：限定：价目草稿、待负责人确认、已确认可适用、已退回、不再用于新计费；按对应规约事件更新，无隐式成功默认。",
+          "source": "UC-11；service_price.status的当次快照",
+          "enum": [
+            "价目草稿",
+            "待负责人确认",
+            "已确认可适用",
+            "已退回",
+            "不再用于新计费"
+          ],
+          "snapshot": true
+        },
+        {
+          "name": "confirmed_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：审核负责人；引用staff.id；核对当时岗位资格。",
+          "source": "UC-11；service_price.confirmed_by的当次快照",
+          "foreign_key": "staff",
+          "snapshot": true
+        },
+        {
+          "name": "confirmed_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：负责人确认时刻",
+          "source": "UC-11；service_price.confirmed_at的当次快照",
+          "snapshot": true
+        }
+      ],
+      "constraints": [
+        "UNIQUE(service_price_id,event_no)及UNIQUE(operation_no)；event_no>0；历史主键和原业务外键恒定；只追加，禁止更新、删除或级联清除。",
+        "每次所列真实业务事件追加对应快照；主表当前结果、对应历史及必要资金/库存结果在同一本地事务保存。序号分配及前一结果核对在写事务内完成；相邻快照保留前后内容，重复同次办理沿operation_no返回原结果。",
+        "actor_id、occurred_at、event_reason及事件类型必填；快照字段遵循原业务有效性，查询历史按原对象及event_no排序。"
+      ],
+      "design_status": "同一分析实体的历史存储映射；未新增系统用例或业务类，未写入运行程序。"
+    },
+    {
+      "key": "Followup_HistoryStorage",
+      "name": "诊后要求历史",
+      "table": "followup_history",
+      "physical_role": "history",
+      "analysis_owner": "followup_requirement",
+      "owner_field": "followup_requirement_id",
+      "source_uc": [
+        "UC-15",
+        "UC-16",
+        "UC-17"
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定历史主键。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement的历次办理保存",
+          "primary_key": true
+        },
+        {
+          "name": "followup_requirement_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "对应原业务对象，不使用多态表名/对象号代替外键。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement的历次办理保存",
+          "foreign_key": "followup_requirement"
+        },
+        {
+          "name": "event_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同原业务内递增序号；前一条历史保持。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement的历次办理保存"
+        },
+        {
+          "name": "operation_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次办理前确定的恒定办理标识，重复请求沿用原号，不因重试生成第二份历史。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement的历次办理保存",
+          "unique": true
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "真实业务事件种类，不另造主业务状态。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement的历次办理保存",
+          "enum": [
+            "发布",
+            "调整",
+            "转交",
+            "联系更新",
+            "继续跟进",
+            "完成",
+            "撤销"
+          ]
+        },
+        {
+          "name": "event_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "提交、决定或更正的业务原因和依据。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement的历次办理保存"
+        },
+        {
+          "name": "actor_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次实际办理责任人员，按事件核对授权；自动返回沿原请求责任身份记录，不冒充新的人工确认。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement的历次办理保存",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "实际办理时刻。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement的历次办理保存"
+        },
+        {
+          "name": "patient_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：引用 patient.id；来源 R060。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.patient_id的当次快照",
+          "foreign_key": "patient",
+          "snapshot": true
+        },
+        {
+          "name": "source_visit_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：引用 visit.id；来源 R061。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.source_visit_id的当次快照",
+          "foreign_key": "visit",
+          "snapshot": true
+        },
+        {
+          "name": "source_plan_version_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：引用 plan_version.id；来源 R062。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.source_plan_version_id的当次快照",
+          "foreign_key": "plan_version",
+          "snapshot": true
+        },
+        {
+          "name": "purpose",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：需要达成的联系或临床目的",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.purpose的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "followup_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：复诊或随访",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.followup_type的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "target_start",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：目标日期范围起点",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.target_start的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "target_end",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：范围终点，不早于起点；单日相同",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.target_end的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "requires_assessment",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：0或1；创建时明确选择，无默认",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.requires_assessment的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "responsible_frontdesk_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：负责前台；引用staff.id；核对当时岗位资格。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.responsible_frontdesk_id的当次快照",
+          "foreign_key": "staff",
+          "snapshot": true
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：限定：待发布、待联系、待到诊或评估、已完成、已撤销；按C状态机转移，无隐式成功默认。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.status的当次快照",
+          "enum": [
+            "待发布",
+            "待联系",
+            "待到诊或评估",
+            "已完成",
+            "已撤销"
+          ],
+          "snapshot": true
+        },
+        {
+          "name": "next_contact_date",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：继续联系时的明确日期",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.next_contact_date的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "published_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：实际发布要求的牙医；待发布为空，发布后保留，不以创建人或负责前台代替。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.published_by的当次快照",
+          "foreign_key": "staff",
+          "snapshot": true
+        },
+        {
+          "name": "published_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：实际发布时间；待发布为空，后续联系、评估或关闭不改写首次发布时间。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.published_at的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "closed_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：获准完成或撤销人员；引用staff.id；核对当时岗位资格。",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.closed_by的当次快照",
+          "foreign_key": "staff",
+          "snapshot": true
+        },
+        {
+          "name": "closed_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：完成/撤销时刻",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.closed_at的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "closure_basis",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：完成或撤销依据",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.closure_basis的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "cancellation_reason",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：撤销时必填",
+          "source": "UC-15、UC-16、UC-17；followup_requirement.cancellation_reason的当次快照",
+          "snapshot": true
+        }
+      ],
+      "constraints": [
+        "UNIQUE(followup_requirement_id,event_no)及UNIQUE(operation_no)；event_no>0；历史主键和原业务外键恒定；只追加，禁止更新、删除或级联清除。",
+        "每次所列真实业务事件追加对应快照；主表当前结果、对应历史及必要资金/库存结果在同一本地事务保存。序号分配及前一结果核对在写事务内完成；相邻快照保留前后内容，重复同次办理沿operation_no返回原结果。",
+        "actor_id、occurred_at、event_reason及事件类型必填；快照字段遵循原业务有效性，查询历史按原对象及event_no排序。"
+      ],
+      "design_status": "同一分析实体的历史存储映射；未新增系统用例或业务类，未写入运行程序。"
+    },
+    {
+      "key": "Count_HistoryStorage",
+      "name": "盘点核实历史",
+      "table": "stock_count_history",
+      "physical_role": "history",
+      "analysis_owner": "stock_count",
+      "owner_field": "stock_count_id",
+      "source_uc": [
+        "UC-20"
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定历史主键。",
+          "source": "UC-20；stock_count的历次办理保存",
+          "primary_key": true
+        },
+        {
+          "name": "stock_count_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "对应原业务对象，不使用多态表名/对象号代替外键。",
+          "source": "UC-20；stock_count的历次办理保存",
+          "foreign_key": "stock_count"
+        },
+        {
+          "name": "event_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同原业务内递增序号；前一条历史保持。",
+          "source": "UC-20；stock_count的历次办理保存"
+        },
+        {
+          "name": "operation_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次办理前确定的恒定办理标识，重复请求沿用原号，不因重试生成第二份历史。",
+          "source": "UC-20；stock_count的历次办理保存",
+          "unique": true
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "真实业务事件种类，不另造主业务状态。",
+          "source": "UC-20；stock_count的历次办理保存",
+          "enum": [
+            "提交",
+            "版本不符",
+            "重新实点",
+            "同意",
+            "拒绝"
+          ]
+        },
+        {
+          "name": "event_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "提交、决定或更正的业务原因和依据。",
+          "source": "UC-20；stock_count的历次办理保存"
+        },
+        {
+          "name": "actor_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次实际办理责任人员，按事件核对授权；自动返回沿原请求责任身份记录，不冒充新的人工确认。",
+          "source": "UC-20；stock_count的历次办理保存",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "实际办理时刻。",
+          "source": "UC-20；stock_count的历次办理保存"
+        },
+        {
+          "name": "batch_stock_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：引用 batch_stock.id；来源 R108。",
+          "source": "UC-20；stock_count.batch_stock_id的当次快照",
+          "foreign_key": "batch_stock",
+          "snapshot": true
+        },
+        {
+          "name": "snapshot_quantity_scaled",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：盘点读取的账面量；非负",
+          "source": "UC-20；stock_count.snapshot_quantity_scaled的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "counted_quantity_scaled",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：实点基本单位数量；非负",
+          "source": "UC-20；stock_count.counted_quantity_scaled的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "stock_revision",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：取快照时库存版本",
+          "source": "UC-20；stock_count.stock_revision的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "counted_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：实点时刻",
+          "source": "UC-20；stock_count.counted_at的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：差异及核实依据",
+          "source": "UC-20；stock_count.reason的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "review_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：负责人确认或拒绝意见",
+          "source": "UC-20；stock_count.review_note的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "confirmed_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：确认负责人；引用staff.id；核对当时岗位资格。",
+          "source": "UC-20；stock_count.confirmed_by的当次快照",
+          "foreign_key": "staff",
+          "snapshot": true
+        },
+        {
+          "name": "confirmed_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：同意或拒绝时刻",
+          "source": "UC-20；stock_count.confirmed_at的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：限定：待确认差异、待重新核对、差异已确认、不予调整；按对应规约事件更新，无隐式成功默认。",
+          "source": "UC-20；stock_count.status的当次快照",
+          "enum": [
+            "待确认差异",
+            "待重新核对",
+            "差异已确认",
+            "不予调整"
+          ],
+          "snapshot": true
+        }
+      ],
+      "constraints": [
+        "UNIQUE(stock_count_id,event_no)及UNIQUE(operation_no)；event_no>0；历史主键和原业务外键恒定；只追加，禁止更新、删除或级联清除。",
+        "每次所列真实业务事件追加对应快照；主表当前结果、对应历史及必要资金/库存结果在同一本地事务保存。序号分配及前一结果核对在写事务内完成；相邻快照保留前后内容，重复同次办理沿operation_no返回原结果。",
+        "actor_id、occurred_at、event_reason及事件类型必填；快照字段遵循原业务有效性，查询历史按原对象及event_no排序。"
+      ],
+      "design_status": "同一分析实体的历史存储映射；未新增系统用例或业务类，未写入运行程序。"
+    },
+    {
+      "key": "ReceiptItem_HistoryStorage",
+      "name": "验收项目历史",
+      "table": "receipt_item_history",
+      "physical_role": "history",
+      "analysis_owner": "purchase_receipt_item",
+      "owner_field": "purchase_receipt_item_id",
+      "source_uc": [
+        "UC-19"
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定历史主键。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存",
+          "primary_key": true
+        },
+        {
+          "name": "purchase_receipt_item_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "对应原业务对象，不使用多态表名/对象号代替外键。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存",
+          "foreign_key": "purchase_receipt_item"
+        },
+        {
+          "name": "event_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同原业务内递增序号；前一条历史保持。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存"
+        },
+        {
+          "name": "operation_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次办理前确定的恒定办理标识，重复请求沿用原号，不因重试生成第二份历史。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存",
+          "unique": true
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "真实业务事件种类，不另造主业务状态。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存",
+          "enum": [
+            "首次确认",
+            "待检后确认",
+            "差异更正"
+          ]
+        },
+        {
+          "name": "event_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "提交、决定或更正的业务原因和依据。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存"
+        },
+        {
+          "name": "actor_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次实际办理责任人员，按事件核对授权；自动返回沿原请求责任身份记录，不冒充新的人工确认。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "实际办理时刻。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存"
+        },
+        {
+          "name": "purchase_receipt_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：引用 purchase_receipt.id；来源 R080。",
+          "source": "UC-19；purchase_receipt_item.purchase_receipt_id的当次快照",
+          "foreign_key": "purchase_receipt",
+          "snapshot": true
+        },
+        {
+          "name": "purchase_order_item_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：引用 purchase_order_item.id；来源 R081。",
+          "source": "UC-19；purchase_receipt_item.purchase_order_item_id的当次快照",
+          "foreign_key": "purchase_order_item",
+          "snapshot": true
+        },
+        {
+          "name": "material_batch_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：引用 material_batch.id；来源 R082。",
+          "source": "UC-19；purchase_receipt_item.material_batch_id的当次快照",
+          "foreign_key": "material_batch",
+          "snapshot": true
+        },
+        {
+          "name": "stock_location_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "当次保存：合格入库位置；合格量大于零时必填；引用stock_location.id。",
+          "source": "UC-19；purchase_receipt_item.stock_location_id的当次快照",
+          "foreign_key": "stock_location",
+          "snapshot": true
+        },
+        {
+          "name": "arrived_quantity_scaled",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：正整数基本单位数量",
+          "source": "UC-19；purchase_receipt_item.arrived_quantity_scaled的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "accepted_quantity_scaled",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：非负基本单位数量",
+          "source": "UC-19；purchase_receipt_item.accepted_quantity_scaled的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "rejected_quantity_scaled",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：非负基本单位数量",
+          "source": "UC-19；purchase_receipt_item.rejected_quantity_scaled的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "pending_quantity_scaled",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次保存：非负基本单位数量",
+          "source": "UC-19；purchase_receipt_item.pending_quantity_scaled的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "inspection_note",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：验收事实、待检原因及后续处理依据",
+          "source": "UC-19；purchase_receipt_item.inspection_note的当次快照",
+          "snapshot": true
+        },
+        {
+          "name": "newly_accepted_scaled",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次新增合格量；首确认等于本次合格量，后续等于本次合格减前次合格，非负。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存"
+        },
+        {
+          "name": "inventory_movement_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "本次合格增量形成的原入库流水；增量0为空。",
+          "source": "UC-19；purchase_receipt_item的历次办理保存",
+          "foreign_key": "inventory_movement",
+          "unique": true
+        }
+      ],
+      "constraints": [
+        "UNIQUE(purchase_receipt_item_id,event_no)及UNIQUE(operation_no)；event_no>0；历史主键和原业务外键恒定；只追加，禁止更新、删除或级联清除。",
+        "每次所列真实业务事件追加对应快照；主表当前结果、对应历史及必要资金/库存结果在同一本地事务保存。序号分配及前一结果核对在写事务内完成；相邻快照保留前后内容，重复同次办理沿operation_no返回原结果。",
+        "actor_id、occurred_at、event_reason及事件类型必填；快照字段遵循原业务有效性，查询历史按原对象及event_no排序。",
+        "到货=合格+拒收+待检，各量遵循UC-19；同验收项目历次到货事实不重计。newly_accepted_scaled等于相邻确认快照的合格增量且非负；不得抹去已入库事实。",
+        "新增合格量>0时须唯一入库流水，增量为0不造流水；同原验收项目、批次位置且流水数量等于增量，历史、流水、余额及当前确认量共同保存。"
+      ],
+      "design_status": "同一分析实体的历史存储映射；未新增系统用例或业务类，未写入运行程序。"
+    },
+    {
+      "key": "InsuranceCase_HistoryStorage",
+      "name": "医保预结算历史",
+      "table": "insurance_preestimate_history",
+      "physical_role": "history",
+      "analysis_owner": "insurance_case",
+      "owner_field": "insurance_case_id",
+      "source_uc": [
+        "UC-22",
+        "UC-23"
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定历史主键。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "primary_key": true
+        },
+        {
+          "name": "insurance_case_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "对应原业务对象，不使用多态表名/对象号代替外键。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "foreign_key": "insurance_case"
+        },
+        {
+          "name": "event_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同原业务内递增序号；前一条历史保持。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        },
+        {
+          "name": "operation_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次办理前确定的恒定办理标识，重复请求沿用原号，不因重试生成第二份历史。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "unique": true
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "真实业务事件种类，不另造主业务状态。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "enum": [
+            "提交",
+            "结果",
+            "失效",
+            "患者选择"
+          ]
+        },
+        {
+          "name": "event_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "提交、决定或更正的业务原因和依据。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        },
+        {
+          "name": "actor_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次实际办理责任人员，按事件核对授权；自动返回沿原请求责任身份记录，不冒充新的人工确认。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "实际办理时刻。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        },
+        {
+          "name": "request_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "结果、失效和患者选择回溯本次提交记录；提交记录为空。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "foreign_key": "insurance_preestimate_history"
+        },
+        {
+          "name": "request_no",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "提交时确定的稳定原请求号；仅提交记录非空且唯一。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "unique": true
+        },
+        {
+          "name": "bill_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次提交账单。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "foreign_key": "bill"
+        },
+        {
+          "name": "identity_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次有效核验。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "foreign_key": "insurance_identity"
+        },
+        {
+          "name": "fee_revision",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "当次实际费用版本，正整数。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        },
+        {
+          "name": "diagnosis_code",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次提交诊断。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        },
+        {
+          "name": "result_status",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "结果事件的实际核实状态；其他事件为空。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "enum": [
+            "成功",
+            "明确失败",
+            "未知"
+          ]
+        },
+        {
+          "name": "estimated_fund_cents",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "成功结果的基金预估。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        },
+        {
+          "name": "estimated_account_cents",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "成功结果的个账预估。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        },
+        {
+          "name": "estimated_patient_cents",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "成功结果的其他自付预估。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        },
+        {
+          "name": "patient_choice",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "患者选择事件保存当次实际选择。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存",
+          "enum": [
+            "待确认",
+            "医保",
+            "自费"
+          ]
+        },
+        {
+          "name": "patient_confirmed_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "患者实际确认医保或自费的时间。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        },
+        {
+          "name": "result_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "平台核实结果或失效、重新说明的实际依据。",
+          "source": "UC-22、UC-23；insurance_case的历次办理保存"
+        }
+      ],
+      "constraints": [
+        "UNIQUE(insurance_case_id,event_no)及UNIQUE(operation_no)；event_no>0；历史主键和原业务外键恒定；只追加，禁止更新、删除或级联清除。",
+        "每次所列真实业务事件追加对应快照；主表当前结果、对应历史及必要资金/库存结果在同一本地事务保存。序号分配及前一结果核对在写事务内完成；相邻快照保留前后内容，重复同次办理沿operation_no返回原结果。",
+        "actor_id、occurred_at、event_reason及事件类型必填；快照字段遵循原业务有效性，查询历史按原对象及event_no排序。",
+        "提交事件request_id为空且request_no非空；其他事件request_no为空，request_id非空且必须指向同医保办理的一条提交事件，禁止自身或循环。各事件的账单、费用版本和核验范围与原提交一致。",
+        "提交明细以insurance_fee.preestimate_request_id固定原提交；同一原应收在该提交内不重复，明细不随主办理修改。结果未知先查原请求，明确失效或未受理才能按规约新提交。",
+        "结果事件须有result_status及结果依据；成功时三项非负预估齐全，合计等于原提交明细金额。失败/未知不伪造金额；其他事件不得作为新的成功预估。",
+        "失效和患者选择只追加；医保或自费确认须实际时间和对该次有效结果的说明依据。正式结算必须使用未失效且已有患者医保确认的确切提交，旧选择不得套用新预估。"
+      ],
+      "design_status": "同一分析实体的历史存储映射；未新增系统用例或业务类，未写入运行程序。"
+    },
+    {
+      "key": "FileVersion_HistoryStorage",
+      "name": "文件归属更正",
+      "table": "document_correction",
+      "physical_role": "history",
+      "analysis_owner": "document_version",
+      "owner_field": "document_version_id",
+      "source_uc": [
+        "UC-10"
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定历史主键。",
+          "source": "UC-10；document_version的历次办理保存",
+          "primary_key": true
+        },
+        {
+          "name": "document_version_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "对应原业务对象，不使用多态表名/对象号代替外键。",
+          "source": "UC-10；document_version的历次办理保存",
+          "foreign_key": "document_version"
+        },
+        {
+          "name": "event_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同原业务内递增序号；前一条历史保持。",
+          "source": "UC-10；document_version的历次办理保存"
+        },
+        {
+          "name": "operation_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次办理前确定的恒定办理标识，重复请求沿用原号，不因重试生成第二份历史。",
+          "source": "UC-10；document_version的历次办理保存",
+          "unique": true
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "真实业务事件种类，不另造主业务状态。",
+          "source": "UC-10；document_version的历次办理保存",
+          "enum": [
+            "归属更正"
+          ]
+        },
+        {
+          "name": "event_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "提交、决定或更正的业务原因和依据。",
+          "source": "UC-10；document_version的历次办理保存"
+        },
+        {
+          "name": "actor_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次实际办理责任人员，按事件核对授权；自动返回沿原请求责任身份记录，不冒充新的人工确认。",
+          "source": "UC-10；document_version的历次办理保存",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "实际办理时刻。",
+          "source": "UC-10；document_version的历次办理保存"
+        },
+        {
+          "name": "corrected_document_version_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "正确归属的新文件索引版本；不把已有引用静默转到另一患者。",
+          "source": "UC-10；document_version的历次办理保存",
+          "foreign_key": "document_version"
+        },
+        {
+          "name": "original_confirmed_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "原确认牙医快照；尚未确认可空。",
+          "source": "UC-10；document_version的历次办理保存",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "original_confirmed_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "原确认时刻。",
+          "source": "UC-10；document_version的历次办理保存"
+        },
+        {
+          "name": "original_confirmation_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "原确认依据。",
+          "source": "UC-10；document_version的历次办理保存"
+        }
+      ],
+      "constraints": [
+        "UNIQUE(document_version_id,event_no)及UNIQUE(operation_no)；event_no>0；历史主键和原业务外键恒定；只追加，禁止更新、删除或级联清除。",
+        "每次所列真实业务事件追加对应快照；主表当前结果、对应历史及必要资金/库存结果在同一本地事务保存。序号分配及前一结果核对在写事务内完成；相邻快照保留前后内容，重复同次办理沿operation_no返回原结果。",
+        "actor_id、occurred_at、event_reason及事件类型必填；快照字段遵循原业务有效性，查询历史按原对象及event_no排序。",
+        "文件归属更正以原文件版本和正确归属的新索引版本成对保存；两者不能相同，须是同一原件内容（摘要一致），正确归属由牙医确认。新索引按UC-10保存，原索引及原患者/就诊/方案归属保留。",
+        "原误关联版本转退回核对，原确认人、时间和依据固定在本记录；既有患者决定引用保留原版本，并列示该版本已更正，不能静默改指新患者。再次更正以当次错误版本为原件继续留链，不覆盖旧更正。"
+      ],
+      "design_status": "同一分析实体的历史存储映射；未新增系统用例或业务类，未写入运行程序。"
+    },
+    {
+      "key": "Prescription_HistoryStorage",
+      "name": "处方审方历史",
+      "table": "prescription_review_history",
+      "physical_role": "history",
+      "analysis_owner": "prescription",
+      "owner_field": "prescription_id",
+      "source_uc": [
+        "UC-25"
+      ],
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定历史主键。",
+          "source": "UC-25；prescription的历次办理保存",
+          "primary_key": true
+        },
+        {
+          "name": "prescription_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "对应原业务对象，不使用多态表名/对象号代替外键。",
+          "source": "UC-25；prescription的历次办理保存",
+          "foreign_key": "prescription"
+        },
+        {
+          "name": "event_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同原业务内递增序号；前一条历史保持。",
+          "source": "UC-25；prescription的历次办理保存"
+        },
+        {
+          "name": "operation_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "本次办理前确定的恒定办理标识，重复请求沿用原号，不因重试生成第二份历史。",
+          "source": "UC-25；prescription的历次办理保存",
+          "unique": true
+        },
+        {
+          "name": "event_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "真实业务事件种类，不另造主业务状态。",
+          "source": "UC-25；prescription的历次办理保存",
+          "enum": [
+            "审方"
+          ]
+        },
+        {
+          "name": "event_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "提交、决定或更正的业务原因和依据。",
+          "source": "UC-25；prescription的历次办理保存"
+        },
+        {
+          "name": "actor_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次实际办理责任人员，按事件核对授权；自动返回沿原请求责任身份记录，不冒充新的人工确认。",
+          "source": "UC-25；prescription的历次办理保存",
+          "foreign_key": "staff"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "实际办理时刻。",
+          "source": "UC-25；prescription的历次办理保存"
+        },
+        {
+          "name": "review_status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "当次保存：院内待审、已通过、待医师处理或院外取药",
+          "source": "UC-25；prescription.review_status的当次快照",
+          "enum": [
+            "院内待审",
+            "已通过",
+            "待医师处理",
+            "院外取药"
+          ],
+          "snapshot": true
+        },
+        {
+          "name": "review_note",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "当次保存：审方及医师重新确认依据",
+          "source": "UC-25；prescription.review_note的当次快照",
+          "snapshot": true
+        }
+      ],
+      "constraints": [
+        "UNIQUE(prescription_id,event_no)及UNIQUE(operation_no)；event_no>0；历史主键和原业务外键恒定；只追加，禁止更新、删除或级联清除。",
+        "每次所列真实业务事件追加对应快照；主表当前结果、对应历史及必要资金/库存结果在同一本地事务保存。序号分配及前一结果核对在写事务内完成；相邻快照保留前后内容，重复同次办理沿operation_no返回原结果。",
+        "actor_id、occurred_at、event_reason及事件类型必填；快照字段遵循原业务有效性，查询历史按原对象及event_no排序。",
+        "实际审方人和时刻取actor_id、occurred_at；review_status为已通过或待医师处理且review_note非空。原处方内容在开立后固定，审方意见只追加，当前审核字段仅取最后一次有效审方。"
+      ],
+      "design_status": "同一分析实体的历史存储映射；未新增系统用例或业务类，未写入运行程序。"
+    }
+  ],
+  "history_mapping": [
+    {
+      "table": "fee_request_history",
+      "analysis_owner": "fee_request",
+      "owner_field": "fee_request_id",
+      "source_uc": [
+        "UC-14"
+      ],
+      "group": 5
+    },
+    {
+      "table": "service_price_history",
+      "analysis_owner": "service_price",
+      "owner_field": "service_price_id",
+      "source_uc": [
+        "UC-11"
+      ],
+      "group": 4
+    },
+    {
+      "table": "followup_history",
+      "analysis_owner": "followup_requirement",
+      "owner_field": "followup_requirement_id",
+      "source_uc": [
+        "UC-15",
+        "UC-16",
+        "UC-17"
+      ],
+      "group": 6
+    },
+    {
+      "table": "stock_count_history",
+      "analysis_owner": "stock_count",
+      "owner_field": "stock_count_id",
+      "source_uc": [
+        "UC-20"
+      ],
+      "group": 7
+    },
+    {
+      "table": "receipt_item_history",
+      "analysis_owner": "purchase_receipt_item",
+      "owner_field": "purchase_receipt_item_id",
+      "source_uc": [
+        "UC-19"
+      ],
+      "group": 8
+    },
+    {
+      "table": "insurance_preestimate_history",
+      "analysis_owner": "insurance_case",
+      "owner_field": "insurance_case_id",
+      "source_uc": [
+        "UC-22",
+        "UC-23"
+      ],
+      "group": 9
+    },
+    {
+      "table": "document_correction",
+      "analysis_owner": "document_version",
+      "owner_field": "document_version_id",
+      "source_uc": [
+        "UC-10"
+      ],
+      "group": 2
+    },
+    {
+      "table": "prescription_review_history",
+      "analysis_owner": "prescription",
+      "owner_field": "prescription_id",
+      "source_uc": [
+        "UC-25"
+      ],
+      "group": 2
     }
   ]
 }

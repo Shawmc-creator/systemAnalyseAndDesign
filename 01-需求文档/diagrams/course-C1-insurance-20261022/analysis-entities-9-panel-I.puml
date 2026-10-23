@@ -1,0 +1,52 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 225
+skinparam linetype ortho
+skinparam nodesep 75
+skinparam ranksep 90
+hide circle
+hide empty members
+package "医保身份及适用项目对应" as I {
+' @reference patient
+class "患者" as patient_i <<entity>>
+' @reference service
+class "收费项目" as service_i <<entity>>
+' @reference material
+class "材料" as material_i <<entity>>
+class "医保身份核验" as insurance_identity <<entity>> {
+ 必要人员编号、参保地区
+ 实际核验结果、时刻及适用期
+ 办理人员、结果依据
+ --
+ +核对患者及核验适用条件()
+ +记录明确核验结果(原办理依据)
+}
+class "医保项目对应" as insurance_item_mapping <<entity>> {
+ 地区、适用编码及起止日期
+ 有效或停用状态
+ --
+ +核对项目或药品唯一归属()
+ +核对本地区及日期适用性()
+}
+patient_i "1" -- "0..*" insurance_identity
+service_i "0..1" -- "0..*" insurance_item_mapping
+material_i "0..1" -- "0..*" insurance_item_mapping
+service_i -[hidden]right- material_i
+note bottom of insurance_item_mapping
+编码对应收费项目或药品恰选其一；核验通过不等于全部可报。
+核验及编码按地区、日期和真实平台结果核对。
+资料不全或核验未知保留原办理，不补造通过或医保编码。
+仅保留必要核验结果，不保存一次性原始认证凭证。
+end note
+}
+@enduml

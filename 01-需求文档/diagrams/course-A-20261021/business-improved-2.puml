@@ -1,0 +1,44 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "牙医" as D
+actor "诊疗助理" as A
+entity "诊所管理系统" as S
+D -> S : 调阅当次患者及既往诊疗健康资料
+S --> D : 展示病历、健康提示及关联影像
+D -> P : 实际询问健康情况并完成检查
+D -> S : 记录复核、检查诊断及治疗方案
+S --> D : 展示方案项目、版本及费用说明
+D -> P : 说明风险、替代方案、费用及本次安排
+P --> D : 表达同意、暂缓或拒绝
+D -> S : 记录患者决定及明确项目范围
+alt 已确认本次执行且准备满足
+ D -> A : 交接本次治疗及器械物资需求
+ A --> D : 确认实际准备
+ D -> P : 实施确认范围内的治疗
+ D -> S : 记录实际经过、项目、数量及来源
+ S -> S : 核对确认范围、实际项目与计费来源\n保留方案和执行的分别记录
+ D -> P : 交代诊后注意事项
+else 暂缓、拒绝或条件未满足
+ D -> S : 保留实际检查、患者决定及未完成安排
+ D -> P : 说明后续建议
+end
+D -> S : 复核已发生的检查及处理意见并签署病历
+S --> D : 返回病历、实际项目及费用交接结果
+D -> A : 实际操作结束后交接资源处理
+@enduml

@@ -1,0 +1,166 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 225
+skinparam linetype ortho
+skinparam nodesep 75
+skinparam ranksep 90
+hide circle
+hide empty members
+package "医保身份及适用项目对应" as I {
+' @reference patient
+class "患者" as patient_i <<entity>>
+' @reference service
+class "收费项目" as service_i <<entity>>
+' @reference material
+class "材料" as material_i <<entity>>
+class "医保身份核验" as insurance_identity <<entity>> {
+ 必要人员编号、参保地区
+ 实际核验结果、时刻及适用期
+ 办理人员、结果依据
+ --
+ +核对患者及核验适用条件()
+ +记录明确核验结果(原办理依据)
+}
+class "医保项目对应" as insurance_item_mapping <<entity>> {
+ 地区、适用编码及起止日期
+ 有效或停用状态
+ --
+ +核对项目或药品唯一归属()
+ +核对本地区及日期适用性()
+}
+patient_i "1" -- "0..*" insurance_identity
+service_i "0..1" -- "0..*" insurance_item_mapping
+material_i "0..1" -- "0..*" insurance_item_mapping
+service_i -[hidden]right- material_i
+note bottom of insurance_item_mapping
+编码对应收费项目或药品恰选其一；核验通过不等于全部可报。
+核验及编码按地区、日期和真实平台结果核对。
+资料不全或核验未知保留原办理，不补造通过或医保编码。
+仅保留必要核验结果，不保存一次性原始认证凭证。
+end note
+}
+package "预结算办理及患者选择" as C {
+' @reference patient
+class "患者" as patient_c <<entity>>
+' @reference visit
+class "就诊" as visit_c <<entity>>
+' @reference bill
+class "应收账目" as bill_c <<entity>>
+' @reference insurance_identity
+class "医保身份核验" as identity_c <<entity>>
+' @reference insurance_case
+class "医保就诊办理" as previous_case_c <<entity>>
+class "医保就诊办理" as insurance_case <<entity>> {
+ 唯一业务号、机构及诊断标识
+ 费用版本、办理状态及结果依据
+ 预估基金／个账／其他自付
+ 患者选择及确认时间
+ --
+ +核对患者就诊身份及账目归属()
+ +核对本次费用范围及适用条件()
+ +保存预估分摊(平台实际结果)
+ +使旧预估失效(变更依据)
+ +记录患者实际选择()
+ +建立重新办理(原办理依据)
+}
+patient_c "1" -- "0..*" insurance_case
+visit_c "1" -- "0..*" insurance_case
+bill_c "0..1" -- "0..*" insurance_case
+identity_c "0..1" -- "0..*" insurance_case
+previous_case_c "原办理\n0..1" -- "0..*" insurance_case
+patient_c -[hidden]right- visit_c
+visit_c -[hidden]right- bill_c
+note bottom of insurance_case
+同一提交范围：总费＝预估基金＋个账＋其他自付，均非负。
+范围外自费另列；预估不抵最终待付，也不算正式到账。
+费用版本或适用条件变化，原预估失效并保留依据。
+患者选择医保后才能正式结算，未决定或自费不自动结算。
+end note
+}
+package "实际费用范围与提交快照" as F {
+' @reference insurance_case
+class "医保就诊办理" as case_f <<entity>>
+' @reference bill_item
+class "应收项目" as bill_item_f <<entity>>
+' @reference insurance_item_mapping
+class "医保项目对应" as mapping_f <<entity>>
+class "医保费用明细" as insurance_fee <<entity>> {
+ 本次提交数量、分金额及费用版本
+ 适用编码或自费标识
+ 实际提交时刻、平台返回依据
+ --
+ +核对实际费用及适用标识()
+ +固定本次提交范围及快照()
+}
+case_f "1" *-- "0..*" insurance_fee
+bill_item_f "1" -- "0..*" insurance_fee
+mapping_f "0..1" -- "0..*" insurance_fee
+case_f -[hidden]right- bill_item_f
+bill_item_f -[hidden]right- mapping_f
+note bottom of insurance_fee
+提交范围来自真实已核价费用，保留本次数量、金额及版本。
+适用编码才关联对应，范围内自费项保存真实自费标识；
+缺编码或标识先补正，不编造映射，不混入范围外费用。
+同一费用不得重复参与有效正式结算。
+end note
+}
+package "正式结算、原单撤销及实际结算款" as S {
+' @reference insurance_case
+class "医保就诊办理" as case_s <<entity>>
+' @reference fee_request
+class "费用申请" as request_s <<entity>>
+class "医保结算" as insurance_settlement <<entity>> {
+ 正式结算号、范围内总费T
+ 基金F、个账A、其他自付P
+ 有效／已撤销、实际确认时间
+ /应拨额、/净到账、/待收或待退
+ --
+ +核对明确正式结果及分摊()
+ +确认有效正式结算()
+ +按成功撤销停用原结算()
+ +计算应拨及收退差额(实际收付)
+}
+class "医保撤销办理" as insurance_reversal <<entity>> {
+ 唯一撤销号、原因及负责人依据
+ 待办理／待核实／已成功／已失败
+ 原笔结果、核实人及时间
+ --
+ +核对原结算及批准依据()
+ +建立原单撤销待办()
+ +保留未知或失败结果(真实依据)
+ +确认平台撤销成功()
+}
+class "医保结算款收付" as insurance_fund_receipt <<entity>> {
+ 拨付或退回、实际正金额
+ 实际时间、医保或银行凭据
+ 经办人员
+ --
+ +核对原结算及实际收付依据()
+ +核对重复收付(原单及凭据)
+ +记录实际拨付或退回()
+}
+case_s "1" -- "0..*" insurance_settlement
+insurance_settlement "1" -- "0..*" insurance_reversal
+request_s "0..1" -- "0..*" insurance_reversal
+insurance_settlement "1" -- "0..*" insurance_fund_receipt
+insurance_reversal -[hidden]right- insurance_fund_receipt
+note bottom of insurance_settlement
+T＝F＋A＋P，均非负；正式结果与预估分开保存。
+同一费用不重复有效结算；未知或未决先查原号。
+撤销成功才改变原结算，患者退款另按UC-14。
+有效结算应拨＝F＋A，已撤销应拨＝0；
+净到账＝实际拨付－实际退回，差额＝应拨－净到账。
+差额正为待收、负为待退，不能自动转成患者欠费。
+end note
+}
+@enduml

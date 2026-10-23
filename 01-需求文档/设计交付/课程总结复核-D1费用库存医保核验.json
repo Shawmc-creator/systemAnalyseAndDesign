@@ -1,0 +1,113 @@
+{
+  "date": "2026-10-23",
+  "status": "第二十七批：费用退费、材料库存、采购验收、医保四组关系及关键约束已修，剩余历史保存和D精化继续",
+  "pdf_pages": 164,
+  "figures": 144,
+  "logical_tables": 69,
+  "logical_fields": 830,
+  "new_tables": [],
+  "new_fields": [
+    "purchase_order.cancellation_reason",
+    "insurance_case.previous_case_id",
+    "insurance_fee.is_self_pay",
+    "insurance_fee.insurance_code_snapshot",
+    "insurance_fee.fee_revision",
+    "insurance_reversal.approved_by",
+    "insurance_reversal.approved_at",
+    "insurance_reversal.approval_basis",
+    "insurance_reversal.verified_by",
+    "insurance_reversal.verification_note"
+  ],
+  "removed_fields": [
+    "supplier.settlement_basis",
+    "supplier.verified_by",
+    "purchase_receipt_item.accepted_amount_cents"
+  ],
+  "modified_tables": [
+    "fee_request",
+    "patient_refund",
+    "batch_stock",
+    "inventory_movement",
+    "material_usage",
+    "supplier",
+    "purchase_order",
+    "purchase_receipt_item",
+    "insurance_identity",
+    "insurance_item_mapping",
+    "insurance_case",
+    "insurance_fee",
+    "insurance_settlement",
+    "insurance_reversal",
+    "insurance_fund_receipt"
+  ],
+  "region_business_relations_checked": 45,
+  "core_regions_rebuilt": [
+    5,
+    7,
+    8,
+    9
+  ],
+  "cumulative_regions_rebuilt": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "cumulative_business_relations": 139,
+  "core_regions_remaining": [],
+  "changed_pdf_pages": [
+    132,
+    137,
+    139,
+    140,
+    141,
+    147,
+    149
+  ],
+  "text_changed_pages": [
+    132,
+    137,
+    139,
+    140,
+    141,
+    147,
+    149
+  ],
+  "unchanged_page_text_count": 157,
+  "selected_key_fields": 271,
+  "analysis_sources_unchanged": true,
+  "C1_classes": 69,
+  "C1_operations": 218,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "historical_sql_changed": false,
+  "github_synced": false,
+  "whole_document_course_compliant": false,
+  "remaining": [
+    "费用申请、价目、随访调整及盘点重核、验收历次数量、预结算历次结果等历史保存方式",
+    "处方更正作废交付、文件误关联依据等关键保存",
+    "旧字段source编号、状态引用、泛化和值表取舍、D-04数据访问及D2/D3",
+    "实际程序、迁移及真实验收另行对齐"
+  ],
+  "validation": {
+    "model_foreign_keys": "passed",
+    "all_9_regions": "passed",
+    "overall_business_FK_pairs_and_cardinality": "passed",
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "visible_text_overlap_pairs": 0,
+    "minimum_font_pt": 9.14,
+    "all_144_figure_titles_numbers_pages_preserved": true
+  },
+  "files": {
+    "tex_sha256": "940cfea2d98e61c73b20803001df2e02ed5798e94fe886d447afdaebf8d83e7e",
+    "pdf_sha256": "29c07ae5b2874e903de965ba619ee6f22679368306dfd2d580b748c2b6ee458b",
+    "logical_model_sha256": "c75938126cd7e3399a419327f52f78bbd6bb7134bb0ffa9cc85afed60ecd7024"
+  }
+}

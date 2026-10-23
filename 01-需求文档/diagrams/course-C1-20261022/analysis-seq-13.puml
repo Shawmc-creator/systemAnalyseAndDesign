@@ -1,0 +1,47 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 145
+actor "收费人员" as A
+boundary "收费人员接口" as B
+control "办理患者付款\n与到账核实控制" as C
+entity "电子支付单" as O
+entity "患者付款" as P
+boundary "支付服务接口" as E
+actor "支付平台" as X
+A -> B : 核对患者待付并选择渠道
+B -> C : 提交原账单和本次付款内容
+alt 现金
+ C -> P : 按实际收到与找零保存净收
+else 电子支付
+ C -> O : 建立可回查的支付业务单
+ C -> E : 发起或查询原笔支付
+ E -> X : 办理原业务单
+ X --> E : 成功、失败或仍待核实
+ E --> C : 核实结果和渠道凭据
+ C -> O : 保存当前真实结果
+ alt 明确成功且金额相符
+  C -> P : 确认一次有效到账及账单用途
+ else 未明确成功
+  C --> B : 保留未付或待核实，不重复记到账
+ end
+end
+C --> B : 返回付款、余额与凭据
+B --> A : 展示真实结果
+
+@enduml

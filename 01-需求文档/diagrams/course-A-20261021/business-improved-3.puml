@@ -1,0 +1,43 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "牙医" as D
+actor "药学岗位" as A
+entity "诊所管理系统" as S
+D -> S : 查诊断、过敏与用药并保存处方
+S -> S : 核对患者、处方权限及必要内容
+D -> S : 确认开立并选择取药路径
+alt 院外取药
+ S --> D : 提供有效处方与用药指导
+ D -> P : 交付处方并说明用药
+else 机构及人员满足院内条件
+ A -> S : 查待审处方、药品及批次
+ S --> A : 提供同一患者的处方与供药资料
+ A -> S : 提交实际审核意见
+ alt 审核通过且可供药
+  S -> S : 核对处方余量、批次状态及库存条件
+  A -> P : 核对患者后实际交付并交代用药
+  A -> S : 确认真实发药量、批次和时间
+  S -> S : 关联实际发药、库存变动及相应费用
+  S --> A : 返回实际交付结果与凭据
+ else 需医师处理或无法供药
+  S --> D : 交接原处方和问题
+  D -> P : 协调处方调整或院外取药
+ end
+end
+@enduml

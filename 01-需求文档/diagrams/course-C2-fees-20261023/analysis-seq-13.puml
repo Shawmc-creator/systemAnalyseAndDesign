@@ -1,0 +1,103 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "收费人员" as A
+boundary "收费人员接口" as B
+control "办理患者付款与到账核实控制" as K
+entity "患者付款" as P
+entity "电子支付单" as E
+entity "付款分配" as U
+entity "预付抵扣" as O
+boundary "支付服务接口" as PE
+actor "支付平台" as X
+
+A -> B : 选择患者、账单，或1a预收用途及金额
+B -> K : 账单待付或明确预收用途
+activate K
+K -> K : 核验收款权限；按UC-12重核医保、待付及未完成原笔
+K -> P : 计算原款可用额(用途与退款)
+K --> B : 最新可办理额度；原未知笔先核，不另收
+break 额度无法核定或原付款结果仍未知
+ K --> B : 先核原笔或费用，不开始本次新收款
+end
+A -> B : 与患者确认金额及现金、电子或原预款抵扣
+B -> K : 本次方式、金额及唯一办理号
+alt 3b 使用同患者原预款
+ K -> O : 核对同患者原款与待付()
+ critical 重核可用原款及本账待付，共同保存抵扣
+  K -> K : 查同次结果；已存复用
+  break 原款可用额、归属或当前待付不满足
+   K --> B : 回步骤2重核，不新增付款
+  end
+  opt 未保存
+   K -> O : 登记预款抵扣()
+   K -> K : 保存抵扣及原款引用，不增加实收
+  end
+ end
+else 现金或电子新收款
+ alt 基本现金路径
+  A -> B : 实际收款、交付找零后，录入实收、找零及依据
+  B -> K : 净收事实、到账时间及核实人
+  K -> P : 核对实收找零与净收()
+ else 3a 电子支付，找零为0
+  K -> E : 核对原单金额及渠道()
+  K -> K : 保存唯一原支付单；重复或未知仅查原单
+  alt 已接入支付服务
+   K -> PE : 发起或查询原单
+   PE -> X : 原业务单号及金额，发起或查询
+   X --> PE : 实际状态、交易号及正式凭据
+   PE --> K : 原渠道正式核实结果
+  else 未接接口，依据正式终端核实
+   A -> B : 核对终端原单、金额、渠道及交易号
+   B -> K : 正式终端真实结果及核实依据，截图不作为成功依据
+  end
+  K -> E : 确认渠道结果(原单与交易号)
+  break 明确未成功或仍未知
+   alt 仍未知
+    K -> E : 记录受理或待核实()
+   else 明确未到账
+    K -> P : 记录未到账核实(依据)
+   end
+   K --> B : 不记到账；查原单后再办理，不重复发起
+  end
+ end
+ critical 真实到账与本账用途共同保存
+  K -> K : 查原办理；重核金额、患者、医保与最新待付
+  break 5b 金额、用途、归属或到账依据不满足且无原结果
+   K -> K : 保存实际已收的待核实线索，不再次收款
+   K --> B : 保留已收线索，回步骤2重核；不再收款
+  end
+  opt 本次付款尚未保存且条件满足
+   K -> P : 核对实收找零与净收()
+   K -> P : 确认实际到账(原单与依据)
+   opt 为本账付款，非1a预收
+    K -> U : 核对可分配原款与待付()
+    K -> U : 登记本账用途()
+   end
+   K -> K : 共同保存确认付款及适用用途、经办人和到账时间
+  end
+ end
+end
+alt 5a 本地结果未知或保存失败
+ K -> K : 查原办理；已存复用，确认未存才补记原收款或抵扣
+ K --> B : 已核实结果或待核实，保留真实收款线索
+else 已确认保存
+ K --> B : 凭据、剩余待付、未用预款；部分付款保留差额
+end
+B --> A : 展示真实结果；医保款不作为患者新收款
+deactivate K
+
+@enduml

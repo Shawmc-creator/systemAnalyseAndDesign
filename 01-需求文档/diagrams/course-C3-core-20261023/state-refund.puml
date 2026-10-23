@@ -1,0 +1,34 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "待审核" as Pending
+state "已退回" as Returned
+state "已同意" as Approved
+state "已拒绝" as Rejected
+state "已撤回" as Withdrawn
+[*] --> Pending : 收费人员提交申请 [原单同患者，\n理由、金额和依据合法]\n/ 保存本次提交版本及编号
+Pending --> Returned : 负责人退回 [需补充依据]\n/ 保存意见、人和时间
+Returned --> Pending : 收费人员补正重提\n[重新核对原单及额度]\n/ 递增提交版本，保留原提交和审核
+Pending --> Approved : 负责人批准\n[当前提交版本及支持额度核实]\n/ 固定批准调整额、退款上限及审核依据
+Pending --> Rejected : 负责人拒绝\n/ 保存原因、人和时间
+Pending --> Withdrawn : 申请人撤回\n[当前提交仍待审核，尚未生效]\n/ 保留原申请及撤回依据
+Approved --> [*]
+Rejected --> [*]
+Withdrawn --> [*]
+
+@enduml

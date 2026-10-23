@@ -1,0 +1,81 @@
+[
+  {
+    "stem": "analysis-entities-4",
+    "width": 3406.0,
+    "height": 1984.0,
+    "panels": [
+      {
+        "stem": "analysis-entities-4-panel-P",
+        "x": 10,
+        "y": 10,
+        "width": 455.0,
+        "height": 700.0
+      },
+      {
+        "stem": "analysis-entities-4-panel-F",
+        "x": 1185.0,
+        "y": 10,
+        "width": 750.0,
+        "height": 854.0
+      },
+      {
+        "stem": "analysis-entities-4-panel-E",
+        "x": 2308.0,
+        "y": 10,
+        "width": 605.0,
+        "height": 984.0
+      },
+      {
+        "stem": "analysis-entities-4-panel-B",
+        "x": 10,
+        "y": 1029.0,
+        "width": 1140.0,
+        "height": 945.0
+      },
+      {
+        "stem": "analysis-entities-4-panel-U",
+        "x": 1185.0,
+        "y": 1029.0,
+        "width": 1088.0,
+        "height": 570.0
+      },
+      {
+        "stem": "analysis-entities-4-panel-V",
+        "x": 2308.0,
+        "y": 1029.0,
+        "width": 1088.0,
+        "height": 570.0
+      }
+    ],
+    "method": "PlantUML分区矢量输出，等字号对齐拼版；不改变类框、文字、连线或关系"
+  },
+  {
+    "stem": "analysis-entities-5",
+    "width": 2581.0,
+    "height": 806.0,
+    "panels": [
+      {
+        "stem": "analysis-entities-5-panel-R",
+        "x": 10,
+        "y": 10,
+        "width": 813.0,
+        "height": 639.0
+      },
+      {
+        "stem": "analysis-entities-5-panel-A",
+        "x": 858.0,
+        "y": 10,
+        "width": 590.0,
+        "height": 786.0
+      },
+      {
+        "stem": "analysis-entities-5-panel-T",
+        "x": 1483.0,
+        "y": 10,
+        "width": 1088.0,
+        "height": 685.0
+      }
+    ],
+    "method": "PlantUML分区矢量输出，等字号对齐拼版；不改变类框、文字、连线或关系"
+  }
+]

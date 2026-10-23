@@ -1,0 +1,94 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 260
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as A
+boundary "牙医接口" as B
+control "记录检查诊断与健康资料控制" as K
+entity "就诊" as V
+entity "接诊占用" as O
+entity "设备占用" as E
+entity "健康版本" as H
+entity "健康条目" as I
+entity "健康复核" as Q
+entity "病历" as R
+entity "检查所见" as F
+
+A -> B : 核实患者、就诊及资源，确认实际开始
+B -> K : 就诊、资源、实际开始时间及办理号
+activate K
+K -> K : 核验权限、到诊与安排；读取当前占用及限制
+break 2a 诊椅或必要设备未就绪、冲突
+ K --> B : 转UC-24协调；就绪后回开始确认
+end
+critical 重核资源与就诊，共同登记开始
+ K -> K : 查本次开始结果，已存则复用
+ break 本次尚未开始且资源或就诊条件已变化
+  K --> B : 停止开始登记，回资源协调核实
+ end
+ opt 尚未开始且当前条件满足
+  K -> V : 开始接诊()
+  K -> O : 承接实际使用()
+  opt 本次需要设备
+   K -> E : 开始使用()
+  end
+  K -> K : 共同保存就诊开始及实际资源使用
+ end
+end
+break 开始登记失败或结果仍未知
+ K --> B : 核实原开始结果后再继续，不记作已开始
+end
+K --> B : 实际开始结果、当前健康版及病历草稿
+A -> B : 询问并复核病史、过敏、用药；检查牙位及所见
+B -> K : 健康确认程度、变更原因、主诉所见诊断及处理意见
+K -> R : 核对草稿可修改性()
+break 5a 已签署或归属、版本不符
+ K --> B : 已签署转UC-09补充；其他返回核实
+end
+opt 3a 健康内容有变化
+ K -> H : 核对患者及前版本()
+ K -> I : 核对类别及确认程度()
+ K -> H : 建立新版(变更原因)
+end
+K -> Q : 核对版本与就诊归属()
+K -> F : 核对牙位牙面()
+break 5a 字段不合法
+ K --> B : 保留输入，回健康询问或检查记录
+end
+K --> B : 本次健康复核与诊疗草稿待确认
+A -> B : 确认保存
+B -> K : 当前病历、健康版本及本次办理号
+critical 重核版本与同次结果，草稿共同提交
+ K -> K : 查原办理；无结果才重核草稿及健康前版
+ break 当前版本变化且尚无原保存结果
+  K --> B : 当前版本及输入，返回重新复核
+ end
+ opt 尚未保存且条件满足
+  K -> R : 更新草稿(当前版本)
+  K -> F : 更新所见(原病历状态)
+  K -> Q : 记录当次复核()
+  K -> K : 保存草稿、所见及复核；若有新版及条目一并保存
+ end
+end
+alt 6a 保存结果未知
+ K -> K : 查原办理；已存返回，未存才允许重试
+ K --> B : 已确认保存结果或待核实
+else 已确认保存
+ K --> B : 草稿及当次复核版本
+end
+B --> A : 未知不记为无；保存草稿不等于签署
+deactivate K
+
+@enduml

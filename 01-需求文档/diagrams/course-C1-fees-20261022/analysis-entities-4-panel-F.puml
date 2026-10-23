@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "患者资金与真实到账" as F {
+' @reference patient
+class "患者" as patient_f <<entity>>
+' @reference patient_refund
+class "退款办理" as refund_f <<entity>>
+class "患者资金" as patient_funds <<entity>> {
+ 建立时间、归属经办人
+ /同患者资金收付汇总
+ --
+ +核对唯一患者归属()
+ +汇总确认收付与未用款()
+}
+class "患者付款" as patient_payment <<entity>> {
+ 实收、找零、渠道、核实状态
+ 到账时间、核实人及凭据
+ /净收、/原款可用额
+ --
+ +核对实收找零与净收()
+ +确认实际到账(原单与依据)
+ +记录未到账核实(依据)
+ +计算原款可用额(用途与退款)
+}
+patient_f "1" -- "1" patient_funds
+patient_funds "1" -- "0..*" patient_payment
+patient_payment "1" -- "0..*" refund_f
+note bottom of patient_payment
+净收＝实收－找零＞0；电子支付找零为0。
+原款可用＝确认净收－用途净额－已确认退款
+－待办或待核实退款占用；未知不记到账。
+未分配预收不计本账抵付，抵扣不增加实收。
+end note
+}
+@enduml

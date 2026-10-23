@@ -1,0 +1,79 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "收费人员" as A
+boundary "收费人员接口" as B
+actor "诊所负责人" as M
+boundary "诊所负责人接口" as BM
+control "维护收费项目与价目控制" as K
+entity "收费项目" as S
+entity "价目" as P
+
+A -> B : 选择项目或1a填写新项目名称及计价单位
+B -> K : 项目、单价、适用起止及变更或零价原因
+activate K
+K -> K : 核验维护权限；已用项目换单位须另建
+K -> S : 核对项目及计价单位()
+K -> P : 核对适用区间(同项目价目)
+break 3a 资料不足、零价无依据或区间冲突
+ K --> B : 指明问题，回步骤2核对原价及衔接
+end
+critical 保存提交版本，不使新价立即适用
+ K -> P : 提交负责人确认()
+ K -> K : 保存项目及待确认价目、人时和本次提交版本
+end
+K --> B : 价目编号及待确认状态
+deactivate K
+... 负责人可稍后办理 ...
+M -> BM : 打开待确认价目，核对原价及适用安排
+BM -> K : 价目编号及所据版本
+activate K
+K -> K : 核验负责人权限及当前提交内容
+alt 4a 退回或暂不确认
+ opt 退回
+  K -> P : 退回修改(原因)
+  K -> K : 保存意见；重提另留提交版本
+ end
+ K --> BM : 待确认或已退回；修改返回步骤2
+else 负责人确认
+ BM -> K : 确认价目及当前版本
+ critical 重核版本及同项目已确认期间
+  K -> K : 查原确认结果；已有结果复用
+  break 5a 版本变化且无本次原确认结果
+   K --> BM : 当前版本，回步骤4核实
+  end
+  opt 尚未确认
+   K -> P : 核对适用区间(同项目价目)
+   break 3a 当前区间已被其他确认占用
+    K --> BM : 拒绝重叠，回步骤2重新安排
+   end
+   K -> P : 确认适用价目(当前版本)
+   K -> K : 保存确认状态、负责人及时间
+  end
+ end
+ K --> BM : 已确认可适用的价目及期间
+end
+deactivate K
+opt 1a 停用项目，独立办理
+ M -> BM : 核对项目并确认停止新计费
+ BM -> K : 项目、原因及负责人依据
+ K -> K : 核验负责人权限并查原办理
+ K -> S : 停用新计费(负责人确认)
+ K -> K : 保存停用结果，保留历史项目、价目和账单快照
+ K --> BM : 停用结果；未知先核原办理，不覆盖历史
+end
+
+@enduml

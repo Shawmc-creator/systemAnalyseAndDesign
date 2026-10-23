@@ -1,0 +1,55 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 215
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 65
+hide circle
+hide empty members
+package "方案、诊断来源与版本历史" as T {
+' @reference patient
+class "患者" as patient_t <<entity>>
+' @reference visit
+class "就诊" as visit_t <<entity>>
+class "治疗方案" as treatment_plan <<entity>> {
+ 治疗目标、建立时间
+ 进行中／已完成／已终止
+ 责任牙医、结束时间及原因
+ --
+ +建立方案(患者与目标)
+ +核对方案患者归属()
+}
+class "方案版本" as plan_version <<entity>> {
+ 版本号、诊断依据
+ 预计安排、变更原因
+ 说明牙医、时间及依据
+ 版本状态、停止时间及原因
+ --
+ +核对诊断与明细完整性()
+ +提交患者确认()
+ +建立修订版(原版本与原因)
+ +停止本版后续执行(依据)
+}
+patient_t "1" -- "0..*" treatment_plan
+treatment_plan "1" *-- "1..*" plan_version
+visit_t "0..1" -- "0..*" plan_version
+' @reference plan_version
+class "方案版本" as previous_plan_version <<entity>>
+previous_plan_version "前版\n0..1" -- "0..*" plan_version
+note bottom of plan_version
+实质变更建立新版并重新说明确认。
+停止旧版仅影响后续，保留既有执行。
+方案估算与预计安排不产生实际应收。
+end note
+}
+@enduml

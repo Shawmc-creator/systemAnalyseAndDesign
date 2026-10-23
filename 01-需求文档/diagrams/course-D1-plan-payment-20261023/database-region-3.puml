@@ -1,0 +1,73 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam EntityBackgroundColor white
+skinparam EntityBorderColor black
+skinparam nodesep 28
+skinparam ranksep 38
+hide circle
+left to right direction
+entity "治疗方案\ntreatment_plan" as treatment_plan {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+}
+entity "方案版本\nplan_version" as plan_version {
+* id : INTEGER <<PK>>
+* treatment_plan_id : INTEGER <<FK>>
+ source_visit_id : INTEGER <<FK>>
+ previous_version_id : INTEGER <<FK>>
+}
+entity "方案项目\nplan_item" as plan_item {
+* id : INTEGER <<PK>>
+* plan_version_id : INTEGER <<FK>>
+}
+entity "患者决定\npatient_decision" as patient_decision {
+* id : INTEGER <<PK>>
+* plan_version_id : INTEGER <<FK>>
+}
+entity "患者决定—方案项目\ndecision_plan_item" as decision_plan_item {
+* decision_id : INTEGER <<PK,FK>>
+* plan_item_id : INTEGER <<PK,FK>>
+ scope_quantity : INTEGER
+}
+entity "患者决定—确认原件\ndecision_file_version" as decision_file_version {
+* decision_id : INTEGER <<PK,FK>>
+* document_version_id : INTEGER <<PK,FK>>
+}
+entity "诊疗执行\ntreatment_execution" as treatment_execution {
+* id : INTEGER <<PK>>
+* visit_id : INTEGER <<FK>>
+ plan_item_id : INTEGER <<FK>>
+* service_id : INTEGER <<FK>>
+ original_execution_id : INTEGER <<FK>>
+}
+entity "文件版本（跨区引用）\ndocument_version" as document_version {
+* id : INTEGER <<PK>>
+}
+entity "患者（跨区引用）\npatient" as patient {
+* id : INTEGER <<PK>>
+}
+entity "收费项目（跨区引用）\nservice" as service {
+* id : INTEGER <<PK>>
+}
+entity "就诊（跨区引用）\nvisit" as visit {
+* id : INTEGER <<PK>>
+}
+patient ||--o{ treatment_plan
+treatment_plan ||--o{ plan_version
+visit |o--o{ plan_version
+plan_version |o--o{ plan_version
+plan_version ||--o{ plan_item
+plan_version ||--o{ patient_decision
+patient_decision ||--o{ decision_plan_item
+plan_item ||--o{ decision_plan_item
+patient_decision ||--o{ decision_file_version
+document_version ||--o{ decision_file_version
+visit ||--o{ treatment_execution
+plan_item |o--o{ treatment_execution
+service ||--o{ treatment_execution
+treatment_execution |o--o{ treatment_execution
+@enduml

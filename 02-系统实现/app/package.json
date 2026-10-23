@@ -24,7 +24,12 @@
     "demo:settlements:v2": "node scripts/demo-v2-settlements.js",
     "demo:business:v2": "node scripts/serve-v2-business-demo.js",
     "check:ui:settlements": "node scripts/check-v2-settlements-ui.cjs",
-    "check:delivery": "node scripts/check-delivery.js"
+    "check:delivery": "node scripts/check-delivery.js",
+    "check:ui:clinical": "node scripts/check-v2-clinical-alignment-ui.cjs",
+    "audit:design": "node scripts/audit-v2-design.js",
+    "check:design": "node scripts/audit-v2-design.js --check",
+    "check:ui:fees": "node scripts/check-v2-fee-history-ui.cjs",
+    "check:ui:histories": "node scripts/check-v2-workflow-history-ui.cjs"
   },
   "engines": {
     "node": ">=24"

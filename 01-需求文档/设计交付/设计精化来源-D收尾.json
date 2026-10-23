@@ -1,0 +1,3932 @@
+{
+  "date": "2026-10-23",
+  "scope": "字段来源清理、完整D2及D3联合收尾",
+  "field_source_changes": [
+    {
+      "table": "patient",
+      "field": "contact_unavailable_reason",
+      "old": "UC-08",
+      "new": "UC-01；联系资料缺失的实际原因"
+    },
+    {
+      "table": "patient_change",
+      "field": "patient_id",
+      "old": "R001",
+      "new": "UC-01；患者资料变更与患者的归属关联"
+    },
+    {
+      "table": "patient_change",
+      "field": "field_name",
+      "old": "UC-08",
+      "new": "UC-01；更正字段与前后值"
+    },
+    {
+      "table": "dated_schedule",
+      "field": "dentist_id",
+      "old": "R006",
+      "new": "UC-02、UC-04；日期安排与职员的归属关联"
+    },
+    {
+      "table": "dated_schedule",
+      "field": "dental_chair_id",
+      "old": "R007",
+      "new": "UC-02、UC-04；日期安排与诊椅的归属关联"
+    },
+    {
+      "table": "schedule_change",
+      "field": "dated_schedule_id",
+      "old": "R008",
+      "new": "UC-04；安排变更与日期安排的归属关联"
+    },
+    {
+      "table": "schedule_change",
+      "field": "change_kind",
+      "old": "UC-15",
+      "new": "UC-04；排班调整或停诊种类"
+    },
+    {
+      "table": "schedule_change",
+      "field": "affected_handling",
+      "old": "UC-15",
+      "new": "UC-04；受影响预约及实际协调依据"
+    },
+    {
+      "table": "resource_occupancy",
+      "field": "dated_schedule_id",
+      "old": "R009",
+      "new": "UC-02、UC-03、UC-04、UC-06、UC-24；接诊占用与日期安排的归属关联"
+    },
+    {
+      "table": "resource_occupancy",
+      "field": "appointment_id",
+      "old": "R010",
+      "new": "UC-02、UC-03、UC-04、UC-06、UC-24；接诊占用与预约的归属关联"
+    },
+    {
+      "table": "resource_occupancy",
+      "field": "visit_id",
+      "old": "R011",
+      "new": "UC-02、UC-03、UC-04、UC-06、UC-24；接诊占用与就诊的归属关联"
+    },
+    {
+      "table": "resource_occupancy",
+      "field": "arrangement_revision",
+      "old": "UC-01、03",
+      "new": "UC-02、UC-03、UC-04；接诊安排版本"
+    },
+    {
+      "table": "resource_occupancy",
+      "field": "release_reason",
+      "old": "UC-01、03",
+      "new": "UC-02、UC-24；取消预留或实际结束释放依据"
+    },
+    {
+      "table": "appointment",
+      "field": "patient_id",
+      "old": "R012",
+      "new": "UC-02、UC-03、UC-16；预约与患者的归属关联"
+    },
+    {
+      "table": "appointment",
+      "field": "arrangement_revision",
+      "old": "UC-01",
+      "new": "UC-02；所用日期安排版本"
+    },
+    {
+      "table": "appointment",
+      "field": "status_reason",
+      "old": "UC-01",
+      "new": "UC-02；改约、取消或未到的真实原因"
+    },
+    {
+      "table": "appointment",
+      "field": "notified_at",
+      "old": "UC-01",
+      "new": "UC-02；实际通知患者时间"
+    },
+    {
+      "table": "appointment_change",
+      "field": "appointment_id",
+      "old": "R013",
+      "new": "UC-02；预约变更与预约的归属关联"
+    },
+    {
+      "table": "appointment_change",
+      "field": "change_kind",
+      "old": "UC-01",
+      "new": "UC-02；新建以外的预约变更种类"
+    },
+    {
+      "table": "visit",
+      "field": "patient_id",
+      "old": "R014",
+      "new": "UC-03、UC-05、UC-06、UC-08、UC-09、UC-15、UC-17、UC-21、UC-24；就诊与患者的归属关联"
+    },
+    {
+      "table": "visit",
+      "field": "appointment_id",
+      "old": "R015",
+      "new": "UC-03、UC-05、UC-06、UC-08、UC-09、UC-15、UC-17、UC-21、UC-24；就诊与预约的归属关联"
+    },
+    {
+      "table": "visit",
+      "field": "dentist_id",
+      "old": "R016",
+      "new": "UC-03、UC-05、UC-06、UC-08、UC-09、UC-15、UC-17、UC-21、UC-24；就诊与职员的归属关联"
+    },
+    {
+      "table": "health_version",
+      "field": "patient_id",
+      "old": "R017",
+      "new": "UC-06；健康版本与患者的归属关联"
+    },
+    {
+      "table": "health_version",
+      "field": "version_no",
+      "old": "UC-21",
+      "new": "UC-06；健康资料版本号"
+    },
+    {
+      "table": "health_version",
+      "field": "effective_at",
+      "old": "UC-21",
+      "new": "UC-06；实际形成的健康版本时间"
+    },
+    {
+      "table": "health_item",
+      "field": "health_version_id",
+      "old": "R018",
+      "new": "UC-06；健康条目与健康版本的归属关联"
+    },
+    {
+      "table": "health_item",
+      "field": "occurred_at",
+      "old": "UC-21",
+      "new": "UC-06；患者报告事项实际发生时间"
+    },
+    {
+      "table": "health_review",
+      "field": "visit_id",
+      "old": "R019",
+      "new": "UC-06、UC-09；健康复核与就诊的归属关联"
+    },
+    {
+      "table": "health_review",
+      "field": "health_version_id",
+      "old": "R020",
+      "new": "UC-06、UC-09；健康复核与健康版本的归属关联"
+    },
+    {
+      "table": "clinical_record",
+      "field": "visit_id",
+      "old": "R021",
+      "new": "UC-03、UC-05、UC-06、UC-09；病历与就诊的归属关联"
+    },
+    {
+      "table": "clinical_record",
+      "field": "signed_revision",
+      "old": "UC-11",
+      "new": "UC-09；签署采用的病历正文版本"
+    },
+    {
+      "table": "clinical_record",
+      "field": "content_hash",
+      "old": "UC-11",
+      "new": "UC-09；冻结签署正文摘要"
+    },
+    {
+      "table": "clinical_finding",
+      "field": "clinical_record_id",
+      "old": "R022",
+      "new": "UC-05、UC-06、UC-09；检查所见与病历的归属关联"
+    },
+    {
+      "table": "clinical_finding",
+      "field": "sequence_no",
+      "old": "UC-10",
+      "new": "UC-06、UC-09；当次检查所见顺序"
+    },
+    {
+      "table": "record_addendum",
+      "field": "clinical_record_id",
+      "old": "R023",
+      "new": "UC-09；病历补充与病历的归属关联"
+    },
+    {
+      "table": "record_addendum",
+      "field": "content_hash",
+      "old": "UC-11",
+      "new": "UC-09；独立签署补充的内容摘要"
+    },
+    {
+      "table": "clinical_document",
+      "field": "patient_id",
+      "old": "R024",
+      "new": "UC-05、UC-10；诊疗文件与患者的归属关联"
+    },
+    {
+      "table": "clinical_document",
+      "field": "visit_id",
+      "old": "R026",
+      "new": "UC-05、UC-10；诊疗文件与就诊的归属关联"
+    },
+    {
+      "table": "clinical_document",
+      "field": "plan_version_id",
+      "old": "R034",
+      "new": "UC-05、UC-10；诊疗文件与方案版本的归属关联"
+    },
+    {
+      "table": "document_version",
+      "field": "clinical_document_id",
+      "old": "R025",
+      "new": "UC-10；文件版本与诊疗文件的归属关联"
+    },
+    {
+      "table": "treatment_plan",
+      "field": "patient_id",
+      "old": "R027",
+      "new": "UC-05、UC-07；治疗方案与患者的归属关联"
+    },
+    {
+      "table": "treatment_plan",
+      "field": "closed_at",
+      "old": "UC-22",
+      "new": "UC-07；方案结束及原因"
+    },
+    {
+      "table": "plan_version",
+      "field": "treatment_plan_id",
+      "old": "R028",
+      "new": "UC-07、UC-15；方案版本与治疗方案的归属关联"
+    },
+    {
+      "table": "plan_version",
+      "field": "source_visit_id",
+      "old": "R111",
+      "new": "UC-07、UC-15；方案版本与就诊的归属关联"
+    },
+    {
+      "table": "plan_version",
+      "field": "version_no",
+      "old": "UC-22",
+      "new": "UC-07；方案修订版本"
+    },
+    {
+      "table": "plan_version",
+      "field": "stopped_at",
+      "old": "UC-22",
+      "new": "UC-07；停止原版后续执行时间"
+    },
+    {
+      "table": "plan_version",
+      "field": "stop_reason",
+      "old": "UC-22",
+      "new": "UC-07；停止或修订依据"
+    },
+    {
+      "table": "plan_item",
+      "field": "plan_version_id",
+      "old": "R029",
+      "new": "UC-07、UC-08；方案项目与方案版本的归属关联"
+    },
+    {
+      "table": "patient_decision",
+      "field": "plan_version_id",
+      "old": "R030",
+      "new": "UC-07、UC-08；患者决定与方案版本的归属关联"
+    },
+    {
+      "table": "patient_decision",
+      "field": "scope_note",
+      "old": "UC-22",
+      "new": "UC-07；本次患者决定和范围限制"
+    },
+    {
+      "table": "decision_plan_item",
+      "field": "decision_id",
+      "old": "R031",
+      "new": "UC-07、UC-08；患者决定—方案项目与患者决定的归属关联"
+    },
+    {
+      "table": "decision_plan_item",
+      "field": "plan_item_id",
+      "old": "R031",
+      "new": "UC-07、UC-08；患者决定—方案项目与方案项目的归属关联"
+    },
+    {
+      "table": "decision_file_version",
+      "field": "decision_id",
+      "old": "R033",
+      "new": "UC-07、UC-10；患者决定—确认原件与患者决定的归属关联"
+    },
+    {
+      "table": "decision_file_version",
+      "field": "document_version_id",
+      "old": "R033",
+      "new": "UC-07、UC-10；患者决定—确认原件与文件版本的归属关联"
+    },
+    {
+      "table": "treatment_execution",
+      "field": "visit_id",
+      "old": "R035",
+      "new": "UC-08；诊疗执行与就诊的归属关联"
+    },
+    {
+      "table": "treatment_execution",
+      "field": "plan_item_id",
+      "old": "R036",
+      "new": "UC-08；诊疗执行与方案项目的归属关联"
+    },
+    {
+      "table": "treatment_execution",
+      "field": "service_id",
+      "old": "R037",
+      "new": "UC-08；诊疗执行与收费项目的归属关联"
+    },
+    {
+      "table": "treatment_execution",
+      "field": "original_execution_id",
+      "old": "R038",
+      "new": "UC-08；诊疗执行与诊疗执行的归属关联"
+    },
+    {
+      "table": "treatment_execution",
+      "field": "execution_kind",
+      "old": "UC-04",
+      "new": "UC-08；首次实际执行或关联原执行的更正"
+    },
+    {
+      "table": "patient_funds",
+      "field": "patient_id",
+      "old": "R044",
+      "new": "UC-12、UC-13、UC-14；患者资金与患者的归属关联"
+    },
+    {
+      "table": "service",
+      "field": "is_active",
+      "old": "UC-05",
+      "new": "UC-11；项目用于新计费的启用状态"
+    },
+    {
+      "table": "service_price",
+      "field": "service_id",
+      "old": "R039",
+      "new": "UC-08、UC-11；价目与收费项目的归属关联"
+    },
+    {
+      "table": "service_price",
+      "field": "review_note",
+      "old": "UC-05",
+      "new": "UC-11；负责人退回或停止适用依据"
+    },
+    {
+      "table": "bill",
+      "field": "patient_id",
+      "old": "R040",
+      "new": "UC-12、UC-13、UC-14、UC-21；应收账目与患者的归属关联"
+    },
+    {
+      "table": "bill",
+      "field": "patient_funds_id",
+      "old": "R110",
+      "new": "UC-12、UC-13、UC-14、UC-21；应收账目与患者资金的归属关联"
+    },
+    {
+      "table": "bill_item",
+      "field": "bill_id",
+      "old": "R041",
+      "new": "UC-08、UC-11、UC-12、UC-21、UC-25；应收项目与应收账目的归属关联"
+    },
+    {
+      "table": "bill_item",
+      "field": "treatment_execution_id",
+      "old": "R042",
+      "new": "UC-08、UC-11、UC-12、UC-21、UC-25；应收项目与诊疗执行的归属关联"
+    },
+    {
+      "table": "bill_item",
+      "field": "service_price_id",
+      "old": "R043",
+      "new": "UC-08、UC-11、UC-12、UC-21、UC-25；应收项目与价目的归属关联"
+    },
+    {
+      "table": "bill_item",
+      "field": "pricing_status",
+      "old": "UC-04、06",
+      "new": "UC-08、UC-11、UC-12、UC-25；实际来源的已核价或待核价状态"
+    },
+    {
+      "table": "patient_payment",
+      "field": "patient_funds_id",
+      "old": "R045",
+      "new": "UC-12、UC-13、UC-14、UC-21；患者付款与患者资金的归属关联"
+    },
+    {
+      "table": "patient_payment",
+      "field": "external_reference",
+      "old": "UC-07",
+      "new": "UC-13；原渠道实际到账的交易依据"
+    },
+    {
+      "table": "patient_payment",
+      "field": "verified_at",
+      "old": "UC-07",
+      "new": "UC-13；核实原付款真实结果时间"
+    },
+    {
+      "table": "payment_allocation",
+      "field": "patient_payment_id",
+      "old": "R046",
+      "new": "UC-12、UC-13、UC-14；付款分配与患者付款的归属关联"
+    },
+    {
+      "table": "payment_allocation",
+      "field": "bill_id",
+      "old": "R047",
+      "new": "UC-12、UC-13、UC-14；付款分配与应收账目的归属关联"
+    },
+    {
+      "table": "prepayment_offset",
+      "field": "patient_payment_id",
+      "old": "R048",
+      "new": "UC-12、UC-13、UC-14；预付抵扣与患者付款的归属关联"
+    },
+    {
+      "table": "prepayment_offset",
+      "field": "bill_id",
+      "old": "R049",
+      "new": "UC-12、UC-13、UC-14；预付抵扣与应收账目的归属关联"
+    },
+    {
+      "table": "prepayment_offset",
+      "field": "reason",
+      "old": "UC-07、25",
+      "new": "UC-13；同患者原预款用于本账的依据"
+    },
+    {
+      "table": "fee_request",
+      "field": "patient_funds_id",
+      "old": "R050",
+      "new": "UC-14；费用申请与患者资金的归属关联"
+    },
+    {
+      "table": "fee_request",
+      "field": "bill_id",
+      "old": "R051",
+      "new": "UC-14；费用申请与应收账目的归属关联"
+    },
+    {
+      "table": "fee_request",
+      "field": "patient_payment_id",
+      "old": "R052",
+      "new": "UC-14；费用申请与患者付款的归属关联"
+    },
+    {
+      "table": "fee_request",
+      "field": "submission_no",
+      "old": "UC-24、25",
+      "new": "UC-14；退回重提的提交版本"
+    },
+    {
+      "table": "fee_request",
+      "field": "approved_adjustment_cents",
+      "old": "UC-25",
+      "new": "UC-14；负责人批准调整额"
+    },
+    {
+      "table": "fee_request",
+      "field": "approved_refund_cents",
+      "old": "UC-25",
+      "new": "UC-14；负责人批准退款上限"
+    },
+    {
+      "table": "fee_request",
+      "field": "reviewed_at",
+      "old": "UC-25",
+      "new": "UC-14；实际负责人审核时间"
+    },
+    {
+      "table": "fee_adjustment",
+      "field": "fee_request_id",
+      "old": "R053",
+      "new": "UC-12、UC-14；费用调整与费用申请的归属关联"
+    },
+    {
+      "table": "fee_adjustment",
+      "field": "bill_id",
+      "old": "R054",
+      "new": "UC-12、UC-14；费用调整与应收账目的归属关联"
+    },
+    {
+      "table": "fee_adjustment_item",
+      "field": "fee_adjustment_id",
+      "old": "R055",
+      "new": "UC-12、UC-14；调整项目与费用调整的归属关联"
+    },
+    {
+      "table": "fee_adjustment_item",
+      "field": "bill_item_id",
+      "old": "R056",
+      "new": "UC-12、UC-14；调整项目与应收项目的归属关联"
+    },
+    {
+      "table": "patient_refund",
+      "field": "fee_request_id",
+      "old": "R057",
+      "new": "UC-14、UC-21；退款办理与费用申请的归属关联"
+    },
+    {
+      "table": "patient_refund",
+      "field": "patient_payment_id",
+      "old": "R058",
+      "new": "UC-14、UC-21；退款办理与患者付款的归属关联"
+    },
+    {
+      "table": "patient_refund",
+      "field": "patient_funds_id",
+      "old": "R059",
+      "new": "UC-14、UC-21；退款办理与患者资金的归属关联"
+    },
+    {
+      "table": "patient_refund",
+      "field": "external_reference",
+      "old": "UC-26",
+      "new": "UC-14；原渠道退款交易依据"
+    },
+    {
+      "table": "patient_refund",
+      "field": "verified_at",
+      "old": "UC-26",
+      "new": "UC-14；核实原退款真实结果时间"
+    },
+    {
+      "table": "patient_refund",
+      "field": "recipient_verification",
+      "old": "UC-26",
+      "new": "UC-14；实际接收方及原渠道核对依据"
+    },
+    {
+      "table": "followup_requirement",
+      "field": "patient_id",
+      "old": "R060",
+      "new": "UC-15、UC-16、UC-17；诊后要求与患者的归属关联"
+    },
+    {
+      "table": "followup_requirement",
+      "field": "source_visit_id",
+      "old": "R061",
+      "new": "UC-15、UC-16、UC-17；诊后要求与就诊的归属关联"
+    },
+    {
+      "table": "followup_requirement",
+      "field": "source_plan_version_id",
+      "old": "R062",
+      "new": "UC-15、UC-16、UC-17；诊后要求与方案版本的归属关联"
+    },
+    {
+      "table": "followup_requirement",
+      "field": "next_contact_date",
+      "old": "UC-12—14",
+      "new": "UC-15、UC-16、UC-17；继续联系或跟进日期"
+    },
+    {
+      "table": "followup_requirement",
+      "field": "closed_at",
+      "old": "UC-12—14",
+      "new": "UC-15、UC-16、UC-17；完成或撤销的真实时间"
+    },
+    {
+      "table": "followup_requirement",
+      "field": "closure_basis",
+      "old": "UC-12—14",
+      "new": "UC-15、UC-16、UC-17；按原目的完成或牙医撤销的依据"
+    },
+    {
+      "table": "contact_history",
+      "field": "followup_requirement_id",
+      "old": "R063",
+      "new": "UC-16；联系经历与诊后要求的归属关联"
+    },
+    {
+      "table": "contact_history",
+      "field": "appointment_id",
+      "old": "R065",
+      "new": "UC-16；联系经历与预约的归属关联"
+    },
+    {
+      "table": "contact_history",
+      "field": "note",
+      "old": "UC-13",
+      "new": "UC-16；本次真实联系事实及沟通内容"
+    },
+    {
+      "table": "clinical_assessment",
+      "field": "followup_requirement_id",
+      "old": "R064",
+      "new": "UC-17；临床评估与诊后要求的归属关联"
+    },
+    {
+      "table": "clinical_assessment",
+      "field": "visit_id",
+      "old": "R066",
+      "new": "UC-17；临床评估与就诊的归属关联"
+    },
+    {
+      "table": "clinical_assessment",
+      "field": "next_date",
+      "old": "UC-14",
+      "new": "UC-17；牙医要求继续跟进的日期"
+    },
+    {
+      "table": "material",
+      "field": "requires_expiry",
+      "old": "UC-32",
+      "new": "UC-18；材料是否必须取得效期"
+    },
+    {
+      "table": "material",
+      "field": "confirmed_at",
+      "old": "UC-32",
+      "new": "UC-18；负责人确认计量设置时间"
+    },
+    {
+      "table": "material",
+      "field": "is_active",
+      "old": "UC-32",
+      "new": "UC-18；新业务使用的启用状态"
+    },
+    {
+      "table": "material_batch",
+      "field": "material_id",
+      "old": "R067",
+      "new": "UC-18、UC-20；材料批次与材料的归属关联"
+    },
+    {
+      "table": "batch_change",
+      "field": "material_batch_id",
+      "old": "R068",
+      "new": "UC-18；批次变更与材料批次的归属关联"
+    },
+    {
+      "table": "stock_location",
+      "field": "is_active",
+      "old": "UC-17、28",
+      "new": "UC-18、UC-19、UC-20；批次存放位置可用性"
+    },
+    {
+      "table": "batch_stock",
+      "field": "material_batch_id",
+      "old": "R069",
+      "new": "UC-19、UC-20；批次存量与材料批次的归属关联"
+    },
+    {
+      "table": "batch_stock",
+      "field": "stock_location_id",
+      "old": "R070",
+      "new": "UC-19、UC-20；批次存量与存放位置的归属关联"
+    },
+    {
+      "table": "inventory_movement",
+      "field": "batch_stock_id",
+      "old": "R071",
+      "new": "UC-19、UC-20、UC-25；库存变动与批次存量的归属关联"
+    },
+    {
+      "table": "inventory_movement",
+      "field": "original_movement_id",
+      "old": "R072",
+      "new": "UC-19、UC-20、UC-25；库存变动与库存变动的归属关联"
+    },
+    {
+      "table": "inventory_movement",
+      "field": "stock_count_id",
+      "old": "R075",
+      "new": "UC-19、UC-20、UC-25；库存变动与盘点核实的归属关联"
+    },
+    {
+      "table": "inventory_movement",
+      "field": "purchase_receipt_item_id",
+      "old": "R083",
+      "new": "UC-19、UC-20、UC-25；库存变动与验收项目的归属关联"
+    },
+    {
+      "table": "material_usage",
+      "field": "inventory_movement_id",
+      "old": "R073",
+      "new": "UC-20；实际用料与库存变动的归属关联"
+    },
+    {
+      "table": "material_usage",
+      "field": "visit_id",
+      "old": "R074",
+      "new": "UC-20；实际用料与就诊的归属关联"
+    },
+    {
+      "table": "stock_count",
+      "field": "batch_stock_id",
+      "old": "R108",
+      "new": "UC-20；盘点核实与批次存量的归属关联"
+    },
+    {
+      "table": "stock_count",
+      "field": "stock_revision",
+      "old": "UC-18",
+      "new": "UC-20；盘点当时库存版本快照"
+    },
+    {
+      "table": "stock_count",
+      "field": "counted_at",
+      "old": "UC-18",
+      "new": "UC-20；实际实点时间"
+    },
+    {
+      "table": "stock_count",
+      "field": "review_note",
+      "old": "UC-18",
+      "new": "UC-20；负责人同意、拒绝或要求重核的依据"
+    },
+    {
+      "table": "supplier",
+      "field": "is_active",
+      "old": "UC-27",
+      "new": "UC-19；新采购可选供方状态"
+    },
+    {
+      "table": "purchase_order",
+      "field": "supplier_id",
+      "old": "R076",
+      "new": "UC-19；采购与供应商的归属关联"
+    },
+    {
+      "table": "purchase_order",
+      "field": "request_reason",
+      "old": "UC-27",
+      "new": "UC-19；采购需求依据"
+    },
+    {
+      "table": "purchase_order_item",
+      "field": "purchase_order_id",
+      "old": "R077",
+      "new": "UC-19；采购项目与采购的归属关联"
+    },
+    {
+      "table": "purchase_order_item",
+      "field": "material_id",
+      "old": "R078",
+      "new": "UC-19；采购项目与材料的归属关联"
+    },
+    {
+      "table": "purchase_order_item",
+      "field": "conversion_numerator",
+      "old": "UC-27、28",
+      "new": "UC-19；确认时计量换算快照"
+    },
+    {
+      "table": "purchase_order_item",
+      "field": "conversion_denominator",
+      "old": "UC-27、28",
+      "new": "UC-19；确认时计量换算快照"
+    },
+    {
+      "table": "purchase_order_item",
+      "field": "quantity_scale",
+      "old": "UC-27、28",
+      "new": "UC-19；确认时数量精度快照"
+    },
+    {
+      "table": "purchase_order_item",
+      "field": "sequence_no",
+      "old": "UC-27、28",
+      "new": "UC-19；原采购明细顺序"
+    },
+    {
+      "table": "purchase_receipt",
+      "field": "purchase_order_id",
+      "old": "R079",
+      "new": "UC-19；验收与采购的归属关联"
+    },
+    {
+      "table": "purchase_receipt_item",
+      "field": "purchase_receipt_id",
+      "old": "R080",
+      "new": "UC-19；验收项目与验收的归属关联"
+    },
+    {
+      "table": "purchase_receipt_item",
+      "field": "purchase_order_item_id",
+      "old": "R081",
+      "new": "UC-19；验收项目与采购项目的归属关联"
+    },
+    {
+      "table": "purchase_receipt_item",
+      "field": "material_batch_id",
+      "old": "R082",
+      "new": "UC-19；验收项目与材料批次的归属关联"
+    },
+    {
+      "table": "purchase_receipt_item",
+      "field": "inspection_note",
+      "old": "UC-28",
+      "new": "UC-19；真实验收、待检或差异结论依据"
+    }
+  ],
+  "table_source_changes": [
+    {
+      "table": "staff",
+      "old": [
+        "UC-04"
+      ],
+      "new": [
+        "UC-02",
+        "UC-04"
+      ]
+    },
+    {
+      "table": "user_account",
+      "old": [
+        "全部岗位用例的登录与权限前提"
+      ],
+      "new": [
+        "UC-01",
+        "UC-02",
+        "UC-03",
+        "UC-04",
+        "UC-05",
+        "UC-06",
+        "UC-07",
+        "UC-08",
+        "UC-09",
+        "UC-10",
+        "UC-11",
+        "UC-12",
+        "UC-13",
+        "UC-14",
+        "UC-15",
+        "UC-16",
+        "UC-17",
+        "UC-18",
+        "UC-19",
+        "UC-20",
+        "UC-21",
+        "UC-22",
+        "UC-23",
+        "UC-24",
+        "UC-25",
+        "全部岗位用例的登录与权限前提"
+      ]
+    },
+    {
+      "table": "dental_chair",
+      "old": [
+        "UC-04",
+        "UC-24"
+      ],
+      "new": [
+        "UC-02",
+        "UC-04",
+        "UC-24"
+      ]
+    },
+    {
+      "table": "resource_occupancy",
+      "old": [
+        "UC-02",
+        "UC-03",
+        "UC-04",
+        "UC-24"
+      ],
+      "new": [
+        "UC-02",
+        "UC-03",
+        "UC-04",
+        "UC-06",
+        "UC-24"
+      ]
+    },
+    {
+      "table": "equipment_occupancy",
+      "old": [
+        "UC-02",
+        "UC-24"
+      ],
+      "new": [
+        "UC-02",
+        "UC-06",
+        "UC-24"
+      ]
+    },
+    {
+      "table": "health_review",
+      "old": [
+        "UC-06"
+      ],
+      "new": [
+        "UC-06",
+        "UC-09"
+      ]
+    },
+    {
+      "table": "patient_decision",
+      "old": [
+        "UC-07"
+      ],
+      "new": [
+        "UC-07",
+        "UC-08"
+      ]
+    },
+    {
+      "table": "decision_plan_item",
+      "old": [
+        "UC-07"
+      ],
+      "new": [
+        "UC-07",
+        "UC-08"
+      ]
+    },
+    {
+      "table": "patient_funds",
+      "old": [
+        "UC-13"
+      ],
+      "new": [
+        "UC-12",
+        "UC-13",
+        "UC-14"
+      ]
+    },
+    {
+      "table": "bill_item",
+      "old": [
+        "UC-08",
+        "UC-12",
+        "UC-21",
+        "UC-25"
+      ],
+      "new": [
+        "UC-08",
+        "UC-11",
+        "UC-12",
+        "UC-21",
+        "UC-25"
+      ]
+    },
+    {
+      "table": "payment_allocation",
+      "old": [
+        "UC-12",
+        "UC-13"
+      ],
+      "new": [
+        "UC-12",
+        "UC-13",
+        "UC-14"
+      ]
+    },
+    {
+      "table": "prepayment_offset",
+      "old": [
+        "UC-13"
+      ],
+      "new": [
+        "UC-12",
+        "UC-13",
+        "UC-14"
+      ]
+    },
+    {
+      "table": "payment_reconciliation",
+      "old": [
+        "UC-13",
+        "UC-21"
+      ],
+      "new": [
+        "UC-13",
+        "UC-14",
+        "UC-21"
+      ]
+    },
+    {
+      "table": "stock_location",
+      "old": [
+        "UC-18"
+      ],
+      "new": [
+        "UC-18",
+        "UC-19",
+        "UC-20"
+      ]
+    },
+    {
+      "table": "batch_stock",
+      "old": [
+        "UC-20"
+      ],
+      "new": [
+        "UC-19",
+        "UC-20"
+      ]
+    },
+    {
+      "table": "inventory_movement",
+      "old": [
+        "UC-20",
+        "UC-25"
+      ],
+      "new": [
+        "UC-19",
+        "UC-20",
+        "UC-25"
+      ]
+    },
+    {
+      "table": "insurance_fee",
+      "old": [
+        "UC-22"
+      ],
+      "new": [
+        "UC-22",
+        "UC-23"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "n": 1,
+      "name": "接诊与资源应用服务",
+      "ucs": [
+        1,
+        2,
+        3,
+        4,
+        24
+      ],
+      "controller": "接诊与资源接口",
+      "repos": [
+        [
+          "接诊存取接口",
+          [
+            "读取患者、排班与占用(稳定键)",
+            "保存患者及更正(办理号,版本)",
+            "保存预约及资源变更(办理号,版本)",
+            "保存到诊及病历草稿(来源)",
+            "保存实际结束及准备限制(版本)"
+          ]
+        ]
+      ],
+      "mapper": "SQLite接诊映射器",
+      "entities": {
+        "patient": [
+          0,
+          3
+        ],
+        "appointment": [
+          0,
+          1,
+          2
+        ],
+        "dated_schedule": [
+          0,
+          1,
+          2
+        ],
+        "resource_occupancy": [
+          0,
+          2,
+          4
+        ],
+        "visit": [
+          0,
+          1,
+          2
+        ],
+        "resource_block": [
+          0,
+          2,
+          3
+        ],
+        "equipment_occupancy": [
+          0,
+          2,
+          4
+        ]
+      },
+      "history": [
+        "patient_change",
+        "schedule_change",
+        "appointment_change"
+      ],
+      "methods": [
+        {
+          "uc": 1,
+          "name": "维护患者资料",
+          "operation": "维护患者资料(身份及联系资料,版本)"
+        },
+        {
+          "uc": 2,
+          "name": "维护预约安排",
+          "operation": "维护预约安排(患者,资源时段,版本)"
+        },
+        {
+          "uc": 3,
+          "name": "登记到诊",
+          "operation": "登记到诊(患者,到诊来源)"
+        },
+        {
+          "uc": 4,
+          "name": "维护排班与接诊安排",
+          "operation": "维护排班与接诊安排(牙医诊椅,日期时段,版本)"
+        },
+        {
+          "uc": 24,
+          "name": "协调诊椅设备准备与停用恢复",
+          "operation": "协调诊椅设备准备与停用恢复(原占用,真实结束及恢复依据)"
+        }
+      ],
+      "shown_entities": [
+        {
+          "table": "patient",
+          "name": "患者",
+          "ops": [
+            "核对辨识资料()",
+            "建立患者档案()"
+          ]
+        },
+        {
+          "table": "appointment",
+          "name": "预约",
+          "ops": [
+            "确认预约()",
+            "改约()",
+            "取消()"
+          ]
+        },
+        {
+          "table": "dated_schedule",
+          "name": "日期安排",
+          "ops": [
+            "核对接诊时段()",
+            "确认发布()",
+            "调整安排()"
+          ]
+        },
+        {
+          "table": "resource_occupancy",
+          "name": "接诊占用",
+          "ops": [
+            "核对时段冲突()",
+            "确认实际结束()",
+            "预留接诊时段()"
+          ]
+        },
+        {
+          "table": "visit",
+          "name": "就诊",
+          "ops": [
+            "登记候诊()",
+            "开始接诊()",
+            "记录诊疗结束()"
+          ]
+        },
+        {
+          "table": "resource_block",
+          "name": "资源停用时段",
+          "ops": [
+            "登记准备或故障限制()",
+            "核对解除依据()",
+            "解除本次限制()"
+          ]
+        },
+        {
+          "table": "equipment_occupancy",
+          "name": "设备占用",
+          "ops": [
+            "预留时段()",
+            "确认实际结束()",
+            "核对设备时段冲突()"
+          ]
+        }
+      ],
+      "all_entity_responsibilities": {
+        "1": [
+          {
+            "table": "patient",
+            "ops": [
+              "核对辨识资料()",
+              "核对联系资料()",
+              "更正基本资料()",
+              "建立患者档案()"
+            ]
+          },
+          {
+            "table": "patient_change",
+            "ops": [
+              "核对实际变化()",
+              "形成更正依据()"
+            ]
+          },
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          }
+        ],
+        "2": [
+          {
+            "table": "staff",
+            "ops": [
+              "核对在岗期间()"
+            ]
+          },
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "dental_chair",
+            "ops": [
+              "核对资源有效期间()"
+            ]
+          },
+          {
+            "table": "dated_schedule",
+            "ops": [
+              "核对接诊时段()",
+              "确认发布()",
+              "调整安排()",
+              "登记停诊()",
+              "保存未发布草稿()"
+            ]
+          },
+          {
+            "table": "resource_occupancy",
+            "ops": [
+              "核对时段冲突()",
+              "承接实际使用()",
+              "确认实际结束()",
+              "释放预约预留()",
+              "预留接诊时段()"
+            ]
+          },
+          {
+            "table": "appointment",
+            "ops": [
+              "确认预约()",
+              "改约()",
+              "取消()",
+              "登记到诊()",
+              "核实未到()"
+            ]
+          },
+          {
+            "table": "appointment_change",
+            "ops": [
+              "保留原安排()",
+              "记录变更及通知依据()"
+            ]
+          },
+          {
+            "table": "clinical_equipment",
+            "ops": [
+              "核对适用设备()",
+              "登记停用()",
+              "依据复核恢复()"
+            ]
+          },
+          {
+            "table": "resource_block",
+            "ops": [
+              "登记准备或故障限制()",
+              "记录真实核查结果()",
+              "核对解除依据()",
+              "解除本次限制()",
+              "核对当前限制()"
+            ]
+          },
+          {
+            "table": "equipment_occupancy",
+            "ops": [
+              "预留时段()",
+              "开始使用()",
+              "确认实际结束()",
+              "释放预约预留()",
+              "核对设备时段冲突()"
+            ]
+          }
+        ],
+        "3": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "resource_occupancy",
+            "ops": [
+              "核对时段冲突()",
+              "承接实际使用()",
+              "确认实际结束()",
+              "释放预约预留()",
+              "预留接诊时段()"
+            ]
+          },
+          {
+            "table": "appointment",
+            "ops": [
+              "确认预约()",
+              "改约()",
+              "取消()",
+              "登记到诊()",
+              "核实未到()"
+            ]
+          },
+          {
+            "table": "visit",
+            "ops": [
+              "登记候诊()",
+              "开始接诊()",
+              "记录诊疗结束()"
+            ]
+          },
+          {
+            "table": "clinical_record",
+            "ops": [
+              "核对草稿可修改性()",
+              "更新草稿(当前版本)",
+              "核对签署完整性(所见与复核)",
+              "签署并冻结正文()",
+              "建立当次草稿()",
+              "核对病历患者及就诊归属()"
+            ]
+          }
+        ],
+        "4": [
+          {
+            "table": "staff",
+            "ops": [
+              "核对在岗期间()"
+            ]
+          },
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "dental_chair",
+            "ops": [
+              "核对资源有效期间()"
+            ]
+          },
+          {
+            "table": "dated_schedule",
+            "ops": [
+              "核对接诊时段()",
+              "确认发布()",
+              "调整安排()",
+              "登记停诊()",
+              "保存未发布草稿()"
+            ]
+          },
+          {
+            "table": "schedule_change",
+            "ops": [
+              "保留变更前后快照()",
+              "记录影响处理依据()"
+            ]
+          }
+        ],
+        "24": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "dental_chair",
+            "ops": [
+              "核对资源有效期间()"
+            ]
+          },
+          {
+            "table": "resource_occupancy",
+            "ops": [
+              "核对时段冲突()",
+              "承接实际使用()",
+              "确认实际结束()",
+              "释放预约预留()",
+              "预留接诊时段()"
+            ]
+          },
+          {
+            "table": "visit",
+            "ops": [
+              "登记候诊()",
+              "开始接诊()",
+              "记录诊疗结束()"
+            ]
+          },
+          {
+            "table": "clinical_equipment",
+            "ops": [
+              "核对适用设备()",
+              "登记停用()",
+              "依据复核恢复()"
+            ]
+          },
+          {
+            "table": "resource_block",
+            "ops": [
+              "登记准备或故障限制()",
+              "记录真实核查结果()",
+              "核对解除依据()",
+              "解除本次限制()",
+              "核对当前限制()"
+            ]
+          },
+          {
+            "table": "equipment_occupancy",
+            "ops": [
+              "预留时段()",
+              "开始使用()",
+              "确认实际结束()",
+              "释放预约预留()",
+              "核对设备时段冲突()"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "n": 2,
+      "name": "临床应用服务",
+      "ucs": [
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "controller": "临床资料接口",
+      "repos": [
+        [
+          "临床存取接口",
+          [
+            "读取患者完整诊疗资料(患者,权限)",
+            "保存草稿、所见及健康复核(版本)",
+            "保存方案、决定和原件关联(版本)",
+            "保存实际治疗及应收来源(办理号)",
+            "保存签署与确切复核(版本)",
+            "保存文书版本及归属更正(办理号)"
+          ]
+        ]
+      ],
+      "mapper": "SQLite临床映射器",
+      "entities": {
+        "clinical_record": [
+          1,
+          2,
+          3
+        ],
+        "health_review": [
+          0,
+          1
+        ],
+        "plan_version": [
+          0,
+          1,
+          2
+        ],
+        "patient_decision": [
+          0,
+          1,
+          2
+        ],
+        "treatment_execution": [
+          0,
+          1,
+          2
+        ],
+        "document_version": [
+          0,
+          1,
+          2
+        ]
+      },
+      "history": [
+        "document_correction",
+        "record_addendum",
+        "health_version",
+        "plan_version",
+        "document_version"
+      ],
+      "methods": [
+        {
+          "uc": 5,
+          "name": "查阅患者诊疗资料",
+          "operation": "查阅患者诊疗资料(患者,诊疗范围)"
+        },
+        {
+          "uc": 6,
+          "name": "记录检查诊断与健康资料",
+          "operation": "记录检查诊断与健康资料(就诊,草稿所见,健康版本)"
+        },
+        {
+          "uc": 7,
+          "name": "制定治疗方案并记录患者确认",
+          "operation": "制定治疗方案并记录患者确认(方案版本,说明及决定范围)"
+        },
+        {
+          "uc": 8,
+          "name": "登记实际治疗与完成项目",
+          "operation": "登记实际治疗与完成项目(实际项目,数量,原执行)"
+        },
+        {
+          "uc": 9,
+          "name": "签署及补充病历",
+          "operation": "签署及补充病历(病历版本,所见及健康复核)"
+        },
+        {
+          "uc": 10,
+          "name": "管理影像与诊疗文书",
+          "operation": "管理影像与诊疗文书(患者归属,文件版本及依据)"
+        }
+      ],
+      "shown_entities": [
+        {
+          "table": "clinical_record",
+          "name": "病历",
+          "ops": [
+            "更新草稿(当前版本)",
+            "核对签署完整性(所见与复核)",
+            "签署并冻结正文()"
+          ]
+        },
+        {
+          "table": "health_review",
+          "name": "健康复核",
+          "ops": [
+            "核对版本与就诊归属()",
+            "记录当次复核()"
+          ]
+        },
+        {
+          "table": "plan_version",
+          "name": "方案版本",
+          "ops": [
+            "核对诊断与明细完整性()",
+            "提交患者确认()",
+            "建立修订版(原版本与原因)"
+          ]
+        },
+        {
+          "table": "patient_decision",
+          "name": "患者决定",
+          "ops": [
+            "记录决定(项目范围)",
+            "核对有效同意范围(时点)",
+            "追加撤回决定(范围与时间)"
+          ]
+        },
+        {
+          "table": "treatment_execution",
+          "name": "诊疗执行",
+          "ops": [
+            "核对实际就诊及同意范围()",
+            "核对累计完成量()",
+            "登记实际完成()"
+          ]
+        },
+        {
+          "table": "document_version",
+          "name": "文件版本",
+          "ops": [
+            "核对原件格式与大小()",
+            "追加版本并保留原件()",
+            "确认诊疗归属(牙医与依据)"
+          ]
+        }
+      ],
+      "all_entity_responsibilities": {
+        "5": [
+          {
+            "table": "patient",
+            "ops": [
+              "核对辨识资料()",
+              "核对联系资料()",
+              "更正基本资料()",
+              "建立患者档案()"
+            ]
+          },
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "clinical_record",
+            "ops": [
+              "核对草稿可修改性()",
+              "更新草稿(当前版本)",
+              "核对签署完整性(所见与复核)",
+              "签署并冻结正文()",
+              "建立当次草稿()",
+              "核对病历患者及就诊归属()"
+            ]
+          },
+          {
+            "table": "prescription",
+            "ops": [
+              "暂存处方草稿()",
+              "开立处方(就诊与权限)",
+              "记录审方结果(资格与意见)",
+              "核对实际发药条件()",
+              "作废未交付处方(原因)",
+              "核对处方就诊归属()"
+            ]
+          }
+        ],
+        "6": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "resource_occupancy",
+            "ops": [
+              "核对时段冲突()",
+              "承接实际使用()",
+              "确认实际结束()",
+              "释放预约预留()",
+              "预留接诊时段()"
+            ]
+          },
+          {
+            "table": "visit",
+            "ops": [
+              "登记候诊()",
+              "开始接诊()",
+              "记录诊疗结束()"
+            ]
+          },
+          {
+            "table": "equipment_occupancy",
+            "ops": [
+              "预留时段()",
+              "开始使用()",
+              "确认实际结束()",
+              "释放预约预留()",
+              "核对设备时段冲突()"
+            ]
+          },
+          {
+            "table": "health_version",
+            "ops": [
+              "建立新版(变更原因)",
+              "核对患者及前版本()"
+            ]
+          },
+          {
+            "table": "health_item",
+            "ops": [
+              "核对类别及确认程度()"
+            ]
+          },
+          {
+            "table": "health_review",
+            "ops": [
+              "核对版本与就诊归属()",
+              "记录当次复核()"
+            ]
+          },
+          {
+            "table": "clinical_record",
+            "ops": [
+              "核对草稿可修改性()",
+              "更新草稿(当前版本)",
+              "核对签署完整性(所见与复核)",
+              "签署并冻结正文()",
+              "建立当次草稿()",
+              "核对病历患者及就诊归属()"
+            ]
+          },
+          {
+            "table": "clinical_finding",
+            "ops": [
+              "核对牙位牙面()",
+              "更新所见(原病历状态)"
+            ]
+          }
+        ],
+        "7": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "treatment_plan",
+            "ops": [
+              "建立方案(患者与目标)",
+              "核对方案患者归属()"
+            ]
+          },
+          {
+            "table": "plan_version",
+            "ops": [
+              "核对诊断与明细完整性()",
+              "提交患者确认()",
+              "建立修订版(原版本与原因)",
+              "停止本版后续执行(依据)"
+            ]
+          },
+          {
+            "table": "plan_item",
+            "ops": [
+              "核对项目数量与牙位()",
+              "核对估算状态()"
+            ]
+          },
+          {
+            "table": "patient_decision",
+            "ops": [
+              "记录决定(项目范围)",
+              "核对有效同意范围(时点)",
+              "追加撤回决定(范围与时间)"
+            ]
+          },
+          {
+            "table": "decision_plan_item",
+            "ops": [
+              "核对同版本项目()",
+              "限定本次决定范围()"
+            ]
+          },
+          {
+            "table": "decision_file_version",
+            "ops": [
+              "核对原件归属及确认状态()",
+              "固定确认时原件版本()"
+            ]
+          }
+        ],
+        "8": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "plan_item",
+            "ops": [
+              "核对项目数量与牙位()",
+              "核对估算状态()"
+            ]
+          },
+          {
+            "table": "patient_decision",
+            "ops": [
+              "记录决定(项目范围)",
+              "核对有效同意范围(时点)",
+              "追加撤回决定(范围与时间)"
+            ]
+          },
+          {
+            "table": "decision_plan_item",
+            "ops": [
+              "核对同版本项目()",
+              "限定本次决定范围()"
+            ]
+          },
+          {
+            "table": "treatment_execution",
+            "ops": [
+              "核对实际就诊及同意范围()",
+              "核对累计完成量()",
+              "登记实际完成()",
+              "关联原执行更正(原因)"
+            ]
+          },
+          {
+            "table": "bill_item",
+            "ops": [
+              "核对唯一实际来源()",
+              "确认计价(适用价目与依据)",
+              "计算项目金额()",
+              "建立实际来源(计价状态)"
+            ]
+          }
+        ],
+        "9": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "visit",
+            "ops": [
+              "登记候诊()",
+              "开始接诊()",
+              "记录诊疗结束()"
+            ]
+          },
+          {
+            "table": "health_review",
+            "ops": [
+              "核对版本与就诊归属()",
+              "记录当次复核()"
+            ]
+          },
+          {
+            "table": "clinical_record",
+            "ops": [
+              "核对草稿可修改性()",
+              "更新草稿(当前版本)",
+              "核对签署完整性(所见与复核)",
+              "签署并冻结正文()",
+              "建立当次草稿()",
+              "核对病历患者及就诊归属()"
+            ]
+          },
+          {
+            "table": "clinical_finding",
+            "ops": [
+              "核对牙位牙面()",
+              "更新所见(原病历状态)"
+            ]
+          },
+          {
+            "table": "record_addendum",
+            "ops": [
+              "核对原病历已签署()",
+              "签署补充并保留原文()"
+            ]
+          }
+        ],
+        "10": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "clinical_document",
+            "ops": [
+              "核对患者及诊疗归属()",
+              "登记文件索引()"
+            ]
+          },
+          {
+            "table": "document_version",
+            "ops": [
+              "核对原件格式与大小()",
+              "追加版本并保留原件()",
+              "确认诊疗归属(牙医与依据)"
+            ]
+          },
+          {
+            "table": "decision_file_version",
+            "ops": [
+              "核对原件归属及确认状态()",
+              "固定确认时原件版本()"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "n": 3,
+      "name": "收费与复诊应用服务",
+      "ucs": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        21
+      ],
+      "controller": "费用与随访接口",
+      "repos": [
+        [
+          "费用存取接口",
+          [
+            "读取原账、付款、医保及有效用途(原单)",
+            "保存价目和审核历史(版本)",
+            "保存收款、用途及核对(原办理号)",
+            "保存申请及审核历史(阶段,版本)",
+            "保存调整及用途释放(版本)",
+            "保存退款占额或真实结果(原办理号)",
+            "查询经营原始事实(营业日)"
+          ]
+        ],
+        [
+          "随访存取接口",
+          [
+            "读取诊后要求及联系评估(患者)",
+            "保存要求、调整和转交历史(版本)",
+            "保存联系与既有预约关联(办理号)",
+            "保存临床评估及要求结果(办理号)"
+          ]
+        ]
+      ],
+      "mapper": "SQLite费用随访映射器",
+      "entities": {
+        "service_price": [
+          0,
+          1,
+          2
+        ],
+        "bill": [
+          0,
+          1,
+          2
+        ],
+        "patient_payment": [
+          0,
+          1,
+          3
+        ],
+        "fee_request": [
+          0,
+          1,
+          2,
+          4
+        ],
+        "fee_adjustment": [
+          0,
+          1,
+          2
+        ],
+        "patient_refund": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "followup_requirement": [
+          0,
+          2,
+          4,
+          5
+        ],
+        "clinical_assessment": [
+          0,
+          1,
+          2
+        ]
+      },
+      "history": [
+        "service_price_history",
+        "fee_request_history",
+        "followup_history"
+      ],
+      "methods": [
+        {
+          "uc": 11,
+          "name": "维护收费项目与价目",
+          "operation": "维护收费项目与价目(项目,单价期间,审核决定)"
+        },
+        {
+          "uc": 12,
+          "name": "查询账单与待结算费用",
+          "operation": "查询账单与待结算费用(原账单,适用费用范围)"
+        },
+        {
+          "uc": 13,
+          "name": "办理患者付款与到账核实",
+          "operation": "办理患者付款与到账核实(原款,渠道,用途或核实依据)"
+        },
+        {
+          "uc": 14,
+          "name": "办理费用更正与退费",
+          "operation": "办理费用更正与退费(原申请原款,批准范围,真实结果)"
+        },
+        {
+          "uc": 15,
+          "name": "提出复诊随访要求",
+          "operation": "提出复诊随访要求(患者来源,目的日期,责任人)"
+        },
+        {
+          "uc": 16,
+          "name": "办理复诊联系与预约",
+          "operation": "办理复诊联系与预约(原要求,实际联系,预约来源)"
+        },
+        {
+          "uc": 17,
+          "name": "记录复诊随访评估",
+          "operation": "记录复诊随访评估(原要求,实际评估,继续跟进)"
+        },
+        {
+          "uc": 21,
+          "name": "核对日常经营与收付款",
+          "operation": "核对日常经营与收付款(营业日期,原单核对范围)"
+        }
+      ],
+      "shown_entities": [
+        {
+          "table": "service_price",
+          "name": "价目",
+          "ops": [
+            "核对适用区间(同项目价目)",
+            "提交负责人确认()",
+            "确认适用价目(当前版本)"
+          ]
+        },
+        {
+          "table": "bill",
+          "name": "应收账目",
+          "ops": [
+            "汇总已核价应收(生效调整)",
+            "核对正式医保分摊()",
+            "计算当前待付(有效抵付)"
+          ]
+        },
+        {
+          "table": "patient_payment",
+          "name": "患者付款",
+          "ops": [
+            "核对实收找零与净收()",
+            "确认实际到账(原单与依据)",
+            "计算原款可用额(用途与退款)"
+          ]
+        },
+        {
+          "table": "fee_request",
+          "name": "费用申请",
+          "ops": [
+            "核对原单归属及申请额度()",
+            "提交或补正重提()",
+            "记录批准退回或拒绝(审核依据)",
+            "计算剩余可办退款额度()"
+          ]
+        },
+        {
+          "table": "fee_adjustment",
+          "name": "费用调整",
+          "ops": [
+            "核对申请已批准且未生效()",
+            "核对明细合计与批准额()",
+            "确认调整及必要用途释放()"
+          ]
+        },
+        {
+          "table": "patient_refund",
+          "name": "退款办理",
+          "ops": [
+            "核对批准额度及原款可用额()",
+            "建立办理并占用额度()",
+            "保留未知结果与占用()",
+            "确认实际退款(真实金额与凭据)"
+          ]
+        },
+        {
+          "table": "followup_requirement",
+          "name": "诊后要求",
+          "ops": [
+            "核对患者与诊疗来源()",
+            "调整未完成要求(原因)",
+            "安排继续跟进(日期与责任人)",
+            "核对目的达成及完成依据()"
+          ]
+        },
+        {
+          "table": "clinical_assessment",
+          "name": "临床评估",
+          "ops": [
+            "核对评估方式与实际依据()",
+            "追加实际评估()",
+            "判断原目的是否达到()"
+          ]
+        }
+      ],
+      "all_entity_responsibilities": {
+        "11": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "service",
+            "ops": [
+              "核对项目及计价单位()",
+              "停用新计费(负责人确认)"
+            ]
+          },
+          {
+            "table": "service_price",
+            "ops": [
+              "核对适用区间(同项目价目)",
+              "提交负责人确认()",
+              "确认适用价目(当前版本)",
+              "退回修改(原因)"
+            ]
+          },
+          {
+            "table": "bill_item",
+            "ops": [
+              "核对唯一实际来源()",
+              "确认计价(适用价目与依据)",
+              "计算项目金额()",
+              "建立实际来源(计价状态)"
+            ]
+          }
+        ],
+        "12": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "patient_funds",
+            "ops": [
+              "核对唯一患者归属()",
+              "汇总确认收付与未用款()"
+            ]
+          },
+          {
+            "table": "bill",
+            "ops": [
+              "汇总已核价应收(生效调整)",
+              "核对正式医保分摊()",
+              "计算当前待付(有效抵付)"
+            ]
+          },
+          {
+            "table": "bill_item",
+            "ops": [
+              "核对唯一实际来源()",
+              "确认计价(适用价目与依据)",
+              "计算项目金额()",
+              "建立实际来源(计价状态)"
+            ]
+          },
+          {
+            "table": "payment_allocation",
+            "ops": [
+              "核对可分配原款与待付()",
+              "登记本账用途()",
+              "释放原用途(批准申请)",
+              "汇总有效用途净额()"
+            ]
+          },
+          {
+            "table": "prepayment_offset",
+            "ops": [
+              "核对同患者原款与待付()",
+              "登记预款抵扣()",
+              "释放原抵扣(批准申请)",
+              "汇总有效用途净额()"
+            ]
+          },
+          {
+            "table": "insurance_settlement",
+            "ops": [
+              "核对明确正式结果及分摊()",
+              "确认有效正式结算()",
+              "按成功撤销停用原结算()",
+              "计算应拨及收退差额(实际收付)"
+            ]
+          }
+        ],
+        "13": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "patient_funds",
+            "ops": [
+              "核对唯一患者归属()",
+              "汇总确认收付与未用款()"
+            ]
+          },
+          {
+            "table": "patient_payment",
+            "ops": [
+              "核对实收找零与净收()",
+              "确认实际到账(原单与依据)",
+              "记录未到账核实(依据)",
+              "计算原款可用额(用途与退款)"
+            ]
+          },
+          {
+            "table": "payment_order",
+            "ops": [
+              "核对原单金额及渠道()",
+              "记录受理或待核实()",
+              "确认渠道结果(原单与交易号)"
+            ]
+          },
+          {
+            "table": "payment_reconciliation",
+            "ops": [
+              "核对收款或退款原单()",
+              "记录核对结果(正式依据)",
+              "记录差异处理(原办理结果)"
+            ]
+          },
+          {
+            "table": "payment_allocation",
+            "ops": [
+              "核对可分配原款与待付()",
+              "登记本账用途()",
+              "释放原用途(批准申请)",
+              "汇总有效用途净额()"
+            ]
+          },
+          {
+            "table": "prepayment_offset",
+            "ops": [
+              "核对同患者原款与待付()",
+              "登记预款抵扣()",
+              "释放原抵扣(批准申请)",
+              "汇总有效用途净额()"
+            ]
+          }
+        ],
+        "14": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "patient_funds",
+            "ops": [
+              "核对唯一患者归属()",
+              "汇总确认收付与未用款()"
+            ]
+          },
+          {
+            "table": "patient_payment",
+            "ops": [
+              "核对实收找零与净收()",
+              "确认实际到账(原单与依据)",
+              "记录未到账核实(依据)",
+              "计算原款可用额(用途与退款)"
+            ]
+          },
+          {
+            "table": "payment_reconciliation",
+            "ops": [
+              "核对收款或退款原单()",
+              "记录核对结果(正式依据)",
+              "记录差异处理(原办理结果)"
+            ]
+          },
+          {
+            "table": "payment_allocation",
+            "ops": [
+              "核对可分配原款与待付()",
+              "登记本账用途()",
+              "释放原用途(批准申请)",
+              "汇总有效用途净额()"
+            ]
+          },
+          {
+            "table": "prepayment_offset",
+            "ops": [
+              "核对同患者原款与待付()",
+              "登记预款抵扣()",
+              "释放原抵扣(批准申请)",
+              "汇总有效用途净额()"
+            ]
+          },
+          {
+            "table": "fee_request",
+            "ops": [
+              "核对原单归属及申请额度()",
+              "提交或补正重提()",
+              "记录批准退回或拒绝(审核依据)",
+              "撤回未审核申请()",
+              "计算剩余可办退款额度()"
+            ]
+          },
+          {
+            "table": "fee_adjustment",
+            "ops": [
+              "核对申请已批准且未生效()",
+              "核对明细合计与批准额()",
+              "确认调整及必要用途释放()"
+            ]
+          },
+          {
+            "table": "fee_adjustment_item",
+            "ops": [
+              "核对同账原项目()",
+              "核对调整后应收非负()"
+            ]
+          },
+          {
+            "table": "patient_refund",
+            "ops": [
+              "核对批准额度及原款可用额()",
+              "建立办理并占用额度()",
+              "保留未知结果与占用()",
+              "确认实际退款(真实金额与凭据)",
+              "确认失败并释放占用(依据)",
+              "关联失败原单重办()"
+            ]
+          },
+          {
+            "table": "insurance_reversal",
+            "ops": [
+              "核对原结算及批准依据()",
+              "建立原单撤销待办()",
+              "保留未知或失败结果(真实依据)",
+              "确认平台撤销成功()"
+            ]
+          }
+        ],
+        "15": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "followup_requirement",
+            "ops": [
+              "核对患者与诊疗来源()",
+              "暂存或发布要求()",
+              "调整未完成要求(原因)",
+              "撤销要求(牙医依据)",
+              "安排继续跟进(日期与责任人)",
+              "核对目的达成及完成依据()"
+            ]
+          }
+        ],
+        "16": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "followup_requirement",
+            "ops": [
+              "核对患者与诊疗来源()",
+              "暂存或发布要求()",
+              "调整未完成要求(原因)",
+              "撤销要求(牙医依据)",
+              "安排继续跟进(日期与责任人)",
+              "核对目的达成及完成依据()"
+            ]
+          },
+          {
+            "table": "contact_history",
+            "ops": [
+              "记录实际联系结果()",
+              "核对成功预约归属()",
+              "关联既有成功预约()",
+              "记录继续联系(日期)"
+            ]
+          }
+        ],
+        "17": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "followup_requirement",
+            "ops": [
+              "核对患者与诊疗来源()",
+              "暂存或发布要求()",
+              "调整未完成要求(原因)",
+              "撤销要求(牙医依据)",
+              "安排继续跟进(日期与责任人)",
+              "核对目的达成及完成依据()"
+            ]
+          },
+          {
+            "table": "clinical_assessment",
+            "ops": [
+              "核对评估方式与实际依据()",
+              "追加实际评估()",
+              "判断原目的是否达到()",
+              "记录继续跟进(日期与责任人)"
+            ]
+          }
+        ],
+        "21": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "patient_payment",
+            "ops": [
+              "核对实收找零与净收()",
+              "确认实际到账(原单与依据)",
+              "记录未到账核实(依据)",
+              "计算原款可用额(用途与退款)"
+            ]
+          },
+          {
+            "table": "payment_reconciliation",
+            "ops": [
+              "核对收款或退款原单()",
+              "记录核对结果(正式依据)",
+              "记录差异处理(原办理结果)"
+            ]
+          },
+          {
+            "table": "bill",
+            "ops": [
+              "汇总已核价应收(生效调整)",
+              "核对正式医保分摊()",
+              "计算当前待付(有效抵付)"
+            ]
+          },
+          {
+            "table": "insurance_settlement",
+            "ops": [
+              "核对明确正式结果及分摊()",
+              "确认有效正式结算()",
+              "按成功撤销停用原结算()",
+              "计算应拨及收退差额(实际收付)"
+            ]
+          },
+          {
+            "table": "insurance_fund_receipt",
+            "ops": [
+              "核对原结算及实际收付依据()",
+              "核对重复收付(原单及凭据)",
+              "记录实际拨付或退回()"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "n": 4,
+      "name": "物资应用服务",
+      "ucs": [
+        18,
+        19,
+        20
+      ],
+      "controller": "材料与库存接口",
+      "repos": [
+        [
+          "物资存取接口",
+          [
+            "读取材料、批次及位置存量(稳定键)",
+            "保存计量与批次决定(版本)",
+            "保存采购及负责人确认(办理号)",
+            "保存验收增量、历史及入库(版本)",
+            "保存领用、退回或实际用料(原单)",
+            "保存盘点决定、历史和必要调整(版本)"
+          ]
+        ]
+      ],
+      "mapper": "SQLite物资映射器",
+      "entities": {
+        "material_batch": [
+          0,
+          1,
+          2
+        ],
+        "purchase_order": [
+          0,
+          2,
+          3
+        ],
+        "purchase_receipt_item": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "batch_stock": [
+          0,
+          1,
+          2
+        ],
+        "inventory_movement": [
+          0,
+          1,
+          2
+        ],
+        "stock_count": [
+          0,
+          1,
+          2,
+          3
+        ]
+      },
+      "history": [
+        "batch_change",
+        "receipt_item_history",
+        "stock_count_history"
+      ],
+      "methods": [
+        {
+          "uc": 18,
+          "name": "维护材料与批次资料",
+          "operation": "维护材料与批次资料(材料计量,批次状态及依据)"
+        },
+        {
+          "uc": 19,
+          "name": "登记基础采购与到货验收",
+          "operation": "登记基础采购与到货验收(采购,到货与验收数量)"
+        },
+        {
+          "uc": 20,
+          "name": "办理库存领用、退回与盘点",
+          "operation": "办理库存领用、退回与盘点(批次位置,原领用或盘点版本)"
+        }
+      ],
+      "shown_entities": [
+        {
+          "table": "material_batch",
+          "name": "材料批次",
+          "ops": [
+            "核对同材料批号及效期()",
+            "核对当前领用可用性(实际日期)",
+            "放行或恢复(负责人及依据)"
+          ]
+        },
+        {
+          "table": "purchase_order",
+          "name": "采购",
+          "ops": [
+            "核对供应商及采购明细()",
+            "确认采购(负责人)",
+            "取消采购(原因)"
+          ]
+        },
+        {
+          "table": "purchase_receipt_item",
+          "name": "验收项目",
+          "ops": [
+            "核对到货数量分解()",
+            "核对材料批次位置及采购支持量()",
+            "确认待检后续结论(保留原到货)",
+            "计算本次应入库增量()"
+          ]
+        },
+        {
+          "table": "batch_stock",
+          "name": "批次存量",
+          "ops": [
+            "核对批次位置唯一性()",
+            "核对当前量及版本()",
+            "按合法变动更新余额()"
+          ]
+        },
+        {
+          "table": "inventory_movement",
+          "name": "库存变动",
+          "ops": [
+            "核对变动及前后量()",
+            "核对原领用退回额度(已用与已退)",
+            "登记实际库存变动()"
+          ]
+        },
+        {
+          "table": "stock_count",
+          "name": "盘点核实",
+          "ops": [
+            "核对确认时库存版本()",
+            "记录待重新核对(原因)",
+            "记录负责人决定(同意或拒绝)",
+            "计算必要调整量()"
+          ]
+        }
+      ],
+      "all_entity_responsibilities": {
+        "18": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "material",
+            "ops": [
+              "核对单位换算及数量精度()",
+              "确认计量设置(负责人)",
+              "核对历史设置可修改性()"
+            ]
+          },
+          {
+            "table": "material_batch",
+            "ops": [
+              "核对同材料批号及效期()",
+              "核对当前领用可用性(实际日期)",
+              "放行或恢复(负责人及依据)",
+              "立即隔离(原因)",
+              "停用批次(负责人及依据)"
+            ]
+          },
+          {
+            "table": "batch_change",
+            "ops": [
+              "核对变更权限与原状态()",
+              "记录状态决定及依据()"
+            ]
+          }
+        ],
+        "19": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "stock_location",
+            "ops": [
+              "核对位置用途及可用性()"
+            ]
+          },
+          {
+            "table": "batch_stock",
+            "ops": [
+              "核对批次位置唯一性()",
+              "核对当前量及版本()",
+              "按合法变动更新余额()"
+            ]
+          },
+          {
+            "table": "inventory_movement",
+            "ops": [
+              "核对变动及前后量()",
+              "核对原领用退回额度(已用与已退)",
+              "登记实际库存变动()"
+            ]
+          },
+          {
+            "table": "supplier",
+            "ops": [
+              "核对供方及联系资料()"
+            ]
+          },
+          {
+            "table": "purchase_order",
+            "ops": [
+              "核对供应商及采购明细()",
+              "提交采购需求()",
+              "确认采购(负责人)",
+              "取消采购(原因)"
+            ]
+          },
+          {
+            "table": "purchase_order_item",
+            "ops": [
+              "核对采购量及计量()",
+              "固定确认时约定快照()",
+              "核对累计合格支持量()"
+            ]
+          },
+          {
+            "table": "purchase_receipt",
+            "ops": [
+              "核对已确认原采购()",
+              "登记本次实际到货()",
+              "确认验收结果(明细与依据)"
+            ]
+          },
+          {
+            "table": "purchase_receipt_item",
+            "ops": [
+              "核对到货数量分解()",
+              "核对材料批次位置及采购支持量()",
+              "确认待检后续结论(保留原到货)",
+              "计算本次应入库增量()"
+            ]
+          }
+        ],
+        "20": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "material_batch",
+            "ops": [
+              "核对同材料批号及效期()",
+              "核对当前领用可用性(实际日期)",
+              "放行或恢复(负责人及依据)",
+              "立即隔离(原因)",
+              "停用批次(负责人及依据)"
+            ]
+          },
+          {
+            "table": "stock_location",
+            "ops": [
+              "核对位置用途及可用性()"
+            ]
+          },
+          {
+            "table": "batch_stock",
+            "ops": [
+              "核对批次位置唯一性()",
+              "核对当前量及版本()",
+              "按合法变动更新余额()"
+            ]
+          },
+          {
+            "table": "inventory_movement",
+            "ops": [
+              "核对变动及前后量()",
+              "核对原领用退回额度(已用与已退)",
+              "登记实际库存变动()"
+            ]
+          },
+          {
+            "table": "material_usage",
+            "ops": [
+              "核对原领用剩余量(已用与已退)",
+              "登记实际就诊用料()"
+            ]
+          },
+          {
+            "table": "stock_count",
+            "ops": [
+              "核对确认时库存版本()",
+              "记录待重新核对(原因)",
+              "记录负责人决定(同意或拒绝)",
+              "计算必要调整量()"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "n": 5,
+      "name": "医保与药学应用服务",
+      "ucs": [
+        22,
+        23,
+        25
+      ],
+      "controller": "医保与药学接口",
+      "repos": [
+        [
+          "医保存取接口",
+          [
+            "读取身份、费用及原办理(患者,原单)",
+            "保存身份及登记(原办理号)",
+            "保存原提交与确切费用明细(办理号)",
+            "追加预估结果、失效或选择(原提交)",
+            "保存正式结算及采用原提交(办理号)",
+            "保存撤销核实或实际回款(原单)"
+          ]
+        ],
+        [
+          "处方存取接口",
+          [
+            "读取处方、审核及实际发药(原方)",
+            "保存开立、交付或原方作废(版本)",
+            "追加实际审方结果(办理号)",
+            "保存实际发药、库存和应收来源(版本)"
+          ]
+        ]
+      ],
+      "mapper": "SQLite医保药学映射器",
+      "entities": {
+        "insurance_case": [
+          0,
+          1,
+          2,
+          4
+        ],
+        "insurance_fee": [
+          0,
+          1
+        ],
+        "insurance_settlement": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "insurance_reversal": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "prescription": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "dispense_record": [
+          0,
+          1
+        ]
+      },
+      "history": [
+        "insurance_preestimate_history",
+        "prescription_review_history"
+      ],
+      "methods": [
+        {
+          "uc": 22,
+          "name": "核验医保身份并办理预结算",
+          "operation": "核验医保身份并办理预结算(原办理,原提交或患者选择)"
+        },
+        {
+          "uc": 23,
+          "name": "办理医保结算、撤销与回款核对",
+          "operation": "办理医保结算、撤销与回款核对(原结算,核实依据或回款)"
+        },
+        {
+          "uc": 25,
+          "name": "开立处方并衔接院内外取药",
+          "operation": "开立处方并衔接院内外取药(原处方,开立审核或实际交付)"
+        }
+      ],
+      "shown_entities": [
+        {
+          "table": "insurance_case",
+          "name": "医保就诊办理",
+          "ops": [
+            "核对患者就诊身份及账目归属()",
+            "核对本次费用范围及适用条件()",
+            "保存预估分摊(平台实际结果)",
+            "记录患者实际选择()"
+          ]
+        },
+        {
+          "table": "insurance_fee",
+          "name": "医保费用明细",
+          "ops": [
+            "核对实际费用及适用标识()",
+            "固定本次提交范围及快照()"
+          ]
+        },
+        {
+          "table": "insurance_settlement",
+          "name": "医保结算",
+          "ops": [
+            "核对明确正式结果及分摊()",
+            "确认有效正式结算()",
+            "按成功撤销停用原结算()",
+            "计算应拨及收退差额(实际收付)"
+          ]
+        },
+        {
+          "table": "insurance_reversal",
+          "name": "医保撤销办理",
+          "ops": [
+            "核对原结算及批准依据()",
+            "建立原单撤销待办()",
+            "保留未知或失败结果(真实依据)",
+            "确认平台撤销成功()"
+          ]
+        },
+        {
+          "table": "prescription",
+          "name": "处方",
+          "ops": [
+            "开立处方(就诊与权限)",
+            "记录审方结果(资格与意见)",
+            "核对实际发药条件()",
+            "作废未交付处方(原因)"
+          ]
+        },
+        {
+          "table": "dispense_record",
+          "name": "实际发药",
+          "ops": [
+            "核对批次效期及可用量()",
+            "登记实际交付(数量与原单)"
+          ]
+        }
+      ],
+      "all_entity_responsibilities": {
+        "22": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "insurance_identity",
+            "ops": [
+              "核对患者及核验适用条件()",
+              "记录明确核验结果(原办理依据)"
+            ]
+          },
+          {
+            "table": "insurance_item_mapping",
+            "ops": [
+              "核对项目或药品唯一归属()",
+              "核对本地区及日期适用性()"
+            ]
+          },
+          {
+            "table": "insurance_case",
+            "ops": [
+              "核对患者就诊身份及账目归属()",
+              "核对本次费用范围及适用条件()",
+              "保存预估分摊(平台实际结果)",
+              "使旧预估失效(变更依据)",
+              "记录患者实际选择()",
+              "建立重新办理(原办理依据)"
+            ]
+          },
+          {
+            "table": "insurance_fee",
+            "ops": [
+              "核对实际费用及适用标识()",
+              "固定本次提交范围及快照()"
+            ]
+          }
+        ],
+        "23": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "insurance_case",
+            "ops": [
+              "核对患者就诊身份及账目归属()",
+              "核对本次费用范围及适用条件()",
+              "保存预估分摊(平台实际结果)",
+              "使旧预估失效(变更依据)",
+              "记录患者实际选择()",
+              "建立重新办理(原办理依据)"
+            ]
+          },
+          {
+            "table": "insurance_fee",
+            "ops": [
+              "核对实际费用及适用标识()",
+              "固定本次提交范围及快照()"
+            ]
+          },
+          {
+            "table": "insurance_settlement",
+            "ops": [
+              "核对明确正式结果及分摊()",
+              "确认有效正式结算()",
+              "按成功撤销停用原结算()",
+              "计算应拨及收退差额(实际收付)"
+            ]
+          },
+          {
+            "table": "insurance_reversal",
+            "ops": [
+              "核对原结算及批准依据()",
+              "建立原单撤销待办()",
+              "保留未知或失败结果(真实依据)",
+              "确认平台撤销成功()"
+            ]
+          },
+          {
+            "table": "insurance_fund_receipt",
+            "ops": [
+              "核对原结算及实际收付依据()",
+              "核对重复收付(原单及凭据)",
+              "记录实际拨付或退回()"
+            ]
+          }
+        ],
+        "25": [
+          {
+            "table": "user_account",
+            "ops": [
+              "核对账号可用性()",
+              "核验办理授权()"
+            ]
+          },
+          {
+            "table": "prescription",
+            "ops": [
+              "暂存处方草稿()",
+              "开立处方(就诊与权限)",
+              "记录审方结果(资格与意见)",
+              "核对实际发药条件()",
+              "作废未交付处方(原因)",
+              "核对处方就诊归属()"
+            ]
+          },
+          {
+            "table": "prescription_item",
+            "ops": [
+              "核对药品规格与用法()",
+              "计算剩余可发量(实际已发量)"
+            ]
+          },
+          {
+            "table": "dispense_record",
+            "ops": [
+              "核对批次效期及可用量()",
+              "登记实际交付(数量与原单)"
+            ]
+          },
+          {
+            "table": "bill_item",
+            "ops": [
+              "核对唯一实际来源()",
+              "确认计价(适用价目与依据)",
+              "计算项目金额()",
+              "建立实际来源(计价状态)"
+            ]
+          },
+          {
+            "table": "inventory_movement",
+            "ops": [
+              "核对变动及前后量()",
+              "核对原领用退回额度(已用与已退)",
+              "登记实际库存变动()"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "screens": [
+    {
+      "n": 1,
+      "title": "患者与预约",
+      "roles": "前台",
+      "ucs": [
+        1,
+        2,
+        3
+      ],
+      "component": "患者摘要、预约表单、资源时段表",
+      "read": "患者身份候选、牙医诊椅及必要设备可用时段",
+      "input": "患者资料、预约目的、资源时段及到诊来源",
+      "guard": "冲突或未就绪先协调；登记到诊只建立候诊，不自动开始接诊",
+      "rows": [
+        [
+          "患者编号",
+          "姓名／联系方式",
+          "原预约",
+          "办理状态"
+        ],
+        [
+          "P001",
+          "陈女士／尾号2086",
+          "10:00 王医生／椅1",
+          "已预约"
+        ],
+        [
+          "P002",
+          "李先生／联系方式待补",
+          "现场到诊",
+          "候诊"
+        ]
+      ],
+      "fields": [
+        [
+          "患者检索",
+          "\"编号／姓名／电话尾号\""
+        ],
+        [
+          "预约日期",
+          "\"2026-10-23\"",
+          "牙医／诊椅",
+          "\"王医生／椅1\""
+        ]
+      ],
+      "actions": [
+        "查找／新建患者",
+        "维护预约",
+        "登记到诊"
+      ],
+      "notice": "诊椅1 10:00—10:30 已预留；改约须重核全部资源"
+    },
+    {
+      "n": 2,
+      "title": "牙医接诊",
+      "roles": "牙医",
+      "ucs": [
+        5,
+        6,
+        8,
+        9
+      ],
+      "component": "患者摘要、病历编辑、牙位所见、签署确认",
+      "read": "患者既往病历、已确认影像、方案决定及健康复核",
+      "input": "主诉诊断、检查所见、实际治疗和签署确认",
+      "guard": "已签署正文只读，补充另存；实际结束与签署分别办理",
+      "rows": [
+        [
+          "就诊",
+          "检查／实际项目",
+          "牙位",
+          "当前结果"
+        ],
+        [
+          "V001",
+          "龋洞检查／树脂充填",
+          "36",
+          "实际完成1项"
+        ],
+        [
+          "R001",
+          "主诉及检查所见",
+          "36咬合面",
+          "草稿待签署"
+        ]
+      ],
+      "fields": [
+        [
+          "患者／就诊",
+          "P001／V001",
+          "健康复核",
+          "已核对本次版本"
+        ],
+        [
+          "主诉／诊断",
+          "\"后牙咬合疼痛／龋病\""
+        ]
+      ],
+      "actions": [
+        "保存草稿",
+        "登记实际治疗",
+        "签署病历"
+      ],
+      "notice": "签署前核对所见和健康复核；诊疗结束由牙医另行确认"
+    },
+    {
+      "n": 3,
+      "title": "方案与影像",
+      "roles": "牙医；助理上传原件",
+      "ucs": [
+        7,
+        10
+      ],
+      "component": "版本明细、患者决定、受控原件及归属核对",
+      "read": "原方案版本、各项决定及确切原件版本",
+      "input": "项目数量顺序、患者实际决定、文件来源与归属依据",
+      "guard": "只执行有效同意范围；替换留原件，牙医确认后作诊疗依据",
+      "rows": [
+        [
+          "来源",
+          "内容",
+          "本次数量／版本",
+          "决定／核对"
+        ],
+        [
+          "方案T001",
+          "36树脂充填",
+          "计划1／确认1",
+          "同意"
+        ],
+        [
+          "影像F001",
+          "根尖片",
+          "原件v2",
+          "牙医已确认"
+        ]
+      ],
+      "fields": [
+        [
+          "患者／方案",
+          "P001／T001 v1",
+          "文件归属",
+          "V001"
+        ],
+        [
+          "说明／决定依据",
+          "\"已说明项目、费用估算及范围\""
+        ]
+      ],
+      "actions": [
+        "保存方案版本",
+        "记录患者决定",
+        "上传／核对原件"
+      ],
+      "notice": "原件v1保留既有引用；更正归属保留原索引和新索引"
+    },
+    {
+      "n": 4,
+      "title": "账单与收款",
+      "roles": "收费人员；负责人确认价目",
+      "ucs": [
+        11,
+        12,
+        13
+      ],
+      "component": "费用明细、承担汇总、收款核实及用途确认",
+      "read": "已核价费用、正式医保分摊、确认付款及有效用途",
+      "input": "拟收渠道、现金实收与找零、原款用途和核实依据",
+      "guard": "费用或医保未定时只列待核对；结果未知先查原笔",
+      "rows": [
+        [
+          "项目",
+          "实际来源",
+          "应收",
+          "计价状态"
+        ],
+        [
+          "36树脂充填",
+          "V001实际完成",
+          "300.00",
+          "已核价"
+        ],
+        [
+          "本账总额／医保承担",
+          "患者应付",
+          "300.00／80.00",
+          "220.00"
+        ]
+      ],
+      "fields": [
+        [
+          "原账单／患者",
+          "B001／P001",
+          "当前有效抵付",
+          "0.00"
+        ],
+        [
+          "现金实收／找零",
+          "\"250.00／30.00\"",
+          "本次净收",
+          "220.00"
+        ]
+      ],
+      "actions": [
+        "核对费用",
+        "登记现金到账",
+        "电子原单核实"
+      ],
+      "notice": "预收按原款单独保存；抵扣不新增实收，价目确认由负责人办理"
+    },
+    {
+      "n": 5,
+      "title": "费用更正与退费",
+      "roles": "收费人员；负责人审批",
+      "ucs": [
+        14
+      ],
+      "component": "原单明细、申请审核、用途释放及退款核实",
+      "read": "原费用、批准范围、医保结果、原款可用额及既有退款",
+      "input": "拟调整及拟退、证据、负责人决定、真实退款依据",
+      "guard": "审批、调整和实际退款分开；医保处理未明不确认最终差额",
+      "rows": [
+        [
+          "原单／申请",
+          "批准调整",
+          "批准退款上限",
+          "当前阶段"
+        ],
+        [
+          "B001／Q001",
+          "-100.00",
+          "100.00",
+          "已批准调整"
+        ],
+        [
+          "原付款C001",
+          "原款可用100.00",
+          "拟退100.00",
+          "待核实"
+        ]
+      ],
+      "fields": [
+        [
+          "申请原因",
+          "\"项目核对后更正\"",
+          "原付款",
+          "C001"
+        ],
+        [
+          "退款核实",
+          "\"渠道原号及真实凭据\""
+        ]
+      ],
+      "actions": [
+        "提交申请",
+        "负责人审核",
+        "查询／确认原退款"
+      ],
+      "notice": "当前为待核实，保留100.00占用；核实原笔后办理，禁止重发"
+    },
+    {
+      "n": 6,
+      "title": "复诊与随访",
+      "roles": "牙医提出及评估；前台联系",
+      "ucs": [
+        15,
+        16,
+        17
+      ],
+      "component": "要求明细、联系经历、预约关联及临床评估",
+      "read": "原目的、目标日期、负责前台、联系与实际评估",
+      "input": "实际联系结果、既有成功预约、评估和继续跟进日期责任",
+      "guard": "未联系上、未到或拒绝不自动完成；临床目的由牙医核实",
+      "rows": [
+        [
+          "要求",
+          "原目的／目标日",
+          "负责人员",
+          "当前结果"
+        ],
+        [
+          "FU001",
+          "治疗后复查／10-30",
+          "前台小李",
+          "待到诊或评估"
+        ],
+        [
+          "联系记录",
+          "已联系并预约A002",
+          "2026-10-23",
+          "不代表已完成"
+        ]
+      ],
+      "fields": [
+        [
+          "要求来源",
+          "V001／方案T001",
+          "需临床评估",
+          "是"
+        ],
+        [
+          "后续安排",
+          "\"继续跟进日期及责任人\""
+        ]
+      ],
+      "actions": [
+        "牙医发布／调整",
+        "前台登记联系",
+        "牙医记录评估"
+      ],
+      "notice": "前台仅处理联系与预约，牙医保留实际评估依据和局限"
+    },
+    {
+      "n": 7,
+      "title": "材料与采购",
+      "roles": "助理登记；负责人确认",
+      "ucs": [
+        18,
+        19
+      ],
+      "component": "计量批次、采购确认、验收数量及合格增量",
+      "read": "已确认单位换算、供方、原采购、批次及位置",
+      "input": "需求明细、到货及合格拒收待检量、负责人决定",
+      "guard": "采购确认不入库；待检后确认只补新增合格量",
+      "rows": [
+        [
+          "采购／材料",
+          "到货",
+          "合格／拒收／待检",
+          "本次入库"
+        ],
+        [
+          "PO001／复合树脂",
+          "10支",
+          "8／0／2",
+          "8支"
+        ],
+        [
+          "后续待检确认",
+          "原到货仍为10支",
+          "10／0／0",
+          "仅补2支"
+        ]
+      ],
+      "fields": [
+        [
+          "原采购／批次",
+          "PO001／LOT01",
+          "存放位置",
+          "材料柜A"
+        ],
+        [
+          "验收说明",
+          "\"效期及实物核对依据\""
+        ]
+      ],
+      "actions": [
+        "提出采购",
+        "负责人确认",
+        "登记／确认验收"
+      ],
+      "notice": "合格增量、历史、原入库流水和库存余额共同保存"
+    },
+    {
+      "n": 8,
+      "title": "库存办理",
+      "roles": "助理；负责人确认盘点",
+      "ucs": [
+        20
+      ],
+      "component": "批次位置余额、原领用、实际用料及盘点核实",
+      "read": "库存状态效期、原领用已用已退、库存版本",
+      "input": "领用或退回量、实际就诊用料、实点量及差异依据",
+      "guard": "四种办理各自核对来源；实际用料不再扣库",
+      "rows": [
+        [
+          "原领用／批次",
+          "领用量",
+          "已用／已退",
+          "可分配"
+        ],
+        [
+          "ISS001／LOT01",
+          "5支",
+          "3／1",
+          "1支"
+        ],
+        [
+          "盘点柜A",
+          "账面B=9",
+          "实点C=8",
+          "差异D=-1"
+        ]
+      ],
+      "fields": [
+        [
+          "当前库存版本",
+          "v6",
+          "批次状态／效期",
+          "可用／2027-06"
+        ],
+        [
+          "本次办理",
+          "\"领用／未用退回／实际用料／盘点\""
+        ]
+      ],
+      "actions": [
+        "登记领用／退回",
+        "登记实际用料",
+        "负责人核实盘点"
+      ],
+      "notice": "盘点版本变化先重实点；零差异不生成流水"
+    },
+    {
+      "n": 9,
+      "title": "排班与经营",
+      "roles": "负责人维护排班；收费人员核对原单",
+      "ucs": [
+        4,
+        21
+      ],
+      "component": "日期安排、影响协调、经营范围及差异原单",
+      "read": "牙医诊椅安排、实际占用、应收实收退费和医保回款",
+      "input": "安排时段、调整或停诊依据、日常核对范围及处理依据",
+      "guard": "安排变更先协调受影响预约；经营查询不改原账",
+      "rows": [
+        [
+          "日期安排",
+          "牙医／诊椅",
+          "时段",
+          "状态"
+        ],
+        [
+          "SCH001",
+          "王医生／椅1",
+          "09:00—12:00",
+          "已确认可预约"
+        ],
+        [
+          "日常核对",
+          "患者净收／已退",
+          "800.00／100.00",
+          "医保待回款另列"
+        ]
+      ],
+      "fields": [
+        [
+          "营业日期",
+          "\"2026-10-23\"",
+          "核对依据",
+          "\"原账、渠道、医保凭据\""
+        ],
+        [
+          "调整影响",
+          "A001需协调改约",
+          "经办及依据",
+          "待负责人确认"
+        ]
+      ],
+      "actions": [
+        "负责人维护排班",
+        "查询经营原单",
+        "记录差异核对"
+      ],
+      "notice": "不把医保预估或未回款计为患者现金实收"
+    },
+    {
+      "n": 10,
+      "title": "医保办理",
+      "roles": "前台核验；收费预结算及结算；负责人核实撤销",
+      "ucs": [
+        22,
+        23
+      ],
+      "component": "身份核验、确切提交、患者选择、结算撤销及回款",
+      "read": "本地区有效身份、诊断及费用版本、原提交结果和正式结算",
+      "input": "本次费用范围、实际患者选择、撤销依据及真实回款凭据",
+      "guard": "按定点及联网条件启用；未知先查原号，旧确认不可套新结果",
+      "rows": [
+        [
+          "原提交",
+          "范围内总费",
+          "基金／个账／其他自付",
+          "阶段"
+        ],
+        [
+          "PRE001",
+          "300.00",
+          "60.00／20.00／220.00",
+          "预结算完成"
+        ],
+        [
+          "患者选择",
+          "已说明本次结果",
+          "医保／10:20确认",
+          "可另办正式结算"
+        ]
+      ],
+      "fields": [
+        [
+          "患者／就诊",
+          "P001／V001",
+          "费用版本",
+          "v3"
+        ],
+        [
+          "机构与身份",
+          "核验通过且适用",
+          "外部办理",
+          "按原提交号核实"
+        ]
+      ],
+      "actions": [
+        "前台核验",
+        "收费预结算／选择",
+        "正式结算／原单查询"
+      ],
+      "notice": "撤销须负责人依据；实际医保回款与正式结算分开保存"
+    },
+    {
+      "n": 11,
+      "title": "接诊资源协调",
+      "roles": "牙医确认实际结束；助理清洁核查；负责人协调故障",
+      "ucs": [
+        24
+      ],
+      "component": "当前占用、准备限制、核查恢复和受影响安排",
+      "read": "实际使用、预计结束、故障或准备限制及受影响预约",
+      "input": "牙医真实结束、助理清洁核查、负责人故障恢复依据",
+      "guard": "预计时间到达不自动释放；所有有效限制解除才可恢复",
+      "rows": [
+        [
+          "资源",
+          "当前占用／限制",
+          "真实核查",
+          "可用性"
+        ],
+        [
+          "诊椅1",
+          "V001诊疗已结束",
+          "清洁准备未完成",
+          "暂不可接下一位"
+        ],
+        [
+          "设备X01",
+          "故障停用",
+          "负责人待核实维修",
+          "不可使用"
+        ]
+      ],
+      "fields": [
+        [
+          "原占用",
+          "OCC001",
+          "受影响预约",
+          "A002待协调"
+        ],
+        [
+          "恢复依据",
+          "\"清洁／维修实际核查结果\""
+        ]
+      ],
+      "actions": [
+        "牙医确认结束",
+        "助理准备核查",
+        "负责人停用／恢复"
+      ],
+      "notice": "释放使用与准备限制衔接，未核实不提前显示可用"
+    },
+    {
+      "n": 12,
+      "title": "处方与取药",
+      "roles": "牙医开立交付；具备条件的药学岗位审方发药",
+      "ucs": [
+        25
+      ],
+      "component": "原方明细、院内外路径、审方历史及实际交付",
+      "read": "原方及更正链、实际审方意见、已发量与可用批次",
+      "input": "用法用量、开立数量、处方交付、审核及实际发药",
+      "guard": "院外只记处方交付；院内有效审方通过后按实际量出库",
+      "rows": [
+        [
+          "处方明细",
+          "开立量",
+          "实际已发",
+          "当前结果"
+        ],
+        [
+          "RX001／药品目录项",
+          "10基本单位",
+          "6",
+          "剩余4未发"
+        ],
+        [
+          "本次审核",
+          "药学人员已通过",
+          "意见及时间留历史",
+          "处方仍有效"
+        ]
+      ],
+      "fields": [
+        [
+          "取药路径",
+          "\"院内／院外\"",
+          "开立及交付",
+          "按真实阶段保存"
+        ],
+        [
+          "用药指导",
+          "\"牙医说明及药学交代\""
+        ]
+      ],
+      "actions": [
+        "牙医开立／交付",
+        "药学审核",
+        "登记实际发药"
+      ],
+      "notice": "作废或重开保留原方；已发生的发药、库存与费用不删除"
+    }
+  ],
+  "navigation": [
+    [
+      "FD",
+      "前台工作台",
+      "患者资料／预约／到诊\\n复诊联系与预约\\n医保身份核验"
+    ],
+    [
+      "DR",
+      "牙医工作台",
+      "诊疗／方案／病历／原件确认\\n复诊要求与临床评估\\n处方开立／实际接诊结束"
+    ],
+    [
+      "AS",
+      "助理工作台",
+      "原件上传／材料批次／采购验收\\n库存领退及用料／盘点提交\\n资源准备与实际清洁核查"
+    ],
+    [
+      "CA",
+      "收费工作台",
+      "费用及付款核实／费用申请与退款\\n医保预结算、结算及实际回款\\n经营原单核对"
+    ],
+    [
+      "MG",
+      "负责人工作台",
+      "排班及影响协调／价目审核\\n费用申请、采购及盘点确认\\n故障恢复／医保撤销依据"
+    ],
+    [
+      "PH",
+      "药学工作台（按条件启用）",
+      "处方审核与意见\\n实际调配、交付和用药交代"
+    ]
+  ],
+  "framework": {
+    "frontend": "HTML/CSS/JavaScript模块；统一岗位页面框架、共享业务组件和请求模块",
+    "backend": "用例应用服务、领域实体、存取接口及SQLite数据映射器",
+    "permissions": "服务端按办理身份和用例授权，页面入口与按钮投影同一权限及业务状态",
+    "history": "当前结果及同实体历史映射共同保存"
+  },
+  "remaining": [
+    "完整设计尚未迁移到运行代码和历史SQL，后续另行对齐与验收",
+    "真实机构现状、蓝图认可和正式外部接口不得以文档静态核对代替"
+  ],
+  "sequences": {
+    "14": {
+      "domain_aliases": {
+        "Q": "fee_request",
+        "D": "fee_adjustment",
+        "RF": "patient_refund"
+      },
+      "domain_calls": [
+        {
+          "alias": "Q",
+          "table": "fee_request",
+          "operation": "核对原单归属及申请额度()"
+        },
+        {
+          "alias": "Q",
+          "table": "fee_request",
+          "operation": "提交或补正重提()"
+        },
+        {
+          "alias": "Q",
+          "table": "fee_request",
+          "operation": "记录批准退回或拒绝(审核依据)"
+        },
+        {
+          "alias": "D",
+          "table": "fee_adjustment",
+          "operation": "核对申请已批准且未生效()"
+        },
+        {
+          "alias": "D",
+          "table": "fee_adjustment",
+          "operation": "核对明细合计与批准额()"
+        },
+        {
+          "alias": "D",
+          "table": "fee_adjustment",
+          "operation": "确认调整及必要用途释放()"
+        },
+        {
+          "alias": "RF",
+          "table": "patient_refund",
+          "operation": "核对批准额度及原款可用额()"
+        },
+        {
+          "alias": "RF",
+          "table": "patient_refund",
+          "operation": "建立办理并占用额度()"
+        },
+        {
+          "alias": "RF",
+          "table": "patient_refund",
+          "operation": "确认实际退款(真实金额与凭据)"
+        },
+        {
+          "alias": "RF",
+          "table": "patient_refund",
+          "operation": "保留未知结果与占用()"
+        },
+        {
+          "alias": "RF",
+          "table": "patient_refund",
+          "operation": "确认失败并释放占用(依据)"
+        }
+      ],
+      "repository_interface": "费用存取接口",
+      "mapper": "SQLite费用随访映射器",
+      "external_calls_outside_local_transaction": true
+    },
+    "22": {
+      "domain_aliases": {
+        "ID": "insurance_identity",
+        "C": "insurance_case",
+        "F": "insurance_fee"
+      },
+      "domain_calls": [
+        {
+          "alias": "ID",
+          "table": "insurance_identity",
+          "operation": "核对患者及核验适用条件()"
+        },
+        {
+          "alias": "ID",
+          "table": "insurance_identity",
+          "operation": "记录明确核验结果(原办理依据)"
+        },
+        {
+          "alias": "C",
+          "table": "insurance_case",
+          "operation": "核对患者就诊身份及账目归属()"
+        },
+        {
+          "alias": "C",
+          "table": "insurance_case",
+          "operation": "核对本次费用范围及适用条件()"
+        },
+        {
+          "alias": "F",
+          "table": "insurance_fee",
+          "operation": "核对实际费用及适用标识()"
+        },
+        {
+          "alias": "F",
+          "table": "insurance_fee",
+          "operation": "固定本次提交范围及快照()"
+        },
+        {
+          "alias": "C",
+          "table": "insurance_case",
+          "operation": "保存预估分摊(平台实际结果)"
+        },
+        {
+          "alias": "C",
+          "table": "insurance_case",
+          "operation": "核对本次费用范围及适用条件()"
+        },
+        {
+          "alias": "C",
+          "table": "insurance_case",
+          "operation": "记录患者实际选择()"
+        }
+      ],
+      "repository_interface": "医保存取接口",
+      "mapper": "SQLite医保药学映射器",
+      "external_calls_outside_local_transaction": true
+    }
+  },
+  "ui_components": [
+    {
+      "name": "RoleShell",
+      "service": "当前身份与授权及五组入口"
+    },
+    {
+      "name": "PatientBanner",
+      "service": "接诊和临床查询按岗位裁剪"
+    },
+    {
+      "name": "DetailTable",
+      "service": "临床、费用、经营及历史查询"
+    },
+    {
+      "name": "BusinessForm",
+      "service": "25个用例应用方法"
+    },
+    {
+      "name": "ConfirmPanel",
+      "service": "需确认的业务办理方法"
+    },
+    {
+      "name": "FileViewer",
+      "service": "临床文件及受控原件存取"
+    },
+    {
+      "name": "ResultPanel",
+      "service": "原办理及历史查询"
+    },
+    {
+      "name": "ApiClient",
+      "service": "控制入口和应用服务"
+    }
+  ]
+}

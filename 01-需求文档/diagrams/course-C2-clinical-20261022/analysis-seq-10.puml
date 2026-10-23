@@ -1,0 +1,111 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 340
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as A
+boundary "牙医接口" as B
+actor "诊疗助理" as AS
+boundary "诊疗助理接口" as BS
+control "管理影像与诊疗文书控制" as K
+entity "诊疗文件" as D
+entity "文件版本" as V
+
+alt 牙医办理
+ A -> B : 选择患者、就诊或方案、文件类型
+ B -> K : 文件归属及当前账号
+else 诊疗助理办理
+ AS -> BS : 选择患者、就诊或方案、文件类型
+ BS -> K : 文件归属及当前账号
+end
+activate K
+K -> K : 核验文件权限及所选患者一致性
+K -> D : 核对患者及诊疗归属()
+alt 初次上传
+ K -> K : 准备初次文件信息
+else 4b 补充或替换旧文件
+ K -> K : 核对原文件、前版与替换原因，原引用保留
+end
+alt 牙医办理
+ K --> B : 可上传及归属信息
+else 助理办理
+ K --> BS : 可上传及归属信息
+end
+alt 牙医上传
+ A -> B : 上传原件、来源及实际形成时间
+ B -> K : 原件、归属、前版及原因
+else 助理上传
+ AS -> BS : 上传原件、来源及实际形成时间
+ BS -> K : 原件、归属、前版及原因
+end
+K -> V : 核对原件格式与大小()
+V --> K : 实际PDF、JPEG或PNG，大小不超过10MB
+break 3a 归属不一致、实际格式不符、超过10MB或上传失败
+ alt 牙医办理
+  K --> B : 拒绝并回上传；无可用索引
+ else 助理办理
+  K --> BS : 拒绝并回上传；无可用索引
+ end
+end
+critical 原件与待确认索引共同登记
+ K -> K : 查本次上传，已有结果复用；无结果再保存
+ opt 尚未保存且原件完整
+  K -> D : 登记文件索引()
+  K -> V : 追加版本并保留原件()
+  K -> K : 共同保存原件、索引、上传人时及待确认版本
+ end
+end
+K -> K : 若上传结果未知，先查原上传
+break 尚未取得已确认保存的文件及版本
+ alt 牙医办理
+  K --> B : 失败或待核实，回上传核实；无可用索引
+ else 助理办理
+  K --> BS : 失败或待核实，回上传核实；无可用索引
+ end
+end
+alt 牙医办理
+ K --> B : 文件编号及待确认版本
+else 助理办理
+ K --> BS : 文件编号及待确认版本
+end
+A -> B : 核实患者、就诊或方案与原件，提交确认依据
+B -> K : 指定版本及牙医确认依据
+K -> K : 核验牙医确认权限，读取上传时信息及当前版本
+K -> D : 核对患者及诊疗归属()
+break 4a 仍不能确定临床归属
+ K --> B : 保持待确认，核实后回确认；不作为临床依据
+end
+opt 4a 确属误关联，牙医提交更正依据
+ K -> K : 核对真实归属及更正依据，保留原关联记录
+end
+critical 按指定原件版本保存牙医确认
+ K -> K : 重核归属、版本及原确认结果
+ break 原件版本变化或确认权限不满足
+  K --> B : 返回当前资料，重新核实
+ end
+ opt 本次确认尚未保存
+  K -> V : 确认诊疗归属(牙医与依据)
+  K -> K : 保存确认人、时间与依据；不改实际形成时间
+ end
+end
+alt 确认结果未知
+ K -> K : 查原确认；已存复用，未存才重试
+ K --> B : 已核实结果或待核实，不重复替换
+else 已确认保存
+ K --> B : 文件编号及确认版本
+end
+B --> A : 已确认版本可引用，旧版及既有引用保留
+deactivate K
+
+@enduml

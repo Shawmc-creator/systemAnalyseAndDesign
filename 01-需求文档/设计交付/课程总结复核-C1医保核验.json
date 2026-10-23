@@ -1,0 +1,111 @@
+{
+  "date": "2026-10-22",
+  "status": "第十五批：C1医保7类及九组静态模型核对；C2/C3及D未完成",
+  "pdf_pages": 173,
+  "figures": 143,
+  "logical_tables": 69,
+  "system_usecases": 25,
+  "entity_classes_revised_this_batch": 7,
+  "operations_this_batch": 23,
+  "core_associations_this_batch": 15,
+  "entity_classes_revised_total": 69,
+  "entity_classes_remaining": 0,
+  "operations_revised_total": 207,
+  "analysis_entity_groups_completed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 80,
+    "D": 128
+  },
+  "validation": {
+    "cover_remains_without_date": true,
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "svg_text_overlap_pairs": 0,
+    "updated_vector_figures": 1,
+    "plantuml_panels": 4,
+    "minimum_font_pt": 11.56,
+    "rendered_and_reviewed_pdf_pages": [
+      80,
+      94
+    ],
+    "unchanged_page_text_count": 171,
+    "all_143_figure_titles_numbers_pages_preserved": true,
+    "canonical_69_classes_match_69_tables": true,
+    "reference_stubs_not_new_entities": true,
+    "A_B_C2_C3_D_sources_unchanged": true
+  },
+  "C1_static_definition_audit": {
+    "entity_count": 69,
+    "operation_count": 207,
+    "groups": 9,
+    "controls": 25,
+    "responsibility_rows": 25,
+    "usecases_referenced": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25
+    ],
+    "all_attributes_and_operations_match_sources": true,
+    "all_canonical_names_and_aliases_match_69_tables": true,
+    "limits": "仅C1静态模型的定义与来源核对；不代表C2协作、C3状态、D物理设计或实现验收完成"
+  },
+  "physical_attribute_refinement_pending": [
+    "医保费用明细允许适用编码或明确自费标识，mapping_id须按场景可空；提交数量、金额、适用编码和费用版本需保留当时快照",
+    "医保重新办理须保留原办理引用；预结算历次结果、失效依据和患者重新确认不应只覆盖当前预估金额",
+    "正式结算的同费用有效唯一性及未决原单约束须与费用范围、版本一致；正式分摊与预估不得混存",
+    "医保撤销补负责人核实依据、核实经办人及时间，未知不使原结算失效；引用费用更正时核对同患者批准申请",
+    "结算款实际收付凭据及原款去重；已撤销结算仍保留历史拨付退回，差额不自动变更患者应付",
+    "临时认证凭证不持久保存；必要人员编号和原始返回仅向获准岗位提供"
+  ],
+  "whole_document_course_compliant": false,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "next_batch": "C2分析序列UC-01—04：患者资料、预约、到诊及排班",
+  "remaining": [
+    "25例分析序列的消息、分支及操作对应",
+    "分析状态机图同步",
+    "D数据访问、关系与约束、业务职责和表示组件",
+    "真实业务确认与验收"
+  ],
+  "files": {
+    "tex_sha256": "a32e6078cd60acf0e2def0630a2d061bb24200e3141ea7ddbf7fd972f2f9641d",
+    "pdf_sha256": "4c21e1b5fb2ee6231ab56c9450c661a1e8f8eba66ea56e988707fb1d466fd4fa",
+    "logical_model_sha256": "68f5db36dfd9f3eaf9ca11b43ffb9a6abf039bf587ecf15f4f9c2b2b69e239e9"
+  }
+}

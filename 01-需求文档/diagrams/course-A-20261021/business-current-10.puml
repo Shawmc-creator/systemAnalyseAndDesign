@@ -1,0 +1,36 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "收费人员" as C
+actor "诊所负责人" as M
+entity "原费用、收付及核对记录" as R
+participant "支付平台" as Pay
+participant "医保平台" as I
+C -> R : 按营业日期查原项目、付款及退款
+R --> C : 费用、患者收付及未完成记录
+C -> C : 清点现金并核对交接依据
+C -> Pay : 核对原笔交易及渠道金额
+Pay --> C : 返回实际交易与差异依据
+C -> I : 核对正式结算及拨付依据
+I --> C : 返回结算与拨付信息
+C -> R : 分记患者实际收付、医保承担与实际拨付
+C -> M : 交接差异、未知交易、欠费及待回款
+M -> R : 记录责任人、处理日期及后续安排
+... 后续取得真实处理结果 ...
+C -> R : 追加核实依据并保留原核对记录
+M -> R : 复核已处理或继续跟进事项
+@enduml

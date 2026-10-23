@@ -1,0 +1,49 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "原单申请与负责人审核" as R {
+' @reference patient_funds
+class "患者资金" as funds_r <<entity>>
+' @reference bill
+class "应收账目" as bill_r <<entity>>
+' @reference patient_payment
+class "患者付款" as payment_r <<entity>>
+class "费用申请" as fee_request <<entity>> {
+ 原因、证据、提交版本及时间
+ 拟调整额、拟退上限
+ 申请状态、批准调整及退款上限
+ 审核人、时间及意见
+ --
+ +核对原单归属及申请额度()
+ +提交或补正重提()
+ +记录批准退回或拒绝(审核依据)
+ +撤回未审核申请()
+ +计算剩余可办退款额度()
+}
+funds_r "1" -- "0..*" fee_request
+bill_r "0..1" -- "0..*" fee_request
+payment_r "0..1" -- "0..*" fee_request
+funds_r -[hidden]right- bill_r
+bill_r -[hidden]right- payment_r
+note bottom of fee_request
+原账或原付款至少一项；都属于同一患者。
+未批准不生效调整或退款；退回补正保留原提交。
+批准额与真实退款分开，撤回仅限未审核申请。
+end note
+}
+@enduml

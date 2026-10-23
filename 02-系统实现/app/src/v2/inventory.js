@@ -111,8 +111,9 @@ class Inventory {
         const at=instant(input.countedAt,'重新实点时刻');
         if(at>now || at<stock.updated_at) fail(422,'COUNT_TIME','实点时刻必须已发生且不早于当前库存快照');
         const quantity=integer(input.countedQuantityScaled,'实点量',true),reason=text(input.reason,'重新核对依据');
-        this.db.prepare("UPDATE stock_count SET snapshot_quantity_scaled=?,counted_quantity_scaled=?,stock_revision=?,counted_at=?,operator_id=?,reason=?,status='待确认差异',updated_at=?,revision=revision+1 WHERE id=?")
+        this.db.prepare("UPDATE stock_count SET snapshot_quantity_scaled=?,counted_quantity_scaled=?,stock_revision=?,counted_at=?,operator_id=?,reason=?,status='待确认差异',review_note=NULL,confirmed_by=NULL,confirmed_at=NULL,updated_at=?,revision=revision+1 WHERE id=?")
           .run(stock.quantity_scaled,quantity,stock.revision,at,ctx.session.staff_id,reason,now,count.id);
+        this.unit.workflowHistory.append('stock_count',count.id,'重新实点',reason,ctx,input,now);
         const after={counted_quantity_scaled:quantity,snapshot_quantity_scaled:stock.quantity_scaled,stock_revision:stock.revision,counted_at:at,operator_id:ctx.session.staff_id,reason};
         return {kind:'stock_count',key:count.id,beforeRevision:count.revision,revision:count.revision+1,reason:'按新实点与当前库存重新提出差异',changes:Object.keys(after).map(k=>({field:k,before:count[k],after:after[k]}))};
       }
@@ -123,6 +124,7 @@ class Inventory {
         if(at>now || at<stock.updated_at) fail(422,'COUNT_TIME','实点时刻必须已发生且不早于当前库存快照');
         const key=insert(this.db,'stock_count',fact(now,{batch_stock_id:stock.id,snapshot_quantity_scaled:stock.quantity_scaled,counted_quantity_scaled:integer(input.countedQuantityScaled,'实点量',true),
           stock_revision:stock.revision,counted_at:at,reason:text(input.reason,'盘点依据'),confirmed_at:null,review_note:null,operator_id:ctx.session.staff_id,confirmed_by:null,status:'待确认差异'}));
+        this.unit.workflowHistory.append('stock_count',key,'提交',text(input.reason,'盘点依据'),ctx,input,now);
         return {kind:'stock_count',key,revision:1,reason:'仅保存盘点快照，负责人确认前不调整余额'};
       }
       const quantity=integer(input.quantityScaled), reason=text(input.reason,'实际办理依据',2000);
@@ -156,12 +158,14 @@ class Inventory {
       } else if(input.action==='approveCount') {
         if(stock.revision!==count.stock_revision || stock.quantity_scaled!==count.snapshot_quantity_scaled) {
           this.db.prepare("UPDATE stock_count SET status='待重新核对',review_note=?,updated_at=?,revision=revision+1 WHERE id=?").run(reason,now,count.id);
+          this.unit.workflowHistory.append('stock_count',count.id,'版本不符',reason,ctx,input,now);
           return {kind:'stock_count',key:count.id,beforeRevision:count.revision,revision:count.revision+1,code:'COUNT_RECHECK_REQUIRED',reason:'盘点期间库存已变化，保留原快照并要求重新实点'};
         }
         this.db.prepare("UPDATE stock_count SET status='差异已确认',confirmed_at=?,confirmed_by=?,review_note=?,updated_at=?,revision=revision+1 WHERE id=?").run(now,ctx.session.staff_id,reason,now,count.id);
         const delta=count.counted_quantity_scaled-count.snapshot_quantity_scaled;
         if(delta) this.movement(ctx,now,stock,{movement_type:'盘点',delta_scaled:delta,stock_count_id:count.id,reason});
       } else fail(422,'INVALID_ACTION','盘点确认动作无效');
+      this.unit.workflowHistory.append('stock_count',count.id,input.action==='reject'?'拒绝':'同意',reason,ctx,input,now);
       return {kind:'stock_count',key:count.id,beforeRevision:count.revision,revision:count.revision+1,reason};
     });
   }
@@ -195,7 +199,7 @@ class Inventory {
           const usages=this.db.prepare(`SELECT u.id,u.inventory_movement_id,u.visit_id,v.record_no visit_no,u.quantity_scaled,u.used_at,u.operator_id
             FROM material_usage u JOIN inventory_movement m ON m.id=u.inventory_movement_id JOIN visit v ON v.id=u.visit_id WHERE m.batch_stock_id=? ORDER BY u.id`).all(stock.id);
           entries.push({batch,material,stock,location,availableQuantityScaled:available?stock.quantity_scaled:0,availability:available?'可用':!batch.expiry_date&&material.requires_expiry?'效期未知':batch.expiry_date&&batch.expiry_date<day(this.unit.auth.now())?'实际已过期':'待检、隔离、停用或材料/位置未启用',
-            movements,usages,counts:this.db.prepare('SELECT * FROM stock_count WHERE batch_stock_id=? ORDER BY id').all(stock.id),changes:this.db.prepare('SELECT * FROM batch_change WHERE material_batch_id=? ORDER BY id').all(batch.id)});
+            movements,usages,counts:this.db.prepare('SELECT * FROM stock_count WHERE batch_stock_id=? ORDER BY id').all(stock.id).map(c=>({...c,history:this.unit.workflowHistory.list('stock_count',c.id)})),changes:this.db.prepare('SELECT * FROM batch_change WHERE material_batch_id=? ORDER BY id').all(batch.id)});
         }
       }
       const items=entries.slice((page-1)*size,page*size);ctx.authority.returnedStockIds=items.map(e=>e.stock?.id).filter(Boolean);

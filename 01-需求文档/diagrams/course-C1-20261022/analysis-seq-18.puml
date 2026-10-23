@@ -1,0 +1,50 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+hide footbox
+autonumber
+skinparam maxMessageSize 120
+actor "诊疗助理" as A
+boundary "诊疗助理接口" as B
+control "维护材料与批次资料控制" as K
+entity "材料" as E0
+entity "材料批次" as E1
+entity "批次变更" as E2
+A -> B : 维护材料与批次资料
+B -> K : 提交对象编号及办理内容
+activate K
+K -> K : 核对岗位权限与必要资料
+alt 可以办理
+K -> E0 : 建立材料规格并确认基本单位
+activate E0
+E0 --> K : 材料编号及单位
+deactivate E0
+K -> E1 : 登记批号效期与质量状态
+activate E1
+E1 --> K : 批次及可用状态
+deactivate E1
+K -> E2 : 保留隔离恢复或停用依据
+activate E2
+E2 --> K : 批次处理记录
+deactivate E2
+K --> B : 返回本次结果
+else 权限资料或状态不符合
+K --> B : 返回核对原因且不改变原记录
+end
+B --> A : 展示结果
+deactivate K
+
+@enduml

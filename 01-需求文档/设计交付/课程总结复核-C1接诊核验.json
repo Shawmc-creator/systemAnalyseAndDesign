@@ -1,0 +1,230 @@
+{
+  "date": "2026-10-22",
+  "status": "第十一批：C1边界控制及身份接诊第一组；C分析尚未全部完成",
+  "pdf_pages": 173,
+  "figures": 143,
+  "system_usecases": 25,
+  "logical_tables": 69,
+  "entity_classes_revised": 14,
+  "entity_classes_remaining": 55,
+  "operations_added": 40,
+  "core_associations": 23,
+  "analysis_entity_groups_completed": [
+    1
+  ],
+  "section_start_pdf_pages": {
+    "A": 3,
+    "B": 39,
+    "C": 80,
+    "D": 128
+  },
+  "validation": {
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "svg_text_overlap_pairs": 0,
+    "updated_vector_figures": 32,
+    "minimum_font_pt": 9.05,
+    "C1_pages_rendered_and_reviewed": [
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86
+    ],
+    "A_and_B_source_unchanged": true,
+    "D_source_unchanged": true,
+    "remaining_eight_entity_group_sources_unchanged": true,
+    "unique_69_entity_aliases_match_69_tables": true,
+    "all_25_control_names_match_usecase_names": true,
+    "C2_only_control_and_boundary_names_changed": true,
+    "C2_original_business_messages_preserved": true,
+    "figure_numbers_titles_and_pages_preserved": 143
+  },
+  "physical_attribute_refinement_pending": [
+    "接诊占用的实际使用阶段和结束确认，与就诊时间及释放依据对应",
+    "资源限制核查和恢复的确认人、时间及依据",
+    "岗位授权保留运行支撑设计，分析账号不混入密码存储算法",
+    "排班变更原新牙医及原新诊椅分别引用；前后相同可复用对象，D按已有四个来源字段映射"
+  ],
+  "next_batch": "C1第二、三组：病历与文书、处方、方案及实际执行的操作和跨组关系",
+  "remaining": [
+    "其余55实体属性操作及关系",
+    "25份C2消息、分支及实体操作对应",
+    "C3状态机同步",
+    "D键、关系、字段约束、数据访问、领域职责及组件",
+    "真实业务确认与验收"
+  ],
+  "whole_document_course_compliant": false,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "github_synced": false,
+  "files": {
+    "tex_sha256": "da8f1af33fd7f6c1db9431367b781a44e161bf47e01124053c6e42a593eaa696",
+    "pdf_sha256": "37a21401b807a6acf6711ab4fb1eb6c5e05dffbed309676df966ca385ac7ab18"
+  },
+  "updated_figures": [
+    {
+      "stem": "analysis-boundaries-1",
+      "pdf_page": 80,
+      "minimum_font_pt": 13.77
+    },
+    {
+      "stem": "analysis-boundaries-2",
+      "pdf_page": 81,
+      "minimum_font_pt": 9.05
+    },
+    {
+      "stem": "analysis-boundaries-3",
+      "pdf_page": 82,
+      "minimum_font_pt": 12.14
+    },
+    {
+      "stem": "analysis-boundaries-4",
+      "pdf_page": 83,
+      "minimum_font_pt": 13.94
+    },
+    {
+      "stem": "analysis-boundaries-pharmacy",
+      "pdf_page": 84,
+      "minimum_font_pt": 16.9
+    },
+    {
+      "stem": "analysis-boundaries-external",
+      "pdf_page": 85,
+      "minimum_font_pt": 17.09
+    },
+    {
+      "stem": "analysis-entities-1",
+      "pdf_page": 86,
+      "minimum_font_pt": 12.99
+    },
+    {
+      "stem": "analysis-seq-01",
+      "pdf_page": 97,
+      "minimum_font_pt": 11.94
+    },
+    {
+      "stem": "analysis-seq-02",
+      "pdf_page": 98,
+      "minimum_font_pt": 10.13
+    },
+    {
+      "stem": "analysis-seq-03",
+      "pdf_page": 99,
+      "minimum_font_pt": 11.07
+    },
+    {
+      "stem": "analysis-seq-04",
+      "pdf_page": 100,
+      "minimum_font_pt": 10.54
+    },
+    {
+      "stem": "analysis-seq-05",
+      "pdf_page": 101,
+      "minimum_font_pt": 10.11
+    },
+    {
+      "stem": "analysis-seq-06",
+      "pdf_page": 102,
+      "minimum_font_pt": 10.06
+    },
+    {
+      "stem": "analysis-seq-07",
+      "pdf_page": 103,
+      "minimum_font_pt": 9.56
+    },
+    {
+      "stem": "analysis-seq-08",
+      "pdf_page": 104,
+      "minimum_font_pt": 10.19
+    },
+    {
+      "stem": "analysis-seq-09",
+      "pdf_page": 105,
+      "minimum_font_pt": 10.87
+    },
+    {
+      "stem": "analysis-seq-10",
+      "pdf_page": 106,
+      "minimum_font_pt": 12.2
+    },
+    {
+      "stem": "analysis-seq-11",
+      "pdf_page": 107,
+      "minimum_font_pt": 13.78
+    },
+    {
+      "stem": "analysis-seq-12",
+      "pdf_page": 108,
+      "minimum_font_pt": 9.47
+    },
+    {
+      "stem": "analysis-seq-13",
+      "pdf_page": 109,
+      "minimum_font_pt": 12.62
+    },
+    {
+      "stem": "analysis-seq-14",
+      "pdf_page": 110,
+      "minimum_font_pt": 10.82
+    },
+    {
+      "stem": "analysis-seq-15",
+      "pdf_page": 111,
+      "minimum_font_pt": 12.53
+    },
+    {
+      "stem": "analysis-seq-16",
+      "pdf_page": 112,
+      "minimum_font_pt": 10.93
+    },
+    {
+      "stem": "analysis-seq-17",
+      "pdf_page": 113,
+      "minimum_font_pt": 11.94
+    },
+    {
+      "stem": "analysis-seq-18",
+      "pdf_page": 114,
+      "minimum_font_pt": 10.58
+    },
+    {
+      "stem": "analysis-seq-19",
+      "pdf_page": 115,
+      "minimum_font_pt": 9.97
+    },
+    {
+      "stem": "analysis-seq-20",
+      "pdf_page": 116,
+      "minimum_font_pt": 9.11
+    },
+    {
+      "stem": "analysis-seq-21",
+      "pdf_page": 117,
+      "minimum_font_pt": 13.04
+    },
+    {
+      "stem": "analysis-seq-22",
+      "pdf_page": 118,
+      "minimum_font_pt": 9.79
+    },
+    {
+      "stem": "analysis-seq-23",
+      "pdf_page": 119,
+      "minimum_font_pt": 11.93
+    },
+    {
+      "stem": "analysis-seq-24",
+      "pdf_page": 120,
+      "minimum_font_pt": 11.35
+    },
+    {
+      "stem": "analysis-seq-25",
+      "pdf_page": 121,
+      "minimum_font_pt": 10.37
+    }
+  ]
+}

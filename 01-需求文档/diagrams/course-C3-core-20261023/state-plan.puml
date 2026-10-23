@@ -1,0 +1,44 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "本版可继续办理" as Open {
+ state "草稿" as Draft
+ state "待确认" as Pending
+ state "已确认" as Agreed
+ state "暂缓" as Deferred
+ state "已拒绝" as Rejected
+ [*] --> Draft
+ Draft --> Pending : 提交说明 [诊断及项目完整]
+ Pending --> Agreed : 保存决定\n[有有效同意范围]
+ Pending --> Deferred : 保存决定 [无有效同意\n且仍有暂缓项目]
+ Pending --> Rejected : 保存决定 [无有效同意\n且剩余项目均拒绝]
+ Deferred --> Pending : 患者愿再决定\n[内容未实质改变]\n/ 重新说明
+ Rejected --> Pending : 患者改变意向\n[内容未实质改变]\n/ 重新说明
+ Agreed : 执行或追加决定 [范围合法]\n/ 保留分项决定及实际数量
+ Agreed : 部分撤回 [仍有其他有效范围]\n/ 仅停止所撤范围
+ Agreed --> Pending : 重新说明 [无可执行同意\n且仍有待决定项目]
+}
+state "停止后续执行" as Stopped
+state "本版执行完成" as Done
+[*] --> Open : 新建或实质修订\n/ 另建版本
+Open -down-> Stopped : 牙医停止本版\n[新版替代，或全部撤回\n且不再安排本版执行]\n/ 记时间、原因
+Agreed -down-> Done : 核对实际执行\n[同意范围完成，且无\n待决定或暂缓项目]
+Stopped --> [*]
+Done --> [*]
+
+@enduml

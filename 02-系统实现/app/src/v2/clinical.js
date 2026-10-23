@@ -1,6 +1,6 @@
 'use strict';
 const { fail, text, id, instant, dateOnly, day, utc, canonical, hash, insert, fact, row, revision } = require('./common');
-const { signaturePayload } = require('./clinical-gates');
+const { signaturePayload,signedIntegrity } = require('./clinical-gates');
 const CATEGORIES = ['病史', '过敏', '用药'];
 const { startResources }=require('./resource-rules');
 class Clinical {
@@ -30,9 +30,16 @@ class Clinical {
     if (!record) fail(409, 'RECORD_MISSING', '就诊缺少病历，需要负责人核对');
     return record;
   }
+  draftContext(ctx,visitId,operation){
+    const visit=this.scope(ctx,visitId,operation);
+    if(!visit.started_at||!['接诊中','诊疗结束'].includes(visit.status))fail(409,'VISIT_NOT_ACTIVE','请先实际开始接诊，再填写本次病历');
+    const record=this.recordFor(visit.id);
+    if(record.status!=='草稿')fail(409,'RECORD_SIGNED','正文已签署，请追加独立补充');
+    return {visit,record};
+  }
   health(credentials, input) {
     return this.unit.command(credentials, 'uc21.health', input, (ctx, now) => {
-      const visit = this.active(ctx, input.visitId, 'health'), record = this.recordFor(visit.id);
+      const {visit,record}=this.draftContext(ctx,input.visitId,'health');
       if (record.status !== '草稿') fail(409, 'RECORD_SIGNED', '签署病历所据健康复核已经冻结');
       if (input.patientId !== visit.patient_id) fail(409, 'PATIENT_MISMATCH', '患者与当前就诊不一致');
       const previous = this.db.prepare('SELECT * FROM health_version WHERE patient_id=? ORDER BY version_no DESC LIMIT 1').get(visit.patient_id);
@@ -79,13 +86,13 @@ class Clinical {
         return { kind: 'visit', key: visit.id, beforeRevision: visit.revision, revision: visit.revision + 1 };
       }
       if (input.action !== 'save') fail(422, 'INVALID_ACTION', '病历办理动作无效');
-      this.active(ctx, visit.id, 'record');
-      const record = this.recordFor(visit.id);
+      const {record}=this.draftContext(ctx,visit.id,'record');
       if (input.recordId !== record.id) fail(409, 'RECORD_MISMATCH', '病历与当前就诊不一致');
       if (record.status !== '草稿') fail(409, 'RECORD_SIGNED', '病历已签署，后续请追加独立补充');
       revision(record, input.expectedRevision);
-      const fields = { chief_complaint: text(input.chiefComplaint, '主诉', 4000), diagnosis: text(input.diagnosis, '诊断', 4000), treatment_advice: text(input.treatmentAdvice, '处理意见', 4000) };
-      if (!Array.isArray(input.findings) || input.findings.length < 1 || input.findings.length > 100) fail(422, 'FINDINGS_REQUIRED', '请记录至少一项且不超过100项检查所见');
+      const optional=(value,label)=>value==null||value===''?null:text(value,label,4000);
+      const fields = { chief_complaint: optional(input.chiefComplaint, '主诉'), diagnosis: optional(input.diagnosis, '诊断'), treatment_advice: optional(input.treatmentAdvice, '处理意见') };
+      if (!Array.isArray(input.findings) || input.findings.length > 100) fail(422, 'FINDINGS_REQUIRED', '检查所见须为不超过100项的列表；尚未完成可暂存草稿');
       const existing = this.db.prepare('SELECT * FROM clinical_finding WHERE clinical_record_id=? ORDER BY sequence_no').all(record.id);
       const ids = input.findings.filter(f => f.id != null).map(f => id(f.id));
       if (new Set(ids).size !== ids.length || existing.some(f => !ids.includes(f.id)) || ids.some(i => !existing.some(f => f.id === i))) fail(422, 'FINDING_SET', '所见须属于当前病历；已有条目请逐项修订，本批暂不提供删除');
@@ -106,7 +113,7 @@ class Clinical {
   sign(credentials, input) {
     return this.unit.command(credentials, 'uc11.sign', input, (ctx, now) => {
       const record = row(this.db, 'clinical_record', input.recordId), visit = this.scope(ctx, record.visit_id, input.action === 'addendum' ? 'addendum' : 'sign');
-      revision(record, input.expectedRevision);
+      revision(record,input.action==='sign'&&record.status==='已签署'&&input.expectedRevision===record.signed_revision?record.revision:input.expectedRevision);
       if (input.confirmed !== true) fail(422, 'CONFIRMATION_REQUIRED', '请确认已经逐项核对本次病历');
       if (input.action === 'addendum') {
         if (record.status !== '已签署') fail(409, 'RECORD_UNSIGNED', '独立补充只适用于已签署病历');
@@ -116,18 +123,18 @@ class Clinical {
         return { kind: 'record_addendum', key, revision: 1, reason: '追加独立病历补充' };
       }
       if (input.action !== 'sign') fail(422, 'INVALID_ACTION', '签署动作无效');
-      if (record.status !== '草稿' || visit.status !== '接诊中') fail(409, 'INVALID_STATE', '只能签署正在接诊的草稿病历');
+      if(record.status==='已签署')return {kind:'clinical_record',key:record.id,revision:record.revision,code:'ALREADY_SIGNED',reason:'返回原签署结果'};
+      if (record.status !== '草稿' || !visit.started_at || !['接诊中','诊疗结束'].includes(visit.status)) fail(409, 'INVALID_STATE', '实际开始接诊后可核对草稿签署；实际结束独立办理');
       if (visit.started_at > now) fail(409, 'START_TIME', '接诊时间晚于当前时间，不能结束诊疗');
       for (const [key, label] of [['chief_complaint', '主诉'], ['diagnosis', '诊断'], ['treatment_advice', '处理意见']]) text(record[key], label, 4000);
       const payload = signaturePayload(this.db, record);
       if (!payload.findings.length || !payload.healthReviews.length) fail(409, 'SIGNING_INCOMPLETE', '签署前必须保存检查所见并完成当次健康复核');
       const latestVersion = this.db.prepare('SELECT id FROM health_version WHERE patient_id=? ORDER BY version_no DESC LIMIT 1').get(visit.patient_id);
       if (payload.healthReviews.at(-1).health_version_id !== latestVersion?.id) fail(409, 'HEALTH_REVIEW_STALE', '健康版本已经更新，请重新复核后再签署');
-      this.db.prepare("UPDATE clinical_record SET status='已签署',signed_at=?,signed_by=?,signed_revision=?,content_hash=?,updated_at=?,revision=revision+1 WHERE id=?").run(now, ctx.session.staff_id, record.revision, hash(canonical(payload)), now, record.id);
-      this.db.prepare("UPDATE visit SET status='诊疗结束',ended_at=?,updated_at=?,revision=revision+1 WHERE id=?").run(now, now, visit.id);
+      this.db.prepare("UPDATE clinical_record SET status='已签署',signed_at=?,signed_by=?,signed_revision=?,signed_health_review_id=?,content_hash=?,updated_at=?,revision=revision+1 WHERE id=?").run(now, ctx.session.staff_id, record.revision,payload.healthReviews[0].id, hash(canonical(payload)), now, record.id);
       // A signed record does not certify physical end or completed chair preparation.
       ctx.authority.healthReviewIds = payload.healthReviews.map(r => r.id);
-      return { kind: 'clinical_record', key: record.id, beforeRevision: record.revision, revision: record.revision + 1, reason: '核对正文、所见和健康复核后签署，结束当次诊疗' };
+      return { kind: 'clinical_record', key: record.id, beforeRevision: record.revision, revision: record.revision + 1, reason: '冻结正文、所见及确切健康复核；实际结束独立办理' };
     });
   }
   detail(credentials, input) {
@@ -137,12 +144,12 @@ class Clinical {
       const record = this.recordFor(visit.id), versions = this.db.prepare('SELECT * FROM health_version WHERE patient_id=? ORDER BY version_no DESC').all(visit.patient_id);
       const occupancy=this.db.prepare('SELECT * FROM resource_occupancy WHERE visit_id=? AND released_at IS NULL').get(visit.id)||null;
       return { serverNow:this.unit.auth.now(),visit, patient: row(this.db, 'patient', visit.patient_id), record,
-        occupancy,physicalEnd:this.db.prepare("SELECT released_at FROM resource_occupancy WHERE visit_id=? AND release_reason='实际操作结束，转清洁核验' ORDER BY id DESC LIMIT 1").get(visit.id)?.released_at||null,
+        requiresEndVerification:visit.status==='诊疗结束'&&!!occupancy,occupancy,physicalEnd:this.db.prepare("SELECT released_at FROM resource_occupancy WHERE visit_id=? AND release_reason='实际操作结束，转清洁核验' ORDER BY id DESC LIMIT 1").get(visit.id)?.released_at||null,
         findings: this.db.prepare('SELECT * FROM clinical_finding WHERE clinical_record_id=? ORDER BY sequence_no').all(record.id),
         addenda: this.db.prepare('SELECT * FROM record_addendum WHERE clinical_record_id=? ORDER BY id').all(record.id),
         healthVersions: versions.map(v => ({ ...v, items: this.db.prepare('SELECT * FROM health_item WHERE health_version_id=? ORDER BY id').all(v.id) })),
         reviews: this.db.prepare('SELECT * FROM health_review WHERE visit_id=? ORDER BY id').all(visit.id),
-        signedIntegrity: record.status === '已签署' ? hash(canonical(signaturePayload(this.db, record))) === record.content_hash : null };
+        signedIntegrity: record.status === '已签署' ? signedIntegrity(this.db,record) : null };
     });
   }
   queue(credentials, input) {

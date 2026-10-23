@@ -1,0 +1,1906 @@
+{
+  "source": "现行69表逻辑模型及C1业务属性",
+  "omitted_details": [
+    "逐表重复的id、关联键和公共经办时间",
+    "非关键列的逐项类型与含义",
+    "每张序列重复展开的通用保存重试过程"
+  ],
+  "tables": [
+    {
+      "table": "patient",
+      "name": "患者",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "birth_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "phone",
+          "type": "TEXT"
+        },
+        {
+          "name": "phone_owner",
+          "type": "TEXT"
+        },
+        {
+          "name": "address",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "患者编号",
+        "姓名及出生日期",
+        "联系资料及联系偏好"
+      ]
+    },
+    {
+      "table": "staff",
+      "name": "职员",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "employed_from",
+          "type": "TEXT"
+        },
+        {
+          "name": "employed_until",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "职员编号与姓名",
+        "在岗期间"
+      ]
+    },
+    {
+      "table": "patient_change",
+      "name": "患者资料变更",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "old_value",
+          "type": "TEXT"
+        },
+        {
+          "name": "new_value",
+          "type": "TEXT"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "field_name",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "字段及前后值",
+        "更正原因",
+        "经办人与发生时间"
+      ]
+    },
+    {
+      "table": "user_account",
+      "name": "职员账号",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "login_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "password_hash",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "个人登录名",
+        "启用或停用",
+        "授权版本"
+      ]
+    },
+    {
+      "table": "dental_chair",
+      "name": "诊椅",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "available_from",
+          "type": "TEXT"
+        },
+        {
+          "name": "available_until",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "诊椅编号与名称",
+        "有效期间"
+      ]
+    },
+    {
+      "table": "dated_schedule",
+      "name": "日期安排",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "starts_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "ends_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "confirmed_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "营业日期与时段",
+        "牙医与诊椅",
+        "发布状态及确认依据"
+      ]
+    },
+    {
+      "table": "schedule_change",
+      "name": "安排变更",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "old_business_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "old_starts_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "old_ends_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "new_business_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "new_starts_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "原牙医与新牙医",
+        "原诊椅与新诊椅",
+        "前后时段及变更原因",
+        "经办时间与影响处理"
+      ]
+    },
+    {
+      "table": "resource_occupancy",
+      "name": "接诊占用",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "starts_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "ends_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "released_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "arrangement_revision",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "来源预约或就诊",
+        "安排版本与占用时段",
+        "实际使用结束及释放依据"
+      ]
+    },
+    {
+      "table": "appointment",
+      "name": "预约",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "planned_start",
+          "type": "TEXT"
+        },
+        {
+          "name": "planned_end",
+          "type": "TEXT"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "due_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "患者及预约编号",
+        "计划时段与就诊目的",
+        "预约状态与安排版本"
+      ]
+    },
+    {
+      "table": "appointment_change",
+      "name": "预约变更",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "old_start",
+          "type": "TEXT"
+        },
+        {
+          "name": "old_end",
+          "type": "TEXT"
+        },
+        {
+          "name": "old_revision",
+          "type": "INTEGER"
+        },
+        {
+          "name": "new_start",
+          "type": "TEXT"
+        },
+        {
+          "name": "new_end",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "前后安排与版本",
+        "变更原因",
+        "经办时间及通知依据"
+      ]
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "arrived_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "started_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "ended_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "患者与就诊编号",
+        "来源预约或现场",
+        "到诊及接诊起止",
+        "候诊或接诊或结束"
+      ]
+    },
+    {
+      "table": "clinical_equipment",
+      "name": "诊疗设备",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "equipment_type",
+          "type": "TEXT"
+        },
+        {
+          "name": "status_reason",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "名称与设备类别",
+        "固定诊椅或共享",
+        "可用或停用及原因"
+      ]
+    },
+    {
+      "table": "resource_block",
+      "name": "资源停用时段",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "starts_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "ends_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "released_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "诊椅或设备",
+        "限制起止与原因",
+        "生效中或已解除",
+        "核查及实际解除依据"
+      ]
+    },
+    {
+      "table": "equipment_occupancy",
+      "name": "设备占用",
+      "group": "身份与接诊",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "starts_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "ends_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "actual_ended_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "设备与预约或就诊",
+        "计划及实际使用时段",
+        "已预留或使用中或已释放"
+      ]
+    },
+    {
+      "table": "health_version",
+      "name": "健康版本",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "formed_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "change_reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "version_no",
+          "type": "INTEGER"
+        },
+        {
+          "name": "effective_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "版本号、形成时间",
+        "变更原因、形成牙医"
+      ]
+    },
+    {
+      "table": "health_item",
+      "name": "健康条目",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "category",
+          "type": "TEXT"
+        },
+        {
+          "name": "content",
+          "type": "TEXT"
+        },
+        {
+          "name": "certainty",
+          "type": "TEXT"
+        },
+        {
+          "name": "reported_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "source",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "类别、内容",
+        "有／无／未知、来源",
+        "报告时间、发生时间"
+      ]
+    },
+    {
+      "table": "health_review",
+      "name": "健康复核",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "reviewed_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "conclusion",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "复核结论",
+        "复核牙医、实际时间"
+      ]
+    },
+    {
+      "table": "clinical_record",
+      "name": "病历",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "chief_complaint",
+          "type": "TEXT"
+        },
+        {
+          "name": "diagnosis",
+          "type": "TEXT"
+        },
+        {
+          "name": "treatment_advice",
+          "type": "TEXT"
+        },
+        {
+          "name": "signed_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "主诉、诊断、处理意见",
+        "草稿／已签署、正文版本",
+        "签署牙医、时间、冻结摘要"
+      ]
+    },
+    {
+      "table": "clinical_finding",
+      "name": "检查所见",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "tooth_code",
+          "type": "TEXT"
+        },
+        {
+          "name": "surface_code",
+          "type": "TEXT"
+        },
+        {
+          "name": "finding_text",
+          "type": "TEXT"
+        },
+        {
+          "name": "sequence_no",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "牙位、牙面、所见内容",
+        "顺序、记录牙医"
+      ]
+    },
+    {
+      "table": "record_addendum",
+      "name": "病历补充",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "content",
+          "type": "TEXT"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "added_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "content_hash",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "补充正文、原因",
+        "签署牙医、补充时间"
+      ]
+    },
+    {
+      "table": "clinical_document",
+      "name": "诊疗文件",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "document_type",
+          "type": "TEXT"
+        },
+        {
+          "name": "source",
+          "type": "TEXT"
+        },
+        {
+          "name": "ownership_note",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "类型、来源、归属说明",
+        "上传经办身份"
+      ]
+    },
+    {
+      "table": "document_version",
+      "name": "文件版本",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "original_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "size_bytes",
+          "type": "INTEGER"
+        },
+        {
+          "name": "sha256",
+          "type": "TEXT"
+        },
+        {
+          "name": "captured_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "版本号、原文件名、实际格式",
+        "大小、摘要、原件索引",
+        "形成时间、替换原因",
+        "上传人／时间、核对状态",
+        "确认牙医／时间／依据"
+      ]
+    },
+    {
+      "table": "prescription",
+      "name": "处方",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "review_status",
+          "type": "TEXT"
+        },
+        {
+          "name": "collection_route",
+          "type": "TEXT"
+        },
+        {
+          "name": "issued_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "开立牙医、时间、取药路径",
+        "草稿／已开立／已作废",
+        "审核状态、审核人及意见",
+        "用药指导、交付与更正依据"
+      ]
+    },
+    {
+      "table": "prescription_item",
+      "name": "处方明细",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "drug_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "directions",
+          "type": "TEXT"
+        },
+        {
+          "name": "quantity_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "开立时药名规格",
+        "用法用量、疗程、单位",
+        "开立数量"
+      ]
+    },
+    {
+      "table": "dispense_record",
+      "name": "实际发药",
+      "group": "病历与诊疗文书",
+      "fields": [
+        {
+          "name": "quantity_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "dispensed_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "guidance_note",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "实际正数量、交付时间",
+        "核发人、用药交代"
+      ]
+    },
+    {
+      "table": "treatment_plan",
+      "name": "治疗方案",
+      "group": "治疗方案与实际执行",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "goal",
+          "type": "TEXT"
+        },
+        {
+          "name": "established_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "termination_reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "closed_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "治疗目标、建立时间",
+        "进行中／已完成／已终止",
+        "责任牙医、结束时间及原因"
+      ]
+    },
+    {
+      "table": "plan_version",
+      "name": "方案版本",
+      "group": "治疗方案与实际执行",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "diagnostic_basis",
+          "type": "TEXT"
+        },
+        {
+          "name": "explained_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "change_reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "planned_schedule",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "版本号、诊断依据",
+        "预计安排、变更原因",
+        "说明牙医、时间及依据",
+        "版本状态、停止时间及原因"
+      ]
+    },
+    {
+      "table": "plan_item",
+      "name": "方案项目",
+      "group": "治疗方案与实际执行",
+      "fields": [
+        {
+          "name": "item_description",
+          "type": "TEXT"
+        },
+        {
+          "name": "tooth_code",
+          "type": "TEXT"
+        },
+        {
+          "name": "surface_code",
+          "type": "TEXT"
+        },
+        {
+          "name": "planned_quantity",
+          "type": "INTEGER"
+        },
+        {
+          "name": "sequence_no",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "项目内容、牙位牙面",
+        "计划数量、实施顺序",
+        "估算费用（未知可空）"
+      ]
+    },
+    {
+      "table": "patient_decision",
+      "name": "患者决定",
+      "group": "治疗方案与实际执行",
+      "fields": [
+        {
+          "name": "decision",
+          "type": "TEXT"
+        },
+        {
+          "name": "decided_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "explanation_basis",
+          "type": "TEXT"
+        },
+        {
+          "name": "scope_note",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "同意／暂缓／拒绝／撤回",
+        "决定时间、说明依据",
+        "说明人、记录人、范围限制"
+      ]
+    },
+    {
+      "table": "decision_plan_item",
+      "name": "患者决定—方案项目",
+      "group": "治疗方案与实际执行",
+      "fields": [
+        {
+          "name": "scope_quantity",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "关联形成时间、记录牙医",
+        "确认数量（限定时记录）"
+      ]
+    },
+    {
+      "table": "decision_file_version",
+      "name": "患者决定—确认原件",
+      "group": "治疗方案与实际执行",
+      "fields": [
+        {
+          "name": "linked_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "关联形成时间、记录牙医"
+      ]
+    },
+    {
+      "table": "treatment_execution",
+      "name": "诊疗执行",
+      "group": "治疗方案与实际执行",
+      "fields": [
+        {
+          "name": "tooth_code",
+          "type": "TEXT"
+        },
+        {
+          "name": "surface_code",
+          "type": "TEXT"
+        },
+        {
+          "name": "completed_quantity",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "牙位牙面、实际完成数量",
+        "操作经过、执行牙医、完成时间",
+        "首次／更正、更正原因"
+      ]
+    },
+    {
+      "table": "patient_funds",
+      "name": "患者资金",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "opened_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "建立时间、归属经办人",
+        "/同患者资金收付汇总"
+      ]
+    },
+    {
+      "table": "service",
+      "name": "收费项目",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "billing_unit",
+          "type": "TEXT"
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "项目编号、名称、计价单位",
+        "启用状态"
+      ]
+    },
+    {
+      "table": "service_price",
+      "name": "价目",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "unit_price_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "valid_from",
+          "type": "TEXT"
+        },
+        {
+          "name": "valid_until",
+          "type": "TEXT"
+        },
+        {
+          "name": "change_reason",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "非负单价、适用起止",
+        "调价或零价原因、确认状态",
+        "提出及确认人、时间、意见"
+      ]
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "formed_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "period_start",
+          "type": "TEXT"
+        },
+        {
+          "name": "period_end",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "形成时间、计费期间",
+        "/G总应收、/I正式医保承担",
+        "/P患者应付、/S有效抵付",
+        "/待付、/不能最终结算原因"
+      ]
+    },
+    {
+      "table": "bill_item",
+      "name": "应收项目",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "quantity",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_price_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "priced_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "实际数量、单价快照",
+        "核价状态、计费时点",
+        "核价人及依据"
+      ]
+    },
+    {
+      "table": "patient_payment",
+      "name": "患者付款",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "channel",
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "net_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "received_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "change_cents",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "实收、找零、渠道、核实状态",
+        "到账时间、核实人及凭据",
+        "/净收、/原款可用额"
+      ]
+    },
+    {
+      "table": "payment_allocation",
+      "name": "付款分配",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "amount_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "effective_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "带符号金额、生效时间",
+        "经办人、分配或释放原因"
+      ]
+    },
+    {
+      "table": "prepayment_offset",
+      "name": "预付抵扣",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "amount_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "effective_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "带符号金额、生效时间",
+        "经办人、抵扣或释放依据"
+      ]
+    },
+    {
+      "table": "payment_order",
+      "name": "电子支付单",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "channel",
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "business_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "amount_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "external_reference",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "唯一原单号、渠道、金额",
+        "平台交易号、核实时间",
+        "支付状态"
+      ]
+    },
+    {
+      "table": "payment_reconciliation",
+      "name": "收退款核对",
+      "group": "价目、账单与收款",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "business_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "expected_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "actual_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "resolution",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "营业日期、原单金额",
+        "渠道实际额、差异与状态",
+        "核对人、处理依据"
+      ]
+    },
+    {
+      "table": "fee_request",
+      "name": "费用申请",
+      "group": "费用更正与退费",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "proposed_adjustment_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "proposed_refund_cents",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "原因、证据、提交版本及时间",
+        "拟调整额、拟退上限",
+        "申请状态、批准调整及退款上限",
+        "审核人、时间及意见"
+      ]
+    },
+    {
+      "table": "fee_adjustment",
+      "name": "费用调整",
+      "group": "费用更正与退费",
+      "fields": [
+        {
+          "name": "reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "effective_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "调整依据、生效时间",
+        "批准负责人"
+      ]
+    },
+    {
+      "table": "fee_adjustment_item",
+      "name": "调整项目",
+      "group": "费用更正与退费",
+      "fields": [
+        {
+          "name": "amount_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "带符号调整额、原项说明"
+      ]
+    },
+    {
+      "table": "patient_refund",
+      "name": "退款办理",
+      "group": "费用更正与退费",
+      "fields": [
+        {
+          "name": "channel",
+          "type": "TEXT"
+        },
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "requested_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "actual_cents",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "唯一退款号、原渠道、接收方核实",
+        "拟退额、实际额、办理时间",
+        "待办理／待核实／已确认退款／已失败",
+        "核实人、时间、凭据及失败依据"
+      ]
+    },
+    {
+      "table": "followup_requirement",
+      "name": "诊后要求",
+      "group": "复诊与随访",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "purpose",
+          "type": "TEXT"
+        },
+        {
+          "name": "followup_type",
+          "type": "TEXT"
+        },
+        {
+          "name": "target_start",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "类型、目的、目标起止日期",
+        "是否需临床评估、负责前台",
+        "要求状态、下次联系日期",
+        "发布及变更依据、完成或撤销人和时间"
+      ]
+    },
+    {
+      "table": "contact_history",
+      "name": "联系经历",
+      "group": "复诊与随访",
+      "fields": [
+        {
+          "name": "method",
+          "type": "TEXT"
+        },
+        {
+          "name": "contacted_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "result",
+          "type": "TEXT"
+        },
+        {
+          "name": "next_contact_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "实际方式、时间、前台",
+        "沟通事实、结果、下次联系日"
+      ]
+    },
+    {
+      "table": "clinical_assessment",
+      "name": "临床评估",
+      "group": "复诊与随访",
+      "fields": [
+        {
+          "name": "method",
+          "type": "TEXT"
+        },
+        {
+          "name": "assessed_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "result",
+          "type": "TEXT"
+        },
+        {
+          "name": "advice",
+          "type": "TEXT"
+        },
+        {
+          "name": "next_date",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "到诊检查或远程沟通、时间、牙医",
+        "结论、意见、来源及局限",
+        "下次日期、跟进责任人"
+      ]
+    },
+    {
+      "table": "material",
+      "name": "材料",
+      "group": "材料与库存",
+      "fields": [
+        {
+          "name": "category",
+          "type": "TEXT"
+        },
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "specification",
+          "type": "TEXT"
+        },
+        {
+          "name": "base_unit",
+          "type": "TEXT"
+        },
+        {
+          "name": "purchase_unit",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "名称、类别、规格、启用状态",
+        "基本单位、采购单位、换算分子分母",
+        "数量精度、批次及效期要求",
+        "计量确认人和时间"
+      ]
+    },
+    {
+      "table": "material_batch",
+      "name": "材料批次",
+      "group": "材料与库存",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "batch_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "expiry_date",
+          "type": "TEXT"
+        },
+        {
+          "name": "source_note",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "实际批号、真实效期、来源",
+        "待检／可用／隔离／停用／过期"
+      ]
+    },
+    {
+      "table": "batch_change",
+      "name": "批次变更",
+      "group": "材料与库存",
+      "fields": [
+        {
+          "name": "old_status",
+          "type": "TEXT"
+        },
+        {
+          "name": "new_status",
+          "type": "TEXT"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "confirmed_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "前后状态、原因",
+        "经办及确认身份、实际时间"
+      ]
+    },
+    {
+      "table": "stock_location",
+      "name": "存放位置",
+      "group": "材料与库存",
+      "fields": [
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "purpose",
+          "type": "TEXT"
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "位置名称、用途、启用状态"
+      ]
+    },
+    {
+      "table": "batch_stock",
+      "name": "批次存量",
+      "group": "材料与库存",
+      "fields": [
+        {
+          "name": "quantity_scaled",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "基本单位账面数量、库存版本"
+      ]
+    },
+    {
+      "table": "inventory_movement",
+      "name": "库存变动",
+      "group": "材料与库存",
+      "fields": [
+        {
+          "name": "movement_type",
+          "type": "TEXT"
+        },
+        {
+          "name": "delta_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "before_scaled",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "类型、正负变动量、前后量",
+        "实际时间、经办人、用途和依据"
+      ]
+    },
+    {
+      "table": "material_usage",
+      "name": "实际用料",
+      "group": "材料与库存",
+      "fields": [
+        {
+          "name": "quantity_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "used_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "note",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "实际正数量、时间、就诊说明",
+        "登记助理"
+      ]
+    },
+    {
+      "table": "stock_count",
+      "name": "盘点核实",
+      "group": "材料与库存",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "snapshot_quantity_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "counted_quantity_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "confirmed_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "账面快照B、实点C、库存版本",
+        "实点时间、助理、差异原因",
+        "负责人决定及时间、核实状态",
+        "/差异D＝C－B"
+      ]
+    },
+    {
+      "table": "supplier",
+      "name": "供应商",
+      "group": "基础采购与验收",
+      "fields": [
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "contact_name",
+          "type": "TEXT"
+        },
+        {
+          "name": "phone",
+          "type": "TEXT"
+        },
+        {
+          "name": "address",
+          "type": "TEXT"
+        },
+        {
+          "name": "is_active",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "名称、联系人、电话、地址",
+        "启用状态"
+      ]
+    },
+    {
+      "table": "purchase_order",
+      "name": "采购",
+      "group": "基础采购与验收",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "agreed_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "delivery_terms",
+          "type": "TEXT"
+        },
+        {
+          "name": "confirmed_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "request_reason",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "需求依据、交付约定",
+        "待确认／已确认／已取消",
+        "提出及确认人、时间、取消原因"
+      ]
+    },
+    {
+      "table": "purchase_order_item",
+      "name": "采购项目",
+      "group": "基础采购与验收",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "ordered_quantity_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "unit_price_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "purchase_unit",
+          "type": "TEXT"
+        },
+        {
+          "name": "conversion_numerator",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "材料、正的采购数量",
+        "单位、换算、精度、单价快照"
+      ]
+    },
+    {
+      "table": "purchase_receipt",
+      "name": "验收",
+      "group": "基础采购与验收",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "arrived_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "delivery_evidence",
+          "type": "TEXT"
+        },
+        {
+          "name": "accepted_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "实际到货时间、随货单依据",
+        "验收状态、经办及确认时间"
+      ]
+    },
+    {
+      "table": "purchase_receipt_item",
+      "name": "验收项目",
+      "group": "基础采购与验收",
+      "fields": [
+        {
+          "name": "arrived_quantity_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "accepted_quantity_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "rejected_quantity_scaled",
+          "type": "INTEGER"
+        },
+        {
+          "name": "pending_quantity_scaled",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "到货、合格、拒收、待检数量",
+        "批次位置、检验及差异依据",
+        "/本次新确认合格增量"
+      ]
+    },
+    {
+      "table": "insurance_identity",
+      "name": "医保身份核验",
+      "group": "门诊医保与结算款",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "insured_person_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "insured_area",
+          "type": "TEXT"
+        },
+        {
+          "name": "verified_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "valid_until",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "必要人员编号、参保地区",
+        "实际核验结果、时刻及适用期",
+        "办理人员、结果依据"
+      ]
+    },
+    {
+      "table": "insurance_item_mapping",
+      "name": "医保项目对应",
+      "group": "门诊医保与结算款",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "insurance_code",
+          "type": "TEXT"
+        },
+        {
+          "name": "insured_area",
+          "type": "TEXT"
+        },
+        {
+          "name": "valid_from",
+          "type": "TEXT"
+        },
+        {
+          "name": "valid_until",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "地区、适用编码及起止日期",
+        "有效或停用状态"
+      ]
+    },
+    {
+      "table": "insurance_case",
+      "name": "医保就诊办理",
+      "group": "门诊医保与结算款",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "business_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "fee_revision",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "唯一业务号、机构及诊断标识",
+        "费用版本、办理状态及结果依据",
+        "预估基金／个账／其他自付",
+        "患者选择及确认时间"
+      ]
+    },
+    {
+      "table": "insurance_fee",
+      "name": "医保费用明细",
+      "group": "门诊医保与结算款",
+      "fields": [
+        {
+          "name": "amount_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER"
+        },
+        {
+          "name": "uploaded_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "result_note",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "本次提交数量、分金额及费用版本",
+        "适用编码或自费标识",
+        "实际提交时刻、平台返回依据"
+      ]
+    },
+    {
+      "table": "insurance_settlement",
+      "name": "医保结算",
+      "group": "门诊医保与结算款",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "external_reference",
+          "type": "TEXT"
+        },
+        {
+          "name": "total_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "fund_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "account_cents",
+          "type": "INTEGER"
+        }
+      ],
+      "business_meaning": [
+        "正式结算号、范围内总费T",
+        "基金F、个账A、其他自付P",
+        "有效／已撤销、实际确认时间",
+        "/应拨额、/净到账、/待收或待退"
+      ]
+    },
+    {
+      "table": "insurance_reversal",
+      "name": "医保撤销办理",
+      "group": "门诊医保与结算款",
+      "fields": [
+        {
+          "name": "status",
+          "type": "TEXT"
+        },
+        {
+          "name": "business_no",
+          "type": "TEXT"
+        },
+        {
+          "name": "reason",
+          "type": "TEXT"
+        },
+        {
+          "name": "external_reference",
+          "type": "TEXT"
+        },
+        {
+          "name": "verified_at",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "唯一撤销号、原因及负责人依据",
+        "待办理／待核实／已成功／已失败",
+        "原笔结果、核实人及时间"
+      ]
+    },
+    {
+      "table": "insurance_fund_receipt",
+      "name": "医保结算款收付",
+      "group": "门诊医保与结算款",
+      "fields": [
+        {
+          "name": "flow_type",
+          "type": "TEXT"
+        },
+        {
+          "name": "amount_cents",
+          "type": "INTEGER"
+        },
+        {
+          "name": "occurred_at",
+          "type": "TEXT"
+        },
+        {
+          "name": "evidence_reference",
+          "type": "TEXT"
+        }
+      ],
+      "business_meaning": [
+        "拨付或退回、实际正金额",
+        "实际时间、医保或银行凭据",
+        "经办人员"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 22
+skinparam ranksep 35
+skinparam state {
+ BackgroundColor white
+ BorderColor black
+ StartColor black
+ EndColor black
+}
+top to bottom direction
+
+state "草稿" as Draft
+state "已签署" as Signed
+[*] --> Draft : 建立当次病历\n[同患者唯一就诊]\n/ 保留本次记录来源
+Draft : 牙医保存检查及诊断 [权限与版本有效]\n/ 草稿、所见及健康复核共同保存
+Draft --> Signed : 牙医确认签署 [必需内容齐全，\n归属、权限与所据版本有效]\n/ 保存签署依据，冻结正文及所见
+Signed : 牙医签署独立补充 [原病历已签署]\n/ 另存内容、原因、人和时间，不改原文
+
+@enduml

@@ -1,0 +1,80 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 17
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam classAttributeIconSize 0
+skinparam nodesep 24
+skinparam ranksep 34
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam nodesep 40
+skinparam ranksep 50
+|负责人|
+start
+:发布日期排班、诊椅可用时段;
+:登记设备配置及清洁、维护停用时段;
+|前台|
+:根据患者需求选择接诊时段;
+:同时核对牙医、诊椅及所需关键设备;
+while (任一必需资源冲突或不可用?) is (是)
+ :协调其他时段、牙医或可替代资源;
+endwhile (否)
+:确认预约并预留所需时段;
+:患者实际到诊后再次核对资源;
+if (前一患者延时或突发故障?) then (是)
+ |牙医|
+ :评估等待、换椅、换设备或改期;
+ |前台|
+ :与患者确认并通知受影响预约;
+ if (已协调出可用资源且患者继续?) then (是)
+ else (等待或改期)
+  :保留候诊或改期结果;
+  stop
+ endif
+endif
+|诊疗助理|
+:确认诊椅和器械准备状态;
+|牙医|
+:开始接诊并实际使用资源;
+:结束当前操作，确认实际使用结束;
+|诊疗助理|
+:回收器械，清洁诊椅并检查设备;
+if (发现故障或处理未合格?) then (是)
+ :停用并报告负责人;
+ |负责人|
+ :取得实际维修结果并安排复核;
+ if (故障已解除且复核合格?) then (是)
+ else (否)
+  :保持停用，明确后续责任;
+  stop
+ endif
+endif
+|诊疗助理|
+:确认准备完成，释放可用资源;
+|前台|
+:更新候诊和后续接诊安排;
+stop
+
+
+
+@enduml

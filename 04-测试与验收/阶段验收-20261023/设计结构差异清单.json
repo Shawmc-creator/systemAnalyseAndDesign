@@ -1,0 +1,734 @@
+{
+  "date": "2026-10-23",
+  "mode": "ISOLATED_SCHEMA_INVENTORY",
+  "runtimeVersion": 2026102303,
+  "liveDataTouched": false,
+  "requirementsChanged": false,
+  "modelSha256": "b65eaa2d2a7fda34e34d008c62df3514e5a4fb75847198278ae4a7392899c25d",
+  "documentTables": 77,
+  "runtimeTables": 108,
+  "matchingTableNames": 77,
+  "missingTables": [],
+  "missingFieldsInExistingTables": 18,
+  "changedFieldDefinitions": 10,
+  "primaryKeyDifferences": [],
+  "results": [
+    {
+      "table": "patient",
+      "name": "患者",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "staff",
+      "name": "职员",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "patient_change",
+      "name": "患者资料变更",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "user_account",
+      "name": "职员账号",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "dental_chair",
+      "name": "诊椅",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "dated_schedule",
+      "name": "日期安排",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "schedule_change",
+      "name": "安排变更",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "resource_occupancy",
+      "name": "接诊占用",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "appointment",
+      "name": "预约",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "appointment_change",
+      "name": "预约变更",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "visit",
+      "name": "就诊",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "clinical_equipment",
+      "name": "诊疗设备",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "resource_block",
+      "name": "资源停用时段",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "equipment_occupancy",
+      "name": "设备占用",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "health_version",
+      "name": "健康版本",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "health_item",
+      "name": "健康条目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "health_review",
+      "name": "健康复核",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "clinical_record",
+      "name": "病历",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "clinical_finding",
+      "name": "检查所见",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "record_addendum",
+      "name": "病历补充",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "clinical_document",
+      "name": "诊疗文件",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "document_version",
+      "name": "文件版本",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "prescription",
+      "name": "处方",
+      "exists": true,
+      "missingFields": [
+        "handed_over_at",
+        "handed_over_by",
+        "voided_by",
+        "original_prescription_id"
+      ],
+      "changedFields": [
+        {
+          "name": "guidance_note",
+          "differences": [
+            "nullable"
+          ]
+        }
+      ],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "prescription_item",
+      "name": "处方明细",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "dispense_record",
+      "name": "实际发药",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "treatment_plan",
+      "name": "治疗方案",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "plan_version",
+      "name": "方案版本",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "plan_item",
+      "name": "方案项目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "patient_decision",
+      "name": "患者决定",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "decision_plan_item",
+      "name": "患者决定—方案项目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "decision_file_version",
+      "name": "患者决定—确认原件",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "treatment_execution",
+      "name": "诊疗执行",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "patient_funds",
+      "name": "患者资金",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "service",
+      "name": "收费项目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "service_price",
+      "name": "价目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "bill",
+      "name": "应收账目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "bill_item",
+      "name": "应收项目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "patient_payment",
+      "name": "患者付款",
+      "exists": true,
+      "missingFields": [
+        "net_cents"
+      ],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "payment_allocation",
+      "name": "付款分配",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "prepayment_offset",
+      "name": "预付抵扣",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "payment_order",
+      "name": "电子支付单",
+      "exists": true,
+      "missingFields": [
+        "patient_funds_id"
+      ],
+      "changedFields": [
+        {
+          "name": "bill_id",
+          "differences": [
+            "nullable"
+          ]
+        }
+      ],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "payment_reconciliation",
+      "name": "收退款核对",
+      "exists": true,
+      "missingFields": [
+        "patient_payment_id"
+      ],
+      "changedFields": [
+        {
+          "name": "resolution",
+          "differences": [
+            "nullable"
+          ]
+        }
+      ],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "fee_request",
+      "name": "费用申请",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "fee_adjustment",
+      "name": "费用调整",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "fee_adjustment_item",
+      "name": "调整项目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "patient_refund",
+      "name": "退款办理",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "followup_requirement",
+      "name": "诊后要求",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "contact_history",
+      "name": "联系经历",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "clinical_assessment",
+      "name": "临床评估",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "material",
+      "name": "材料",
+      "exists": true,
+      "missingFields": [
+        "category"
+      ],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "material_batch",
+      "name": "材料批次",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "batch_change",
+      "name": "批次变更",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "stock_location",
+      "name": "存放位置",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "batch_stock",
+      "name": "批次存量",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "inventory_movement",
+      "name": "库存变动",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "material_usage",
+      "name": "实际用料",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "stock_count",
+      "name": "盘点核实",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "supplier",
+      "name": "供应商",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "purchase_order",
+      "name": "采购",
+      "exists": true,
+      "missingFields": [
+        "cancellation_reason"
+      ],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "purchase_order_item",
+      "name": "采购项目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "purchase_receipt",
+      "name": "验收",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "purchase_receipt_item",
+      "name": "验收项目",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "insurance_identity",
+      "name": "医保身份核验",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [
+        {
+          "name": "insured_person_no",
+          "differences": [
+            "nullable"
+          ]
+        },
+        {
+          "name": "valid_until",
+          "differences": [
+            "nullable"
+          ]
+        }
+      ],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "insurance_item_mapping",
+      "name": "医保项目对应",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "insurance_case",
+      "name": "医保就诊办理",
+      "exists": true,
+      "missingFields": [
+        "previous_case_id"
+      ],
+      "changedFields": [
+        {
+          "name": "result_note",
+          "differences": [
+            "nullable"
+          ]
+        }
+      ],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "insurance_fee",
+      "name": "医保费用明细",
+      "exists": true,
+      "missingFields": [
+        "is_self_pay",
+        "insurance_code_snapshot",
+        "fee_revision"
+      ],
+      "changedFields": [
+        {
+          "name": "mapping_id",
+          "differences": [
+            "nullable"
+          ]
+        },
+        {
+          "name": "preestimate_request_id",
+          "differences": [
+            "nullable"
+          ]
+        }
+      ],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "insurance_settlement",
+      "name": "医保结算",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [
+        {
+          "name": "preestimate_request_id",
+          "differences": [
+            "nullable"
+          ]
+        }
+      ],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "insurance_reversal",
+      "name": "医保撤销办理",
+      "exists": true,
+      "missingFields": [
+        "approved_by",
+        "approved_at",
+        "approval_basis",
+        "verified_by",
+        "verification_note"
+      ],
+      "changedFields": [
+        {
+          "name": "fee_request_id",
+          "differences": [
+            "nullable"
+          ]
+        }
+      ],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "insurance_fund_receipt",
+      "name": "医保结算款收付",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "fee_request_history",
+      "name": "费用申请历史",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "service_price_history",
+      "name": "价目审核历史",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "followup_history",
+      "name": "诊后要求历史",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "stock_count_history",
+      "name": "盘点核实历史",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "receipt_item_history",
+      "name": "验收项目历史",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "insurance_preestimate_history",
+      "name": "医保预结算历史",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "document_correction",
+      "name": "文件归属更正",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    },
+    {
+      "table": "prescription_review_history",
+      "name": "处方审方历史",
+      "exists": true,
+      "missingFields": [],
+      "changedFields": [],
+      "primaryKeyMatches": true
+    }
+  ],
+  "limits": [
+    "仅比较表名、列名、类型、可空、指定单列唯一、外键及主键；不验证业务语义、条件唯一或全部约束",
+    "运行库保留历史及技术表，总表数不能代表需求覆盖",
+    "规约、历史写入及设计分层仍须分别实施和验收"
+  ],
+  "schemaInventoryAligned": false
+}

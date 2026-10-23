@@ -29,11 +29,11 @@ test('empty draft cannot publish; published contents and item membership stay fr
 test('partial consent grants only explicitly selected items, withdrawal stops that scope and refuses stale decisions', t => {
   const a = setup(t), v = a.draft([{ description: '46项目', toothCode: '46', quantity: 2 }, { description: '47项目', toothCode: '47', quantity: 1 }]); a.publish(v.id);
   const [first, second] = a.info().plans[0].versions[0].items;
-  a.decide(v.id, 2, { wholeScope: false, itemIds: [first.id] });
+  a.decide(v.id, 2, { wholeScope: false, wholeItems: true, itemIds: [first.id] });
   const s = a.service();
   rejects(() => a.execute(s.id, { planItemId: second.id, toothCode: '47' }), 'CONSENT_REQUIRED');
   a.execute(s.id, { planItemId: first.id, toothCode: '46' });
-  a.decide(v.id, 3, { decision: '撤回', wholeScope: false, itemIds: [first.id] });
+  a.decide(v.id, 3, { decision: '撤回', wholeScope: false, wholeItems: true, itemIds: [first.id] });
   rejects(() => a.execute(s.id, { planItemId: first.id, toothCode: '46' }), 'CONSENT_REQUIRED');
   rejects(() => a.decide(v.id, 3), 'VERSION_CONFLICT');
   assert.equal(a.db.prepare('SELECT count(*) n FROM treatment_execution').get().n, 1);
@@ -99,7 +99,7 @@ test('cross-role, cross-patient and unassigned-clinician access is denied', t =>
 test('decision item and file collections cannot be expanded after commit', t => {
   const a = setup(t), v = a.draft([{ description: '46项目', quantity: 1 }, { description: '47项目', quantity: 1 }]); a.publish(v.id);
   const [first, second] = a.info().plans[0].versions[0].items;
-  const decision = a.decide(v.id, 2, { wholeScope: false, itemIds: [first.id] });
+  const decision = a.decide(v.id, 2, { wholeScope: false, wholeItems: true, itemIds: [first.id] });
   rejects(() => a.unit.command(a.d, 'uc22.plan', command({}), (ctx, now) => {
     insert(a.db, 'decision_plan_item', { decision_id: decision.id, plan_item_id: second.id, linked_at: now, linked_by: ctx.session.staff_id });
     return { kind: 'patient_decision', key: decision.id, revision: 1 };
@@ -108,7 +108,7 @@ test('decision item and file collections cannot be expanded after commit', t => 
 });
 test('guessed, cross-version and unverified decision sources roll back together', t => {
   const a = setup(t), v = a.draft(); a.publish(v.id);
-  rejects(() => a.decide(v.id, 2, { wholeScope: false, itemIds: [] }), 'DECISION_SCOPE');
+  rejects(() => a.decide(v.id, 2, { wholeScope: false, wholeItems: true, itemIds: [] }), 'DECISION_SCOPE');
   rejects(() => a.decide(v.id, 2, { documentVersionIds: [999999] }), 'NOT_FOUND');
   const proxy = insert(a.db, 'patient_proxy', fact(a.auth.now(), { patient_id: 1, proxy_name: '实际核验的代理人', relationship: '监护关系', scope: '自由文字并不自动授予方案决定权',
     valid_from: a.auth.now(), valid_until: null, verification_basis: '仅作隔离测试', verified_by: 4 }));

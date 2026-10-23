@@ -61,6 +61,7 @@ class Purchases {
         this.db.prepare('UPDATE purchase_receipt_item SET inspection_note=?,updated_at=?,revision=revision+1 WHERE id=?').run(content,now,r.id);
         this.db.prepare('UPDATE purchase_receipt SET updated_at=?,revision=revision+1 WHERE id=?').run(now,h.id);
         ctx.authority.receiptItemId=r.id;
+        this.unit.workflowHistory.append('purchase_receipt_item',r.id,'差异更正',note,ctx,input,now,{newly_accepted_scaled:0,inventory_movement_id:null});
         return {kind:'purchase_receipt',key:h.id,beforeRevision:h.revision,revision:h.revision+1,reason:note,changes:[{field:'item:'+r.id+':inspection_note',before:r.inspection_note,after:content}]};
       }
       const p=row(this.db,'purchase_order',input.purchaseId);revision(p,input.expectedRevision);
@@ -98,7 +99,7 @@ class Purchases {
     if(!delta) return;
     let stock=this.db.prepare('SELECT * FROM batch_stock WHERE material_batch_id=? AND stock_location_id=?').get(batchId,locationId);
     if(!stock) { const key=insert(this.db,'batch_stock',fact(now,{material_batch_id:batchId,stock_location_id:locationId,quantity_scaled:0}));stock=row(this.db,'batch_stock',key); }
-    this.inventory.movement(ctx,now,stock,{movement_type:'验收入库',delta_scaled:delta,purchase_receipt_item_id:receiptItemId,reason:'按本次新增合格认可量入库；批次放行另核实'});
+    return this.inventory.movement(ctx,now,stock,{movement_type:'验收入库',delta_scaled:delta,purchase_receipt_item_id:receiptItemId,reason:'按本次新增合格认可量入库；批次放行另核实'});
   }
   progress(purchaseId,now) {
     for(const item of this.db.prepare('SELECT * FROM purchase_order_item WHERE purchase_order_id=?').all(purchaseId)) {
@@ -140,7 +141,8 @@ class Purchases {
         for(const r of parsed) {
           const lineId=insert(this.db,'purchase_receipt_item',fact(now,{purchase_receipt_id:key,purchase_order_item_id:r.item.id,material_batch_id:r.batch.id,stock_location_id:r.location.id,
             arrived_quantity_scaled:r.qty,accepted_quantity_scaled:r.accepted,rejected_quantity_scaled:r.rejected,pending_quantity_scaled:r.pending,accepted_amount_cents:receiptAmount(r.item,r.accepted),inspection_note:r.note}));
-          this.stockAccepted(ctx,now,lineId,r.accepted,r.batch.id,r.location.id);
+          const movement=this.stockAccepted(ctx,now,lineId,r.accepted,r.batch.id,r.location.id);
+          this.unit.workflowHistory.append('purchase_receipt_item',lineId,'首次确认',r.note,ctx,input,now,{newly_accepted_scaled:r.accepted,inventory_movement_id:movement||null});
         }
         this.progress(p.id,now);this.db.prepare('UPDATE purchase_order SET updated_at=?,revision=revision+1 WHERE id=?').run(now,p.id);
         ctx.authority.purchaseId=p.id;
@@ -160,7 +162,8 @@ class Purchases {
         .run(...Object.values(after),note,now,r.id);
       const stillPending=!!this.db.prepare('SELECT id FROM purchase_receipt_item WHERE purchase_receipt_id=? AND pending_quantity_scaled>0').get(h.id);
       this.db.prepare('UPDATE purchase_receipt SET status=?,updated_at=?,revision=revision+1 WHERE id=?').run(stillPending?'部分待检':'已确认',now,h.id);
-      this.stockAccepted(ctx,now,r.id,accepted,batch.id,location.id);
+      const movement=this.stockAccepted(ctx,now,r.id,accepted,batch.id,location.id);
+      this.unit.workflowHistory.append('purchase_receipt_item',r.id,'待检后确认',text(input.inspectionNote,'后续检验依据',2000),ctx,input,now,{newly_accepted_scaled:accepted,inventory_movement_id:movement||null});
       const relatedChanges=[];
       this.progress(h.purchase_order_id,now);
       this.db.prepare('UPDATE purchase_order SET updated_at=?,revision=revision+1 WHERE id=?').run(now,h.purchase_order_id);
@@ -174,7 +177,7 @@ class Purchases {
       if(!Number.isSafeInteger(page)||page<1||!Number.isSafeInteger(size)||size<1||size>100) fail(422,'INVALID_PAGE','分页参数无效');
       const all=this.db.prepare('SELECT * FROM purchase_order ORDER BY id DESC').all().filter(p=>(input.purchaseId==null||p.id===Number(input.purchaseId))&&(input.supplierId==null||p.supplier_id===Number(input.supplierId)));
       const items=all.slice((page-1)*size,page*size).map(p=>({...p,items:this.db.prepare('SELECT * FROM purchase_order_item WHERE purchase_order_id=? ORDER BY sequence_no').all(p.id),
-        receipts:this.db.prepare('SELECT * FROM purchase_receipt WHERE purchase_order_id=? ORDER BY id').all(p.id).map(r=>({...r,items:this.db.prepare('SELECT * FROM purchase_receipt_item WHERE purchase_receipt_id=? ORDER BY id').all(r.id)})),
+        receipts:this.db.prepare('SELECT * FROM purchase_receipt WHERE purchase_order_id=? ORDER BY id').all(p.id).map(r=>({...r,items:this.db.prepare('SELECT * FROM purchase_receipt_item WHERE purchase_receipt_id=? ORDER BY id').all(r.id).map(i=>({...i,history:this.unit.workflowHistory.list('purchase_receipt_item',i.id)}))})),
         historicalReadOnly:historicalPurchase(this.db,p.id)}));
       const suppliers=this.db.prepare('SELECT * FROM supplier ORDER BY id').all().map(s=>credentials.role==='manager'?s:{id:s.id,name:s.name,contact_name:s.contact_name,phone:s.phone,is_active:s.is_active,revision:s.revision});
       ctx.authority.returnedPurchaseIds=items.map(p=>p.id);

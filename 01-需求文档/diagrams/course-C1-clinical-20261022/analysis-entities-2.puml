@@ -1,0 +1,198 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 215
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 65
+hide circle
+hide empty members
+package "健康资料与当次复核" as H {
+' @reference patient
+class "患者" as patient_h <<entity>>
+' @reference visit
+class "就诊" as visit_h <<entity>>
+class "健康版本" as health_version <<entity>> {
+ 版本号、形成时间
+ 变更原因、形成牙医
+ --
+ +建立新版(变更原因)
+ +核对患者及前版本()
+}
+class "健康条目" as health_item <<entity>> {
+ 类别、内容
+ 有／无／未知、来源
+ 报告时间、发生时间
+ --
+ +核对类别及确认程度()
+}
+class "健康复核" as health_review <<entity>> {
+ 复核结论
+ 复核牙医、实际时间
+ --
+ +核对版本与就诊归属()
+ +记录当次复核()
+}
+patient_h "1" -- "0..*" health_version
+health_version "1" *-- "0..*" health_item
+health_version "1" -- "0..*" health_review
+visit_h "1" -- "0..*" health_review
+' @reference health_version
+class "健康版本" as previous_health_version <<entity>>
+previous_health_version "前版\n0..1" -- "0..*" health_version
+patient_h -[hidden]right- visit_h
+health_version -[hidden]right- health_review
+note bottom of health_item
+未知不能记为无；新版不覆盖历史。
+复核与所据版本、就诊属于同一患者。
+end note
+}
+package "病历正文与签后补充" as R {
+' @reference visit
+class "就诊" as visit_r <<entity>>
+class "病历" as clinical_record <<entity>> {
+ 主诉、诊断、处理意见
+ 草稿／已签署、正文版本
+ 签署牙医、时间、冻结摘要
+ --
+ +核对草稿可修改性()
+ +更新草稿(当前版本)
+ +核对签署完整性(所见与复核)
+ +签署并冻结正文()
+ +建立当次草稿()
+ +核对病历患者及就诊归属()
+}
+class "检查所见" as clinical_finding <<entity>> {
+ 牙位、牙面、所见内容
+ 顺序、记录牙医
+ --
+ +核对牙位牙面()
+ +更新所见(原病历状态)
+}
+class "病历补充" as record_addendum <<entity>> {
+ 补充正文、原因
+ 签署牙医、补充时间
+ --
+ +核对原病历已签署()
+ +签署补充并保留原文()
+}
+visit_r "1" -- "1" clinical_record
+clinical_record "1" *-- "0..*" clinical_finding
+clinical_record "1" *-- "0..*" record_addendum
+clinical_finding -[hidden]right- record_addendum
+note bottom of clinical_record
+签署前核对所见和本次健康复核。
+签后仅追加独立补充，不改正文或所见；
+签署不代替实际结束、资源恢复或收费。
+end note
+}
+package "影像文书及确切原件" as D {
+' @reference patient
+class "患者" as patient_d <<entity>>
+' @reference visit
+class "就诊" as visit_d <<entity>>
+' @reference plan_version
+class "方案版本" as plan_version_d <<entity>>
+class "诊疗文件" as clinical_document <<entity>> {
+ 类型、来源、归属说明
+ 上传经办身份
+ --
+ +核对患者及诊疗归属()
+ +登记文件索引()
+}
+class "文件版本" as document_version <<entity>> {
+ 版本号、原文件名、实际格式
+ 大小、摘要、原件索引
+ 形成时间、替换原因
+ 上传人／时间、核对状态
+ 确认牙医／时间／依据
+ --
+ +核对原件格式与大小()
+ +追加版本并保留原件()
+ +确认诊疗归属(牙医与依据)
+}
+patient_d "1" -- "0..*" clinical_document
+visit_d "0..1" -- "0..*" clinical_document
+plan_version_d "0..1" -- "0..*" clinical_document
+clinical_document "1" *-- "1..*" document_version
+' @reference document_version
+class "文件版本" as previous_document_version <<entity>>
+previous_document_version "前版\n0..1" -- "0..*" document_version
+patient_d -[hidden]right- visit_d
+visit_d -[hidden]right- plan_version_d
+note bottom of document_version
+上传成功后才登记原件及索引；
+待核对不能作为已确认诊疗依据。
+替换保留旧原件及既有确认引用。
+end note
+}
+package "处方与实际发药（院内按条件启用）" as P {
+' @reference patient
+class "患者" as patient_p <<entity>>
+' @reference visit
+class "就诊" as visit_p <<entity>>
+' @reference material
+class "材料" as material_p <<entity>>
+' @reference inventory_movement
+class "库存变动" as inventory_p <<entity>>
+' @reference bill_item
+class "应收项目" as bill_item_p <<entity>>
+class "处方" as prescription <<entity>> {
+ 开立牙医、时间、取药路径
+ 草稿／已开立／已作废
+ 审核状态、审核人及意见
+ 用药指导、交付与更正依据
+ --
+ +暂存处方草稿()
+ +开立处方(就诊与权限)
+ +记录审方结果(资格与意见)
+ +核对实际发药条件()
+ +作废未交付处方(原因)
+ +核对处方就诊归属()
+}
+class "处方明细" as prescription_item <<entity>> {
+ 开立时药名规格
+ 用法用量、疗程、单位
+ 开立数量
+ --
+ +核对药品规格与用法()
+ +计算剩余可发量(实际已发量)
+}
+class "实际发药" as dispense_record <<entity>> {
+ 实际正数量、交付时间
+ 核发人、用药交代
+ --
+ +核对批次效期及可用量()
+ +登记实际交付(数量与原单)
+}
+patient_p "1" -- "0..*" prescription
+visit_p "1" -- "0..*" prescription
+prescription "1" *-- "0..*" prescription_item
+material_p "1" -- "0..*" prescription_item
+prescription_item "1" -- "0..*" dispense_record
+inventory_p "1" -- "0..1" dispense_record
+dispense_record "0..1" -- "1" bill_item_p
+patient_p -[hidden]right- visit_p
+inventory_p -[hidden]right- bill_item_p
+note bottom of dispense_record
+院内：资质与审方通过后，才按实际量发药。
+累计发药量≤有效开立量，且不超可用库存。
+发药、同源出库及费用来源共同保存；
+缺价留待核价，不能补成零价。
+院外：不产生诊所发药、出库及药品应收。
+end note
+}
+patient_h -[hidden]right-> visit_r
+patient_d -[hidden]right-> patient_p
+health_item -[hidden]down-> patient_d
+record_addendum -[hidden]down-> patient_p
+@enduml

@@ -1,0 +1,52 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 65
+skinparam ranksep 75
+hide circle
+hide empty members
+package "批准调整与原费用明细" as A {
+' @reference fee_request
+class "费用申请" as request_a <<entity>>
+' @reference bill
+class "应收账目" as bill_a <<entity>>
+' @reference bill_item
+class "应收项目" as item_a <<entity>>
+class "费用调整" as fee_adjustment <<entity>> {
+ 调整依据、生效时间
+ 批准负责人
+ --
+ +核对申请已批准且未生效()
+ +核对明细合计与批准额()
+ +确认调整及必要用途释放()
+}
+class "调整项目" as fee_adjustment_item <<entity>> {
+ 带符号调整额、原项说明
+ --
+ +核对同账原项目()
+ +核对调整后应收非负()
+}
+request_a "1" -- "0..1" fee_adjustment
+bill_a "1" -- "0..*" fee_adjustment
+fee_adjustment "1" *-- "1..*" fee_adjustment_item
+item_a "1" -- "0..*" fee_adjustment_item
+request_a -[hidden]right- bill_a
+note bottom of fee_adjustment_item
+批准调整与必要原用途释放共同生效。
+已医保结算费用先核实撤销及最终重新分摊；
+未知不确定最终退补差额，需补收转UC-13。
+仅退未用预款不形成费用调整。
+end note
+}
+@enduml

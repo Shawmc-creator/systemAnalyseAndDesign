@@ -1,0 +1,57 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam EntityBackgroundColor white
+skinparam EntityBorderColor black
+skinparam nodesep 34
+skinparam ranksep 45
+hide circle
+left to right direction
+entity "诊后要求\nfollowup_requirement" as followup_requirement {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+ source_visit_id : INTEGER <<FK>>
+ source_plan_version_id : INTEGER <<FK>>
+* responsible_frontdesk_id : INTEGER <<FK>>
+}
+entity "联系经历\ncontact_history" as contact_history {
+* id : INTEGER <<PK>>
+* followup_requirement_id : INTEGER <<FK>>
+ appointment_id : INTEGER <<FK>>
+}
+entity "临床评估\nclinical_assessment" as clinical_assessment {
+* id : INTEGER <<PK>>
+* followup_requirement_id : INTEGER <<FK>>
+ visit_id : INTEGER <<FK>>
+* assessed_by : INTEGER <<FK>>
+ responsible_staff_id : INTEGER <<FK>>
+}
+entity "预约（跨区引用）\nappointment" as appointment {
+* id : INTEGER <<PK>>
+}
+entity "患者（跨区引用）\npatient" as patient {
+* id : INTEGER <<PK>>
+}
+entity "方案版本（跨区引用）\nplan_version" as plan_version {
+* id : INTEGER <<PK>>
+}
+entity "职员（跨区引用）\nstaff" as staff {
+* id : INTEGER <<PK>>
+}
+entity "就诊（跨区引用）\nvisit" as visit {
+* id : INTEGER <<PK>>
+}
+patient ||--o{ followup_requirement
+visit |o--o{ followup_requirement
+plan_version |o--o{ followup_requirement
+staff ||--o{ followup_requirement
+followup_requirement ||--o{ contact_history
+appointment |o--o{ contact_history
+followup_requirement ||--o{ clinical_assessment
+visit |o--o{ clinical_assessment
+staff ||--o{ clinical_assessment : assessed_by
+staff |o--o{ clinical_assessment : responsible_staff_id
+@enduml

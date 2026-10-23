@@ -1,0 +1,41 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "收费人员" as C
+entity "费用与收款记录" as R
+participant "支付平台" as Pay
+C -> R : 查原项目、正式医保分摊及原付款
+R --> C : 可核对的患者当前待付
+C -> P : 核对费用及本次金额、付款方式
+P --> C : 确认现金或电子方式
+alt 现金
+ P -> C : 实际交付现金
+ C -> P : 核实实收及找零
+ C -> R : 登记实际净收和账单用途
+else 电子支付
+ P -> Pay : 确认本次原笔付款
+ C -> Pay : 核对原交易号、金额及结果
+ Pay --> C : 明确成功、失败或仍未知
+ alt 核实成功且归属金额相符
+  C -> R : 登记一次实际到账及账单用途
+ else 明确失败或仍未知
+  C -> R : 保留未付或原笔待核实
+ end
+end
+C -> P : 交付真实结果及相应凭据
+@enduml

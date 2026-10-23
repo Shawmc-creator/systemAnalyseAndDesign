@@ -1,0 +1,82 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 260
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as A
+boundary "牙医接口" as B
+control "登记实际治疗与完成项目控制" as K
+entity "患者决定" as D
+entity "诊疗执行" as E
+entity "应收项目" as F
+
+A -> B : 选择患者、进行中的就诊及治疗项目
+B -> K : 就诊、方案版本及决定范围
+activate K
+K -> K : 核验诊疗权限及实际接诊状态
+alt 方案内治疗
+ K -> D : 核对有效同意范围(时点)
+else 常规检查
+ K -> K : 核实当次常规检查的诊疗依据
+end
+K -> E : 核对实际就诊及同意范围()
+K -> E : 核对累计完成量()
+break 2a 缺少同意或超出有效范围、数量
+ K --> B : 拒绝登记；完成UC-07后回项目选择
+end
+K --> B : 本次允许范围及剩余量；常规检查显示当次依据
+A -> B : 实施治疗后记录实际牙位、操作人、时间、事实与数量
+B -> K : 实际完成；3a部分完成另记未完成说明
+K -> E : 核对累计完成量()
+K -> K : 核对实际数量、收费项目及适用价目
+K --> B : 可用价格依据，缺价则明确待核价
+A -> B : 确认实际完成及计价状态
+B -> K : 实际事实、已确认价目或待核价、本次办理号
+critical 重核同意、累计数量和唯一来源，共同提交
+ K -> K : 查原办理；同一实际执行不重复计费
+ break 当前同意范围或累计完成量已变化且无原结果
+  K --> B : 返回当前事实与范围，回项目选择
+ end
+ opt 尚未保存且条件满足
+  K -> E : 核对实际就诊及同意范围()
+  K -> E : 核对累计完成量()
+  K -> E : 登记实际完成()
+  K -> F : 核对唯一实际来源()
+  K -> F : 建立实际来源(计价状态)
+  alt 价目明确并经确认
+   K -> F : 确认计价(适用价目与依据)
+   K -> F : 计算项目金额()
+  else 4a 缺少可用价目
+   K -> K : 保留待核价，不以估算或零额代替；后续UC-11
+  end
+  K -> K : 实际执行与唯一应收来源共同保存
+ end
+end
+alt 5b 结果未知
+ K -> K : 查原执行及应收来源；已存复用，未存才重试
+ K --> B : 原结果或待核实
+else 已确认保存
+ K --> B : 实际完成及已核价金额或待核价
+end
+opt 5a 更正既有实际执行，独立办理
+ A -> B : 原执行编号、真实更正及原因
+ B -> K : 更正事实及本次办理号
+ K -> K : 核验原执行、权限及原更正结果
+ K -> E : 关联原执行更正(原因)
+ K -> K : 保留原事实，共同保存更正；费用转UC-14
+ K --> B : 更正结果；未知先查原办理
+end
+deactivate K
+
+@enduml

@@ -1,0 +1,81 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+skinparam maxMessageSize 260
+skinparam responseMessageBelowArrow true
+hide footbox
+autonumber
+actor "牙医" as A
+boundary "牙医接口" as B
+control "制定治疗方案并记录患者确认控制" as K
+entity "治疗方案" as T
+entity "方案版本" as V
+entity "方案项目" as I
+entity "患者决定" as D
+entity "患者决定—方案项目" as L
+entity "患者决定—确认原件" as F
+
+A -> B : 患者、诊断依据与治疗目标，或选择原方案修订
+B -> K : 患者及方案版本、变更原因
+activate K
+K -> K : 核验权限与患者、诊断依据
+alt 1a 修订已有方案
+ K -> T : 核对方案患者归属()
+ K -> V : 建立修订版(原版本与原因)
+ K -> K : 保留原版、原决定及实际执行
+else 新建方案
+ K -> T : 建立方案(患者与目标)
+end
+A -> B : 项目、牙位、数量、顺序、安排及估算
+B -> K : 当前版本与项目明细
+K -> I : 核对项目数量与牙位()
+K -> I : 核对估算状态()
+K -> V : 核对诊断与明细完整性()
+break 3a 依据或项目不完整
+ K --> B : 回诊断依据或项目补正，不进入确认
+end
+K -> V : 提交患者确认()
+K --> B : 待确认版本、估算及说明内容
+A -> B : 说明风险、替代方案和费用，记录依据及患者决定
+B -> K : 决定、具体版本项目范围、数量及时点
+alt 5b 撤回已有同意
+ K -> D : 追加撤回决定(范围与时间)
+ K -> K : 核实原同意及所撤范围
+else 基本同意，或5a暂缓、拒绝、部分同意
+ K -> D : 记录决定(项目范围)
+end
+K -> L : 核对同版本项目()
+K -> L : 限定本次决定范围()
+opt 有确认原件
+ K -> F : 核对原件归属及确认状态()
+ K -> F : 固定确认时原件版本()
+end
+critical 6 重核所据版本和范围，共同保存
+ K -> K : 查原办理，核对版本、决定及附件依据
+ break 6a 版本变化且无原结果，或范围不合法
+  K --> B : 保留输入，回待确认版本重新说明
+ end
+ opt 未保存且条件满足
+  K -> K : 保存方案及版本明细、患者决定与两类范围关联
+  K -> K : 撤回范围停止后续执行；保留已发生事实
+ end
+end
+alt 6a 结果未知或重复办理
+ K -> K : 先查原决定；已存复用，未存才重试
+ K --> B : 原结果或待核实
+else 已确认保存
+ K --> B : 版本及决定的实际生效范围
+end
+B --> A : 未同意项目不执行；估算不作为应收
+deactivate K
+
+@enduml

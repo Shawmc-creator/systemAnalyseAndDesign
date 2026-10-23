@@ -1,0 +1,99 @@
+{
+  "date": "2026-10-23",
+  "status": "第二十八批：D1数据映射器选型、映射取舍、处方关键保存及六处状态空引用已修；历史持久化及D2/D3继续",
+  "pdf_pages": 164,
+  "figures": 144,
+  "logical_tables": 69,
+  "logical_fields": 838,
+  "new_tables": [],
+  "new_fields": [
+    "prescription.guidance_note",
+    "prescription.handed_over_at",
+    "prescription.handed_over_by",
+    "prescription.void_reason",
+    "prescription.voided_at",
+    "prescription.voided_by",
+    "prescription.original_prescription_id",
+    "prescription.reviewed_at"
+  ],
+  "modified_tables": [
+    "document_version",
+    "prescription",
+    "prescription_item",
+    "dispense_record",
+    "service_price",
+    "patient_payment",
+    "patient_refund",
+    "stock_count",
+    "purchase_order_item"
+  ],
+  "cumulative_business_relations": 140,
+  "overall_self_references": [
+    "staff.created_by",
+    "health_version.previous_version_id",
+    "document_version.previous_version_id",
+    "prescription.original_prescription_id",
+    "plan_version.previous_version_id",
+    "treatment_execution.original_execution_id",
+    "payment_allocation.original_allocation_id",
+    "prepayment_offset.original_offset_id",
+    "patient_refund.previous_attempt_id",
+    "inventory_movement.original_movement_id",
+    "insurance_case.previous_case_id"
+  ],
+  "simple_status_references_fixed": [
+    "document_version",
+    "service_price",
+    "patient_payment",
+    "patient_refund",
+    "stock_count",
+    "purchase_order_item"
+  ],
+  "data_access_choice": "数据映射器",
+  "history_physical_design_complete": false,
+  "changed_pdf_pages": [
+    129,
+    132,
+    134,
+    149
+  ],
+  "text_changed_pages": [
+    129,
+    134,
+    149
+  ],
+  "unchanged_page_text_count": 161,
+  "selected_key_fields": 271,
+  "analysis_sources_unchanged": true,
+  "C1_classes": 69,
+  "C1_operations": 218,
+  "code_changed": false,
+  "runtime_data_changed": false,
+  "historical_sql_changed": false,
+  "github_synced": false,
+  "whole_document_course_compliant": false,
+  "remaining": [
+    "上述业务历史物理保存结构，须对应现有业务对象且保留明确原单",
+    "其他旧字段source编号",
+    "D2服务、实体和存取接口按本批选型精化，D3组件与页面",
+    "运行程序、迁移及真实业务验收另行对齐"
+  ],
+  "validation": {
+    "model_foreign_keys": "passed",
+    "all_9_regions": "passed",
+    "overall_business_FK_pairs_and_cardinality": "passed",
+    "architecture_has_separate_data_access": true,
+    "entity_direct_SQL_dependency": false,
+    "plantuml": "passed",
+    "offline_latex": "passed",
+    "layout_warnings": 0,
+    "visible_text_overlap_pairs": 0,
+    "minimum_font_pt": 9.14,
+    "all_144_figure_titles_numbers_pages_preserved": true
+  },
+  "files": {
+    "tex_sha256": "12bab8410f77cfda5158421df3f7864b57a0be6e857a63e8f006fd99c5bf1cf0",
+    "pdf_sha256": "8ca383235e15914686da967ecface79de378ca16a14c89cd9ae5cb7e2e7f58eb",
+    "logical_model_sha256": "02d03da19a60f21ee70a0c0d74b1e81e38a03a970a7576331fe8c3d6e137291f"
+  }
+}

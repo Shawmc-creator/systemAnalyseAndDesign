@@ -1,0 +1,105 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam EntityBackgroundColor white
+skinparam EntityBorderColor black
+skinparam nodesep 34
+skinparam ranksep 45
+hide circle
+left to right direction
+entity "患者\npatient" as patient {
+* id : INTEGER <<PK>>
+}
+entity "职员\nstaff" as staff {
+* id : INTEGER <<PK>>
+}
+entity "患者资料变更\npatient_change" as patient_change {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+}
+entity "职员账号\nuser_account" as user_account {
+* id : INTEGER <<PK>>
+* staff_id : INTEGER <<FK,UK>>
+}
+entity "诊椅\ndental_chair" as dental_chair {
+* id : INTEGER <<PK>>
+}
+entity "日期安排\ndated_schedule" as dated_schedule {
+* id : INTEGER <<PK>>
+* dentist_id : INTEGER <<FK>>
+* dental_chair_id : INTEGER <<FK>>
+}
+entity "安排变更\nschedule_change" as schedule_change {
+* id : INTEGER <<PK>>
+* dated_schedule_id : INTEGER <<FK>>
+* old_dentist_id : INTEGER <<FK>>
+* new_dentist_id : INTEGER <<FK>>
+* old_chair_id : INTEGER <<FK>>
+* new_chair_id : INTEGER <<FK>>
+}
+entity "接诊占用\nresource_occupancy" as resource_occupancy {
+* id : INTEGER <<PK>>
+* dated_schedule_id : INTEGER <<FK>>
+ appointment_id : INTEGER <<FK>>
+ visit_id : INTEGER <<FK>>
+}
+entity "预约\nappointment" as appointment {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+}
+entity "预约变更\nappointment_change" as appointment_change {
+* id : INTEGER <<PK>>
+* appointment_id : INTEGER <<FK>>
+* old_schedule_id : INTEGER <<FK>>
+ new_schedule_id : INTEGER <<FK>>
+}
+entity "就诊\nvisit" as visit {
+* id : INTEGER <<PK>>
+* patient_id : INTEGER <<FK>>
+ appointment_id : INTEGER <<FK,UK>>
+* dentist_id : INTEGER <<FK>>
+}
+entity "诊疗设备\nclinical_equipment" as clinical_equipment {
+* id : INTEGER <<PK>>
+ dental_chair_id : INTEGER <<FK>>
+}
+entity "资源停用时段\nresource_block" as resource_block {
+* id : INTEGER <<PK>>
+ dental_chair_id : INTEGER <<FK>>
+ equipment_id : INTEGER <<FK>>
+}
+entity "设备占用\nequipment_occupancy" as equipment_occupancy {
+* id : INTEGER <<PK>>
+* equipment_id : INTEGER <<FK>>
+ appointment_id : INTEGER <<FK>>
+ visit_id : INTEGER <<FK>>
+}
+patient ||--o{ patient_change
+staff ||--o| user_account
+staff ||--o{ dated_schedule
+dental_chair ||--o{ dated_schedule
+dated_schedule ||--o{ schedule_change
+staff ||--o{ schedule_change : old_dentist_id
+staff ||--o{ schedule_change : new_dentist_id
+dental_chair ||--o{ schedule_change : old_chair_id
+dental_chair ||--o{ schedule_change : new_chair_id
+dated_schedule ||--o{ resource_occupancy
+appointment |o--o{ resource_occupancy
+visit |o--o{ resource_occupancy
+patient ||--o{ appointment
+appointment ||--o{ appointment_change
+dated_schedule ||--o{ appointment_change : old_schedule_id
+dated_schedule |o--o{ appointment_change : new_schedule_id
+patient ||--o{ visit
+appointment |o--o| visit
+staff ||--o{ visit
+dental_chair |o--o{ clinical_equipment
+dental_chair |o--o{ resource_block
+clinical_equipment |o--o{ resource_block
+clinical_equipment ||--o{ equipment_occupancy
+appointment |o--o{ equipment_occupancy
+visit |o--o{ equipment_occupancy
+@enduml
