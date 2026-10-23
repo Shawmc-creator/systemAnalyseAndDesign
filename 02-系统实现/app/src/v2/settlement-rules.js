@@ -18,6 +18,6 @@ function validateSettlements(db){
   const paid=['payment_allocation','prepayment_offset'].flatMap(t=>db.prepare(`SELECT amount_cents FROM ${t} WHERE bill_id=?`).all(b.id)).reduce((n,r)=>n+BigInt(r.amount_cents),0n);
   if(paid+BigInt(share)>adjusted)fail(409,'INSURANCE_PATIENT_BUDGET','患者付款用途不能超过医保正式分摊后的患者承担额');
  }
- if(db.prepare(`SELECT o.id FROM payment_order o JOIN patient_payment p ON p.id=o.patient_payment_id JOIN bill b ON b.id=o.bill_id WHERE o.status='已成功' AND (p.status<>'到账已确认' OR p.net_cents<>o.amount_cents OR p.channel<>o.channel OR p.external_reference<>o.external_reference OR p.patient_funds_id<>b.patient_funds_id)`).get())fail(409,'PAYMENT_ORDER_SOURCE','支付成功结果与患者原款不一致');
+ if(db.prepare(`SELECT o.id FROM payment_order o JOIN patient_payment p ON p.id=o.patient_payment_id LEFT JOIN bill b ON b.id=o.bill_id WHERE o.status='已成功' AND (p.status<>'到账已确认' OR p.net_cents<>o.amount_cents OR p.channel<>o.channel OR p.external_reference<>o.external_reference OR p.patient_funds_id<>o.patient_funds_id OR (o.bill_id IS NOT NULL AND (b.id IS NULL OR b.patient_funds_id<>o.patient_funds_id)))`).get())fail(409,'PAYMENT_ORDER_SOURCE','支付成功结果与患者原款不一致');
 }
 module.exports={feeDigest,insuranceShare,paymentGate,feeChangeGate,validateSettlements};

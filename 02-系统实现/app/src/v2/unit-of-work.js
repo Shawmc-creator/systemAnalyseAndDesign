@@ -18,6 +18,10 @@ const RESULT_TABLES = new Set(['patient', 'dated_schedule', 'appointment', 'visi
   'clinical_equipment','resource_block','equipment_occupancy','clinical_document','document_version','prescription','dispense_record','staff_role_qualification',
   'payment_order','payment_reconciliation','cash_reconciliation','issue_followup','insurance_identity','insurance_item_mapping','insurance_case','insurance_settlement','insurance_reversal','insurance_fund_receipt']);
 const SQL_ERRORS = {
+  payment_order_context:['PAYMENT_ORDER_SOURCE','支付原单与患者资金、原账单或确认的实际付款不一致'],
+  cash_check_context:['RECONCILIATION_SOURCE','现金原款或后续核对与原记录不一致'],
+  prescription_handover:['PRESCRIPTION_HANDOVER','处方文件交付的状态、人员或时间不符，原交付事实不能覆盖'],
+  purchase_cancel_reason:['PURCHASE_CANCEL_REASON','取消采购须保存实际取消依据'],
   workflow_history_frozen:['WORKFLOW_HISTORY_FROZEN','已形成的业务历史只能追加，不能修改或删除'],
   workflow_history_context:['WORKFLOW_HISTORY_CONTEXT','历史与原业务、顺序或来源不一致，已拒绝保存'],
   financial_history_frozen:['FINANCIAL_HISTORY_FROZEN','已形成的业务历史只能追加，不能覆盖或删除'],

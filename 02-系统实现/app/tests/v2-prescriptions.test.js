@@ -29,7 +29,7 @@ test('issued prescription and drug snapshots are sealed; void retains original c
  const a=setup(t);a.review();a.record();const p=a.rxDraft();a.rxIssue(p);
  rejects(()=>a.rx({action:'save',prescriptionId:p.id,expectedRevision:2,reason:'试图覆盖'}),'PRESCRIPTION_SEALED');assert.throws(()=>a.db.prepare("UPDATE prescription_item SET directions='changed' WHERE prescription_id=?").run(p.id),/prescription_frozen/);
  assert.throws(()=>a.db.prepare("UPDATE material SET base_unit='盒' WHERE id=?").run(a.drug.id),/prescription_material_frozen/);
- a.rx({action:'void',prescriptionId:p.id,expectedRevision:2,confirmed:true,reason:'医师核实后作废，保留原方'});const old=a.prescriptions.query(a.d,a.context).prescriptions[0];assert.equal(old.status,'已作废');assert.equal(old.contentIntact,true);
+ a.rx({action:'void',prescriptionId:p.id,expectedRevision:2,confirmed:true,medicationNotDispensed:true,reason:'医师核实后作废，保留原方'});const old=a.prescriptions.query(a.d,a.context).prescriptions[0];assert.equal(old.status,'已作废');assert.equal(old.contentIntact,true);
  rejects(()=>a.rx({action:'issue',prescriptionId:p.id,expectedRevision:3,reason:'试图重新启用'}),'PRESCRIPTION_STATE');const next=a.rxDraft();assert.notEqual(next.id,p.id);assert.notEqual(a.db.prepare('SELECT record_no FROM prescription WHERE id=?').get(next.id).record_no,old.record_no);
 });
 test('outside-only guard rejects inpatient route, review and dispense without inventing a pharmacy qualification',t=>{
@@ -48,7 +48,7 @@ test('audit failure rolls back prescription header, items and successful submiss
 });
 test('export is a protected escaped record of the issued snapshot and preserves void status',t=>{
  const a=setup(t);a.review();a.record();const p=a.rxDraft({guidanceNote:'<script>unsafe</script> & 医师指导'});rejects(()=>a.prescriptions.export(a.d,p.id),'PRESCRIPTION_STATE');a.rxIssue(p);const copy=a.prescriptions.export(a.d,p.id);assert.match(copy.html,/&lt;script&gt;unsafe&lt;\/script&gt;/);assert.equal(copy.html.includes('<script>'),false);assert.match(copy.html,/院外取药/);assert.match(copy.html,/医师填写的演示用法/);
- a.rx({action:'void',prescriptionId:p.id,expectedRevision:2,confirmed:true,reason:'核实后作废'});assert.match(a.prescriptions.export(a.d,p.id).html,/状态：已作废/);
+ a.rx({action:'void',prescriptionId:p.id,expectedRevision:2,confirmed:true,medicationNotDispensed:true,reason:'核实后作废'});assert.match(a.prescriptions.export(a.d,p.id).html,/状态：已作废/);
 });
 function legacyResource(folder){const file=path.join(folder,'known-88.db'),db=new DatabaseSync(file);db.exec(fs.readFileSync(path.join(DESIGN_DIR,'SQLite-建表设计.sql'),'utf8'));db.exec('PRAGMA application_id=0x51484432');upgradeResources(db,':memory:');db.close();return file;}
 function folder(t){const f=fs.mkdtempSync(path.join(os.tmpdir(),'clinic-rx-'));t.after(()=>{assert.ok(path.resolve(f).startsWith(path.join(os.tmpdir(),'clinic-rx-')));fs.rmSync(f,{recursive:true,force:true});});return f;}

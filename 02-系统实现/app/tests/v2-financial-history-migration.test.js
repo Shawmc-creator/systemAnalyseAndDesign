@@ -19,7 +19,7 @@ function legacy(t){
 }
 test('100-table upgrade preserves all facts through the financial and workflow history migrations, preserves all existing facts and takes one readable old-version backup',t=>{
  const f=legacy(t),db=f.track(openDatabase(f.file));assert.equal(db.prepare('PRAGMA user_version').get().user_version,VERSION);
- for(const[name,rows]of f.original)assert.equal(JSON.stringify(db.prepare('SELECT * FROM "'+name+'" ORDER BY rowid').all()),rows,name);
+ for(const[name,rows]of f.original){const old=JSON.parse(rows),fields=old.length?Object.keys(old[0]):[];assert.equal(JSON.stringify(db.prepare('SELECT * FROM "'+name+'" ORDER BY rowid').all().map(r=>fields.length?Object.fromEntries(fields.map(k=>[k,r[k]])):r)),rows,name);}
  for(const name of ['fee_request_history','service_price_history'])assert.equal(db.prepare('SELECT count(*) n FROM '+name).get().n,0,'old events must not be fabricated');
  assert.equal(db.prepare("SELECT count(*) n FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get().n,108);assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
  const backups=fs.readdirSync(path.join(f.folder,'backups'));assert.equal(backups.length,1);

@@ -1,0 +1,704 @@
+{
+  "date": "2026-10-23",
+  "requirementsUnchanged": true,
+  "originalSqlUnchanged": true,
+  "automatedTests": 352,
+  "uiScenarios": 11,
+  "textHashPolicy": "sha256 records exact local bytes; sha256_lf supports Git CRLF/LF normalization",
+  "files": [
+    {
+      "path": "01-需求文档/数据层设计/SQLite-建表设计.sql",
+      "sha256": "6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d",
+      "sha256_lf": "6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d"
+    },
+    {
+      "path": "01-需求文档/牙科诊所管理系统-需求文档.pdf",
+      "sha256": "3477884aef8708bd18b3a7e9d570ec36b4d98550ede880c62dfb5f90408840c9"
+    },
+    {
+      "path": "01-需求文档/牙科诊所管理系统-需求文档.tex",
+      "sha256": "4ee783d58bd4aaf28f4e9f36077e91b65adf1bf92adbc19ceea7fbd1df829c52",
+      "sha256_lf": "374518465f0f89544226123b6331a78fb51661754e70a1f0e99f9bec2d0e3234"
+    },
+    {
+      "path": "01-需求文档/设计交付/核心业务数据模型.json",
+      "sha256": "b65eaa2d2a7fda34e34d008c62df3514e5a4fb75847198278ae4a7392899c25d",
+      "sha256_lf": "ef47c8d42cad03298af8e9da58db489bada74f522389e58026d23fb5ac3f757a"
+    },
+    {
+      "path": "02-系统实现/app/package.json",
+      "sha256": "8fcb4bd658f1d314829fb278e64de6f8b846b0e9ba95768b1c43cbee91b71d83",
+      "sha256_lf": "5f03ca1791201a44c6ad67fa881d01960c198a30953a3ab0d73ce4ceef72a3f0"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/app.js",
+      "sha256": "b8766df5b398e27b441c4096fdb6a13fe873461b8e8f3f6246427d9185246fe1",
+      "sha256_lf": "01bc3c30042dde3c6da21d2651beda9060b83d12bb1bd479d5aac97d3cee9193"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/catalog.js",
+      "sha256": "d036c87c10088151213cf45fbfb1ee211d5c91bc20ff0c3b76197efc5c00041d",
+      "sha256_lf": "c8c7876c29f6aab10de28a2f10aec5af912010ffb9ab9b0393137d9fd7ea04bf"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/clinical.js",
+      "sha256": "19e3af8ee3cdd9dd96867c62dcc8a7fe95a7a95a2428892e5b63a7c462b2642a",
+      "sha256_lf": "f49854dabf3a90c5a9e6ad883bc9bf969a67cf3e70463b2e317e04a85afd4daf"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/documents.js",
+      "sha256": "50ca111916efb78f382143ce9fb381871835ade770082a6ab4ff2d6cb0af639e",
+      "sha256_lf": "369858bb8221ccba598d2036b5d685047153902ecf38c858fb9880b3a02d7b18"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/finance.js",
+      "sha256": "ee0e91f07d782261eaf0a1c0d0e705afb7d690f20a23366c5855055f1348e358",
+      "sha256_lf": "8798e461a5f3b18275d6ebf32adedd4b7e6e04153ec33231bc9183168d817d46"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/followups.js",
+      "sha256": "a23739634908f9fe2dbbb583c41e0df62f9dcc8ec757ae97dfb46c65ef2b7197",
+      "sha256_lf": "4e6d72d2a3369de3fa5acf7e455c12793f292e93b20318bfddff0ae78288f4a8"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/index.html",
+      "sha256": "30c4f55e2f5e9af6dbbb4dcce22c44b22f53471e01779d6774e52ef6dc75bde8",
+      "sha256_lf": "8874ef4b81e0f27f67147934da90883717960a33c72b823d795cfce7bb0d209a"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/insurance.js",
+      "sha256": "7e51540c58987a9c85d71f4b225a4a1ef2c9ea4aff03eab488b79e744dd5c9f5",
+      "sha256_lf": "222d500bfef7474d58cf70c027d2c728b37252cb3a6e4f2f1580b45e22a12672"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/inventory.js",
+      "sha256": "09666563b4baf5f3fe7611fcdd181005b46b3574dac261476e148e7e5f54978d",
+      "sha256_lf": "6419ca8eb9c78344da91cfcb1da66d22555aaeb4eaba469ced1bbca8bae74e74"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/pharmacy.js",
+      "sha256": "125b667596f6dac0db68bd7e10842aa0b26095c586ff1e8a6259ed23dfbd8282",
+      "sha256_lf": "a8f13a9024b404e6e9877f6284121c0033f7b1dc8cbdde30996f143699bd1fac"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/prescriptions.js",
+      "sha256": "c1098c2dbda203fb874950ba426b63921d96b534ab67395a47d2f2830b6dbf24",
+      "sha256_lf": "959bba0347ad9a1e46f637570d24ff30e77be231a10c057e3334e370ed702a3b"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/settlements.js",
+      "sha256": "daad5391028dd8ad28dc4d3b3cdd10ee52f02e156bde9480b28e4b4572f16895",
+      "sha256_lf": "4c7b1a36f2be00f741cb03c60ca3a69f49be4c9dcb38ca9a0ecc8c775b1063e0"
+    },
+    {
+      "path": "02-系统实现/app/public/v2/styles.css",
+      "sha256": "7621c8343027efa3a91b438e236954250b9ea1d90825e25fb9c2ccd6749dc4ac",
+      "sha256_lf": "850464efca408dc30283d90333a1cf0cbd2fd5adc1f3af6376806a0abd927035"
+    },
+    {
+      "path": "02-系统实现/app/scripts/acceptance.js",
+      "sha256": "2a7d72691e87563a78d916f1f4d172b9798ba76f671dd9ac413c9d315ec280ad",
+      "sha256_lf": "a4b00bc9cdbafbeebe1a109a6572da105eba48206ac9d4a603f6916b5ebcd879"
+    },
+    {
+      "path": "02-系统实现/app/scripts/audit-v2-design.js",
+      "sha256": "2870c9acd56e9ed9b62edf433c54358527b232fa357229deddcf70d78e909313",
+      "sha256_lf": "3e22278dff4eb245409da2fa4811cb98b946904df0b00dd7be5003c28e1b6751"
+    },
+    {
+      "path": "02-系统实现/app/scripts/backup-v2.js",
+      "sha256": "6bc5b3b22358cf3c39a4633adccd5f0b156aaac86333bc172831dda83554c508",
+      "sha256_lf": "6bc5b3b22358cf3c39a4633adccd5f0b156aaac86333bc172831dda83554c508"
+    },
+    {
+      "path": "02-系统实现/app/scripts/backup.js",
+      "sha256": "763437e36590a170876bf2897978a751e78fffe1b0934febfb848fa7554cbc4b",
+      "sha256_lf": "763437e36590a170876bf2897978a751e78fffe1b0934febfb848fa7554cbc4b"
+    },
+    {
+      "path": "02-系统实现/app/scripts/check-delivery.js",
+      "sha256": "44c360453307c517e1b5bdf30c4384502a05bbf11b1715d702fee29e7006334d",
+      "sha256_lf": "44c360453307c517e1b5bdf30c4384502a05bbf11b1715d702fee29e7006334d"
+    },
+    {
+      "path": "02-系统实现/app/scripts/check-v2-clinical-alignment-ui.cjs",
+      "sha256": "052506f63cd77ac0a805af0b7e1e0aeb8712c286ae84f46b3086a25fc3ae1ad0",
+      "sha256_lf": "f0dfbaf8f4484dedc7dd956570ab767ed6417f53ed33525e1c5aed8bca2a59aa"
+    },
+    {
+      "path": "02-系统实现/app/scripts/check-v2-fee-history-ui.cjs",
+      "sha256": "5600363de7b0be80bc16d38dd99ed635b7c9606550d4c20cce9cc1b9408f1c1e",
+      "sha256_lf": "44912be6ac7ac5b79af85187ce5525628450f0c17406c540e207490ff46d84e6"
+    },
+    {
+      "path": "02-系统实现/app/scripts/check-v2-migration.js",
+      "sha256": "edc351e8b692b6c5bb947d67a27e481a6a8601b9be7cd4b2b29c7f2b81d5c65a",
+      "sha256_lf": "edc351e8b692b6c5bb947d67a27e481a6a8601b9be7cd4b2b29c7f2b81d5c65a"
+    },
+    {
+      "path": "02-系统实现/app/scripts/check-v2-payment-prescription-ui.cjs",
+      "sha256": "759aab98ab8c10d8fc009a86fcac73671104ee2b738916b63f34a4a8cdf4f192",
+      "sha256_lf": "759aab98ab8c10d8fc009a86fcac73671104ee2b738916b63f34a4a8cdf4f192"
+    },
+    {
+      "path": "02-系统实现/app/scripts/check-v2-settlements-ui.cjs",
+      "sha256": "bb8d149db26f318cec54859a88986a91c4892d4b2b1b37a63342d4a1b22a5b94",
+      "sha256_lf": "a2f1603d96a96f1561cc485b8adac96e60674479d7317efc21dfd2d8a74c181e"
+    },
+    {
+      "path": "02-系统实现/app/scripts/check-v2-workflow-history-ui.cjs",
+      "sha256": "90b59d1866b1a15836450a71c6f0da308e44a852e69c2eda740170e9b53a0abe",
+      "sha256_lf": "90b59d1866b1a15836450a71c6f0da308e44a852e69c2eda740170e9b53a0abe"
+    },
+    {
+      "path": "02-系统实现/app/scripts/demo-v2-fees.js",
+      "sha256": "fd53e39ff337b58bb4df5c8d5371c28189f44a1fd091531ff85b2fdbac6dc590",
+      "sha256_lf": "fd53e39ff337b58bb4df5c8d5371c28189f44a1fd091531ff85b2fdbac6dc590"
+    },
+    {
+      "path": "02-系统实现/app/scripts/demo-v2-followups.js",
+      "sha256": "90aa66d988921133d3245fe4470b39033f8331344f5a18b57ee4ac6d9df15415",
+      "sha256_lf": "90aa66d988921133d3245fe4470b39033f8331344f5a18b57ee4ac6d9df15415"
+    },
+    {
+      "path": "02-系统实现/app/scripts/demo-v2-inventory.js",
+      "sha256": "d7290bb446499b8304142a8a0114507c98be9b143e673309f602361b06329bf6",
+      "sha256_lf": "d7290bb446499b8304142a8a0114507c98be9b143e673309f602361b06329bf6"
+    },
+    {
+      "path": "02-系统实现/app/scripts/demo-v2-resources.js",
+      "sha256": "dcd921dc735c4a79130517b26eaf25a6c6971025938e0b6a2089e9bfe5926e2a",
+      "sha256_lf": "dcd921dc735c4a79130517b26eaf25a6c6971025938e0b6a2089e9bfe5926e2a"
+    },
+    {
+      "path": "02-系统实现/app/scripts/demo-v2-settlements.js",
+      "sha256": "9303234cd5d34ed110078cc27f5e42ff7569328d838114493a559a665e103581",
+      "sha256_lf": "9303234cd5d34ed110078cc27f5e42ff7569328d838114493a559a665e103581"
+    },
+    {
+      "path": "02-系统实现/app/scripts/demo-v2-treatment.js",
+      "sha256": "1497edf46725f36fe4c2eca3a3fde9117f9ac643333afc4bcbb7a06de21b6fda",
+      "sha256_lf": "1497edf46725f36fe4c2eca3a3fde9117f9ac643333afc4bcbb7a06de21b6fda"
+    },
+    {
+      "path": "02-系统实现/app/scripts/export-demo.js",
+      "sha256": "f844714d93a4f639c9d59a5f4a7abae5a781c976e9906843559a0e71d844d885",
+      "sha256_lf": "562689c30d418667ae0d640329d005cf764176fde2604cd5dfc44ca01939244f"
+    },
+    {
+      "path": "02-系统实现/app/scripts/lib/v2-backup.js",
+      "sha256": "be5e58fbfffd95fc34b60c8ce1a464a585290e49bc9da037a6ebd39d953b0dc8",
+      "sha256_lf": "be5e58fbfffd95fc34b60c8ce1a464a585290e49bc9da037a6ebd39d953b0dc8"
+    },
+    {
+      "path": "02-系统实现/app/scripts/run-demo-workflow.js",
+      "sha256": "71e664ec71c6fb27f58a6c69a0e4d5aea81be0219b34532732f19c458759dd4b",
+      "sha256_lf": "b8e794dd8bec2c0af7fd5d40b8869df3ca10bb2673bd4c7757057bbd5ae6a25c"
+    },
+    {
+      "path": "02-系统实现/app/scripts/seed-attachment-demo.js",
+      "sha256": "bdfe5aaf63acb0fa1432b31dcdb793f67d0624b0902a068180522a241a21666f",
+      "sha256_lf": "bdfe5aaf63acb0fa1432b31dcdb793f67d0624b0902a068180522a241a21666f"
+    },
+    {
+      "path": "02-系统实现/app/scripts/seed-demo.js",
+      "sha256": "e7681022610c49bd4c031f7d8068e3f51b6ac9673e6f4f0d20e9cae20fa57e70",
+      "sha256_lf": "b77db5df8bfbd55e44684b2f3f83f5641079b166ecfc549ffd0a70f7e67a5643"
+    },
+    {
+      "path": "02-系统实现/app/scripts/serve-v2-business-demo.js",
+      "sha256": "1f1476f8c67899201ab0ccaf697532bfe65b8633e93a7e7a64c565e1e5efae64",
+      "sha256_lf": "1f1476f8c67899201ab0ccaf697532bfe65b8633e93a7e7a64c565e1e5efae64"
+    },
+    {
+      "path": "02-系统实现/app/scripts/smoke-http.js",
+      "sha256": "1431c9b1211edc7d1fd133e92a5042e6d994b3074f906e39ef45d3ca5d3a2415",
+      "sha256_lf": "37953eb2c8c57d143f3fa7747ba99026d2bc6bf7024bf9d5aeff5b64c6166a87"
+    },
+    {
+      "path": "02-系统实现/app/scripts/start-v2.js",
+      "sha256": "b3a95631174e00b66403bd4885765a23ebd776ad870fb792eac89db76e36854f",
+      "sha256_lf": "5995a78d0dd160b0a3c79ecaab9a0b45fffa5a78f165e2dcbdf1ff5a01035487"
+    },
+    {
+      "path": "02-系统实现/app/scripts/verify-backup-v2.js",
+      "sha256": "62fa4bd691847d5590625614b756d2ecaae084e47121adf6378ef436b6d737ae",
+      "sha256_lf": "62fa4bd691847d5590625614b756d2ecaae084e47121adf6378ef436b6d737ae"
+    },
+    {
+      "path": "02-系统实现/app/scripts/verify-backup.js",
+      "sha256": "84690ceb3f161180bda2420ec7d62db899e54f86515681f5a5aa8d54ec3a2b5f",
+      "sha256_lf": "a3ac3661e2791117c754f60362412449f520b589f97c4978a1ba3a1f5a5fc184"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/auth.js",
+      "sha256": "86c3546703591f3727af618a26de763c217e2908b98027b230cfc62b1a3425da",
+      "sha256_lf": "86c3546703591f3727af618a26de763c217e2908b98027b230cfc62b1a3425da"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/billing.js",
+      "sha256": "d7a3ade7e5108931d1314404c90385a90f6cee8aa9465a549bf9b4266ebce4d2",
+      "sha256_lf": "2ca217efb6329d32618ebe961e862fe6b02687e331722a8f4f00b8d53fd088a0"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/clinical-gates.js",
+      "sha256": "78d3b242fbde1e3113a0b58b9912b576f124f08f3796d3913898eed49dda28d1",
+      "sha256_lf": "78d3b242fbde1e3113a0b58b9912b576f124f08f3796d3913898eed49dda28d1"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/clinical-schema.js",
+      "sha256": "890a3d76b2514eeb32776f00ab59bc9ad6fe3b5172234cc62e63bd006e561362",
+      "sha256_lf": "11dce9cea530ffd606769de2cff10041edb5a41231e756785dbc0fc503beeef1"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/clinical.js",
+      "sha256": "0d7c5797c70837283116ae8afca808879fc95746c3406ffde1b00e63caa8db39",
+      "sha256_lf": "b9529974b8e6765e9a4869274e2c9de39b328e8b33ed96ee0b27e90bb7a00929"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/common.js",
+      "sha256": "5cc9176e9eeb980b01939ee57815191ab71c873265c7a8c06d822d6c71938683",
+      "sha256_lf": "5cc9176e9eeb980b01939ee57815191ab71c873265c7a8c06d822d6c71938683"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/database.js",
+      "sha256": "0e1626d6c3f6f9c663f968f21261b17715816b03f763f517c30932afff092657",
+      "sha256_lf": "0e1626d6c3f6f9c663f968f21261b17715816b03f763f517c30932afff092657"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/demo.js",
+      "sha256": "abe1bf339dd616268250cee99e34736c1b935017dcd8ec584a6adfb8eb58e043",
+      "sha256_lf": "abe1bf339dd616268250cee99e34736c1b935017dcd8ec584a6adfb8eb58e043"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/document-store.js",
+      "sha256": "6d1e2baf59069a8d1c21891dc8ebabde5de4ae57ddbc86844499f7187099272f",
+      "sha256_lf": "6d1e2baf59069a8d1c21891dc8ebabde5de4ae57ddbc86844499f7187099272f"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/documents.js",
+      "sha256": "cfcee56b282905f8015874fdb1e05e06860e3c3d1c5c3a5b0a324b68d700b727",
+      "sha256_lf": "8948f159a6733a9c98e08a09f6b20d83c99f186dbc67a6c24d0f17cea89a84ae"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/fee-gates.js",
+      "sha256": "79da5e683eff0fc0f865354a0afcb78f973e493d72d5b25203dcccaf86c16aa2",
+      "sha256_lf": "79da5e683eff0fc0f865354a0afcb78f973e493d72d5b25203dcccaf86c16aa2"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/fees.js",
+      "sha256": "e5b59b13e0014482d203fa9768fb2d0484761fc832f30967c66ee489cc2f8b46",
+      "sha256_lf": "9cdc1a6b808da38888e6f4915b1abca892ab317370dc5f486ffcf43064ddffb6"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/financial-history-schema.js",
+      "sha256": "64f8aaa24afdb1cc277548767ce4cc45f20796d749e512b0331c4fd943e46dbb",
+      "sha256_lf": "2ea201a51edfc3030f03f5cfbe3487ec4fdf7f6ea1d932ff1312e1b611a7662b"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/financial-history.js",
+      "sha256": "86e2f4ba8a2fe57acb9c692997a6e1dcbaacbd076f40652d13632f152e443b93",
+      "sha256_lf": "86e2f4ba8a2fe57acb9c692997a6e1dcbaacbd076f40652d13632f152e443b93"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/followup-rules.js",
+      "sha256": "6900c1460ffa6456bec26b1cdd52748d85f3454f9336d6b23f6f644ccb37a2c2",
+      "sha256_lf": "6900c1460ffa6456bec26b1cdd52748d85f3454f9336d6b23f6f644ccb37a2c2"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/followups.js",
+      "sha256": "7003a3c6f9cfd4033f85c85202da70aa9862776e1900b425bd739457777768bd",
+      "sha256_lf": "ece36dfd82fb4c6872ad0f4aac4106ab92557514975cbd90b781c1759c09b771"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/insurance-policy.js",
+      "sha256": "a97812b7796d8447a29f6d9ac8f54680d2743478ad2c90eeeecf89d71bd7e4a5",
+      "sha256_lf": "a97812b7796d8447a29f6d9ac8f54680d2743478ad2c90eeeecf89d71bd7e4a5"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/insurance.js",
+      "sha256": "f0cc0b4c7e226d5d75cad6723872d3d9fdd5963ee7a367821664a9f9a0f00704",
+      "sha256_lf": "d9295447d071898468f3c28adce7ed1db792b713b3fcabd367f9be1d59d17cd1"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/inventory-gates.js",
+      "sha256": "ad725fc39fb624a3755d71135c8b2c24fde877762e183c517c70b5167b31963a",
+      "sha256_lf": "ad725fc39fb624a3755d71135c8b2c24fde877762e183c517c70b5167b31963a"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/inventory.js",
+      "sha256": "acf867cf92f86683edce18c07884544c606621ee4501a951a18bff1d9bd0ae90",
+      "sha256_lf": "d8065f2afd944de98cb0d740798cd90a1c9b18d44ce09c1cb5cce2e8a2e27e1e"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/legacy-scope.js",
+      "sha256": "5035928af763279ceea6983498ae7d89d09ea7a9f5c39b48aa5da18f01712daa",
+      "sha256_lf": "5035928af763279ceea6983498ae7d89d09ea7a9f5c39b48aa5da18f01712daa"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/payment-prescription-schema.js",
+      "sha256": "acf891c119639e2e3334d93cf432c8fc98192ef57debcb770f3de5c9760c0673",
+      "sha256_lf": "acf891c119639e2e3334d93cf432c8fc98192ef57debcb770f3de5c9760c0673"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/payments.js",
+      "sha256": "ea072df5430eafef9d2774af43448f6ba0219a67256559052938c2acfad5f7ed",
+      "sha256_lf": "ea072df5430eafef9d2774af43448f6ba0219a67256559052938c2acfad5f7ed"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/pharmacy-policy.js",
+      "sha256": "181369ee46a57422066ac148634b3e3a4bdc24866f47cd5b1a75409b7b445c94",
+      "sha256_lf": "181369ee46a57422066ac148634b3e3a4bdc24866f47cd5b1a75409b7b445c94"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/pharmacy-schema.js",
+      "sha256": "df9360f71b01d1077cfde7b6d2acc1c3c8abb38f55ff545caa14dbf6a89a972b",
+      "sha256_lf": "df9360f71b01d1077cfde7b6d2acc1c3c8abb38f55ff545caa14dbf6a89a972b"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/pharmacy.js",
+      "sha256": "83d0e78a8fde0bff57ec17c48958aeb39cdcce70831b8857638f53985ba0313a",
+      "sha256_lf": "0cf7c42544d6ce195c576bb2ca0829b61b7fc5aaae48f0b641194534889dc492"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/prescription-schema.js",
+      "sha256": "a620b1a3163660596beec468e4393a0d21dec6dcf946ad471948d7705bb4fb4f",
+      "sha256_lf": "a620b1a3163660596beec468e4393a0d21dec6dcf946ad471948d7705bb4fb4f"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/prescriptions.js",
+      "sha256": "9ade011a54d5dbe36db3ccc23ccb14564b3396ed1af881dea1f5834ae6b2a319",
+      "sha256_lf": "b847242b6b7533123d4b160964db284f0c5bd54555d20529e214ddd13073a2a7"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/purchases.js",
+      "sha256": "e56e6080611844c224b754a729672bd70b0154ca73cb245844cbfdce2ba200f8",
+      "sha256_lf": "dbbbe25868ed08ba95cf71cb4611c15bef8cd928d1a8541abaefdd14ac49076a"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/reception.js",
+      "sha256": "dff362b82827958d39c26061090a48d7e8cacf3d2e095f688dec68abd3c681f8",
+      "sha256_lf": "dff362b82827958d39c26061090a48d7e8cacf3d2e095f688dec68abd3c681f8"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/resource-rules.js",
+      "sha256": "e5292c785e87be458f7c3f12fa18e26addddf2e37371c434c223c74e87e00b4c",
+      "sha256_lf": "e5292c785e87be458f7c3f12fa18e26addddf2e37371c434c223c74e87e00b4c"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/resource-schema.js",
+      "sha256": "d2644d624484f4d8ab0fb294997dfd03f4f485992462409e44fbcfab9c9cd8f8",
+      "sha256_lf": "d2644d624484f4d8ab0fb294997dfd03f4f485992462409e44fbcfab9c9cd8f8"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/resources.js",
+      "sha256": "80fe0bbfdfa55bf3ec1da7396b2a8998f53fe7a84116d244e562ff9977a4f442",
+      "sha256_lf": "80fe0bbfdfa55bf3ec1da7396b2a8998f53fe7a84116d244e562ff9977a4f442"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/server.js",
+      "sha256": "0585130341002f5185e735cee10206bc5fe13408a200d3b0c59fae68eff53875",
+      "sha256_lf": "f037fc978c477ae15ea2a1a4b1d2e26be6d01da066423aa74d730d15b0c0f0e3"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/settlement-rules.js",
+      "sha256": "8bd3c4ee6d6d9c3b864c94b5f1f3848282a5d503c3a07001e32e287370a54449",
+      "sha256_lf": "c03dac780e6db8f5775afc0df3e73df7fc5848760c61e61699a0f61bd8bd9359"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/settlement-schema.js",
+      "sha256": "e7e6357bb5e48ab278d7ccb7298aaf481ba39520a4c978789c5229ef407e1642",
+      "sha256_lf": "e7e6357bb5e48ab278d7ccb7298aaf481ba39520a4c978789c5229ef407e1642"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/settlements.js",
+      "sha256": "c97d52523a82803969ac8291462d65ea66b9c2c4b4ef96ccddfa6137174d5da3",
+      "sha256_lf": "08960ddab3f02f4f3abb1db697ae5de89fad007051f819c1e9cc2a06c933c1c9"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/treatment-gates.js",
+      "sha256": "017a6e27a76d9b07801e084ac0151f4ea0260ec5278f1851653afa4752171af9",
+      "sha256_lf": "017a6e27a76d9b07801e084ac0151f4ea0260ec5278f1851653afa4752171af9"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/treatment.js",
+      "sha256": "16077d1ec9df02697d3bb2ebd6bfe4b74c94e4bb1f66b173f6fd67f894365653",
+      "sha256_lf": "16077d1ec9df02697d3bb2ebd6bfe4b74c94e4bb1f66b173f6fd67f894365653"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/unit-of-work.js",
+      "sha256": "177af33c09e5ccfec0523e5aeb0036d3c977d86ef49d32347435ad2248981925",
+      "sha256_lf": "9ba56357b1fc856c3789f472507dc95a1e9f99778d92bb8fcfb5940f62d33895"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/workflow-history-schema.js",
+      "sha256": "87235161527136a8bc8ef0eda8789e46dd217c1df796232dbc0358b6062dae9a",
+      "sha256_lf": "78a8c8a9509080cb0132d090aa5e16e0fd660fa16e199b8d40d54769478bdc93"
+    },
+    {
+      "path": "02-系统实现/app/src/v2/workflow-history.js",
+      "sha256": "1164c7f8da73dcbe1d719babb179d1e9bab7bf4e1d8ce9cbf227065d9e16c1be",
+      "sha256_lf": "1164c7f8da73dcbe1d719babb179d1e9bab7bf4e1d8ce9cbf227065d9e16c1be"
+    },
+    {
+      "path": "02-系统实现/app/tests/appointments-requirements.test.js",
+      "sha256": "957ff334b91de7d31c37f7b78df319acd654e1ae8f5bb50133b8b03984bb019c",
+      "sha256_lf": "0df411e2aa3f183e57576168f447e35bec0d9ece9af0a69a3b5a4199d9b11568"
+    },
+    {
+      "path": "02-系统实现/app/tests/core.test.js",
+      "sha256": "b16485b90eb244b0d1306a7fbd2dfce122f6613e57ab46b2c6d46cbd67097d7f",
+      "sha256_lf": "86a29012d9fb188131c7347d226360c60d88f488a1e6514cc65b8f3c9744eec3"
+    },
+    {
+      "path": "02-系统实现/app/tests/helpers/v2-fees.js",
+      "sha256": "eb8e1891d904ecb6725ae483f65b3cf12b2bf4213398922d685ad411f37bbeaa",
+      "sha256_lf": "4f78cee97d57ceeda4314f3c10f572baf6d7358612abedf94726ba82f7fbdfe2"
+    },
+    {
+      "path": "02-系统实现/app/tests/helpers/v2-followups.js",
+      "sha256": "365a27b1dafed1ffba3d27f5fa5a930dae075d430ea6b7b7c7924d430e1fd2ed",
+      "sha256_lf": "365a27b1dafed1ffba3d27f5fa5a930dae075d430ea6b7b7c7924d430e1fd2ed"
+    },
+    {
+      "path": "02-系统实现/app/tests/helpers/v2-inventory.js",
+      "sha256": "1edc46fe74fdbea7d42f078af0d556eb6321124c017ab4822ec4c787b45dd315",
+      "sha256_lf": "1edc46fe74fdbea7d42f078af0d556eb6321124c017ab4822ec4c787b45dd315"
+    },
+    {
+      "path": "02-系统实现/app/tests/helpers/v2-payment-prescription-legacy.js",
+      "sha256": "9c8e42e4587d5bf6267c03823ed2ba94bedd3f3776dd78b1b1e5a5349495d7fc",
+      "sha256_lf": "9c8e42e4587d5bf6267c03823ed2ba94bedd3f3776dd78b1b1e5a5349495d7fc"
+    },
+    {
+      "path": "02-系统实现/app/tests/helpers/v2-pharmacy.js",
+      "sha256": "b991783cf29369715b8ea7b7b53d23387c625019dbc12c56d176d631e04d11e1",
+      "sha256_lf": "4879a456f02fb636d4884bac0e52777bfae6f79464488796360ce94c31cb165c"
+    },
+    {
+      "path": "02-系统实现/app/tests/helpers/v2-prescriptions.js",
+      "sha256": "46ed7ce7a5258ace75fff05d0c5f06893639fce5fc5d5aac7cb2a03e89ae512a",
+      "sha256_lf": "46ed7ce7a5258ace75fff05d0c5f06893639fce5fc5d5aac7cb2a03e89ae512a"
+    },
+    {
+      "path": "02-系统实现/app/tests/helpers/v2-settlements.js",
+      "sha256": "6d45038eb568570a04051ed59468b8c3760bb7d94b33ddfd7ba67521b1c6e5b4",
+      "sha256_lf": "6d45038eb568570a04051ed59468b8c3760bb7d94b33ddfd7ba67521b1c6e5b4"
+    },
+    {
+      "path": "02-系统实现/app/tests/helpers/v2-treatment.js",
+      "sha256": "e1f1c1f23a9f3aa1bffe61b9b3edb6928b50d107fc109e8d308034e8a778d9ce",
+      "sha256_lf": "e1f1c1f23a9f3aa1bffe61b9b3edb6928b50d107fc109e8d308034e8a778d9ce"
+    },
+    {
+      "path": "02-系统实现/app/tests/helpers/v2-workflow-legacy.js",
+      "sha256": "6d84bd9d219787f6a239f2249c4f959c083cffec0ccbcbac1e4e6648e3e0d706",
+      "sha256_lf": "6d84bd9d219787f6a239f2249c4f959c083cffec0ccbcbac1e4e6648e3e0d706"
+    },
+    {
+      "path": "02-系统实现/app/tests/http-exceptions.test.js",
+      "sha256": "c72bbe64fd519b3e7727509ec44dcb3126cc43737118922884b3ce22fdbb9c5e",
+      "sha256_lf": "21f3d592a961ca7130094b673e7ceb277192fe97f29dd0d64d53357a7ccfedca"
+    },
+    {
+      "path": "02-系统实现/app/tests/materials-requirements.test.js",
+      "sha256": "f24116f9563bb9610ae576c74f3b4a54e5fbdf86eeeb09efa9be01bc8f058beb",
+      "sha256_lf": "35d90f9284f00be3295922c40391dcc5db1bf1fcd342ea96234494a6e50aba71"
+    },
+    {
+      "path": "02-系统实现/app/tests/uc20-acceptance.test.js",
+      "sha256": "dc96113c18085cb35b67c32bd3bbfed02c344a8dd6d3d1d6ba9c18dbd49e4007",
+      "sha256_lf": "56f3eadc269c810440e626c99b1768dcef759609f17963a0d0469951859ab5a8"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-backup.test.js",
+      "sha256": "4c16fb5161d9032109185754e8167d1d6bf06708142258cde13ee4992cea596c",
+      "sha256_lf": "07570eecdc1cd0baea7aa4264d13d7d328dc737a1e8ebee2ff125becb10dee02"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-billing.test.js",
+      "sha256": "15a84697e7185d66f01d004146858f131a8644cb28c88dd1cddd5a9844f8031a",
+      "sha256_lf": "15a84697e7185d66f01d004146858f131a8644cb28c88dd1cddd5a9844f8031a"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-clinical-http.test.js",
+      "sha256": "68f96cc9b5ff385a42a180dc1360c70b7d97d67563f4f847c1b8322bbecc9dcd",
+      "sha256_lf": "d379a459cddea13734063135e226b593da404ff00ceedf3b518e8ee6d742a7c9"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-clinical.test.js",
+      "sha256": "6667ab3594826b516631590a8ff312993fc0e9fb0fbbf5d6759e4b452c9dcb66",
+      "sha256_lf": "4a8506d855a31543cf2d8625180e1dcf6a2d895a0b11a99bc93b1085ff7ef805"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-course-clinical-migration.test.js",
+      "sha256": "83422df72888662598cc40ab3f437d9c61eb12faabc60161353d22c5d41e15e4",
+      "sha256_lf": "b3f022465f01f5b94c739f257b75dc3de2db43b42ff8c6ee3889ef59dc3edf4f"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-course-clinical.test.js",
+      "sha256": "772e5c64b07adce911e14412fd713a47a2c44592b13183c5d3ad413394d4bbdb",
+      "sha256_lf": "772e5c64b07adce911e14412fd713a47a2c44592b13183c5d3ad413394d4bbdb"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-current-scope.test.js",
+      "sha256": "6f00339b5ffdf2989ae11b24e7251ec9ca7f7ce5c1477f6862a605bf48a31fd2",
+      "sha256_lf": "4f5539963bf753449ca3f830b7bac2cefa6913338700d7e971dc03bb6f1c80f6"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-documents-http.test.js",
+      "sha256": "83974c38b4ea08634cefa7a535f07a45c01c34b757209b1d3b113fe8766e643f",
+      "sha256_lf": "83974c38b4ea08634cefa7a535f07a45c01c34b757209b1d3b113fe8766e643f"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-documents.test.js",
+      "sha256": "78aa1c750ee4f7ee9c6ce1bedc72d6425fd207265515020d49258c3ce494af34",
+      "sha256_lf": "78aa1c750ee4f7ee9c6ce1bedc72d6425fd207265515020d49258c3ce494af34"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-fees-http.test.js",
+      "sha256": "a49c4aa326ebf59a5c04c70a6c75f22fe2b9b22b993d5f5c0efd6338d7b0f453",
+      "sha256_lf": "a49c4aa326ebf59a5c04c70a6c75f22fe2b9b22b993d5f5c0efd6338d7b0f453"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-fees.test.js",
+      "sha256": "b91095f180665666f014226f3058da0605b94138c195ee34ad02c1e36dc86a4e",
+      "sha256_lf": "3cc0f377a1f8556c55fe9ff37fa7bddeb55097a89491ac63e18a17d231d83307"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-finance-views.test.js",
+      "sha256": "8e163317d9c7710160e647abf07f8ba07e615b1db86559f7766d41399cef3019",
+      "sha256_lf": "8e163317d9c7710160e647abf07f8ba07e615b1db86559f7766d41399cef3019"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-financial-history-http.test.js",
+      "sha256": "a21bdd9eb57de2eb78f973c7859b43fef18bd6a2711db338ea99d0b2558924aa",
+      "sha256_lf": "a21bdd9eb57de2eb78f973c7859b43fef18bd6a2711db338ea99d0b2558924aa"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-financial-history-migration.test.js",
+      "sha256": "74c9868baf5f2c96aa6008b7f574aa8d2f8536ec86f294bfa45234a6c3d77ee6",
+      "sha256_lf": "290dedfa4e8f04e87eb157aee1b5d48897be6740d8b7a63fca5f02c9e64897ec"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-financial-history.test.js",
+      "sha256": "23f39997e4ba16b2bb251b32eeb6d1ed74e1320f8432eda3ac32209a9c029d3f",
+      "sha256_lf": "23f39997e4ba16b2bb251b32eeb6d1ed74e1320f8432eda3ac32209a9c029d3f"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-followup-context.test.js",
+      "sha256": "bb9a027f7ded5097ba5539b4d443fcbd8da5f12f97638089a0c4fa50173e493e",
+      "sha256_lf": "bb9a027f7ded5097ba5539b4d443fcbd8da5f12f97638089a0c4fa50173e493e"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-followups-http.test.js",
+      "sha256": "3bd10521548b92fbcd209dec4973bdc2ffbd3edf1710b7385dba1d151ad8633d",
+      "sha256_lf": "3bd10521548b92fbcd209dec4973bdc2ffbd3edf1710b7385dba1d151ad8633d"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-followups.test.js",
+      "sha256": "f61f717a59901b79930820e6389dab14399be28e05beb66dffead6053accd69c",
+      "sha256_lf": "f61f717a59901b79930820e6389dab14399be28e05beb66dffead6053accd69c"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-http.test.js",
+      "sha256": "8f55d19210c7740f18562c49aee1e298b29a2a34240530562522f19f728e5720",
+      "sha256_lf": "8f55d19210c7740f18562c49aee1e298b29a2a34240530562522f19f728e5720"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-inventory-http.test.js",
+      "sha256": "3e9752cb213134709df4d0d572278da4aaf84766d60fb7a62dc18ecdad9c24cf",
+      "sha256_lf": "3e9752cb213134709df4d0d572278da4aaf84766d60fb7a62dc18ecdad9c24cf"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-inventory.test.js",
+      "sha256": "8a8355c74aa26b848f224dd21e5851f8621f9fe0235b12e231d9c26405e4e665",
+      "sha256_lf": "8a8355c74aa26b848f224dd21e5851f8621f9fe0235b12e231d9c26405e4e665"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-payment-prescription-alignment.test.js",
+      "sha256": "000984418d1cc6d68f0f7df2926fccc291e6ebecea0686f97bfb3dfc0700f209",
+      "sha256_lf": "000984418d1cc6d68f0f7df2926fccc291e6ebecea0686f97bfb3dfc0700f209"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-payments.test.js",
+      "sha256": "b348df31bb3cffb2f2b267f7ac29ec39494df1d6402678be9f1ee5c025853487",
+      "sha256_lf": "b348df31bb3cffb2f2b267f7ac29ec39494df1d6402678be9f1ee5c025853487"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-pharmacy-http.test.js",
+      "sha256": "49fa397f0773b6e97fe3e71c06e5951a8550d09cc7f2f24e5117fddfb05de8e5",
+      "sha256_lf": "49fa397f0773b6e97fe3e71c06e5951a8550d09cc7f2f24e5117fddfb05de8e5"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-pharmacy-migration.test.js",
+      "sha256": "df8215fb90db0eafc85a5029821e9f7316210cf1239262d9f77c168975e0c47d",
+      "sha256_lf": "718341f6335fc3624afecf0d23a466c5519cc8fb6a8fd64d79902ff14c98530d"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-pharmacy.test.js",
+      "sha256": "34e168db82a673148af454b22720f72fd303050a3de5e136b3e54b2f8b6348ab",
+      "sha256_lf": "34e168db82a673148af454b22720f72fd303050a3de5e136b3e54b2f8b6348ab"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-prescriptions-http.test.js",
+      "sha256": "47e2d9577d5d204cbda6567076e83f0224a5e232100a01bb51c9d340df3a242c",
+      "sha256_lf": "47e2d9577d5d204cbda6567076e83f0224a5e232100a01bb51c9d340df3a242c"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-prescriptions.test.js",
+      "sha256": "aacf2d9b772c9dd49e5dfe9af6a17e4e38630db26528ab1c197e42d98f4619bf",
+      "sha256_lf": "aadc6a67ded44ff6989a95b7f881a1cd6058a7724d1d8ee77a4d151619411101"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-reception.test.js",
+      "sha256": "3f77ddc40ae82daa4b71142fc4b9bf07d47824534a5ac16a872cf978219582fd",
+      "sha256_lf": "652ce492af7c5ac46bd489cba43d399acf41b5a67b315ca713e9622dcaae66b2"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-resources.test.js",
+      "sha256": "49c46fc76afa01ec8e04773c288263fb5e3ec87b75cde2d0c498daf0d199a59a",
+      "sha256_lf": "6a13a8b7f005557af1fa0988dec40c46a5b6fc20af75e2b00a56344bb2106106"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-settlements-http.test.js",
+      "sha256": "7c1ffaaae6ba1149467713e6182ff6a7effa7813aa62cec6cf0be165d9bee7d7",
+      "sha256_lf": "7c1ffaaae6ba1149467713e6182ff6a7effa7813aa62cec6cf0be165d9bee7d7"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-settlements-migration.test.js",
+      "sha256": "d4f01336ce589f55632cf2656a4820765c503666ebec0ec5eac5a59ae86f08f1",
+      "sha256_lf": "1e7c48cd15caee8e596742b26ecd9056bc5b51902c46a54047914f74cda5c02d"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-settlements.test.js",
+      "sha256": "a59d3aac9a999930cd47ebd7d35d38f3ebdc4735ec7b55e73a2a7196f343f37e",
+      "sha256_lf": "a59d3aac9a999930cd47ebd7d35d38f3ebdc4735ec7b55e73a2a7196f343f37e"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-treatment-http.test.js",
+      "sha256": "1273c8250c377f55d540d9cacb8503edad4b9a7be97b2ff939a324f3543b8805",
+      "sha256_lf": "da45380655e532793e5c502debec4b839527a6ecb51cda34be1a86ebc9fefe49"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-treatment.test.js",
+      "sha256": "d7b74a0918629a92839dfb4435d43d6d156ef00f88e75fa99bb27fbca95cfe25",
+      "sha256_lf": "e7627b9d00821bf76bf77124ecbf09836a71fff3eab763b06f502635757a656a"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-waiting.test.js",
+      "sha256": "57bd1fce452a1871c8d06aa488539ac3425fb9282a404f152d67202a30bbde7d",
+      "sha256_lf": "57bd1fce452a1871c8d06aa488539ac3425fb9282a404f152d67202a30bbde7d"
+    },
+    {
+      "path": "02-系统实现/app/tests/v2-workflow-history.test.js",
+      "sha256": "a156c8d7cd4b77df92eced0274b62255e9efaa97666998890d608d4dbc91a8df",
+      "sha256_lf": "37f0799a387ec8779a1b05bfb080f04e8251aa81ea1bdc3341faf901a882c44d"
+    },
+    {
+      "path": "02-系统实现/收付与处方字段对齐验收-20261023.md",
+      "sha256": "a667db45c20ab54d9cbb7503b0edc0ddb874650e5861e9a5a1862923005bee1f",
+      "sha256_lf": "a47c84ffed024e0a18369c8d6875258e9640675a1292cf135072eaf34bd6baa9"
+    }
+  ]
+}

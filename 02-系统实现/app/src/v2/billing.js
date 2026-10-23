@@ -177,7 +177,7 @@ class Billing {
       const total = field => safe(bills.reduce((n, b) => n + BigInt(b.summary[field]), 0n));
       return { patient: { id: patient.id, recordNo: patient.record_no, name: patient.name }, computedAt: this.unit.auth.now(), total: bills.length, page, pageSize: size, items,
         totals: { receivableCents: total('receivableCents'), allocatedCents: total('allocatedCents'), offsetCents: total('offsetCents'), unpaidCents: total('unpaidCents'), pendingPricingCount: bills.reduce((n, b) => n + b.summary.pendingPricingCount, 0) },
-        funds: this.fundsSummary(patient.id) };
+        funds: this.fundsSummary(patient.id),paymentOrders:this.db.prepare('SELECT o.*,f.patient_id,p.name patient_name FROM payment_order o JOIN patient_funds f ON f.id=o.patient_funds_id JOIN patient p ON p.id=f.patient_id WHERE f.patient_id=? ORDER BY o.id DESC LIMIT 100').all(patient.id) };
     });
   }
 }

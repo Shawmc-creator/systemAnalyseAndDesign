@@ -6,7 +6,7 @@ const {setupInventory}=require('./helpers/v2-inventory');
 const {setup:setupPharmacy}=require('./helpers/v2-pharmacy');
 const {setup:setupInsurance}=require('./helpers/v2-settlements');
 const {setup}=require('./helpers/v2-treatment');
-const {CONFIG,upgradeWorkflowHistory}=require('../src/v2/workflow-history-schema');
+const {CONFIG,upgradeWorkflowHistory,VERSION:WORKFLOW_VERSION}=require('../src/v2/workflow-history-schema');
 const {openDatabase,VERSION}=require('../src/v2/database');
 const {removeWorkflowHistoryFixture}=require('./helpers/v2-workflow-legacy');
 const list=(a,kind,id)=>a.unit.workflowHistory.list(kind,id);
@@ -113,5 +113,5 @@ test('102-table upgrade preserves all original columns and facts, creates empty 
 test('failure in a later history table rolls back earlier new tables, added columns, triggers and schema version',t=>{
  const f=previous(t),db=f.track(new DatabaseSync(f.file));db.exec('CREATE TABLE stock_count_history(id INTEGER PRIMARY KEY)');assert.throws(()=>upgradeWorkflowHistory(db,':memory:'),/already exists/);
  assert.equal(db.prepare('PRAGMA user_version').get().user_version,2026102302);assert.equal(db.prepare("SELECT count(*) n FROM sqlite_master WHERE name='followup_history'").get().n,0);assert.equal(db.prepare('PRAGMA table_info(followup_requirement)').all().some(c=>c.name==='published_at'),false);
- db.exec('DROP TABLE stock_count_history');upgradeWorkflowHistory(db,':memory:');assert.equal(db.prepare('PRAGMA user_version').get().user_version,VERSION);
+ db.exec('DROP TABLE stock_count_history');upgradeWorkflowHistory(db,':memory:');assert.equal(db.prepare('PRAGMA user_version').get().user_version,WORKFLOW_VERSION);
 });

@@ -8,10 +8,20 @@ class Settlements{
  constructor(db,unit,billing,payments,simulation=false){Object.assign(this,{db,unit,billing,payments,simulation});}
  result(kind,key,before){return {kind,key,revision:row(this.db,kind,key).revision,beforeRevision:before,reason:'按原账单和原渠道单核实，不以受理、截图或统计调整代替真实收付款'};}
  order(credentials,input){return this.unit.command(credentials,'uc07.receive',input,(ctx,now)=>{
-  const bill=row(this.db,'bill',input.billId);revision(bill,input.expectedRevision);paymentGate(this.db,bill.id);
-  const summary=this.billing.billSummary(bill.id),amount=this.billing.amount(input.amountCents);if(summary.pendingPricingCount||amount>summary.unpaidCents)fail(409,'PAYMENT_ORDER_AMOUNT','支付金额不能超过医保分摊后的患者待付，且原费用须已核价');
+  let bill=null,funds;
+  const amount=this.billing.amount(input.amountCents);
+  if(input.billId==null){
+   if(input.confirmPrepayment!==true)fail(422,'PREPAYMENT_CONFIRMATION','预收须明确核对患者及预收用途，不建立虚假账单');
+   funds=this.payments.funds(input,ctx,now);
+   if(this.db.prepare("SELECT id FROM payment_order WHERE patient_funds_id=? AND bill_id IS NULL AND status IN ('待支付','处理中','待核实')").get(funds.id))fail(409,'PAYMENT_ORDER_PENDING','该患者原预收支付尚未明确，请先核实原单');
+  }else{
+   bill=row(this.db,'bill',input.billId);revision(bill,input.expectedRevision);paymentGate(this.db,bill.id);
+   if(input.patientId!=null&&bill.patient_id!==input.patientId)fail(409,'PATIENT_MISMATCH','原账单与患者不一致');
+   const summary=this.billing.billSummary(bill.id);if(summary.pendingPricingCount||amount>summary.unpaidCents)fail(409,'PAYMENT_ORDER_AMOUNT','支付金额不能超过医保分摊后的患者待付，且原费用须已核价');
+   funds=row(this.db,'patient_funds',bill.patient_funds_id);
+  }
   if(!CHANNELS.slice(1).includes(input.channel))fail(422,'PAYMENT_CHANNEL','电子支付请选择银行卡、微信或支付宝');
-  const key=insert(this.db,'payment_order',fact(now,{bill_id:bill.id,patient_payment_id:null,business_no:recordNo('PO'),channel:input.channel,amount_cents:amount,external_reference:null,verified_at:null,status:'待支付',result_note:text(input.evidence,'核对患者及原费用依据',4000),operator_id:ctx.session.staff_id}));return this.result('payment_order',key);
+  const key=insert(this.db,'payment_order',fact(now,{patient_funds_id:funds.id,bill_id:bill?.id||null,patient_payment_id:null,business_no:recordNo('PO'),channel:input.channel,amount_cents:amount,external_reference:null,verified_at:null,status:'待支付',result_note:text(input.evidence,'核对患者及原费用或预收用途依据',4000),operator_id:ctx.session.staff_id}));return this.result('payment_order',key);
  });}
  verifyOrder(credentials,input){return this.unit.command(credentials,'uc07.receive',input,(ctx,now)=>{
   const order=row(this.db,'payment_order',input.orderId);revision(order,input.expectedRevision);if(['已成功','已失败','已关闭'].includes(order.status))fail(409,'PAYMENT_ORDER_TERMINAL','原支付已核实结束，请查阅原款，不能再次登记');
@@ -20,14 +30,14 @@ class Settlements{
   const evidence=text(input.evidence,'渠道原单、金额、收款方及结果核实依据',4000);let paymentId=null,reference=null;
   if(['failed','closed'].includes(input.outcome)&&input.terminalConfirmed!==true)fail(422,'PAYMENT_TERMINAL_CHECK','须核实官方原单确已失败或关闭，未知结果不能释放重收');
   if(input.outcome==='success'){
-   const bill=row(this.db,'bill',order.bill_id);revision(bill,input.expectedBillRevision);paymentGate(this.db,bill.id,order.id);
+   const bill=order.bill_id==null?null:row(this.db,'bill',order.bill_id);if(bill){revision(bill,input.expectedBillRevision);paymentGate(this.db,bill.id,order.id);}
    if(input.patientMatches!==true||input.merchantMatches!==true||input.amountCents!==order.amount_cents)fail(409,'PAYMENT_RESULT_MISMATCH','须核实原支付患者、收款方、原单号和到账金额完全一致');
-   if(order.amount_cents>this.billing.billSummary(bill.id).unpaidCents)fail(409,'PAYMENT_ORDER_AMOUNT','原费用患者待付已变化，须核查差额，不能重复记收款');
+   if(bill&&order.amount_cents>this.billing.billSummary(bill.id).unpaidCents)fail(409,'PAYMENT_ORDER_AMOUNT','原费用患者待付已变化，须核查差额，不能重复记收款');
    reference=text(input.reference,'平台实际交易号',200);this.payments.uniqueReference(order.channel,reference);
-   const receivedAt=this.payments.receivedAt(input.receivedAt,now),funds=row(this.db,'patient_funds',bill.patient_funds_id);revision(funds,input.expectedFundsRevision);
-   const extra=this.unit.auth.authorize(credentials.token,credentials.role,'uc07.allocate',credentials.csrf??'');ctx.authority.allocationPermissionId=extra.permission.id;ctx.authority.paymentOrderId=order.id;
+   const receivedAt=this.payments.receivedAt(input.receivedAt,now),funds=row(this.db,'patient_funds',order.patient_funds_id);revision(funds,input.expectedFundsRevision);
+   if(bill){const extra=this.unit.auth.authorize(credentials.token,credentials.role,'uc07.allocate',credentials.csrf??'');ctx.authority.allocationPermissionId=extra.permission.id;}ctx.authority.paymentOrderId=order.id;
    paymentId=insert(this.db,'patient_payment',fact(now,{patient_funds_id:funds.id,received_cents:order.amount_cents,change_cents:0,channel:order.channel,received_at:receivedAt,transaction_evidence:evidence,external_reference:reference,verified_at:now,operator_id:ctx.session.staff_id,verified_by:ctx.session.staff_id,status:'到账已确认',record_no:recordNo('PAY')}));
-   this.payments.apply(ctx,row(this.db,'patient_payment',paymentId),funds,[{billId:bill.id,expectedRevision:bill.revision,amountCents:order.amount_cents,reason:'核对电子支付原单及实际到账后一次分配'}],'allocate',now);this.payments.touchFunds(funds,now);
+   if(bill)this.payments.apply(ctx,row(this.db,'patient_payment',paymentId),funds,[{billId:bill.id,expectedRevision:bill.revision,amountCents:order.amount_cents,reason:'核对电子支付原单及实际到账后一次分配'}],'allocate',now);this.payments.touchFunds(funds,now);
   }
   this.db.prepare('UPDATE payment_order SET status=?,patient_payment_id=?,external_reference=?,verified_at=?,result_note=?,updated_at=?,revision=revision+1 WHERE id=?').run(status,paymentId,reference,['success','failed','closed'].includes(input.outcome)?now:null,order.result_note+'\n原单核实：'+evidence,now,order.id);return this.result('payment_order',order.id,order.revision);
  });}
@@ -42,7 +52,7 @@ class Settlements{
   const settlements=this.db.prepare('SELECT s.*,c.patient_id,c.bill_id FROM insurance_settlement s JOIN insurance_case c ON c.id=s.insurance_case_id WHERE s.confirmed_at>=? AND s.confirmed_at<?').all(r.start,r.end),receipts=this.db.prepare('SELECT * FROM insurance_fund_receipt WHERE occurred_at>=? AND occurred_at<?').all(r.start,r.end);
   const outstanding=this.db.prepare('SELECT s.*,c.business_no,c.patient_id,p.name patient_name FROM insurance_settlement s JOIN insurance_case c ON c.id=s.insurance_case_id JOIN patient p ON p.id=c.patient_id ORDER BY s.id DESC').all().map(s=>{const flows=this.db.prepare('SELECT flow_type,amount_cents FROM insurance_fund_receipt WHERE settlement_id=?').all(s.id),received=safe(flows.reduce((n,f)=>n+BigInt(f.flow_type==='拨付'?f.amount_cents:-f.amount_cents),0n)),share=safe(BigInt(s.fund_cents)+BigInt(s.account_cents));return {...s,receivedCents:received,pendingCents:s.status==='有效'?share-received:0,returnDueCents:s.status==='已撤销'?received:0};});
   const reports=this.db.prepare('SELECT c.*,s.name operator_name FROM cash_reconciliation c JOIN staff s ON s.id=c.operator_id WHERE business_date>=? AND business_date<=? ORDER BY c.id DESC').all(r.from,r.to).map(c=>({...c,differenceCents:safe(BigInt(c.actual_cents)-BigInt(c.expected_cents)),currentSourceChanged:c.source_digest!==hash(canonical(this.sources(c.business_date,c.channel,c.cutoff_at))),items:this.db.prepare('SELECT * FROM reconciliation_item WHERE cash_reconciliation_id=? ORDER BY id').all(c.id)}));
-  return {range:r,computedAt:now,mode:this.simulation?'隔离演示':'人工核实官方渠道原单',networkConnected:false,bills,payments,refunds,orders:this.db.prepare('SELECT o.*,b.patient_id,p.name patient_name FROM payment_order o JOIN bill b ON b.id=o.bill_id JOIN patient p ON p.id=b.patient_id WHERE o.created_at>=? AND o.created_at<? ORDER BY o.id DESC').all(r.start,r.end),
+  return {range:r,computedAt:now,mode:this.simulation?'隔离演示':'人工核实官方渠道原单',networkConnected:false,bills,payments,refunds,orders:this.db.prepare('SELECT o.*,f.patient_id,p.name patient_name FROM payment_order o JOIN patient_funds f ON f.id=o.patient_funds_id JOIN patient p ON p.id=f.patient_id WHERE o.created_at>=? AND o.created_at<? ORDER BY o.id DESC').all(r.start,r.end),
    reconciliationChecks:this.db.prepare('SELECT p.*,(SELECT id FROM payment_reconciliation n WHERE n.previous_reconciliation_id=p.id) supersededBy FROM payment_reconciliation p WHERE business_date>=? AND business_date<=? ORDER BY id DESC').all(r.from,r.to),reports,issues:this.db.prepare('SELECT i.*,s.name assigned_name FROM issue_followup i JOIN staff s ON s.id=i.assigned_to WHERE cash_reconciliation_id IS NOT NULL ORDER BY i.id DESC LIMIT 200').all(),staff:this.db.prepare('SELECT id,name FROM staff WHERE employed_from<=? AND (employed_until IS NULL OR employed_until>=?)').all(day(now),day(now)),
    pendingPayments:this.db.prepare("SELECT id,record_no,channel,net_cents FROM patient_payment WHERE status='待核实' ORDER BY id DESC LIMIT 100").all(),pendingRefunds:this.db.prepare("SELECT id,record_no,channel,requested_cents FROM patient_refund WHERE status IN ('待办理','待核实') ORDER BY id DESC LIMIT 100").all(),
    insuranceOutstanding:outstanding,insuranceSettlements:settlements,insuranceReceipts:receipts,
@@ -58,11 +68,20 @@ class Settlements{
   for(const s of p.sources)insert(this.db,'reconciliation_item',fact(now,{cash_reconciliation_id:key,patient_payment_id:s.patientPaymentId,patient_refund_id:s.patientRefundId,supplier_payment_id:null,supplier_refund_id:null,source_type:s.kind,included_cents:s.amount,source_at:s.at,source_revision:s.revision}));return this.result('cash_reconciliation',key);
  });}
  check(credentials,input){return this.unit.command(credentials,input.action==='resolve'?'settlements.manage':'settlements.reconcile',input,(ctx,now)=>{
-  let order=null,refund=null;if(input.orderId!=null)order=row(this.db,'payment_order',input.orderId);if(input.refundId!=null)refund=row(this.db,'patient_refund',input.refundId);if(!!order===!!refund)fail(422,'RECONCILIATION_SOURCE','核对一笔原支付或原退款');
-  const expected=order?.amount_cents??refund.requested_cents,actual=input.actualCents==null?null:this.billing.amount(input.actualCents,true),resolution=text(input.evidence,'渠道核对结果及差异处理依据',4000);
-  if(input.action==='resolve'){const old=row(this.db,'payment_reconciliation',input.checkId);if(old.payment_order_id!==(order?.id||null)||old.patient_refund_id!==(refund?.id||null))fail(409,'RECONCILIATION_SOURCE','须保留原核对对象');if(!['差异待处理','待核对'].includes(old.status)||actual===null||this.db.prepare('SELECT id FROM payment_reconciliation WHERE previous_reconciliation_id=?').get(old.id))fail(409,'RECONCILIATION_STATE','须核实真实金额并说明处理依据；原差异不可重复处理');}
-  else if(input.action!=='check')fail(422,'INVALID_ACTION','核对动作无效');
-  const date=dateOnly(input.date);if(date>day(now))fail(422,'RECONCILIATION_RANGE','核对日期不能在未来');const key=insert(this.db,'payment_reconciliation',fact(now,{payment_order_id:order?.id||null,patient_refund_id:refund?.id||null,business_date:date,expected_cents:expected,actual_cents:actual,status:input.action==='resolve'?'已处理':actual===null?'待核对':actual===expected?'一致':'差异待处理',resolution,previous_reconciliation_id:input.action==='resolve'?input.checkId:null,operator_id:ctx.session.staff_id}));return this.result('payment_reconciliation',key);
+  if([input.paymentId,input.orderId,input.refundId].filter(v=>v!=null).length!==1)fail(422,'RECONCILIATION_SOURCE','请选择一笔现金原付款、原电子支付或原退款');
+  const cash=input.paymentId==null?null:row(this.db,'patient_payment',input.paymentId),order=input.orderId==null?null:row(this.db,'payment_order',input.orderId),refund=input.refundId==null?null:row(this.db,'patient_refund',input.refundId);
+  if(cash&&(cash.channel!=='现金'||cash.status!=='到账已确认'))fail(409,'RECONCILIATION_SOURCE','现金逐笔核对须引用已经核实到账的现金原付款');
+  const expected=cash?.net_cents??order?.amount_cents??(refund.status==='已确认退款'?refund.actual_cents:refund.requested_cents),actual=input.actualCents==null?null:this.billing.amount(input.actualCents,true);
+  const resolution=input.evidence==null||typeof input.evidence==='string'&&!input.evidence.trim()?null:text(input.evidence,'原单核对及差异处理依据',4000);
+  if((actual!==null||input.action==='resolve')&&!resolution)fail(422,'RECONCILIATION_EVIDENCE','已核实金额或处理差异须记录实际依据');
+  let old=null;
+  if(input.action==='resolve'){
+   old=row(this.db,'payment_reconciliation',input.checkId);
+   if(old.patient_payment_id!==(cash?.id||null)||old.payment_order_id!==(order?.id||null)||old.patient_refund_id!==(refund?.id||null))fail(409,'RECONCILIATION_SOURCE','须保留原核对对象');
+   if(!['差异待处理','待核对'].includes(old.status)||actual===null||this.db.prepare('SELECT id FROM payment_reconciliation WHERE previous_reconciliation_id=?').get(old.id))fail(409,'RECONCILIATION_STATE','须核实真实金额并说明处理依据；原差异不可重复处理');
+  }else if(input.action!=='check')fail(422,'INVALID_ACTION','核对动作无效');
+  const date=dateOnly(input.date);if(date>day(now)||old&&old.business_date!==date)fail(422,'RECONCILIATION_RANGE','核对日期不得在未来，处理时保留原营业日期');
+  const key=insert(this.db,'payment_reconciliation',fact(now,{patient_payment_id:cash?.id||null,payment_order_id:order?.id||null,patient_refund_id:refund?.id||null,business_date:date,expected_cents:expected,actual_cents:actual,status:input.action==='resolve'?'已处理':actual===null?'待核对':actual===expected?'一致':'差异待处理',resolution,previous_reconciliation_id:input.action==='resolve'?input.checkId:null,operator_id:ctx.session.staff_id}));return this.result('payment_reconciliation',key);
  });}
  issue(credentials,input){return this.unit.command(credentials,'settlements.manage',input,(ctx,now)=>{
   if(input.action==='assign'){

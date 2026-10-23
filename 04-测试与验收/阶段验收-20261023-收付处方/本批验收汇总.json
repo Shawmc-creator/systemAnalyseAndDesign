@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-23",
+  "runtimeVersion": 2026102304,
+  "runtimeTables": 108,
+  "automatedTests": 352,
+  "automatedPassed": 352,
+  "newTests": 18,
+  "uiScenarios": 11,
+  "uiPassed": 11,
+  "oldTablesPreserved": 108,
+  "originalColumnsAndGeneratedNetPreserved": true,
+  "logicalModelUnchanged": true,
+  "requirementsChanged": false,
+  "correctedInventoryFalsePositive": "net_cents was already a stored NOT NULL generated column; PRAGMA table_xinfo now includes generated columns",
+  "newFields": [
+    "payment_order.patient_funds_id",
+    "payment_reconciliation.patient_payment_id",
+    "prescription.handed_over_at",
+    "prescription.handed_over_by",
+    "prescription.voided_by",
+    "prescription.original_prescription_id",
+    "material.category",
+    "purchase_order.cancellation_reason"
+  ],
+  "remainingFieldNames": 9,
+  "remainingFieldDefinitions": 7,
+  "remainingSchemaArea": "医保",
+  "wholeDesignImplemented": false
+}

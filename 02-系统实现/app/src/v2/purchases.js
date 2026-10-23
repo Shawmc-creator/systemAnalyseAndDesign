@@ -68,7 +68,7 @@ class Purchases {
       if(p.status!=='待确认') fail(409,'PURCHASE_SEALED','采购已确认或取消；已有约定不能追改');
       const reason=text(input.reviewNote,'负责人核实意见',2000);
       if(input.action==='cancel') {
-        this.db.prepare("UPDATE purchase_order SET status='已取消',updated_at=?,revision=revision+1 WHERE id=?").run(now,p.id);
+        this.db.prepare("UPDATE purchase_order SET status='已取消',cancellation_reason=?,updated_at=?,revision=revision+1 WHERE id=?").run(reason,now,p.id);
       } else if(input.action==='approve') {
         const s=row(this.db,'supplier',p.supplier_id);revision(s,input.expectedSupplierRevision);
         if(!s.is_active) fail(409,'SUPPLIER_INACTIVE','供应商当前停用，请核对原需求');

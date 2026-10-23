@@ -98,7 +98,7 @@ async function renderFinance(version){
  }
  const id=financeView.patientId,[fees,bills]=await Promise.all([api('/fee-requests/query?patientId='+id+'&page='+financeView.requestPage),manager?null:api('/patient-bills/query?patientId='+id+'&page='+financeView.billPage)]);if(version!==renderVersion)return;
  financeView.fees=fees;financeView.bills=bills;
- const f=fees.funds;$('#filters').innerHTML='';$('#page-actions').innerHTML='<button id="back-finance">返回患者查找</button><button id="refresh-finance">刷新核对</button>'+(!manager?'<button id="receive-money" class="primary">登记实际收款</button>'+ (f.id?'<button id="apply-fee">费用与普通退费申请</button>':''):'');
+ const f=fees.funds;$('#filters').innerHTML='';$('#page-actions').innerHTML='<button id="back-finance">返回患者查找</button><button id="refresh-finance">刷新核对</button>'+(!manager?'<button id="receive-money" class="primary">登记实际收款</button><button id="receive-electronic-prepayment">建立电子预收原单</button>'+ (f.id?'<button id="apply-fee">费用与普通退费申请</button>':''):'');
  let html=`<section class="clinical-summary"><h2>${esc(fees.patient.name)} <small>${esc(fees.patient.recordNo)}</small></h2><p>已确认原收 ${clinicalMoney(f.confirmedReceivedCents)} · 待核实 ${clinicalMoney(f.pendingPaymentCents)} · 已退 ${clinicalMoney(f.refundedCents)}</p><p>可用原款 ${clinicalMoney(f.availableCents)} · 退款占用 ${clinicalMoney(f.refundHeldCents)}</p></section>`;
  if(bills){
   html+=`<h2 class="subheading">账目与实际费用</h2><p>合计应收${clinicalMoney(bills.totals.receivableCents)} · 未付${clinicalMoney(bills.totals.unpaidCents)} · 待核价${bills.totals.pendingPricingCount}项</p>`;
@@ -106,6 +106,7 @@ async function renderFinance(version){
   if(!bills.items.length)html+=empty('没有符合本页条件的实际费用，方案预计费用不形成应收。');
   html+=financePagination('bill',financeView.billPage,bills.total,bills.pageSize);
  }
+ if(bills?.paymentOrders?.length)html+='<h2 class="subheading">电子支付原单与预收</h2>'+table(['原单 / 用途','金额 / 结果','办理'],bills.paymentOrders.map(o=>`<tr><td>${esc(o.business_no)}<small>${o.bill_id?'账目#'+o.bill_id:'患者预收，未指定账目'} / ${esc(o.channel)}</small></td><td>${clinicalMoney(o.amount_cents)}<small>${esc(o.status)}</small></td><td>${!['已成功','已失败','已关闭'].includes(o.status)?`<button data-finance-order-result="${o.id}">核实原支付结果</button>`:''}</td></tr>`));
  html+='<h2 class="subheading">原付款与用途</h2>'+(f.payments.length?table(['原款 / 渠道','原登记金额 / 找零','到账 / 可用','用途','办理'],f.payments.map(p=>`<tr><td>${esc(p.recordNo)}<small>${esc(p.channel)} / ${esc(p.externalReference||'无渠道号')}</small></td><td>${clinicalMoney(p.receivedCents)}<small>找零${clinicalMoney(p.changeCents)} / 登记净额${clinicalMoney(p.netCents)}</small></td><td>${esc(p.status)}<small>可用${clinicalMoney(p.availableCents)} / 退款占用${clinicalMoney(p.refundHeldCents)}</small></td><td>分配${clinicalMoney(p.allocatedCents)}<small>抵扣${clinicalMoney(p.offsetCents)} / 已退${clinicalMoney(p.refundedCents)}</small></td><td>${!manager&&p.status==='待核实'?`<button data-verify-payment="${p.id}">核实原付款</button>`:''}${!manager&&p.availableCents>0?`<button data-offset-payment="${p.id}">抵扣账目</button>`:''}</td></tr>`)):empty('尚无实际付款记录。'));
  html+='<h2 class="subheading">费用申请与普通退款</h2>';
  for(const r of fees.items){html+=`<section class="clinical-plan"><h3>${esc(r.record_no)} · ${esc(r.status)}</h3><p>${esc(r.reason)}</p><p>申请应收调整${clinicalMoney(r.proposed_adjustment_cents)} / 退回${clinicalMoney(r.proposed_refund_cents)}</p>${r.review_note?`<p>负责人意见：${esc(r.review_note)}</p>`:''}`;
@@ -127,6 +128,7 @@ async function renderFinance(version){
  $('#back-finance').onclick=()=>{resetFinance();clinicalAction(render);};$('#refresh-finance').onclick=()=>clinicalAction(render);
  if(!manager){$('#receive-money').onclick=()=>clinicalAction(()=>financeReceive());if($('#apply-fee'))$('#apply-fee').onclick=()=>clinicalAction(()=>financeApply());}
  const bind=(selector,fn)=>document.querySelectorAll(selector).forEach(b=>b.onclick=()=>clinicalAction(()=>fn(b)));
+ if($('#receive-electronic-prepayment'))$('#receive-electronic-prepayment').onclick=()=>clinicalAction(electronicPrepayment);bind('[data-finance-order-result]',b=>electronicResult(bills.paymentOrders.find(o=>o.id===Number(b.dataset.financeOrderResult))));
  bind('[data-electronic-order]',b=>electronicOrder(bills.items.find(x=>x.id===Number(b.dataset.electronicOrder))));
  bind('[data-verify-payment]',b=>financeReceive(f.payments.find(p=>p.id===Number(b.dataset.verifyPayment))));bind('[data-offset-payment]',b=>financeOffset(f.payments.find(p=>p.id===Number(b.dataset.offsetPayment))));
  bind('[data-fee-review]',b=>financeReview(fees.items.find(r=>r.id===Number(b.dataset.feeReview)),b.dataset.reviewAction));bind('[data-fee-withdraw]',b=>financeWithdraw(fees.items.find(r=>r.id===Number(b.dataset.feeWithdraw))));bind('[data-fee-resubmit]',b=>financeApply(fees.items.find(r=>r.id===Number(b.dataset.feeResubmit))));

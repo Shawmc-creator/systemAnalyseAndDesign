@@ -29,7 +29,8 @@
     "audit:design": "node scripts/audit-v2-design.js",
     "check:design": "node scripts/audit-v2-design.js --check",
     "check:ui:fees": "node scripts/check-v2-fee-history-ui.cjs",
-    "check:ui:histories": "node scripts/check-v2-workflow-history-ui.cjs"
+    "check:ui:histories": "node scripts/check-v2-workflow-history-ui.cjs",
+    "check:ui:payment-prescription": "node scripts/check-v2-payment-prescription-ui.cjs"
   },
   "engines": {
     "node": ">=24"

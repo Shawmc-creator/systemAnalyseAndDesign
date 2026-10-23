@@ -2,6 +2,7 @@
 const {CONFIG}=require('../../src/v2/workflow-history-schema');
 // Only for isolated migration fixtures: reconstruct the schema before this migration.
 function removeWorkflowHistoryFixture(db){
+ require('./v2-payment-prescription-legacy').removePaymentPrescriptionFixture(db);
  const fk=db.prepare('PRAGMA foreign_keys').get().foreign_keys;db.exec('PRAGMA foreign_keys=OFF');
  for(const name of ['insurance_fee_original_request','insurance_settlement_original_request','insurance_settlement_request_frozen'])db.exec('DROP TRIGGER '+name);
  for(const c of Object.values(CONFIG))db.exec('DROP TABLE '+c.table);
