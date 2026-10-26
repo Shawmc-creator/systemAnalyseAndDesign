@@ -159,10 +159,10 @@ async function renderResources(version) {
 }
 async function render() {
   const version = ++renderVersion, page = state.page, role = state.role;
-  const pages={frontdesk:['appointments','patients','followups','resources','insurance'],manager:['schedules','catalog','finance','inventory','resources','pharmacy','insurance','settlements'],dentist:['clinical','documents','prescriptions','followups','resources'],assistant:['inventory','documents','resources'],cashier:['catalog','finance','insurance','settlements'],pharmacist:['pharmacy']};
+  const pages={frontdesk:['appointments','patients','followups','resources','insurance'],manager:['schedules','clinic','catalog','finance','inventory','resources','pharmacy','insurance','settlements'],dentist:['clinical','documents','prescriptions','followups','resources'],assistant:['inventory','documents','resources'],cashier:['catalog','finance','insurance','settlements'],pharmacist:['pharmacy']};
   document.querySelectorAll('[data-page]').forEach(b => { b.classList.toggle('active', b.dataset.page === page); b.hidden = !(pages[role]||[]).includes(b.dataset.page); });
-  $('#page-title').textContent = { appointments: '预约与到诊', patients: '患者资料', schedules: '日期排班',resources:'诊椅与设备',clinical:'牙医接诊',catalog:'收费价目',finance:'收费与退费',followups:'复诊与随访',inventory:'材料采购与库存',documents:'影像与诊疗文书',prescriptions:'处方与取药',pharmacy:'院内药学',insurance:'医保办理',settlements:'经营与收付核对' }[page];
-  $('#page-hint').textContent = { appointments: '先核对身份，再办理接诊安排', patients: '同名患者分别建档，按患者号确认身份', schedules: '确认牙医、诊椅与指定日期的可用时段',resources:'核对实际使用、清洁准备和必要设备，按真实结果交接',clinical:'核对患者、健康资料及本次诊疗范围，记录真实办理结果',catalog:'收费人员维护项目和价目，负责人核对后确认适用',finance:'核对原账目、实际到账与付款用途；普通退费先审核，再核实实际结果',followups:'有来源、有联系责任，按实际联系与牙医评估跟进',inventory:'按实物批次和基本单位办理采购验收、领用及盘点',documents:'核对患者与就诊归属，保留原件和明确的文件版本',prescriptions:'依据本次诊断及健康复核，由牙医明确处方与用药指导',pharmacy:'按机构条件与药学资格，分别核实审方和实际发药',insurance:'按原身份、费用及官方结果核对分摊，实际回款分别办理',settlements:'分别核对总费用、患者实际收付及医保待回款，安排差异责任' }[page];
+  $('#page-title').textContent = { appointments: '预约与到诊', patients: '患者资料', schedules: '日期排班',clinic:'诊所基础管理',resources:'诊椅与设备',clinical:'牙医接诊',catalog:'收费价目',finance:'收费与退费',followups:'复诊与随访',inventory:'材料采购与库存',documents:'影像与诊疗文书',prescriptions:'处方与取药',pharmacy:'院内药学',insurance:'医保办理',settlements:'经营与收付核对' }[page];
+  $('#page-hint').textContent = { appointments: '先核对身份，再办理接诊安排', patients: '同名患者分别建档，按患者号确认身份', schedules: '确认牙医、诊椅与指定日期的可用时段',clinic:'核实职员任职、个人账号和诊椅目录，保留原业务及授权历史',resources:'核对实际使用、清洁准备和必要设备，按真实结果交接',clinical:'核对患者、健康资料及本次诊疗范围，记录真实办理结果',catalog:'收费人员维护项目和价目，负责人核对后确认适用',finance:'核对原账目、实际到账与付款用途；普通退费先审核，再核实实际结果',followups:'有来源、有联系责任，按实际联系与牙医评估跟进',inventory:'按实物批次和基本单位办理采购验收、领用及盘点',documents:'核对患者与就诊归属，保留原件和明确的文件版本',prescriptions:'依据本次诊断及健康复核，由牙医明确处方与用药指导',pharmacy:'按机构条件与药学资格，分别核实审方和实际发药',insurance:'按原身份、费用及官方结果核对分摊，实际回款分别办理',settlements:'分别核对总费用、患者实际收付及医保待回款，安排差异责任' }[page];
   if(page==='insurance')return renderInsurance(version);
   if(page==='settlements')return renderSettlements(version);
   if(page==='pharmacy')return renderPharmacy(version);
@@ -170,6 +170,7 @@ async function render() {
   if(page==='documents')return renderDocuments(version);
   if(page==='resources')return renderResources(version);
   if(page==='clinical')return renderClinical(version);
+  if(page==='clinic')return renderClinic(version);
   if(page==='catalog')return renderCatalog(version);
   if(page==='finance')return renderFinance(version);
   if(page==='followups')return renderFollowups(version);

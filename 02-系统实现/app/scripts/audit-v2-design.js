@@ -18,12 +18,12 @@ try{
   const primary=actual.filter(f=>f.pk).sort((a,b)=>a.pk-b.pk).map(f=>f.name),expected=table.fields.filter(f=>f.primary_key).map(f=>f.name);
   results.push({table:table.table,name:table.name,exists:true,missingFields:table.fields.filter(f=>!byName.has(f.name)).map(f=>f.name),changedFields,generatedFields:actual.filter(f=>[2,3].includes(f.hidden)).map(f=>({name:f.name,storage:f.hidden===3?'stored':'virtual'})),primaryKeyMatches:JSON.stringify(primary)===JSON.stringify(expected)});
  }
- const report={date:'2026-10-23',mode:'ISOLATED_SCHEMA_INVENTORY',runtimeVersion:VERSION,liveDataTouched:false,requirementsChanged:false,modelSha256:crypto.createHash('sha256').update(bytes).digest('hex'),
+ const report={date:new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai'}).format(new Date()),mode:'ISOLATED_SCHEMA_INVENTORY',runtimeVersion:VERSION,liveDataTouched:false,requirementsChanged:false,modelSha256:crypto.createHash('sha256').update(bytes).digest('hex'),
   documentTables:model.tables.length,runtimeTables:names.length,matchingTableNames:results.filter(t=>t.exists).length,missingTables:results.filter(t=>!t.exists).map(t=>t.table),
   missingFieldsInExistingTables:results.filter(t=>t.exists).reduce((n,t)=>n+t.missingFields.length,0),changedFieldDefinitions:results.filter(t=>t.exists).reduce((n,t)=>n+t.changedFields.length,0),
   primaryKeyDifferences:results.filter(t=>t.exists&&!t.primaryKeyMatches).map(t=>t.table),results,
   limits:['仅比较表名、列名、类型、可空、指定单列唯一、外键及主键；不验证业务语义、条件唯一或全部约束','运行库保留历史及技术表，总表数不能代表需求覆盖','规约、历史写入及设计分层仍须分别实施和验收']};
  report.schemaInventoryAligned=report.missingTables.length===0&&report.missingFieldsInExistingTables===0&&report.changedFieldDefinitions===0&&report.primaryKeyDifferences.length===0;
- if(process.argv.includes('--save')){const folder=path.join(delivery,'04-测试与验收/测试结果/20261023-v2-insurance-alignment');fs.mkdirSync(folder,{recursive:true});fs.writeFileSync(path.join(folder,'设计结构差异清单.json'),JSON.stringify(report,null,2));}
+ if(process.argv.includes('--save')){const folder=path.join(delivery,'04-测试与验收/测试结果/'+report.date.replaceAll('-','')+'-v2-design-inventory');fs.mkdirSync(folder,{recursive:true});fs.writeFileSync(path.join(folder,'设计结构差异清单.json'),JSON.stringify(report,null,2));}
  console.log(JSON.stringify(report,null,2));if(process.argv.includes('--check')&&!report.schemaInventoryAligned)process.exitCode=2;
 }finally{db.close();}

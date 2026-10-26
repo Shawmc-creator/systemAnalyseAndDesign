@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-26",
+  "mode": "READ_ONLY_COUNTS",
+  "checks": [
+    {
+      "table": "staff",
+      "before": 6,
+      "after": 6
+    },
+    {
+      "table": "dental_chair",
+      "before": 2,
+      "after": 2
+    },
+    {
+      "table": "service",
+      "before": 0,
+      "after": 0
+    },
+    {
+      "table": "service_price",
+      "before": 0,
+      "after": 0
+    },
+    {
+      "table": "treatment_execution",
+      "before": 0,
+      "after": 0
+    },
+    {
+      "table": "patient_payment",
+      "before": 0,
+      "after": 0
+    }
+  ],
+  "foreignKeyErrors": 0,
+  "integrity": "ok"
+}

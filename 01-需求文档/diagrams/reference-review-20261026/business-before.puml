@@ -1,0 +1,20 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam sequenceMessageAlign center
+skinparam classAttributeIconSize 0
+actor "诊所负责人" as M
+entity "纸面任职与资源台账" as L
+actor "前台" as F
+M -> M : 核实人员分工、专业条件及诊椅可用情况
+M -> L : 登记任职、交接及资源变化依据
+M -> F : 通知可排班人员及可用诊椅
+F -> L : 查阅最新登记
+L --> F : 返回当前名单及台账依据
+F --> M : 反馈需要协调的原预约及资源安排
+@enduml

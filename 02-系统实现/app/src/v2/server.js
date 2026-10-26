@@ -15,6 +15,7 @@ const { Followups } = require('./followups');
 const { Inventory } = require('./inventory');
 const { Purchases } = require('./purchases');
 const { Resources }=require('./resources');
+const {Clinic}=require('./clinic');
 const { Documents }=require('./documents');
 const { DocumentStore,MAX_FILE_BYTES }=require('./document-store');
 const {Prescriptions}=require('./prescriptions');
@@ -49,7 +50,7 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
   const insurance=new Insurance(db,unit,billing,normalizeInsurancePolicy(insurancePolicy===undefined?(filename===':memory:'?{enabled:false}:loadInsurancePolicy(filename)):insurancePolicy),integrationSimulation);
   const followups = new Followups(db, unit, clinical);
   const inventory = new Inventory(db, unit), purchases = new Purchases(db, unit, inventory);
-  const resources=new Resources(db,unit,clinical);
+  const resources=new Resources(db,unit,clinical),clinic=new Clinic(db,unit);
   const prescriptions=new Prescriptions(db,unit,clinical);
   const pharmacy=new Pharmacy(db,unit,prescriptions,inventory,billing,normalizePolicy(pharmacyPolicy===undefined?(filename===':memory:'?{enabled:false}:loadPolicy(filename)):pharmacyPolicy));prescriptions.pharmacy=pharmacy;
   if (demo) seedDemo(db, auth, reception);
@@ -58,7 +59,7 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
     try {
       const url = new URL(req.url, 'http://localhost'), p = url.pathname;
       if (!p.startsWith('/api/')) {
-        const files = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/documents.js':['documents.js','text/javascript'], '/prescriptions.js':['prescriptions.js','text/javascript'], '/pharmacy.js':['pharmacy.js','text/javascript'], '/settlements.js':['settlements.js','text/javascript'], '/insurance.js':['insurance.js','text/javascript'], '/clinical.js':['clinical.js','text/javascript'], '/catalog.js':['catalog.js','text/javascript'], '/finance.js':['finance.js','text/javascript'], '/followups.js':['followups.js','text/javascript'], '/inventory.js':['inventory.js','text/javascript'], '/styles.css': ['styles.css', 'text/css'] };
+        const files = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/documents.js':['documents.js','text/javascript'], '/prescriptions.js':['prescriptions.js','text/javascript'], '/pharmacy.js':['pharmacy.js','text/javascript'], '/settlements.js':['settlements.js','text/javascript'], '/insurance.js':['insurance.js','text/javascript'], '/clinical.js':['clinical.js','text/javascript'], '/clinic.js':['clinic.js','text/javascript'], '/catalog.js':['catalog.js','text/javascript'], '/finance.js':['finance.js','text/javascript'], '/followups.js':['followups.js','text/javascript'], '/inventory.js':['inventory.js','text/javascript'], '/styles.css': ['styles.css', 'text/css'] };
         if (!files[p] || req.method !== 'GET') return json(res, 404, { code: 'NOT_FOUND', message: '页面不存在' });
         res.writeHead(200, { 'Content-Type': files[p][1] + '; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
           'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'" });
@@ -96,7 +97,7 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
         const file=documents.download(credentials,Number(download[1]));
         res.writeHead(200,{'Content-Type':file.mediaType,'Content-Length':file.bytes.length,'Content-Disposition':`attachment; filename="document"; filename*=UTF-8''${encodeURIComponent(file.name).replace(/['()*]/g,c=>'%'+c.charCodeAt(0).toString(16))}`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(file.bytes);
       }
-      if (p === '/api/v2/status' && req.method === 'GET') return json(res, 200, { application:'qinghe-dental-v2',schemaVersion:VERSION,ready:true,demo,businessDate:day(auth.now()),now:auth.now(),numbering:'现行需求文档25个系统用例，内部权限保留历史编号',implementedCoreUsecases:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25],pendingCoreUsecases:[],settlementApi:{implemented:['orders','dailyReconciliation','discrepancyFollowup'],networkConnected:false,mode:integrationSimulation?'isolatedSimulation':'officialTerminalVerification'},insuranceApi:{implemented:['identity','preSettlement','preestimateOriginalQuery','preestimateInvalidation','explicitSelfPay','patientChoice','settlement','approvedReversal','reversal','linkedReregistration','fundReceipts'],...insurance.state()},prescriptionApi:{usecase:'现行UC-25',implemented:['outsideDraft','outsideIssue','inHouseDraft','inHouseIssue','physicianResponse','void','protectedCopy'],inHouseEnabled:pharmacy.state().active,pending:[]},pharmacyApi:{usecase:'现行UC-25',implemented:['qualification','review','physicianResponse','dispense','stockAndActualFees'],inHouseEnabled:pharmacy.state().active},excludedScope:['复杂供应商结算与付款','细粒度采购退换与资金分配','器械逐包追溯','运行迁移与详细技术验收'],purchaseReceiptApi:{usecase:'现行UC-19',implemented:['receive','inspectPending','receiptNote']},resourceApi:{usecase:'现行UC-24',implemented:['equipment','block','restore','physicalEnd','equipmentReservation','readinessCheck','waitingRecoordination']} });
+      if (p === '/api/v2/status' && req.method === 'GET') return json(res, 200, { application:'qinghe-dental-v2',schemaVersion:VERSION,ready:true,demo,businessDate:day(auth.now()),now:auth.now(),numbering:'现行需求文档26个系统用例，内部权限保留历史编号',implementedCoreUsecases:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],pendingCoreUsecases:[],settlementApi:{implemented:['orders','dailyReconciliation','discrepancyFollowup'],networkConnected:false,mode:integrationSimulation?'isolatedSimulation':'officialTerminalVerification'},insuranceApi:{implemented:['identity','preSettlement','preestimateOriginalQuery','preestimateInvalidation','explicitSelfPay','patientChoice','settlement','approvedReversal','reversal','linkedReregistration','fundReceipts'],...insurance.state()},prescriptionApi:{usecase:'现行UC-25',implemented:['outsideDraft','outsideIssue','inHouseDraft','inHouseIssue','physicianResponse','void','protectedCopy'],inHouseEnabled:pharmacy.state().active,pending:[]},pharmacyApi:{usecase:'现行UC-25',implemented:['qualification','review','physicianResponse','dispense','stockAndActualFees'],inHouseEnabled:pharmacy.state().active},excludedScope:['复杂供应商结算与付款','细粒度采购退换与资金分配','器械逐包追溯','运行迁移与详细技术验收'],purchaseReceiptApi:{usecase:'现行UC-19',implemented:['receive','inspectPending','receiptNote']},resourceApi:{usecase:'现行UC-24',implemented:['equipment','block','restore','physicalEnd','equipmentReservation','readinessCheck','waitingRecoordination']} });
       if (p === '/api/v2/auth/login' && req.method === 'POST') {
         // Reject cross-origin requests even before login; do not trust forwarded IP headers.
         if (req.headers.origin && req.headers.origin !== `http://${req.headers.host}`) fail(403, 'ORIGIN_FORBIDDEN', '请求来源无效');
@@ -117,6 +118,11 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
       if (commands[p] && req.method === 'POST') return json(res, 200, reception[commands[p]](credentials, await body(req)));
       const resourceCommands={'/api/v2/resources/equipment':'equipment','/api/v2/resources/blocks':'block','/api/v2/resources/finish':'finish'};
       if(resourceCommands[p]&&req.method==='POST')return json(res,200,resources[resourceCommands[p]](credentials,await body(req)));
+      if(p==='/api/v2/clinic/query'&&req.method==='GET')return json(res,200,clinic.query(credentials));
+      if(p==='/api/v2/clinic/reference-services'&&req.method==='GET')return json(res,200,clinic.references(credentials));
+      if(p==='/api/v2/clinic/staff'&&req.method==='POST')return json(res,200,clinic.staff(credentials,await body(req)));
+      if(p==='/api/v2/clinic/chairs'&&req.method==='POST')return json(res,200,clinic.chair(credentials,await body(req)));
+      if(p==='/api/v2/services/manage'&&req.method==='POST')return json(res,200,billing.manageService(credentials,await body(req)));
       if(p==='/api/v2/resources/query'&&req.method==='GET')return json(res,200,resources.query(credentials,Object.fromEntries(url.searchParams)));
       const clinicalCommands = { '/api/v2/health-versions/health': 'health', '/api/v2/clinical-records/record': 'record', '/api/v2/clinical-record-signatures/sign': 'sign' };
       if (clinicalCommands[p] && req.method === 'POST') return json(res, 200, clinical[clinicalCommands[p]](credentials, await body(req)));
@@ -182,7 +188,7 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
     }
   };
   const server = http.createServer(handler);
-  return { db, auth, unit, reception, clinical, billing, treatment, payments, fees, followups, inventory, purchases, resources, documents, documentStore, prescriptions,pharmacy,settlements,insurance,server };
+  return { db, auth, unit, reception, clinical, billing, treatment, payments, fees, followups, inventory, purchases, resources, clinic, documents, documentStore, prescriptions,pharmacy,settlements,insurance,server };
 }
 if (require.main === module) {
   const filename = process.env.CLINIC_V2_DB || path.resolve(__dirname, '../../data/clinic-v2.db');

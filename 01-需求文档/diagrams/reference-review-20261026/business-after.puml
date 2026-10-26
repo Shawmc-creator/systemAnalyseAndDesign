@@ -1,0 +1,25 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam sequenceMessageAlign center
+skinparam classAttributeIconSize 0
+actor "诊所负责人" as M
+entity "牙科诊所管理系统" as S
+actor "前台" as F
+M -> M : 核实任职条件及资源变化
+M -> S : 提交人员、获准岗位或诊椅资料及依据
+S -> S : 核对当前权限、版本及受影响排班
+alt 存在待协调安排
+ S --> M : 返回影响事项，保留原资料与安排
+else 可以生效
+ S -> S : 保存基础资料、授权及变更责任
+ S --> M : 返回实际生效结果
+ F -> S : 查询有效人员、诊椅及已发布安排
+ S --> F : 返回可用于预约核对的当前资料
+end
+@enduml

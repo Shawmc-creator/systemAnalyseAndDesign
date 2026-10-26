@@ -1,0 +1,63 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam sequenceMessageAlign center
+skinparam classAttributeIconSize 0
+hide circle
+skinparam linetype ortho
+left to right direction
+entity "职员\nstaff" as S {
+ * id : INTEGER <<PK>>
+ --
+ name : TEXT
+ employed_from / employed_until
+}
+entity "职员账号\nuser_account" as A {
+ * id : INTEGER <<PK>>
+ * staff_id : INTEGER <<FK,UQ>>
+ --
+ login_name : TEXT <<UQ>>
+ status / auth_version
+ password_hash : TEXT
+}
+entity "岗位任职\nstaff_role_qualification" as Q {
+ * id : INTEGER <<PK>>
+ * staff_id : INTEGER <<FK>>
+ * role_id : INTEGER <<FK>>
+ --
+ valid_from / valid_until
+ verification_basis / revoked_at
+}
+entity "账号岗位授予\naccount_role" as G {
+ * id : INTEGER <<PK>>
+ * account_id : INTEGER <<FK>>
+ * role_id : INTEGER <<FK>>
+ * qualification_id : INTEGER <<FK>>
+ --
+ granted_at / revoked_at
+}
+entity "岗位值表\naccess_role" as R {
+ * id : INTEGER <<PK>>
+ --
+ code : TEXT <<UQ>>
+ name : TEXT
+}
+entity "诊椅\ndental_chair" as H {
+ * id : INTEGER <<PK>>
+ --
+ record_no : TEXT <<UQ>>
+ name / available_from / available_until
+}
+S ||--o| A
+S ||--o{ Q
+A ||--o{ G
+Q ||--o{ G
+R ||--o{ Q
+R ||--o{ G
+H -[hidden]down-> S
+@enduml

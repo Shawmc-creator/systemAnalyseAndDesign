@@ -12,12 +12,13 @@ const {validatePharmacy}=require('./pharmacy');
 const {validateSettlements}=require('./settlement-rules');
 const {FinancialHistoryRepository,snapshotFinancialHistory,validateFinancialHistory}=require('./financial-history');
 const {WorkflowHistoryRepository}=require('./workflow-history');
-const RESULT_TABLES = new Set(['patient', 'dated_schedule', 'appointment', 'visit', 'health_review', 'clinical_record', 'record_addendum',
+const RESULT_TABLES = new Set(['staff','dental_chair','patient', 'dated_schedule', 'appointment', 'visit', 'health_review', 'clinical_record', 'record_addendum',
   'treatment_plan', 'plan_version', 'patient_decision', 'treatment_execution', 'service', 'service_price', 'bill_item', 'patient_payment', 'patient_funds', 'fee_request', 'patient_refund',
   'followup_requirement', 'contact_history', 'clinical_assessment', 'material', 'material_batch', 'stock_location', 'inventory_movement', 'material_usage', 'stock_count', 'supplier', 'purchase_order', 'purchase_receipt', 'purchase_issue', 'supplier_funds', 'supplier_payment', 'supplier_refund',
   'clinical_equipment','resource_block','equipment_occupancy','clinical_document','document_version','prescription','dispense_record','staff_role_qualification',
   'payment_order','payment_reconciliation','cash_reconciliation','issue_followup','insurance_identity','insurance_item_mapping','insurance_case','insurance_settlement','insurance_reversal','insurance_fund_receipt']);
 const SQL_ERRORS = {
+  service_identity_frozen:['SERVICE_IDENTITY_FROZEN','项目已有价目或业务引用，名称及计价单位不能改写；请另建项目并保留旧目录'],
   insurance_contract_context:['INSURANCE_SOURCE','医保原提交、费用标识、批准或重新办理来源不一致'],
   payment_order_context:['PAYMENT_ORDER_SOURCE','支付原单与患者资金、原账单或确认的实际付款不一致'],
   cash_check_context:['RECONCILIATION_SOURCE','现金原款或后续核对与原记录不一致'],

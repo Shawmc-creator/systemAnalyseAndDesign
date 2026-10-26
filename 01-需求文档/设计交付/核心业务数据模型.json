@@ -1,8 +1,8 @@
 {
-  "version": "2026-10-23-course-summary-D-final",
+  "version": "2026-10-26-reference-review",
   "document": "../牙科诊所管理系统-需求文档.pdf",
   "purpose": "69个分析实体的主业务映射与8张必要历史存储表；每张历史表有明确analysis_owner和原业务外键，保持对象及事件来源。",
-  "implementation_status": "77表设计保持；当前字段来源已核对现行25用例，D2服务/实体/映射器和D3页面组件按文档精化，运行代码与历史SQL未改。",
+  "implementation_status": "基础管理复用既有实体与权限存储；目录新增分类字段。运行实现须按本次来源及验收对应核对。",
   "counts": {
     "tables": 77,
     "retained_tables": 54,
@@ -366,7 +366,8 @@
       "historical_source_uc": "01—32",
       "source_uc": [
         "UC-02",
-        "UC-04"
+        "UC-04",
+        "UC-26"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -603,7 +604,8 @@
         "UC-23",
         "UC-24",
         "UC-25",
-        "全部岗位用例的登录与权限前提"
+        "全部岗位用例的登录与权限前提",
+        "UC-26"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -691,7 +693,8 @@
       "source_uc": [
         "UC-02",
         "UC-04",
-        "UC-24"
+        "UC-24",
+        "UC-26"
       ],
       "design_status": "保留的核心设计；不等同于程序已经实现"
     },
@@ -3924,6 +3927,13 @@
           "source": "公共持久化字段",
           "common": true,
           "default": 1
+        },
+        {
+          "name": "category",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "目录业务分类：检查预防、牙体牙髓、拔牙外科、修复、正畸、药品、其他；历史未分类不推测为特定类别。",
+          "source": "UC-11步骤1；参考系统治疗目录分类与检索"
         }
       ],
       "constraints": [
@@ -3933,7 +3943,10 @@
       "source_uc": [
         "UC-11"
       ],
-      "design_status": "保留的核心设计；不等同于程序已经实现"
+      "design_status": "保留的核心设计；不等同于程序已经实现",
+      "rules": [
+        "项目目录分类不改变原费用；同项目已有价目或实际引用时不追改名称、计价单位，不同收费范围另建可辨识项目。"
+      ]
     },
     {
       "key": "Price",

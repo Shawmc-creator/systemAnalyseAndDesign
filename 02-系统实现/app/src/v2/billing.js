@@ -6,6 +6,7 @@ function safe(value) {
   return Number(value);
 }
 const sum = (rows, field) => rows.reduce((n, r) => n + BigInt(r[field]), 0n);
+const SERVICE_CATEGORIES=['检查预防','牙体牙髓','拔牙外科','修复','正畸','药品','其他'];
 class Billing {
   constructor(db, unit) { this.db = db; this.unit = unit; }
   amount(value, zero = false) {
@@ -39,8 +40,17 @@ class Billing {
   }
   draft(credentials, input) {
     return this.unit.command(credentials, 'uc05.draft', input, (ctx, now) => {
+      if(input.action==='reference'){
+        const example=require('../../config/reference-services.example.json').items.find(i=>i.id===input.referenceId);if(!example)fail(422,'REFERENCE_SERVICE','请选择参考项目');
+        if(this.db.prepare('SELECT id FROM service WHERE name=? AND billing_unit=? AND is_active=1').get(example.name,example.unit))fail(409,'SERVICE_EXISTS','已有此参考项目，请从原项目建立价目版本');
+        const cents=this.amount(input.unitPriceCents,true),reason=text(input.reason,'本诊所拟价及范围核实依据',2000)+(cents===0?'\n免收依据：'+text(input.waiverBasis,'免收依据',1000):'')+'\n参考示例，非正式价目；范围：'+example.scope;
+        const service=insert(this.db,'service',fact(now,{name:example.name,billing_unit:example.unit,category:example.category,is_active:1,created_by:ctx.session.staff_id,record_no:recordNo('SERVICE')}));
+        const start=instant(input.validFrom,'拟生效时间'),key=insert(this.db,'service_price',fact(now,{service_id:service,unit_price_cents:cents,valid_from:start,valid_until:null,change_reason:reason,confirmed_at:null,review_note:null,created_by:ctx.session.staff_id,confirmed_by:null,status:'价目草稿'}));
+        ctx.authority.referenceId=example.id;ctx.authority.serviceId=service;return {kind:'service_price',key,revision:1,reason:'仅建立参考项目及拟价草稿，未确认不能计费'};
+      }
       if (input.action === 'service') {
-        const key = insert(this.db, 'service', fact(now, { name: text(input.name, '收费项目名称', 100), billing_unit: text(input.billingUnit, '计价单位', 50),
+        const category=input.category||'其他';if(!SERVICE_CATEGORIES.includes(category))fail(422,'SERVICE_CATEGORY','项目分类无效');
+        const key = insert(this.db, 'service', fact(now, { name: text(input.name, '收费项目名称', 100), billing_unit: text(input.billingUnit, '计价单位', 50),category,
           is_active: 1, created_by: ctx.session.staff_id, record_no: recordNo('SERVICE') }));
         return { kind: 'service', key, revision: 1, reason: text(input.reason, '项目建立依据', 2000) };
       }
@@ -101,9 +111,22 @@ class Billing {
     this.billSummary(item.bill_id);
     return { kind: 'bill_item', key: item.id, beforeRevision: item.revision, revision: item.revision + 1, reason: '按原实际发生时点确认待核价项目' };
   }
+  manageService(credentials,input){return this.unit.command(credentials,'uc05.approve',input,(ctx,now)=>{
+    const service=row(this.db,'service',input.serviceId);revision(service,input.expectedRevision);const reason=text(input.reason,'项目启停或资料修订依据',2000);
+    if(input.action==='edit'){
+      const name=text(input.name,'项目名称',100),unit=text(input.billingUnit,'计价单位',50),category=input.category||service.category;if(!SERVICE_CATEGORIES.includes(category))fail(422,'SERVICE_CATEGORY','项目分类无效');
+      this.db.prepare('UPDATE service SET name=?,billing_unit=?,category=?,updated_at=?,revision=revision+1 WHERE id=?').run(name,unit,category,now,service.id);
+    }else if(input.action==='category'){
+      if(!SERVICE_CATEGORIES.includes(input.category))fail(422,'SERVICE_CATEGORY','项目分类无效');this.db.prepare('UPDATE service SET category=?,updated_at=?,revision=revision+1 WHERE id=?').run(input.category,now,service.id);
+    }else if(['stop','enable'].includes(input.action)){
+      const active=input.action==='enable'?1:0;if(service.is_active===active)fail(409,'SERVICE_STATE','项目状态已变化，请刷新');
+      this.db.prepare('UPDATE service SET is_active=?,updated_at=?,revision=revision+1 WHERE id=?').run(active,now,service.id);
+    }else fail(422,'INVALID_ACTION','项目操作无效');
+    return {kind:'service',key:service.id,beforeRevision:service.revision,revision:service.revision+1,reason};
+  });}
   catalog(credentials) {
     const permission = credentials.role === 'dentist' ? 'uc04.execute' : credentials.role === 'manager' ? 'uc05.approve' : 'uc05.draft';
-    return this.unit.query(credentials, permission, () => ({ services: this.db.prepare('SELECT * FROM service ORDER BY id').all(), prices: this.db.prepare('SELECT * FROM service_price ORDER BY service_id,valid_from,id').all().map(p=>({...p,...(credentials.role==='dentist'?{}:{history:this.unit.financialHistory.list('service_price',p.id),historyCoverage:'历史仅展示实际记录的提交及审核；未记录的早期内容不作推断。'})})),
+    return this.unit.query(credentials, permission, () => ({ categories:SERVICE_CATEGORIES,services: this.db.prepare('SELECT * FROM service ORDER BY id').all(), prices: this.db.prepare('SELECT * FROM service_price ORDER BY service_id,valid_from,id').all().map(p=>({...p,...(credentials.role==='dentist'?{}:{history:this.unit.financialHistory.list('service_price',p.id),historyCoverage:'历史仅展示实际记录的提交及审核；未记录的早期内容不作推断。'})})),
       ...(credentials.role==='manager'?{pendingItems:this.lines().filter(i=>i.pricing_status==='待核价').slice(0,100)}: {}) }));
   }
   lines(billId=null){return this.db.prepare(`SELECT i.*,coalesce(e.service_id,pi.billing_service_id) service_id,

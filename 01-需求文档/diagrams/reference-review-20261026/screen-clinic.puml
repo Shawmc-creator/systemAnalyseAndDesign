@@ -1,0 +1,21 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam sequenceMessageAlign center
+skinparam classAttributeIconSize 0
+skinparam rectangleRoundCorner 8
+rectangle "负责人工作台：诊所基础管理" {
+ rectangle "当前身份与原办理结果" as A
+ rectangle "人员、个人账号及在岗状态\n新增职员和账号／核实授予／撤销岗位／启停账号\n显示核实依据及授权历史" as B
+ rectangle "诊椅目录\n新增实际诊椅／核实退役\n显示有效期间及受影响排班提示" as C
+ rectangle "既有岗位权限矩阵（只读）\n临时清洁与故障转诊椅设备页面" as D
+ A -[hidden]down-> B
+ B -[hidden]down-> C
+ C -[hidden]down-> D
+}
+@enduml

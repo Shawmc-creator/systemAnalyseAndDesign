@@ -1,0 +1,27 @@
+✔ clinic upgrade preserves every original column and clinical row, backs up the old file once, and classifies unknown existing services as other (892.4376ms)
+✔ an upgrade failure rolls the new column, permissions, triggers and version back together; the unchanged old database can be retried (794.439ms)
+✔ unsupported versions and an existing transaction are rejected before any clinic schema changes (771.2517ms)
+✔ manager creates an independent staff/account with verified role; responses and audit do not expose password hashes or raw passwords (724.1044ms)
+✔ ordinary staff cannot maintain personnel or grant themselves roles; CSRF and request versions remain enforced (687.7682ms)
+✔ duplicate login or a failed audit rolls staff, account and role qualification back together; repeated original command is not duplicated (704.3349ms)
+✔ revoking a verified role takes effect immediately while the original grant remains; a stale personnel version is rejected (681.6662ms)
+✔ disable invalidates existing sessions, preserves historical staff identity and can be restored without restoring revoked roles (1186.5167ms)
+✔ current manager cannot disable or revoke their own management entry; a dentist with schedules or actual use must be coordinated first (1150.882ms)
+✔ a new dental chair can be scheduled but is not a bookable timeslot merely because it exists (1150.3962ms)
+✔ chair retirement never cancels or releases existing clinical work; unused retirement keeps the old record (1121.5889ms)
+✔ reference prices create only local drafts and never become confirmed prices automatically (1179.6802ms)
+✔ reference import is atomic, preserves fractional yuan accurately, and needs a waiver for zero (1133.0656ms)
+✔ project stop prevents new price drafting and never rewrites original charges or approved price history (1147.4687ms)
+✔ a priced or clinically referenced project cannot change its name or unit and reinterpret old fees (1129.7637ms)
+✔ HTTP clinic endpoints and new browser assets exist with authorization; a non-manager cannot read personnel or assign grants (1304.1062ms)
+✔ the personnel page uses authorization validity, including expired qualifications and disabled accounts, rather than just an unrevoked grant (1243.0318ms)
+✔ HTTP personnel workflow creates a usable personal account, restricts management by role, disables sessions and preserves the original identity (1364.6644ms)
+✔ HTTP reference pricing requires submission and manager confirmation; category and stop affect the catalog without altering existing fees (1452.0587ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17510.2423

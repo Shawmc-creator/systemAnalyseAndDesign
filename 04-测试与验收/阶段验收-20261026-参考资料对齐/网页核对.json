@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-26",
+  "mode": "LOCAL_READ_ONLY_BROWSER_CHECK",
+  "url": "http://127.0.0.1:3001/",
+  "schemaVersion": 2026102601,
+  "checks": [
+    {
+      "name": "负责人基础管理入口及当前岗位状态",
+      "passed": true
+    },
+    {
+      "name": "原6名职员及2张诊椅可读，授权历史入口可见",
+      "passed": true
+    },
+    {
+      "name": "收费岗位目录分类、搜索及参考草稿入口",
+      "passed": true
+    },
+    {
+      "name": "参考项目切换完整疗程，范围说明及拟价同步改变",
+      "passed": true
+    },
+    {
+      "name": "取消草稿，返回价目页且未新增价目",
+      "passed": true
+    }
+  ],
+  "businessWritesPerformed": false,
+  "fullWorkflowValidatedBy": "隔离HTTP测试；不计为浏览器提交审批验收",
+  "limits": [
+    "本机目录为空，未在本机创建正式价目验证筛选结果",
+    "本段未重跑全部医保收付网页或窄屏场景"
+  ],
+  "screenshots": [
+    "基础管理页面.png",
+    "参考价草稿页面.png"
+  ]
+}

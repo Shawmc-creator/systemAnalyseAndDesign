@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-26",
+  "inputs": [
+    "课程资料/参考价格.txt",
+    "课程资料/参考系统.txt",
+    "课程资料/课程总结.txt"
+  ],
+  "verifiedSources": {
+    "OpenDental": "官方Quick Manual及26.2.0.0结构XML（430表），核对provider/operatory/procedurecode/fee/feesched/procedurelog及授权概念",
+    "DentalPin": "已实际登录公开演示，查看人员和角色、新增人员字段、诊室目录、治疗目录分类及价格组织"
+  },
+  "changes": [
+    "UC-26基础资料与个人账号，复用职员/账号/诊椅",
+    "UC-11分类检索、参考草稿、计价范围、已引用目录冻结",
+    "ABCD图文对应及D3基础管理入口"
+  ],
+  "coreEntityTables": 69,
+  "historyTables": 8,
+  "physicalDesignTables": 77,
+  "logicalFields": 987,
+  "runtimeTableCount": 108,
+  "newTablesCreated": 0,
+  "limits": [
+    "不复制外国税务、欧元价及保险规则",
+    "参考价格未核实为本诊所正式价目，示例仅建草稿",
+    "C3保留现有复杂对象状态机，不为简单账号启停增加冗余图"
+  ],
+  "sourceSqlUnchanged": true,
+  "stage": "第一段：资料学习与文档修订已完成；按用户要求分段推进",
+  "pdfPages": 176,
+  "figures": 154,
+  "usecases": 26,
+  "allFigureFontsAtLeast8_8pt": true,
+  "minimumReviewedFontPt": 8.83,
+  "latexOverflowWarnings": 0,
+  "runtimeDraftVersion": 2026102601,
+  "automatedTestsAlreadyRun": 386,
+  "githubSyncedThisStage": false,
+  "nextStage": [
+    "对现有代码改动做专项验收和整理",
+    "集中核对后台管理、分类与参考价草稿页面",
+    "阶段验收后再同步GitHub"
+  ],
+  "files": {
+    "pdf_sha256": "56d4a4a34efd6a06a847a260226a9f2b30acda035c1125886a60c1cbd832d2aa",
+    "tex_sha256": "1d0c9be6634452ce2e864d0c4247a44f964af7362f77b20ec6ff4585d6b50a0d",
+    "logical_model_sha256": "9902f8f1f8bbb45ab2728c953d09080b35dec29753243d9622123c3807e0bb06"
+  }
+}

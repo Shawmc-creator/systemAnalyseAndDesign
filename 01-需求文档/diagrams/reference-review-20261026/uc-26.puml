@@ -1,0 +1,17 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam sequenceMessageAlign center
+skinparam classAttributeIconSize 0
+left to right direction
+actor "诊所负责人" as M
+rectangle "牙科诊所管理系统" {
+ usecase "UC-26\n维护诊所基础资料与账号" as U
+}
+M -- U
+@enduml

@@ -1,0 +1,21 @@
+{
+  "date": "2026-10-26",
+  "runtimeVersion": 2026102601,
+  "documentPages": 176,
+  "documentFigures": 154,
+  "usecases": 26,
+  "designTables": 77,
+  "logicalFields": 987,
+  "runtimeTables": 108,
+  "automatedTests": 392,
+  "specialistTestsIncluded": 19,
+  "failures": 0,
+  "newTestsThisSegment": 6,
+  "structureAligned": true,
+  "stage1RequirementsRevisionIncluded": true,
+  "stage2MainPdfChanged": false,
+  "originalSqlUnchanged": true,
+  "actualPaymentInsuranceNetwork": false,
+  "githubSync": "与本段源码、文档及验收证据一并提交；推送结果见本机回执",
+  "remaining": "D2其余服务、实体与数据存取分层仍待后续对照"
+}
