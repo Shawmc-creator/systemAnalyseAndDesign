@@ -13,6 +13,7 @@ function previousInsuranceSchema(){
 }
 // Isolated test fixtures only. No filename or production database is accepted.
 function removeInsuranceFixture(db){
+ require('./v2-quote-legacy').removeQuotesFixture(db);
  if(!db.prepare('PRAGMA table_info(insurance_fee)').all().some(c=>c.name==='is_self_pay'))return;
  const schema=previousInsuranceSchema(),triggers=db.prepare("SELECT name,sql FROM sqlite_master WHERE type='trigger'").all(),indexes=db.prepare("SELECT tbl_name,sql FROM sqlite_master WHERE type='index' AND sql IS NOT NULL").all().filter(i=>TABLES.includes(i.tbl_name)),fk=db.prepare('PRAGMA foreign_keys').get().foreign_keys;
  db.exec('PRAGMA foreign_keys=OFF;BEGIN');try{

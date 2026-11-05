@@ -204,8 +204,9 @@ class Followups {
       if (input.overdueOnly != null && !['true','false',true,false].includes(input.overdueOnly)) fail(422, 'INVALID_FILTER', '逾期筛选无效');
       const from = input.from == null ? null : dateOnly(input.from), to = input.to == null ? null : dateOnly(input.to);
       if (from && to && from > to) fail(422, 'INVALID_RANGE', '日期范围无效');
-      const candidates = this.db.prepare(`SELECT * FROM followup_requirement WHERE (? IS NULL OR patient_id=?) AND (? IS NULL OR status=?)
-        ORDER BY coalesce(next_contact_date,target_start),id`).all(patientId, patientId, input.status ?? null, input.status ?? null);
+      const followupId=input.followupId==null?null:id(Number(input.followupId));
+      const candidates = this.db.prepare(`SELECT * FROM followup_requirement WHERE (? IS NULL OR patient_id=?) AND (? IS NULL OR status=?) AND (? IS NULL OR id=?)
+        ORDER BY coalesce(next_contact_date,target_start),id`).all(patientId, patientId, input.status ?? null, input.status ?? null,followupId,followupId);
       const visible = candidates.filter(f => {
         if (!clinical) return f.responsible_frontdesk_id === ctx.session.staff_id && f.status !== '待发布';
         try { this.scope(ctx, f, 'followup.read'); return true; } catch (e) { if (e.code === 'FOLLOWUP_SCOPE') return false; throw e; }

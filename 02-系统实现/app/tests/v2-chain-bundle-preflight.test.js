@@ -1,0 +1,21 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os');
+const {spawnSync}=require('node:child_process');const {setup}=require('./helpers/v2-treatment');const {createBundle}=require('../scripts/lib/v2-backup');const {inspectBundle}=require('../scripts/lib/chain-bundle-preflight');
+const mapping=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../../../01-需求文档/设计交付/连锁业务表归属候选映射.json'),'utf8'));
+test('备份包只读门店核对：完整性、关联冲突、不完整和篡改均可识别',async t=>{
+ const folder=fs.mkdtempSync(path.join(os.tmpdir(),'chain-bundle-preflight-'));
+ const source=path.join(folder,'clinic-v2.db'),app=setup(t,{filename:source});t.after(()=>{if(!path.resolve(folder).startsWith(path.resolve(os.tmpdir())+path.sep+'chain-bundle-preflight-'))throw Error('临时目录无效');fs.rmSync(folder,{recursive:true,force:true});});
+ const result=await createBundle({source,outputDir:path.join(folder,'backups')});
+ const assignment={branchIds:[1,2],tables:{}};
+ for(const row of mapping.rows){if(!['新增门店外键','来源与负责门店'].includes(row.mode))continue;const fields=row.mode==='新增门店外键'?[row.field]:row.fields;assignment.tables[row.table]={};for(const r of app.db.prepare('SELECT id FROM "'+row.table+'"').all())assignment.tables[row.table][r.id]=Object.fromEntries(fields.map(f=>[f,1]));}
+ const dbfile=path.join(result.directory,'clinic-v2.db'),before=fs.readFileSync(dbfile),baseline=inspectBundle(result.directory,assignment);
+ assert.equal(baseline.readyForReview,true);assert.equal(baseline.assignmentTrial.passed,true);assert.equal(baseline.assignmentTrial.rollbackVerified,true);assert.equal(baseline.schema.rollbackVerified,true);assert.ok(baseline.relations.relationships.some(x=>x.relationship==='就诊与预约'&&x.checked>0));assert.deepEqual(fs.readFileSync(dbfile),before);
+ assert.equal(baseline.identity.consistent,true);assert.ok(baseline.identity.relationships.some(x=>x.relationship==='就诊与预约患者'&&x.checked>0));
+ const missing=structuredClone(assignment),appt=Object.keys(missing.tables.appointment)[0];delete missing.tables.appointment[appt];const notReady=inspectBundle(result.directory,missing);assert.equal(notReady.readyForReview,false);assert.equal(notReady.mapping.assignmentComplete,false);assert.equal(notReady.assignmentTrial,null);assert.ok(notReady.relations.relationships.some(x=>x.unresolved>0));
+ const assignmentFile=path.join(folder,'missing-assignment.json');fs.writeFileSync(assignmentFile,JSON.stringify(missing));const cli=spawnSync(process.execPath,[path.resolve(__dirname,'../scripts/check-chain-bundle.js'),result.directory,assignmentFile],{encoding:'utf8'});assert.equal(cli.status,2,cli.stderr);assert.equal(JSON.parse(cli.stdout).readyForReview,false);
+ const conflicting=structuredClone(assignment);conflicting.tables.appointment[appt].branch_id=2;const conflict=inspectBundle(result.directory,conflicting);assert.equal(conflict.mapping.assignmentComplete,true);assert.equal(conflict.readyForReview,false);assert.ok(conflict.relations.relationships.some(x=>x.conflicts>0));assert.deepEqual(fs.readFileSync(dbfile),before);
+ const service=app.service();app.price(service.id);app.execute(service.id,{independentCheck:true,independentBasis:'虚构检查'});
+ const rich=await createBundle({source,outputDir:path.join(folder,'backups')});const richMap=structuredClone(assignment);for(const row of mapping.rows){if(!['新增门店外键','来源与负责门店'].includes(row.mode))continue;const fields=row.mode==='新增门店外键'?[row.field]:row.fields;for(const r of app.db.prepare('SELECT id FROM "'+row.table+'"').all())richMap.tables[row.table][r.id]=Object.fromEntries(fields.map(f=>[f,1]));}
+ const richBefore=fs.readFileSync(path.join(rich.directory,'clinic-v2.db')),richResult=inspectBundle(rich.directory,richMap);assert.equal(richResult.mapping.assignmentComplete,true);assert.equal(richResult.assignmentTrial.passed,true);assert.match(richResult.assignmentTrial.strictFailure,/treatment_execution/);assert.equal(richResult.assignmentTrial.method,'受限触发器事务试验');assert.equal(richResult.assignmentTrial.guardedTriggerRestoreVerified,1);assert.equal(richResult.readyForReview,true);assert.deepEqual(fs.readFileSync(path.join(rich.directory,'clinic-v2.db')),richBefore);
+ fs.appendFileSync(dbfile,'tamper');assert.throws(()=>inspectBundle(result.directory,assignment),/摘要不匹配/);
+});

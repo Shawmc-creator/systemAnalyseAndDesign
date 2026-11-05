@@ -1,0 +1,66 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam sequenceMessageAlign center
+skinparam classAttributeIconSize 0
+left to right direction
+class "基础管理接口" as B <<controller>> {
+ 接收当前门店、对象及核实依据()
+ 按当前身份调用维护服务()
+}
+class "基础管理应用服务" as C <<application>> {
+ UC-26 维护诊所基础资料与账号()
+ 核验连锁或门店管理权限()
+ 协调岗位、跨店授权及排班影响()
+ 共同保存结果与操作依据()
+}
+class "职员" as E1 <<entity>> {
+ 核对在岗期间()
+ 核实任职及授权依据()
+}
+class "职员账号" as E2 <<entity>> {
+ 核验办理授权()
+ 授予或撤销已核实岗位()
+ 停用或恢复账号()
+}
+class "门店岗位授权" as E4 <<entity>> {
+ 核对职员、门店及岗位范围()
+ 授予或撤销岗位权限()
+}
+class "跨店病历查阅授权" as E5 <<entity>> {
+ 核对牙医、患者及来源就诊()
+ 核对目标门店、范围及有效期()
+}
+class "诊椅" as E3 <<entity>> {
+ 核对资源有效期间()
+ 核对退役条件()
+ 确认诊椅退役()
+}
+interface "基础资料存取接口" as R {
+ 读取职员、门店授权及资源(稳定键)
+ 查询有效管理入口和排班影响()
+ 保存本次基础资料及授权(版本)
+}
+class "SQLite基础资料映射器" as DB <<mapper>> {
+ 映射人员、资源与候选授权表()
+ 同事务保存任职授予及审计()
+}
+B --> C
+C --> E1
+C --> E2
+C --> E3
+C --> E4
+C --> E5
+C --> R
+DB ..|> R
+note bottom of R
+职员、账号及诊椅复用分析实体。
+门店岗位与跨店查阅授权为候选结构，
+历史授权须核实，不自动迁移。
+end note
+@enduml

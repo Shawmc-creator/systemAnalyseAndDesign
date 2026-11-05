@@ -1,0 +1,56 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam sequenceMessageAlign center
+skinparam classAttributeIconSize 0
+actor "获授权负责人" as M
+boundary "诊所基础管理边界" as B
+control "维护基础资料与账号控制" as C
+entity "当前账号:职员账号" as CURRENT
+entity "职员" as S
+entity "目标账号:职员账号" as A
+entity "门店岗位授权" as RG
+entity "诊椅" as H
+entity "跨店病历查阅授权" as AUTH
+M -> B : 选择门店、维护对象及动作，提交版本和依据
+B -> C : 维护基础资料与账号(输入)
+C -> CURRENT : 核验办理授权()
+C -> RG : 核对门店岗位权限()
+break 无相应管理权限
+ C --> B : 拒绝办理，不改变原记录
+end
+alt 人员及账号维护
+ C -> S : 核对在岗期间()
+ C -> S : 核实任职及授权依据()
+ C -> A : 核对账号可用性()
+ alt 新人员及个人账号
+  C -> S : 建立职员资料()
+  C -> A : 建立个人账号()
+  C -> RG : 授予或撤销()
+ else 岗位变更
+  C -> C : 核对管理入口及有效排班影响
+  C -> RG : 授予或撤销()
+ else 账号启停
+  C -> C : 核对管理入口及有效排班影响
+  C -> A : 停用或恢复账号()
+ end
+else 跨店病历查阅授权或撤销
+ C -> C : 核对牙医、患者、原就诊及授权范围
+ C -> AUTH : 登记或撤销授权及依据()
+else 诊椅登记或退役
+ C -> H : 核对资源有效期间()
+ alt 新增诊椅
+  C -> H : 登记诊椅()
+ else 永久退役
+  C -> H : 核对退役条件()
+  C -> H : 确认诊椅退役()
+ end
+end
+C --> B : 返回实际生效状态及原办理编号
+B --> M : 展示结果；冲突则保持原资料并提示协调
+@enduml

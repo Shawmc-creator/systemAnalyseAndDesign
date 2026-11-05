@@ -3,6 +3,10 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const { openDatabase, VERSION } = require('./database');
+const {BUILD}=require('./release');
+const {PatientWorkspace}=require('./patient-workspace');
+const {AppointmentCalendar}=require('./appointment-calendar');
+const {Home}=require('./home');
 const { Auth } = require('./auth');
 const { UnitOfWork, mapError } = require('./unit-of-work');
 const { Reception } = require('./reception');
@@ -16,6 +20,7 @@ const { Inventory } = require('./inventory');
 const { Purchases } = require('./purchases');
 const { Resources }=require('./resources');
 const {Clinic}=require('./clinic');
+const {Quotes}=require('./quotes');
 const { Documents }=require('./documents');
 const { DocumentStore,MAX_FILE_BYTES }=require('./document-store');
 const {Prescriptions}=require('./prescriptions');
@@ -38,13 +43,16 @@ async function body(req,limit=64*1024) {
   if (!result || typeof result !== 'object' || Array.isArray(result)) fail(400, 'INVALID_JSON', '请求内容应为对象');
   return result;
 }
-function createApplication({ filename = ':memory:', demo = false, clock, attachmentDir,pharmacyPolicy,insurancePolicy,integrationSimulation=false } = {}) {
+function createApplication({ filename = ':memory:', demo = false, clock, attachmentDir,pharmacyPolicy,insurancePolicy,integrationSimulation=false,sessionCookieName='clinic_v2_session' } = {}) {
   if(integrationSimulation&&filename!==':memory:')throw new Error('支付医保模拟仅允许隔离内存数据库，不得写入实际业务库');
+  if(!/^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(sessionCookieName))throw new Error('会话Cookie名称无效');
   const db = openDatabase(filename), auth = new Auth(db, clock), unit = new UnitOfWork(db, auth), reception = new Reception(db, unit), clinical = new Clinical(db, unit);
   const documentStore=new DocumentStore(attachmentDir||(filename===':memory:'?null:path.resolve(path.dirname(filename),'clinical-files')));
   const documents=new Documents(db,unit,clinical,documentStore);
   const billing = new Billing(db, unit), treatment = new Treatment(db, unit, clinical, billing,documents);
   const payments = new Payments(db, unit, billing);
+  const quotes=new Quotes(db,unit,clinical,billing);
+  const workspace=new PatientWorkspace(db,unit,clinical),calendar=new AppointmentCalendar(db,unit);
   const fees = new Fees(db, unit, billing, payments);
   const settlements=new Settlements(db,unit,billing,payments,integrationSimulation);
   const insurance=new Insurance(db,unit,billing,normalizeInsurancePolicy(insurancePolicy===undefined?(filename===':memory:'?{enabled:false}:loadInsurancePolicy(filename)):insurancePolicy),integrationSimulation);
@@ -53,20 +61,30 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
   const resources=new Resources(db,unit,clinical),clinic=new Clinic(db,unit);
   const prescriptions=new Prescriptions(db,unit,clinical);
   const pharmacy=new Pharmacy(db,unit,prescriptions,inventory,billing,normalizePolicy(pharmacyPolicy===undefined?(filename===':memory:'?{enabled:false}:loadPolicy(filename)):pharmacyPolicy));prescriptions.pharmacy=pharmacy;
+  const home=new Home(db,unit,{clinical,quotes,followups,billing,purchases,pharmacy,insurance});
   if (demo) seedDemo(db, auth, reception);
-  const cookie = token => `clinic_v2_session=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${token ? 28800 : 0}`;
+  const cookie = token => `${sessionCookieName}=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${token ? 28800 : 0}`;
   const handler = async (req, res) => {
     try {
       const url = new URL(req.url, 'http://localhost'), p = url.pathname;
       if (!p.startsWith('/api/')) {
-        const files = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/documents.js':['documents.js','text/javascript'], '/prescriptions.js':['prescriptions.js','text/javascript'], '/pharmacy.js':['pharmacy.js','text/javascript'], '/settlements.js':['settlements.js','text/javascript'], '/insurance.js':['insurance.js','text/javascript'], '/clinical.js':['clinical.js','text/javascript'], '/clinic.js':['clinic.js','text/javascript'], '/catalog.js':['catalog.js','text/javascript'], '/finance.js':['finance.js','text/javascript'], '/followups.js':['followups.js','text/javascript'], '/inventory.js':['inventory.js','text/javascript'], '/styles.css': ['styles.css', 'text/css'] };
+        const files = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/documents.js':['documents.js','text/javascript'], '/prescriptions.js':['prescriptions.js','text/javascript'], '/pharmacy.js':['pharmacy.js','text/javascript'], '/settlements.js':['settlements.js','text/javascript'], '/insurance.js':['insurance.js','text/javascript'], '/clinical.js':['clinical.js','text/javascript'], '/clinic.js':['clinic.js','text/javascript'], '/quotes.js':['quotes.js','text/javascript'], '/workspace.js':['workspace.js','text/javascript'], '/calendar.js':['calendar.js','text/javascript'], '/home.js':['home.js','text/javascript'], '/catalog.js':['catalog.js','text/javascript'], '/finance.js':['finance.js','text/javascript'], '/followups.js':['followups.js','text/javascript'], '/inventory.js':['inventory.js','text/javascript'], '/styles.css': ['styles.css', 'text/css'] };
         if (!files[p] || req.method !== 'GET') return json(res, 404, { code: 'NOT_FOUND', message: '页面不存在' });
         res.writeHead(200, { 'Content-Type': files[p][1] + '; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff',
           'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'" });
         return res.end(fs.readFileSync(path.join(PUBLIC, files[p][0])));
       }
-      const token = String(req.headers.cookie || '').split(';').map(x => x.trim()).find(x => x.startsWith('clinic_v2_session='))?.slice('clinic_v2_session='.length);
+      const prefix=sessionCookieName+'=';
+      const token = String(req.headers.cookie || '').split(';').map(x => x.trim()).find(x => x.startsWith(prefix))?.slice(prefix.length);
       const credentials = { token, role: req.headers['x-clinic-role'], csrf: req.headers['x-csrf-token'] };
+      if(p==='/api/v2/home/query'&&req.method==='GET')return json(res,200,home.query(credentials,Object.fromEntries(url.searchParams)));
+      if(p==='/api/v2/home/target'&&req.method==='GET')return json(res,200,home.resolve(credentials,Object.fromEntries(url.searchParams)));
+      if(p==='/api/v2/workspace/candidates'&&req.method==='GET')return json(res,200,workspace.candidates(credentials,Object.fromEntries(url.searchParams)));
+      if(p==='/api/v2/workspace/query'&&req.method==='GET')return json(res,200,workspace.query(credentials,Object.fromEntries(url.searchParams)));
+      if(p==='/api/v2/appointments/calendar'&&req.method==='GET')return json(res,200,calendar.query(credentials,Object.fromEntries(url.searchParams)));
+      if(p==='/api/v2/quotes/query'&&req.method==='GET')return json(res,200,quotes.query(credentials,Object.fromEntries(url.searchParams)));
+      const quoteCommands={'/api/v2/quotes/prepare':'prepare','/api/v2/quotes/issue':'issue','/api/v2/quotes/decide':'decide'};
+      if(quoteCommands[p]&&req.method==='POST')return json(res,200,quotes[quoteCommands[p]](credentials,await body(req)));
       if(p==='/api/v2/settlements/query'&&req.method==='GET')return json(res,200,settlements.query(credentials,Object.fromEntries(url.searchParams)));
       if(p==='/api/v2/insurance/query'&&req.method==='GET')return json(res,200,insurance.query(credentials,Object.fromEntries(url.searchParams)));
       const settlementCommands={'/api/v2/payment-orders/create':'order','/api/v2/payment-orders/verify':'verifyOrder','/api/v2/settlements/reconcile':'reconcile','/api/v2/settlements/check':'check','/api/v2/settlements/issues':'issue'};
@@ -97,7 +115,7 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
         const file=documents.download(credentials,Number(download[1]));
         res.writeHead(200,{'Content-Type':file.mediaType,'Content-Length':file.bytes.length,'Content-Disposition':`attachment; filename="document"; filename*=UTF-8''${encodeURIComponent(file.name).replace(/['()*]/g,c=>'%'+c.charCodeAt(0).toString(16))}`,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; default-src 'none'"});return res.end(file.bytes);
       }
-      if (p === '/api/v2/status' && req.method === 'GET') return json(res, 200, { application:'qinghe-dental-v2',schemaVersion:VERSION,ready:true,demo,businessDate:day(auth.now()),now:auth.now(),numbering:'现行需求文档26个系统用例，内部权限保留历史编号',implementedCoreUsecases:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],pendingCoreUsecases:[],settlementApi:{implemented:['orders','dailyReconciliation','discrepancyFollowup'],networkConnected:false,mode:integrationSimulation?'isolatedSimulation':'officialTerminalVerification'},insuranceApi:{implemented:['identity','preSettlement','preestimateOriginalQuery','preestimateInvalidation','explicitSelfPay','patientChoice','settlement','approvedReversal','reversal','linkedReregistration','fundReceipts'],...insurance.state()},prescriptionApi:{usecase:'现行UC-25',implemented:['outsideDraft','outsideIssue','inHouseDraft','inHouseIssue','physicianResponse','void','protectedCopy'],inHouseEnabled:pharmacy.state().active,pending:[]},pharmacyApi:{usecase:'现行UC-25',implemented:['qualification','review','physicianResponse','dispense','stockAndActualFees'],inHouseEnabled:pharmacy.state().active},excludedScope:['复杂供应商结算与付款','细粒度采购退换与资金分配','器械逐包追溯','运行迁移与详细技术验收'],purchaseReceiptApi:{usecase:'现行UC-19',implemented:['receive','inspectPending','receiptNote']},resourceApi:{usecase:'现行UC-24',implemented:['equipment','block','restore','physicalEnd','equipmentReservation','readinessCheck','waitingRecoordination']} });
+      if (p === '/api/v2/status' && req.method === 'GET') return json(res, 200, { application:'qinghe-dental-v2',schemaVersion:VERSION,buildVersion:BUILD,ready:true,demo,businessDate:day(auth.now()),now:auth.now(),numbering:'现行需求文档27个系统用例，内部权限保留历史编号',implementedCoreUsecases:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27],pendingCoreUsecases:[],settlementApi:{implemented:['orders','dailyReconciliation','discrepancyFollowup'],networkConnected:false,mode:integrationSimulation?'isolatedSimulation':'officialTerminalVerification'},insuranceApi:{implemented:['identity','preSettlement','preestimateOriginalQuery','preestimateInvalidation','explicitSelfPay','patientChoice','settlement','approvedReversal','reversal','linkedReregistration','fundReceipts'],...insurance.state()},prescriptionApi:{usecase:'现行UC-25',implemented:['outsideDraft','outsideIssue','inHouseDraft','inHouseIssue','physicianResponse','void','protectedCopy'],inHouseEnabled:pharmacy.state().active,pending:[]},pharmacyApi:{usecase:'现行UC-25',implemented:['qualification','review','physicianResponse','dispense','stockAndActualFees'],inHouseEnabled:pharmacy.state().active},excludedScope:['复杂供应商结算与付款','细粒度采购退换与资金分配','器械逐包追溯','运行迁移与详细技术验收'],purchaseReceiptApi:{usecase:'现行UC-19',implemented:['receive','inspectPending','receiptNote']},resourceApi:{usecase:'现行UC-24',implemented:['equipment','block','restore','physicalEnd','equipmentReservation','readinessCheck','waitingRecoordination']} });
       if (p === '/api/v2/auth/login' && req.method === 'POST') {
         // Reject cross-origin requests even before login; do not trust forwarded IP headers.
         if (req.headers.origin && req.headers.origin !== `http://${req.headers.host}`) fail(403, 'ORIGIN_FORBIDDEN', '请求来源无效');
@@ -151,7 +169,7 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
       if (p === '/api/v2/followups/context' && req.method === 'GET') return json(res, 200, followups.context(credentials,filters));
       if (p === '/api/v2/fee-requests/query' && req.method === 'GET') return json(res, 200, fees.query(credentials, filters));
       if (p === '/api/v2/treatment-plans/query' && req.method === 'GET') return json(res, 200, treatment.detail(credentials, filters));
-      if (p === '/api/v2/services/options' && req.method === 'GET') return json(res, 200, billing.catalog(credentials));
+      if (p === '/api/v2/services/options' && req.method === 'GET') return json(res, 200, billing.catalog(credentials,filters));
       if (p === '/api/v2/patient-bills/query' && req.method === 'GET') return json(res, 200, billing.query(credentials, filters));
       if (p === '/api/v2/finance/patients' && req.method === 'GET') return json(res, 200, billing.candidates(credentials, filters));
       if (p === '/api/v2/patient-clinical-data/query' && req.method === 'GET') return json(res, 200, clinical.detail(credentials, filters));
@@ -161,12 +179,13 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
         const query = String(filters.q || '').trim();
         if (query.length > 80) fail(422, 'INVALID_INPUT', '查找条件过长');
         const pattern = '%' + query.replace(/[!%_]/g, '!$&') + '%';
-        return { items: db.prepare("SELECT * FROM patient WHERE name LIKE ? ESCAPE '!' OR phone LIKE ? ESCAPE '!' OR record_no=? ORDER BY id DESC LIMIT 100").all(pattern, pattern, query) };
+        const birthDate=filters.birthDate?dateOnly(filters.birthDate):null;
+        return { items: db.prepare("SELECT * FROM patient WHERE (name LIKE ? ESCAPE '!' OR phone LIKE ? ESCAPE '!' OR record_no=?) AND (? IS NULL OR birth_date=?) ORDER BY id DESC LIMIT 100").all(pattern, pattern, query, birthDate, birthDate) };
       }));
       if (p === '/api/v2/reception/options' && req.method === 'GET') return json(res, 200, unit.query(credentials, credentials.role === 'manager' ? 'uc15.schedule' : 'uc02.query', () => {
         const selectedDay = dateOnly(filters.date || day(auth.now()));
         const schedules = db.prepare(`SELECT s.*,d.name dentist_name,c.name chair_name FROM dated_schedule s JOIN staff d ON d.id=s.dentist_id
-          JOIN dental_chair c ON c.id=s.dental_chair_id WHERE s.business_date=? ORDER BY s.starts_at,s.id`).all(selectedDay);
+          JOIN dental_chair c ON c.id=s.dental_chair_id WHERE s.business_date=? AND (?='manager' OR s.status='已确认') ORDER BY s.starts_at,s.id`).all(selectedDay,credentials.role);
         const dentists = db.prepare(`SELECT DISTINCT s.id,s.name FROM staff s JOIN staff_role_qualification q ON q.staff_id=s.id JOIN access_role r ON r.id=q.role_id
           WHERE r.code='dentist' AND s.employed_from<=? AND (s.employed_until IS NULL OR s.employed_until>=?)
           AND q.valid_from<=? AND (q.valid_until IS NULL OR q.valid_until>?) AND (q.revoked_at IS NULL OR q.revoked_at>?)`).all(selectedDay, selectedDay, auth.now(), auth.now(), auth.now());
@@ -188,7 +207,7 @@ function createApplication({ filename = ':memory:', demo = false, clock, attachm
     }
   };
   const server = http.createServer(handler);
-  return { db, auth, unit, reception, clinical, billing, treatment, payments, fees, followups, inventory, purchases, resources, clinic, documents, documentStore, prescriptions,pharmacy,settlements,insurance,server };
+  return { db, auth, unit, reception, clinical, billing, treatment, payments, fees, followups, inventory, purchases, resources, clinic, quotes, workspace, calendar, home, documents, documentStore, prescriptions,pharmacy,settlements,insurance,server };
 }
 if (require.main === module) {
   const filename = process.env.CLINIC_V2_DB || path.resolve(__dirname, '../../data/clinic-v2.db');

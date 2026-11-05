@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "收费人员" as C
+entity "连锁诊所管理系统" as S
+participant "支付平台" as Pay
+C -> S : 查原费用、有效医保承担及患者付款
+S -> S : 核对患者当前待付和原笔未明交易
+S --> C : 展示明细、待付及可继续条件
+C -> P : 核对金额及付款方式
+P --> C : 确认本次付款安排
+alt 现金
+ P -> C : 实际交付现金
+ C -> P : 核实实收与找零
+ C -> S : 提交真实收款与找零
+ S -> S : 核对净收并关联账单用途
+else 电子支付
+ C -> S : 登记本次付款用途及原单
+ P -> Pay : 按实际情况办理付款
+ C -> Pay : 在外部渠道核对原笔付款
+ Pay --> C : 告知成功、失败或结果未知
+ C -> S : 登记核对结果
+ opt 结果未知
+  C -> Pay : 查询原业务号及渠道交易
+  Pay --> C : 返回原笔实际结果
+  C -> S : 登记本次核对结果
+ end
+ alt 明确成功且归属金额一致
+  S -> S : 只确认一次到账及账单用途
+ else 未明确成功
+  S -> S : 保留未付或待核实，不重复计入实收
+ end
+end
+S --> C : 返回真实付款、余额及凭据
+C -> P : 交付结果并说明后续事项
+@enduml

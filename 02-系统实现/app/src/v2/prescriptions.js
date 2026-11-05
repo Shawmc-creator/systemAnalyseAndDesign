@@ -38,7 +38,7 @@ class Prescriptions{
   this.db.prepare('DELETE FROM prescription_item WHERE prescription_id=?').run(key);
   for(const value of values)insert(this.db,'prescription_item',fact(now,value));
  }
- write(credentials,input){
+ write(credentials,input,{scopeGuard=null}={}){
   return this.unit.command(credentials,'prescriptions.write',input,(ctx,now)=>{
    if(['review','dispense'].includes(input.action))fail(409,'PHARMACY_NOT_ENABLED','审方与发药须由具备药学岗位资格的人员办理');
    const route=input.collectionRoute===undefined?'院外':input.collectionRoute;if(!['院外','院内'].includes(route))fail(422,'INVALID_INPUT','请选择院外或院内取药');
@@ -99,7 +99,7 @@ class Prescriptions{
    }else fail(422,'INVALID_ACTION','处方操作无效');
    const after=row(this.db,'prescription',p.id);
    return {kind:'prescription',key:p.id,beforeRevision:p.revision,revision:p.revision+1,reason,changes:['status','handed_over_at','handed_over_by','voided_at','voided_by','void_reason'].filter(k=>p[k]!==after[k]).map(field=>({field,before:p[field],after:after[field]}))};
-  });
+  },scopeGuard);
  }
  worklist(credentials,input={}){
   return this.unit.query(credentials,'prescriptions.query',ctx=>{
@@ -108,13 +108,13 @@ class Prescriptions{
     (SELECT count(*) FROM prescription x WHERE x.visit_id=v.id) prescription_count FROM visit v JOIN patient p ON p.id=v.patient_id WHERE v.arrived_at>=? AND v.arrived_at<? ORDER BY v.arrived_at,v.id`).all(start,utc(Date.parse(start)+86400000)).filter(v=>{try{this.clinical.scope(ctx,v.id);return true;}catch(e){if(e.code==='CLINICAL_SCOPE')return false;throw e;}})};
   });
  }
- query(credentials,input){
+ query(credentials,input,{scopeGuard=null}={}){
   return this.unit.query(credentials,'prescriptions.query',ctx=>{
    const visit=this.context(ctx,input),record=this.clinical.recordFor(visit.id),review=this.db.prepare('SELECT * FROM health_review WHERE visit_id=? ORDER BY id DESC LIMIT 1').get(visit.id)||null;
    const health=review?this.db.prepare('SELECT category,certainty,content,source FROM health_item WHERE health_version_id=? ORDER BY id').all(review.health_version_id):[];
    const prescriptions=this.db.prepare('SELECT * FROM prescription WHERE visit_id=? ORDER BY id DESC').all(visit.id).map(p=>({...p,originalRecordNo:p.original_prescription_id?row(this.db,'prescription',p.original_prescription_id).record_no:null,items:this.items(p.id).map(i=>({...i,dispensedQuantityScaled:this.db.prepare('SELECT coalesce(sum(quantity_scaled),0) n FROM dispense_record WHERE prescription_item_id=?').get(i.id).n})),history:this.pharmacy.history(p.id),reviewHistory:this.unit.workflowHistory.list('prescription',p.id),contentIntact:p.status==='草稿'?null:hash(canonical(payload(this.db,p)))===p.content_hash,canManage:p.prescriber_id===ctx.session.staff_id}));
    return {visit,patient:row(this.db,'patient',visit.patient_id),record,review,health,prescriptions,drugs:this.db.prepare('SELECT id,name,specification,base_unit,quantity_scale,revision,billing_service_id FROM material WHERE is_drug=1 AND is_active=1 AND confirmed_at IS NOT NULL ORDER BY name,id').all(),inHouseEnabled:this.pharmacy.state().active};
-  });
+  },scopeGuard);
  }
  export(credentials,rxId){
   return this.unit.query(credentials,'prescriptions.query',ctx=>{

@@ -1,0 +1,486 @@
+{
+  "date": "2026-10-26",
+  "source": "https://demo.dentalpin.com/",
+  "method": "通过公开演示界面只读查看；不写入或删除站点业务数据",
+  "modules": [
+    {
+      "name": "accounting_export",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "activity_journal",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "agenda",
+      "page": 1,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "billing",
+      "page": 1,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "budget",
+      "page": 1,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "catalog",
+      "page": 1,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "clinical_notes",
+      "page": 1,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "contacts",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "copilot",
+      "page": 1,
+      "observedInstalled": true,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "documents",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "expenses",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "gdpr",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "imaging_ai",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "imaging_viewer",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "india_gst",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "integrations",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "inventory",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "inventory_reorder",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "lab_orders",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "leads",
+      "page": 1,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "media",
+      "page": 2,
+      "observedInstalled": true,
+      "verificationLevel": "患者分区及模块描述，未打开或上传原件",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "medical_reference",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "medication_catalog",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "migration_import",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "nav_online",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "notifications",
+      "page": 2,
+      "observedInstalled": true,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "odontogram",
+      "page": 2,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "orthodontics",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "patient_relationships",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "patient_segments",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "patient_timeline",
+      "page": 2,
+      "observedInstalled": true,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "patients",
+      "page": 2,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "patients_clinical",
+      "page": 2,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "payment_gateways",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "payments",
+      "page": 2,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "payroll",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "periodontogram",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "prescriptions",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "purchase_orders",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "razorpay",
+      "page": 2,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "recall_reminders",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "recalls",
+      "page": 3,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "reports",
+      "page": 3,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "schedules",
+      "page": 3,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "sdi_it",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "sistema_ts",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "sms_gateway",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "staff_attendance",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "staff_tasks",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "supplier_items",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "supplier_ratings",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "suppliers",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "telephony",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "treasury",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "treatment_consumables",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "treatment_plan",
+      "page": 3,
+      "observedInstalled": true,
+      "verificationLevel": "实际页面及可见字段核对；未提交变更",
+      "visibleWorkflowReviewed": true
+    },
+    {
+      "name": "verifactu",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "whatsapp_kapso",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    },
+    {
+      "name": "whatsapp_webhook",
+      "page": 3,
+      "observedInstalled": false,
+      "verificationLevel": "仅模块目录说明和安装状态",
+      "visibleWorkflowReviewed": false
+    }
+  ],
+  "moduleCount": 59,
+  "installedCount": 17,
+  "uninstalledCount": 42,
+  "actualPagesReviewed": [
+    "首页",
+    "预约周视图与看板",
+    "新预约表单",
+    "患者摘要及临床牙位图",
+    "治疗方案明细",
+    "报价清单及接受报价明细",
+    "账单清单及部分付款明细",
+    "收款流水",
+    "复诊联系工作台",
+    "报表总览",
+    "后台设置分类",
+    "专业人员周排班与例外日期",
+    "人员账号列表",
+    "治疗目录",
+    "通信及集成入口",
+    "三页模块目录"
+  ],
+  "importantLimits": [
+    "仅查看界面、字段和可见关联，没有通过新增、收退款或删除操作验证写入逻辑",
+    "模块目录已安装不等于所有分支已经验证",
+    "copilot等条目只核对目录；未使用AI功能",
+    "media只核对患者分区和模块描述，未打开原件，不把完整上传流程标为已验证",
+    "未照搬国外税务及支付网关",
+    "未安装库存、采购、处方和技工模块的流程尚未验证"
+  ],
+  "userDecisions": {
+    "independentQuotes": true,
+    "labOrdersThisRound": false
+  },
+  "adopted": [
+    "按患者连续办理",
+    "日历及当日状态看板",
+    "方案和独立报价分开",
+    "医疗同意与费用决定分开",
+    "账单、预付及真实到账分开",
+    "复诊联系与实际完成分开",
+    "岗位首页及按业务分组导航"
+  ],
+  "retainedOriginalCore": [
+    "支付医保",
+    "处方及有条件院内发药",
+    "基础采购库存",
+    "诊椅设备清洁故障及实际恢复"
+  ],
+  "target": {
+    "usecases": 27,
+    "coreEntityTables": 73,
+    "historyTables": 8,
+    "designTables": 81,
+    "fields": 1036
+  },
+  "runtimeChanged": false,
+  "runtimeVersion": 2026102601,
+  "codeAlignmentPending": [
+    "UC-27报价服务、4张表及2处引用",
+    "患者工作区、日历看板及岗位首页的新增设计"
+  ],
+  "diagramSource": "diagrams/dentalpin-review-20261026/",
+  "pdfPages": 180,
+  "figures": 161,
+  "publicationSha256": "2805b9e45e18759f20b2fe296c8e3fee120772e59ebea8fbc133c13c6be5ad8d",
+  "validation": "DentalPin复核验证-20261026/"
+}

@@ -4,6 +4,20 @@ function resetClinical(){clinicalView.selected=null;clinicalView.detail=null;cli
 const clinicalText=(name,title,value='',required=true)=>`<label>${esc(title)}<textarea name="${name}" ${required?'required':''}>${esc(value||'')}</textarea></label>`;
 const clinicalConfirm=label=>`<label><input type="checkbox" name="confirmed" required>${esc(label)}</label>`;
 const clinicalMoney=cents=>cents==null?'未填写':(cents/100).toFixed(2)+'元';
+function clinicalVisitHealth(d){
+ const signed=d.record.status==='已签署',review=signed?d.reviews.find(r=>r.id===d.record.signed_health_review_id):d.reviews.at(-1);
+ const version=review?d.healthVersions.find(v=>v.id===review.health_version_id):null;
+ return {review:review||null,version:version||null,latest:d.healthVersions[0]||null,signed};
+}
+function clinicalHealthDisplay(d){
+ const {review,version,latest,signed}=clinicalVisitHealth(d);
+ const rows=v=>table(['类别','核实情况','实际内容及来源'],v.items.map(i=>`<tr><td>${esc(i.category)}</td><td>${esc(i.certainty)}</td><td class="clinical-note">${esc(i.content)}<small>${esc(i.source)}</small></td></tr>`));
+ let html=review?`<p>${signed?'签署所据':'本次'}健康复核：${esc(review.conclusion)} · ${esc(localDateTimeSeconds(review.reviewed_at))}</p>`:(signed?'<p>签署所据健康复核无法找到，请核对原记录。</p>':'<p>本次健康复核尚未完成。</p>');
+ if(review)html+=version?`<h3>本次复核所据健康资料 · 第${esc(version.version_no)}版</h3>${rows(version)}`:'<p>复核所据健康版本无法找到，请核对原记录。</p>';
+ if(latest&&latest.id!==version?.id)html+=`<h3>患者最新健康资料 · 第${esc(latest.version_no)}版</h3><p>此版本不代表已在本次就诊复核。</p>${rows(latest)}`;
+ if(!latest&&!review)html+=empty('尚未记录健康资料，开始接诊后逐项核实。');
+ return html;
+}
 function workflowHistory(history,fields=[],title='办理历史'){
  if(!history?.length)return '';
  return `<details class="workflow-history"><summary>${esc(title)}（${history.length}次）</summary>`+table(['办理 / 人员 / 时间','当次内容'],history.map(h=>`<tr><td>${esc(h.event_type)} · ${esc(h.actor_name)}<small>${esc(localDateTimeSeconds(h.occurred_at))}</small><small>${esc(h.event_reason)}</small></td><td>${fields.map(([key,label,format])=>`<div>${esc(label)}：${esc(h[key]==null?'未记录':format?format(h[key]):h[key])}</div>`).join('')}</td></tr>`))+'</details>';
@@ -67,6 +81,15 @@ function clinicalPlanEditor(plan=null,version=null,revise=false){
  });
  $('#add-plan-item').onclick=()=>$('#plan-item-rows').insertAdjacentHTML('beforeend',planItemRow());
 }
+function clinicalDecisionHistory(decision,items){
+ const scopes=(decision.itemScopes||[]).map(scope=>{
+  const item=items.find(i=>i.id===scope.itemId);
+  const name=item?`${item.item_description} · ${item.tooth_code||'未指定牙位'}${item.surface_code?' / '+item.surface_code:''}`:`项目 #${scope.itemId}（请核对原记录）`;
+  const quantity=scope.quantity==null?'整项范围':decision.decision==='同意'?`累计同意上限 ${scope.quantity}`:decision.decision==='撤回'?`撤回未执行量 ${scope.quantity}`:`限定数量 ${scope.quantity}`;
+  return `<li>${esc(name)}：${esc(quantity)}</li>`;
+ }).join('');
+ return `<div class="clinical-note"><p>${esc(decision.decision)} · ${esc(localDateTimeSeconds(decision.decided_at))}</p><p>说明及决定依据：${esc(decision.explanation_basis)}</p><p>范围说明：${esc(decision.scope_note)}</p>${scopes?`<ul>${scopes}</ul>`:'<p>未找到关联项目，请核对原记录。</p>'}${decision.documentVersionIds?.length?`<p>关联已确认原件版本编号：${decision.documentVersionIds.map(esc).join('、')}</p>`:''}</div>`;
+}
 async function clinicalDecision(plan,version){
  const [status,attachments]=await Promise.all([api('/status'),api('/documents/query?'+new URLSearchParams(clinicalContext()))]),now=status.now;
  const files=attachments.documents.filter(d=>!d.plan_version_id||d.plan_version_id===version.id).flatMap(d=>d.versions.filter(v=>v.status==='原件已确认'&&v.available));
@@ -84,15 +107,21 @@ function clinicalPlanAction(plan,version,action){
   await command('/treatment-plans/plan',{action,...clinicalContext(),versionId:version.id,expectedRevision:version.revision,expectedPlanRevision:plan.revision,reason:value.reason,...(action==='close'?{outcome:value.outcome}:{})},'clinical-plan-action');
  });
 }
+function clinicalExecutionServices(catalog,original){
+ const services=catalog.services.filter(s=>s.is_active);
+ if(original){const source=catalog.services.find(s=>s.id===original.service_id);if(!source)throw new Error('原执行项目无法核对，请刷新后联系负责人');if(!source.is_active)services.unshift({...source,name:source.name+'（已停用，仅用于原记录更正）'});}
+ return services;
+}
 async function clinicalExecution(original=null){
- const d=clinicalView.detail,now=(await api('/status')).now,services=clinicalView.catalog.services.filter(s=>s.is_active);
+ const d=clinicalView.detail,now=(await api('/status')).now,services=clinicalExecutionServices(clinicalView.catalog,original);
  if(!services.length)throw new Error('尚未建立收费项目，请由收费人员维护项目、负责人核对价目后再登记');
+ const quoteData=original?{quotes:[]}:await api('/quotes/query?patientId='+d.patient.id),quoted=quoteData.quotes.flatMap(q=>q.versions.filter(v=>v.issued_at&&v.id===q.versions.filter(x=>x.issued_at).at(-1)?.id).flatMap(v=>v.items.map(i=>({...i,label:q.record_no+' / V'+v.version_no+' / '+i.description_snapshot+' / '+(i.tooth_code||'未指定牙位')+' / '+(i.latestDecision?.decision_type||'未决定')}))));
  const scope=[];
  for(const p of clinicalView.treatment.plans)if(p.status==='进行中')for(const v of p.versions)if(v.status==='已确认'&&v.id===p.versions.at(-1).id)for(const i of v.items)if(i.remainingConsentQuantity>0)scope.push(i);
  const choices='<option value="">请选择实际执行依据</option><option value="independent">本次独立检查或咨询</option>'+options(scope,i=>`${i.item_description} / ${i.tooth_code||'未指定牙位'} / 同意余量${i.remainingConsentQuantity}`);
- openEditor(original?'追加实际执行更正':'登记实际完成项目',`${select('serviceId','实际收费项目',options(services,s=>s.name,original?.service_id))}${original?'<p>更正保留原执行与原应收，费用变动另由收费岗位核对。</p>':select('planItemId','实际执行依据',choices)+clinicalText('independentBasis','独立检查咨询的实际依据（关联方案时可留空）','',false)}<div class="form-grid">${input('toothCode','牙位（可留空）',original?.tooth_code||'','text',false)}${input('surfaceCode','牙面（可留空）',original?.surface_code||'','text',false)}${input('quantity','实际完成数量',original?.completed_quantity||1,'number')}${input('completedAt','实际完成时间',localDateTimeSeconds(original?.completed_at||now),'datetime-local')}</div>${clinicalText('procedureNote','实际操作经过',original?.procedure_note||'')}${original?clinicalText('reason','更正依据'):''}${clinicalConfirm('已按本次实际发生的项目、数量和时间核对记录')}`,async value=>{
+ openEditor(original?'追加实际执行更正':'登记实际完成项目',`${select('serviceId','实际收费项目',options(services,s=>s.name,original?.service_id))}${original?'<p>更正保留原执行与原应收，费用变动另由收费岗位核对。</p>':select('planItemId','实际执行依据',choices)+select('quoteItemId','本次对应报价项目（有关联报价时请核对）','<option value="">按原方案自动核对；独立检查未报价可留空</option>'+options(quoted,i=>i.label),false)+clinicalText('independentBasis','独立检查咨询的实际依据（关联方案时可留空）','',false)}<div class="form-grid">${input('toothCode','牙位（可留空）',original?.tooth_code||'','text',false)}${input('surfaceCode','牙面（可留空）',original?.surface_code||'','text',false)}${input('quantity','实际完成数量',original?.completed_quantity||1,'number')}${input('completedAt','实际完成时间',localDateTimeSeconds(original?.completed_at||now),'datetime-local')}</div>${clinicalText('procedureNote','实际操作经过',original?.procedure_note||'')}${original?clinicalText('reason','更正依据'):''}${clinicalConfirm('已按本次实际发生的项目、数量和时间核对记录')}`,async value=>{
   const independent=value.planItemId==='independent';
-  await command('/executions/execute',{...clinicalContext(),expectedVisitRevision:d.visit.revision,serviceId:Number(value.serviceId),quantity:Number(value.quantity),toothCode:value.toothCode||null,surfaceCode:value.surfaceCode||null,completedAt:stamp(value.completedAt),procedureNote:value.procedureNote,
+  await command('/executions/execute',{...clinicalContext(),expectedVisitRevision:d.visit.revision,serviceId:Number(value.serviceId),quantity:Number(value.quantity),toothCode:value.toothCode||null,surfaceCode:value.surfaceCode||null,completedAt:stamp(value.completedAt),procedureNote:value.procedureNote,...(!original?{quoteItemId:value.quoteItemId?Number(value.quoteItemId):null}:{}),
    ...(original?{originalExecutionId:original.id,planItemId:original.plan_item_id,reason:value.reason}:{planItemId:independent?null:Number(value.planItemId),independentCheck:independent,independentBasis:value.independentBasis})},'clinical-execution');
  });
  const chooser=$('#editor [name=planItemId]');if(chooser)chooser.onchange=()=>{const item=scope.find(i=>i.id===Number(chooser.value));if(item){$('#editor [name=toothCode]').value=item.tooth_code||'';$('#editor [name=surfaceCode]').value=item.surface_code||'';}};
@@ -103,7 +132,7 @@ async function renderClinical(version){
   const data=await api('/clinical-worklist/query?date='+state.date);if(version!==renderVersion)return;
   $('#page-actions').innerHTML='';filterDate();
   $('#content').innerHTML=data.items.length?table(['患者身份','实际到诊','就诊 / 病历状态','办理'],data.items.map(v=>`<tr><td>${esc(v.patient_name)}<small>${esc(v.patient_no)}</small></td><td>${time(v.arrived_at)}<small>${esc(v.record_no)}</small></td><td>${esc(v.status)}<small>${esc(v.record_status)}</small></td><td><button class="primary" data-open-clinical="${v.id}">${v.status==='候诊'?'核对并接诊':'查看本次病历'}</button></td></tr>`)):empty('该日期没有分配给当前牙医的到诊记录。前台完成实际到诊登记后，患者会进入接诊名单。');
-  document.querySelectorAll('[data-open-clinical]').forEach(b=>b.onclick=()=>{const row=data.items.find(v=>v.id===Number(b.dataset.openClinical));clinicalView.selected={visitId:row.id,patientId:row.patient_id};clinicalAction(render);});
+  document.querySelectorAll('[data-open-clinical]').forEach(b=>b.onclick=()=>{const row=data.items.find(v=>v.id===Number(b.dataset.openClinical));clinicalAction(()=>openWorkspace(row.patient_id,row.id,'clinical'));});
   $('#refresh').onclick=()=>{state.date=$('#filter-date').value;clinicalAction(render);};
   if($('#tomorrow'))$('#tomorrow').onclick=()=>{state.date=new Date(Date.parse(state.status.businessDate+'T12:00:00Z')+86400000).toISOString().slice(0,10);clinicalAction(render);};
   return;
@@ -114,22 +143,22 @@ async function renderClinical(version){
  $('#filters').innerHTML='';$('#page-actions').innerHTML='<button id="back-clinical">返回接诊名单</button>';
  const actionButtons=d.visit.status==='候诊'?'<button class="primary" id="start-clinical">核对并开始接诊</button>':
   `${draftEditable?'<button id="edit-health">记录健康资料</button>'+ (latest?'<button id="review-health">复核已有资料</button>':'')+'<button id="edit-record">编辑病历草稿</button><button class="primary" id="sign-record">核对并签署</button>':''}${signed?'<button id="record-addendum">追加独立补充</button>':''}${d.occupancy&&d.visit.started_at?'<button id="end-physical">确认实际操作结束</button>':''}`;
- let html=`<section class="clinical-summary"><h2>${esc(d.patient.name)} <small>${esc(d.patient.record_no)}</small></h2><p>就诊 ${esc(d.visit.record_no)} · ${esc(d.visit.status)} · 病历${esc(d.record.status)}</p>${d.requiresEndVerification?'<p>历史就诊已标结束，但实际资源尚未交接；请牙医核实后单独确认实际结束。</p>':''}<p>实际资源：${d.physicalEnd?'已结束操作并交接清洁':d.visit.started_at?'实际使用未交接结束':'尚未开始实际使用'}</p><div class="actions"><button id="clinical-documents">影像与诊疗文书</button><button id="clinical-prescriptions">处方与用药指导</button>${actionButtons}${d.visit.started_at?'<button id="create-followup">提出复诊或随访要求</button>':''}</div></section>`;
- html+='<h2 class="subheading">健康资料与当次复核</h2>'+(latest?table(['类别','核实情况','实际内容及来源'],latest.items.map(i=>`<tr><td>${esc(i.category)}</td><td>${esc(i.certainty)}</td><td class="clinical-note">${esc(i.content)}<small>${esc(i.source)}</small></td></tr>`)):empty('尚未记录健康资料，开始接诊后逐项核实。'))+`<p>当次复核：${d.reviews.length?esc(d.reviews.at(-1).conclusion)+' · '+esc(localDateTimeSeconds(d.reviews.at(-1).reviewed_at)):'尚未完成'}</p>`;
+ let html=`<section data-home-record="resource_occupancy:${d.occupancy?.id}" data-clinical-section="clinical" class="clinical-summary"><h2>${esc(d.patient.name)} <small>${esc(d.patient.record_no)}</small></h2><p>就诊 ${esc(d.visit.record_no)} · ${esc(d.visit.status)} · 病历${esc(d.record.status)}</p>${d.requiresEndVerification?'<p>历史就诊已标结束，但实际资源尚未交接；请牙医核实后单独确认实际结束。</p>':''}<p>实际资源：${d.physicalEnd?'已结束操作并交接清洁':d.visit.started_at?'实际使用未交接结束':'尚未开始实际使用'}</p><div class="actions"><button id="clinical-documents">影像与诊疗文书</button><button id="clinical-prescriptions">处方与用药指导</button>${actionButtons}${d.visit.started_at?'<button id="create-followup">提出复诊或随访要求</button>':''}</div></section>`;
+ html+='<div data-home-record="clinical_record:'+d.record.id+'" data-clinical-section="clinical"><h2 class="subheading">健康资料与当次复核</h2>'+clinicalHealthDisplay(d);
  html+='<h2 class="subheading">本次病历</h2><div class="clinical-note">'+[['主诉',d.record.chief_complaint],['诊断',d.record.diagnosis],['处理意见',d.record.treatment_advice]].map(([n,v])=>`<strong>${n}</strong><p>${esc(v||'未填写')}</p>`).join('')+'</div>';
  if(d.findings.length)html+=table(['牙位 / 牙面','检查所见'],d.findings.map(f=>`<tr><td>${esc(f.tooth_code||'未指定')} / ${esc(f.surface_code||'未指定')}</td><td class="clinical-note">${esc(f.finding_text)}</td></tr>`));
  if(signed)html+=`<p>签署时间：${esc(localDateTimeSeconds(d.record.signed_at))}；采用健康复核 #${d.record.signed_health_review_id}；正文校验：${d.signedIntegrity?'通过':'未通过，请核对记录'}。</p>`;
  for(const a of d.addenda)html+=`<div class="clinical-note"><strong>独立补充 · ${esc(localDateTimeSeconds(a.added_at))}</strong><p>${esc(a.content)}</p><p>依据：${esc(a.reason)}</p></div>`;
- html+='<h2 class="subheading">治疗方案与患者决定</h2>'+(!signed&&active?'<button id="create-plan">建立治疗方案</button>':'');
+ html+='</div><div data-clinical-section="plans"><h2 class="subheading">治疗方案与患者决定</h2>'+(active?'<button id="create-plan">建立治疗方案</button>':'');
  for(const plan of t.plans){html+=`<section class="clinical-plan"><h3>${esc(plan.goal)} · ${esc(plan.status)}</h3>`;for(const v of plan.versions){const isLatest=v.id===plan.versions.at(-1).id;html+=`<details ${isLatest?'open':''}><summary>第${v.version_no}版 · ${esc(v.status)}</summary><p>${esc(v.diagnostic_basis)}</p><p>${esc(v.planned_schedule)}</p>`+table(['项目 / 牙位','计划 / 已完成','预计费用','患者当前决定'],v.items.map(i=>`<tr><td>${esc(i.item_description)}<small>${esc(i.tooth_code||'未指定牙位')}</small></td><td>${i.planned_quantity} / ${i.effectiveQuantity}<small>有效同意上限 ${i.consentedQuantity}；余量 ${i.remainingConsentQuantity}</small></td><td>${clinicalMoney(i.estimated_cents)}</td><td>${esc(i.latestDecision?.decision==='撤回'&&i.latestDecision.scope_quantity!=null?'部分撤回':i.latestDecision?.decision||'未记录')}<small>${esc(i.latestDecision?.scope_note||'')}</small></td></tr>`));
    if(plan.status==='进行中'&&isLatest){html+='<div class="actions">';if(v.status==='草稿')html+=`<button data-plan="${plan.id}" data-version="${v.id}" data-plan-action="edit">编辑草稿</button><button data-plan="${plan.id}" data-version="${v.id}" data-plan-action="publish">说明方案</button>`;if(v.status==='暂缓')html+=`<button data-plan="${plan.id}" data-version="${v.id}" data-plan-action="resubmit">重新说明</button>`;if(['待确认','已确认'].includes(v.status))html+=`<button data-plan="${plan.id}" data-version="${v.id}" data-plan-action="decide">记录患者决定</button>`;if(v.status!=='草稿')html+=`<button data-plan="${plan.id}" data-version="${v.id}" data-plan-action="revise">形成新版本</button>`;if(v.status==='已确认')html+=`<button data-plan="${plan.id}" data-version="${v.id}" data-plan-action="completeVersion">核对本版完成</button><button data-plan="${plan.id}" data-version="${v.id}" data-plan-action="stop">停止后续执行</button>`;html+=`<button data-plan="${plan.id}" data-version="${v.id}" data-plan-action="close">结束方案</button></div>`;}
    if(['已确认','本版执行完成'].includes(v.status)&&plan.status!=='已终止')html+=`<button data-plan-followup="${v.id}">由本版方案提出诊后要求</button>`;
-   if(v.decisions.length)html+='<details><summary>患者决定历史</summary>'+v.decisions.map(x=>`<p>${esc(x.decision)} · ${esc(localDateTimeSeconds(x.decided_at))} · ${esc(x.explanation_basis)} · ${esc(x.scope_note)}</p>`).join('')+'</details>';html+='</details>';}
+   if(v.decisions.length)html+='<details><summary>患者决定历史</summary>'+v.decisions.map(x=>clinicalDecisionHistory(x,v.items)).join('')+'</details>';html+='</details>';}
   html+='</section>';
  }
  if(!t.plans.length)html+=empty('尚无治疗方案。需要治疗时先说明方案并记录患者决定；独立检查咨询单独记实际依据。');
- html+='<h2 class="subheading">实际完成项目与费用来源</h2>'+(active?'<button id="create-execution">登记实际完成项目</button>':'')+(t.executions.length?table(['实际项目','数量 / 实际时间','经过与计费','记录'],t.executions.map(e=>`<tr><td>${esc(e.service_name)}<small>${esc(e.tooth_code||'未指定牙位')}</small></td><td>${e.completed_quantity}<small>${esc(localDateTimeSeconds(e.completed_at))}</small></td><td class="clinical-note">${esc(e.procedure_note)}<small>${esc(e.pricing_status||'原记录保留，费用另行核对')}</small></td><td>${e.is_effective?`<button data-correct-execution="${e.id}">追加更正</button>`:'已由后续记录更正'}</td></tr>`)):empty('尚未登记实际完成项目。方案预计费用不形成实际收费。'));
- $('#content').innerHTML=html;
+ html+='</div><div data-clinical-section="clinical"><h2 class="subheading">实际完成项目与费用来源</h2>'+(active?'<button id="create-execution">登记实际完成项目</button>':'')+(t.executions.length?table(['实际项目','数量 / 实际时间','经过与计费','记录'],t.executions.map(e=>`<tr><td>${esc(e.service_name)}<small>${esc(e.tooth_code||'未指定牙位')}</small></td><td>${e.completed_quantity}<small>${esc(localDateTimeSeconds(e.completed_at))}</small></td><td class="clinical-note">${esc(e.procedure_note)}<small>${esc(e.pricing_status||'原记录保留，费用另行核对')}</small></td><td>${e.is_effective?`<button data-correct-execution="${e.id}">追加更正</button>`:'已由后续记录更正'}</td></tr>`)):empty('尚未登记实际完成项目。方案预计费用不形成实际收费。'));
+ $('#content').innerHTML=html+'</div>';
  const bind=(selector,fn)=>{const el=$(selector);if(el)el.onclick=()=>clinicalAction(fn);};
  bind('#clinical-prescriptions',()=>openPrescriptions(clinicalContext()));bind('#clinical-documents',()=>openDocuments(clinicalContext()));bind('#back-clinical',()=>{resetClinical();return render();});bind('#start-clinical',clinicalStart);bind('#edit-health',()=>clinicalHealth());bind('#review-health',()=>clinicalHealth(true));bind('#edit-record',clinicalRecord);bind('#sign-record',()=>clinicalSign());bind('#record-addendum',()=>clinicalSign(true));bind('#create-plan',()=>clinicalPlanEditor());bind('#create-execution',()=>clinicalExecution());
  bind('#end-physical',()=>finishEditor({...d.occupancy,visit_id:d.visit.id,visit_revision:d.visit.revision,visit_no:d.visit.record_no}));

@@ -1,5 +1,5 @@
 'use strict';
-const {fail,text,instant,dateOnly,day,row,revision,insert,fact,recordNo,canonical}=require('./common');
+const {fail,text,id,instant,dateOnly,day,row,revision,insert,fact,recordNo,canonical}=require('./common');
 const {safe}=require('./billing');
 const {feeDigest,paymentGate}=require('./settlement-rules');
 const {policyState,requireActive}=require('./insurance-policy');
@@ -15,14 +15,14 @@ class Insurance{
   const fund=this.billing.amount(input[prefix+'fundCents'],true),account=this.billing.amount(input[prefix+'accountCents'],true),patient=this.billing.amount(input[prefix+'patientCents'],true);
   if(BigInt(fund)+BigInt(account)+BigInt(patient)!==BigInt(total))fail(422,'INSURANCE_SPLIT','基金、个账及患者其他自付合计必须等于本次原费用');return {fund,account,patient};
  }
- identity(credentials,input){return this.unit.command(credentials,'insurance.identity',input,(ctx,now)=>{
+ identity(credentials,input,{scopeGuard=null}={}){return this.unit.command(credentials,'insurance.identity',input,(ctx,now)=>{
   this.active(ctx,now);row(this.db,'patient',input.patientId);if(!['passed','failed'].includes(input.outcome))fail(422,'INSURANCE_IDENTITY_RESULT','须如实记录身份核验结果');
   const passed=input.outcome==='passed',verified=this.time(input.verifiedAt,now,'实际核验时间'),until=input.validUntil?instant(input.validUntil,'核验适用截止'):null,person=input.personNo?text(input.personNo,'医保人员编号',100):null;
   if(passed&&(!person||!until))fail(422,'INSURANCE_IDENTITY_RESULT','核验通过须平台返回的人员编号及有效截止');
   if(until&&until<=verified)fail(422,'INSURANCE_VALIDITY','核验截止须晚于核验时间');
   const key=insert(this.db,'insurance_identity',fact(now,{patient_id:input.patientId,insured_person_no:person,insured_area:text(input.area,'参保地区',100),verified_at:verified,valid_until:until,status:passed?'核验通过':'核验未通过',result_note:this.evidence(input),operator_id:ctx.session.staff_id}));return this.result('insurance_identity',key);
- });}
- mapping(credentials,input){return this.unit.command(credentials,'insurance.manage',input,(ctx,now)=>{
+ },scopeGuard);}
+ mapping(credentials,input,{scopeGuard=null}={}){return this.unit.command(credentials,'insurance.manage',input,(ctx,now)=>{
   this.active(ctx,now);
   if(input.action==='stop'){const m=row(this.db,'insurance_item_mapping',input.mappingId);revision(m,input.expectedRevision);if(m.status!=='有效')fail(409,'INSURANCE_MAPPING_STOPPED','原对应已停用');return this.update('insurance_item_mapping',m,{status:'停用',basis:m.basis+'\n停用依据：'+this.evidence(input)},now);}
   if(input.action!=='create')fail(422,'INVALID_ACTION','项目对应操作无效');
@@ -32,8 +32,8 @@ class Insurance{
   if(material&&material.is_drug!==1)fail(422,'INSURANCE_MAPPING_SOURCE','药品医保对应只能引用已确认的药品目录');
   if(this.db.prepare("SELECT id FROM insurance_item_mapping WHERE status='有效' AND service_id IS ? AND material_id IS ? AND insured_area=? AND valid_from<coalesce(?,'9999-12-31') AND coalesce(valid_until,'9999-12-31')>?").get(service?.id||null,material?.id||null,area,until,from))fail(409,'INSURANCE_MAPPING_OVERLAP','同地区同项目已有重叠适用期的有效对应，请核实原目录');
   const key=insert(this.db,'insurance_item_mapping',fact(now,{service_id:service?.id||null,material_id:material?.id||null,insurance_code:text(input.code,'适用医保项目编码',100),insured_area:area,valid_from:from,valid_until:until,status:'有效',basis:this.evidence(input),operator_id:ctx.session.staff_id}));return this.result('insurance_item_mapping',key);
- });}
- register(credentials,input){return this.unit.command(credentials,'insurance.identity',input,(ctx,now)=>{
+ },scopeGuard);}
+ register(credentials,input,{scopeGuard=null}={}){return this.unit.command(credentials,'insurance.identity',input,(ctx,now)=>{
   const state=this.active(ctx,now),visit=row(this.db,'visit',input.visitId);if(visit.patient_id!==input.patientId)fail(409,'PATIENT_MISMATCH','就诊与指定患者不一致');
   const bill=input.billId==null?null:row(this.db,'bill',input.billId),identity=input.identityId==null?null:row(this.db,'insurance_identity',input.identityId);
   if(bill&&bill.patient_id!==input.patientId||identity&&identity.patient_id!==input.patientId)fail(409,'PATIENT_MISMATCH','医保办理的身份、账单及患者须一致');
@@ -42,7 +42,7 @@ class Insurance{
   const previous=input.previousCaseId==null?null:row(this.db,'insurance_case',input.previousCaseId);
   if((prior&&previous?.id!==prior.id)||(!prior&&previous)||previous&&(previous.patient_id!==input.patientId||previous.visit_id!==visit.id||previous.status!=='已撤销'||this.db.prepare("SELECT id FROM insurance_settlement WHERE insurance_case_id=? AND status='有效'").get(previous.id)))fail(409,'INSURANCE_PREVIOUS_CASE','重新办理须引用同患者、同就诊已明确结束或撤销成功的最近原办理');
   const key=insert(this.db,'insurance_case',fact(now,{previous_case_id:previous?.id||null,patient_id:input.patientId,visit_id:visit.id,bill_id:bill?.id||null,identity_id:identity?.id||null,business_no:recordNo('INS'),fee_revision:null,patient_choice:'待确认',patient_confirmed_at:null,institution_code:state.institutionCode,diagnosis_code:null,estimated_fund_cents:null,estimated_account_cents:null,estimated_patient_cents:null,status:identity?.status==='核验通过'?'待预结算':'待核验',result_note:this.evidence(input),fee_digest:null,pre_valid_until:null,pre_reference:null,operator_id:ctx.session.staff_id}));return this.result('insurance_case',key);
- });}
+ },scopeGuard);}
  preestimate(c){
   if(!c.current_preestimate_id)return {request:null,pending:false,valid:false};
   const request=row(this.db,'insurance_preestimate_history',c.current_preestimate_id),events=this.db.prepare('SELECT * FROM insurance_preestimate_history WHERE request_id=? ORDER BY event_no').all(request.id),result=events.filter(h=>h.event_type==='结果').at(-1),invalid=events.some(h=>h.event_type==='失效');
@@ -52,7 +52,7 @@ class Insurance{
  }
  requestFields(request){return {request_id:request.id,bill_id:request.bill_id,identity_id:request.identity_id,fee_revision:request.fee_revision,diagnosis_code:request.diagnosis_code};}
  clearEstimate(){return {estimated_fund_cents:null,estimated_account_cents:null,estimated_patient_cents:null,pre_valid_until:null,patient_choice:'待确认',patient_confirmed_at:null};}
- prepare(credentials,input){return this.unit.command(credentials,'insurance.prepare',input,(ctx,now)=>{
+ prepare(credentials,input,{scopeGuard=null}={}){return this.unit.command(credentials,'insurance.prepare',input,(ctx,now)=>{
   const state=this.active(ctx,now),c=row(this.db,'insurance_case',input.caseId);revision(c,input.expectedRevision);const evidence=this.evidence(input),action=input.action||'record',old=this.preestimate(c);
   if(c.institution_code!==state.institutionCode)fail(409,'INSURANCE_INSTITUTION','机构编码已变，须核实原办理');
   if(['结算待核实','已结算','已撤销'].includes(c.status))fail(409,'INSURANCE_CASE_STATE','正式原单未明确或原办理已结束，不能更改预结算');
@@ -97,7 +97,7 @@ class Insurance{
   this.update('insurance_case',c,{...this.clearEstimate(),current_preestimate_id:requestId,bill_id:bill.id,identity_id:identity.id,fee_revision:bill.revision,diagnosis_code:diagnosis,fee_digest:feeDigest(this.db,bill.id),pre_reference:reference,status:'待预结算',result_note:(c.result_note||'')+'\n原提交：'+evidence},now);
   if(action==='record')return {...this.preestimateResult(row(this.db,'insurance_case',c.id),row(this.db,'insurance_preestimate_history',requestId),{...input,outcome:'success'},ctx,now,evidence),beforeRevision:c.revision};
   return this.result('insurance_case',c.id,c.revision);
- });}
+ },scopeGuard);}
  preestimateResult(c,request,input,ctx,now,evidence){
   if(!['success','failed','unknown'].includes(input.outcome))fail(422,'INSURANCE_RESULT','须如实记录原预结算结果');
   if(input.action==='verify'&&input.outcome==='success'&&input.patientMatches!==true)fail(422,'INSURANCE_PATIENT_RESULT','须核对原提交患者、机构、费用及实际平台结果');
@@ -108,7 +108,7 @@ class Insurance{
   if(stale)this.unit.workflowHistory.append('insurance_case',c.id,'失效','原结果已核实，但费用或身份有效期已变化，须重提并重新说明',ctx,input,now,{...this.requestFields(request),result_note:evidence});
   return this.update('insurance_case',c,{...this.clearEstimate(),...(s&&!stale?{estimated_fund_cents:s.fund,estimated_account_cents:s.account,estimated_patient_cents:s.patient,pre_valid_until:until,status:'预结算完成'}:{status:'待预结算'}),result_note:(c.result_note||'')+'\n预结算结果：'+evidence},now);
  }
- choice(credentials,input){return this.unit.command(credentials,'insurance.prepare',input,(ctx,now)=>{
+ choice(credentials,input,{scopeGuard=null}={}){return this.unit.command(credentials,'insurance.prepare',input,(ctx,now)=>{
   this.active(ctx,now);const c=row(this.db,'insurance_case',input.caseId);revision(c,input.expectedRevision);
   if(['结算待核实','已结算','已撤销'].includes(c.status))fail(409,'INSURANCE_CASE_STATE','当前原笔已提交或结束，不能更改患者选择');
   if(!['医保','自费'].includes(input.choice)||input.patientConfirmed!==true)fail(422,'INSURANCE_CHOICE','须说明预估分摊及自费项目，并记录患者真实选择');
@@ -116,8 +116,8 @@ class Insurance{
   if(input.choice==='医保'&&!this.preestimate(c).valid)fail(409,'INSURANCE_PRE_STALE','须取得当前费用的有效预结算，再确认医保办理');
   const result=this.update('insurance_case',c,{patient_choice:input.choice,patient_confirmed_at:now,...(input.choice==='自费'?{status:'已撤销'}:{}),result_note:(c.result_note||'')+'\n患者选择：'+this.evidence(input)},now);
   if(c.current_preestimate_id)this.unit.workflowHistory.append('insurance_case',c.id,'患者选择',this.evidence(input),ctx,input,now,{request_id:c.current_preestimate_id,bill_id:c.bill_id,identity_id:c.identity_id,fee_revision:c.fee_revision,diagnosis_code:c.diagnosis_code,patient_choice:input.choice,patient_confirmed_at:now,result_note:this.evidence(input)});return result;
- });}
- settle(credentials,input){return this.unit.command(credentials,'insurance.settle',input,(ctx,now)=>{
+ },scopeGuard);}
+ settle(credentials,input,{scopeGuard=null}={}){return this.unit.command(credentials,'insurance.settle',input,(ctx,now)=>{
   this.active(ctx,now);const c=row(this.db,'insurance_case',input.caseId);revision(c,input.expectedRevision);const evidence=this.evidence(input);
   if(input.businessNo!==c.business_no)fail(409,'INSURANCE_ORIGINAL_ORDER','必须核对当前原医保办理号');
   if(input.action==='submit'){
@@ -135,8 +135,8 @@ class Insurance{
   const key=insert(this.db,'insurance_settlement',fact(now,{insurance_case_id:c.id,preestimate_request_id:c.current_preestimate_id,external_reference:text(input.reference,'官方正式结算号',200),total_cents:total,fund_cents:s.fund,account_cents:s.account,patient_due_cents:s.patient,confirmed_at:this.time(input.confirmedAt,now,'实际正式结果核实时间'),status:'有效'}));
   this.update('insurance_case',c,{status:'已结算',result_note:(c.result_note||'')+'\n正式结算：'+evidence},now);this.db.prepare('UPDATE bill SET revision=revision+1,updated_at=? WHERE id=?').run(now,c.bill_id);
   return this.result('insurance_settlement',key);
- });}
- reverse(credentials,input){const permission=input.action==='initiate'?'insurance.manage':'insurance.settle';return this.unit.command(credentials,permission,input,(ctx,now)=>{
+ },scopeGuard);}
+ reverse(credentials,input,{scopeGuard=null}={}){const permission=input.action==='initiate'?'insurance.manage':'insurance.settle';return this.unit.command(credentials,permission,input,(ctx,now)=>{
   this.active(ctx,now);const evidence=this.evidence(input);
   if(input.action==='initiate'){
    const settlement=row(this.db,'insurance_settlement',input.settlementId);revision(settlement,input.expectedRevision);const c=row(this.db,'insurance_case',settlement.insurance_case_id),request=input.requestId==null?null:row(this.db,'fee_request',input.requestId);
@@ -152,15 +152,16 @@ class Insurance{
    const s=row(this.db,'insurance_settlement',r.settlement_id),c=row(this.db,'insurance_case',s.insurance_case_id);this.update('insurance_settlement',s,{status:'已撤销'},now);this.update('insurance_case',c,{status:'已撤销',result_note:(c.result_note||'')+'\n原医保已撤销：'+evidence},now);this.db.prepare('UPDATE bill SET revision=revision+1,updated_at=? WHERE id=?').run(now,c.bill_id);
   }
   return this.update('insurance_reversal',r,{status:input.outcome==='success'?'已成功':input.outcome==='failed'?'已失败':'待核实',external_reference:input.outcome==='success'?text(input.reference,'官方撤销结果号',200):null,verified_at:input.outcome==='unknown'?null:now,verified_by:ctx.session.staff_id,verification_note:evidence,result_note:r.result_note+'\n核实结果：'+evidence},now);
- });}
- receipt(credentials,input){return this.unit.command(credentials,'insurance.receipt',input,(ctx,now)=>{
+ },scopeGuard);}
+ receipt(credentials,input,{scopeGuard=null}={}){return this.unit.command(credentials,'insurance.receipt',input,(ctx,now)=>{
   this.active(ctx,now);const s=row(this.db,'insurance_settlement',input.settlementId);revision(s,input.expectedRevision);const amount=this.billing.amount(input.amountCents),old=this.db.prepare('SELECT flow_type,amount_cents FROM insurance_fund_receipt WHERE settlement_id=?').all(s.id).reduce((n,r)=>n+BigInt(r.flow_type==='拨付'?r.amount_cents:-r.amount_cents),0n),share=BigInt(s.fund_cents)+BigInt(s.account_cents);
   if(!['拨付','退回'].includes(input.flowType)||input.flowType==='拨付'&&(s.status!=='有效'||old+BigInt(amount)>share)||input.flowType==='退回'&&(s.status!=='已撤销'||BigInt(amount)>old))fail(409,'INSURANCE_RECEIPT_BUDGET','实际拨付不能超未回款，撤销后实际退回不能超已收到原医保款');
   const key=insert(this.db,'insurance_fund_receipt',fact(now,{settlement_id:s.id,flow_type:input.flowType,amount_cents:amount,occurred_at:this.time(input.occurredAt,now,'实际医保收付时间'),evidence_reference:text(input.reference,'医保或银行唯一收付凭据',200),operator_id:ctx.session.staff_id}));ctx.authority.evidence=this.evidence(input);return this.result('insurance_fund_receipt',key);
- });}
+ },scopeGuard);}
  query(credentials,input={}){return this.unit.query(credentials,'insurance.query',()=>{
   const patientId=input.patientId?Number(input.patientId):null;if(patientId)row(this.db,'patient',patientId);
-  const cases=this.db.prepare(`SELECT c.*,p.name patient_name,p.record_no patient_no,b.record_no bill_no FROM insurance_case c JOIN patient p ON p.id=c.patient_id LEFT JOIN bill b ON b.id=c.bill_id WHERE (? IS NULL OR c.patient_id=?) ORDER BY c.id DESC LIMIT 200`).all(patientId,patientId).map(c=>({...c,preValid:this.preestimate(c).valid,prePending:this.preestimate(c).pending,preInvalid:this.preestimate(c).invalid,...(credentials.role==='frontdesk'?{}:{preestimateHistory:this.unit.workflowHistory.list('insurance_case',c.id),fees:this.db.prepare('SELECT f.*,f.insurance_code_snapshot insurance_code FROM insurance_fee f WHERE f.insurance_case_id=? ORDER BY f.id').all(c.id),settlement:this.db.prepare('SELECT * FROM insurance_settlement WHERE insurance_case_id=?').get(c.id)||null})}));
+  const caseId=input.caseId==null?null:id(Number(input.caseId));if(caseId&&patientId&&row(this.db,'insurance_case',caseId).patient_id!==patientId)fail(403,'PATIENT_MISMATCH','原医保办理与当前患者不一致');
+  const cases=this.db.prepare(`SELECT c.*,p.name patient_name,p.record_no patient_no,b.record_no bill_no FROM insurance_case c JOIN patient p ON p.id=c.patient_id LEFT JOIN bill b ON b.id=c.bill_id WHERE (? IS NULL OR c.patient_id=?) AND (? IS NULL OR c.id=?) ORDER BY c.id DESC LIMIT 200`).all(patientId,patientId,caseId,caseId).map(c=>({...c,preValid:this.preestimate(c).valid,prePending:this.preestimate(c).pending,preInvalid:this.preestimate(c).invalid,...(credentials.role==='frontdesk'?{}:{preestimateHistory:this.unit.workflowHistory.list('insurance_case',c.id),fees:this.db.prepare('SELECT f.*,f.insurance_code_snapshot insurance_code FROM insurance_fee f WHERE f.insurance_case_id=? ORDER BY f.id').all(c.id),settlement:this.db.prepare('SELECT * FROM insurance_settlement WHERE insurance_case_id=?').get(c.id)||null})}));
   const identities=this.db.prepare('SELECT i.*,p.name patient_name,p.record_no patient_no FROM insurance_identity i JOIN patient p ON p.id=i.patient_id WHERE (? IS NULL OR i.patient_id=?) ORDER BY i.id DESC LIMIT 200').all(patientId,patientId).map(i=>({...i,insured_person_no:i.insured_person_no?'****'+i.insured_person_no.slice(-4):null}));
   const basic={policy:this.state(),cases,identities,patients:this.db.prepare('SELECT id,name,record_no FROM patient ORDER BY id DESC LIMIT 500').all(),visits:this.db.prepare('SELECT id,patient_id,arrived_at FROM visit ORDER BY id DESC LIMIT 500').all()};
   if(credentials.role==='frontdesk')return {...basic,cases:cases.map(c=>({id:c.id,revision:c.revision,patient_id:c.patient_id,patient_name:c.patient_name,patient_no:c.patient_no,visit_id:c.visit_id,status:c.status,business_no:c.business_no,patient_choice:c.patient_choice,previous_case_id:c.previous_case_id}))};

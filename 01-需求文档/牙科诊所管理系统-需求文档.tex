@@ -27,16 +27,16 @@
 {\large 青禾牙科诊所}\par\vspace{8mm}
 \end{center}
 \vfill
-\noindent 系统面向单店小型牙科诊所，支持预约接诊、诊疗处方、支付医保、复诊与日常运营协作。
+\noindent 系统面向拥有3至4家分店的小型牙科连锁诊所，支持各门店预约接诊、诊疗处方、费用登记、复诊与日常运营协作。
 \clearpage
 \tableofcontents
 \clearpage
 \section{业务建模}
 \subsection{愿景}
 \subsubsection{诊所业务与建设目标}
-青禾牙科诊所面向周边居民及师生提供口腔检查、诊断、治疗和诊后服务。基本人员配置为2名牙医（其中1名兼负责人）、2名诊疗助理、1名前台和1名收费人员。岗位可以兼任，具有专业资格要求的业务按机构和人员条件启用。\par
-患者预约或到店提出需求，前台核对身份并协调牙医、诊椅与必要设备。准备就绪后牙医接诊，复核健康情况，完成检查诊断，说明方案和费用并记录患者决定，实施实际治疗、开立必要处方及完成病历。收费人员核对实际费用，衔接医保和患者自付；前台承接复诊联系，牙医完成后续临床评估。\par
-运营岗位保障排班、器械、环境和物资条件。负责人处理资源冲突、价目采购和费用异议，核对经营、患者收付及医保待回款，并明确未完成事项的后续责任。\par
+青禾牙科为拥有3至4家分店的小型连锁诊所，面向周边居民及师生提供口腔检查、诊断、治疗和诊后服务。各门店根据业务规模配备牙医、诊疗助理、前台和收费人员，岗位可由具备相应条件的人员兼任。连锁负责人统筹各店经营，门店负责人负责本店人员、接诊资源与日常管理。\par
+患者预约或到店提出需求，前台核对身份并协调牙医、诊椅与必要设备。准备就绪后牙医接诊，复核健康情况，完成检查诊断，说明方案，由收费岗位核价出具独立报价，分别记录费用决定和医疗同意，实施实际治疗、开立必要处方及完成病历。收费人员核对实际费用，衔接医保和患者自付；前台承接复诊联系，牙医完成后续临床评估。\par
+各门店保障本店排班、诊椅、器械、环境和物资条件，负责人处理资源冲突、采购及费用异议；连锁负责人按获准范围核对各店和汇总经营情况。收费项目、材料及供应商目录统一，价目和库存按门店管理。患者档案在连锁内统一，跨店病历由经授权的牙医查看，前台按职责办理身份和预约。医保及院内药学业务按各门店实际条件启用；系统仅登记付款，不发起真实支付或退款。\par
 {\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.13}
 \refstepcounter{table}
 \noindent\textbf{表\thetable：建设目标}\par\smallskip
@@ -59,9 +59,9 @@
 \toprule
 项目 & 内容 \\ \midrule
 系统 & 牙科诊所管理系统。 \\
-目标组织 & 青禾牙科诊所，单店小型口腔诊疗机构。 \\
-主要涉众及利益 & 诊所负责人：在现有人员配置下提高接诊组织效率，使患者安排及业务交接可核对；承担目标确认和效果验收责任。 \\
-目标 & 将分散的患者资料、排班与资源安排集中用于预约和到诊办理，减少前台重复查找、抄录和核对时间。 \\
+目标组织 & 青禾牙科连锁诊所，设有3至4家分店。 \\
+主要涉众及利益 & 连锁负责人和门店负责人：协调门店接诊与业务交接，按授权核对门店经营；牙医、前台、助理、收费人员和患者获得连续的诊疗服务。 \\
+目标 & 统一患者身份，明确各门店的排班、诊椅和业务归属；在授权范围内衔接跨店就诊，减少前台重复查找、抄录和核对时间。 \\
 度量指标 & 新预约办理和到诊登记分别统计平均办理时长，并按基准期两类业务的件数占比加权比较。 \\
 对比时间 & 启用前连续4周，与启用后第5至第8周按同一范围统计。 \\
 目标改进值 & 加权平均办理时长较基准期减少30\%；该值为建设目标，验收时根据记录计算实际结果。 \\
@@ -85,13 +85,14 @@
 牙医 & 判断接诊优先级、复核病史，检查诊断、说明方案、治疗、处方、病历与复诊评估。 \\
 诊疗助理 & 核实器械环境与设备准备，协助诊疗和影像，办理物资及实际用料，处理清洁与资源异常。 \\
 收费人员 & 核对实际费用，办理医保、自付与退费，核实真实结果并交付凭据，完成日常款项核对。 \\
-诊所负责人 & 维护职员个人账号、核实岗位任职及诊椅目录，确认排班、价目、采购和费用调整；协调资源及岗位，核对经营结果与未完成事项。 \\
+门店负责人 & 负责本店人员、排班、诊椅、采购、费用调整及日常经营核对。\\
+连锁负责人 & 统筹门店及岗位授权，按获准范围核对各店与连锁经营情况。 \\
 药学岗位 & 机构及人员具备相应条件后承担院内审方、调配、核对、实际发药及用药交代。 \\
 外部协作 & 支付平台提供收退查单结果；医保经办与平台提供核验、分摊和结算依据；供应商供货，维护单位修复设备。 \\
 \bottomrule
 \end{tabular}\par}
 \medskip
-医保流程在取得相应定点和联网条件后启用。保留处方及用药指导；未具备院内药学条件时采用院外取药路径，不默认由助理承担专业药学职责。后台管理由负责人及具备相应权限的工作人员办理。\par
+医保流程按各门店取得的相应条件启用。保留处方及用药指导；未具备院内药学条件时采用院外取药路径，不默认由助理承担专业药学职责。连锁与门店管理由具备对应权限的工作人员办理。\par
 
 \clearpage
 \subsubsection{完整业务范围}
@@ -103,7 +104,7 @@
 业务 & 需要完成的主要工作 \\ \midrule
 预约到诊 & 咨询受理、身份核对、预约改约、现场到诊、候诊及异常协调。 \\
 排班和接诊资源 & 牙医、诊椅和必要设备的可用安排、预留、实际使用、延时、清洁停用和恢复。 \\
-检查诊断与治疗 & 健康复核、检查影像、诊断、方案说明、患者确认、实际执行和病历。 \\
+检查诊断与治疗 & 健康复核、检查影像、诊断、方案及独立报价说明、患者决定、实际执行和病历。 \\
 处方与用药 & 处方开立和用药指导；符合条件时院内审核及发药，否则衔接院外取药。 \\
 费用及支付 & 实际费用、预付与自付、现金或电子支付、真实到账、欠费、更正和退款。 \\
 门诊医保 & 身份登记、编码及费用核对、预结算说明、正式结算、撤销及结算款核对。 \\
@@ -119,49 +120,49 @@
 \clearpage
 \subsection{业务用例图}
 \subsubsection{业务总体视图}
-青禾牙科诊所为组织边界。患者是主要业务执行者，获得接诊、诊疗、用药、复诊及费用服务；支付服务机构和医保经办机构协作完成相应缴费、结算及更正。前台、牙医、助理、收费人员和负责人在诊所内部协作实现这些服务。\par
+青禾牙科连锁诊所为组织边界，各门店共同提供预约、诊疗、用药、复诊及费用服务。患者在门店接受服务，支付服务机构和医保经办机构按实际业务协作；各门店岗位负责本店办理，连锁负责人统筹门店经营与授权。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=19.5cm,keepaspectratio]{diagrams/course-A-20261021/business-overall.pdf}
-\par\smallskip\refstepcounter{figure}\label{fig:business-overall}\small 图\thefigure：诊所业务用例图
+\includegraphics[width=16.2cm,height=19.5cm,keepaspectratio]{diagrams/chain-A-20261027/business-overall.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:business-overall}\small 图\thefigure：连锁诊所业务用例图
 \end{center}
 \clearpage
 \subsubsection{业务用例及办理结果1}
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/course-A-20261021/buc-01.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-A-20261027/buc-01.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:buc-01}\small 图\thefigure：BUC-01 预约与到诊业务用例图
 \end{center}
 主要执行者：患者。办理结果：取得与需求相符的接诊时间；实际到店后完成登记并进入候诊。\par
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/course-A-20261021/buc-02.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-A-20261027/buc-02.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:buc-02}\small 图\thefigure：BUC-02 检查诊断与口腔治疗业务用例图
 \end{center}
 主要执行者：患者。办理结果：取得检查诊断和治疗建议，知情选择后按确认范围接受治疗及诊后指导。\par
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/course-A-20261021/buc-03.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-A-20261027/buc-03.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:buc-03}\small 图\thefigure：BUC-03 处方与用药服务业务用例图
 \end{center}
 主要执行者：患者。办理结果：取得有效处方和用药指导；具备院内条件时取得核对后实际交付的药品。\par
 \clearpage
 \subsubsection{业务用例及办理结果2}
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/course-A-20261021/buc-04.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-A-20261027/buc-04.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:buc-04}\small 图\thefigure：BUC-04 复诊与随访业务用例图
 \end{center}
 主要执行者：患者。办理结果：取得与原诊疗目的对应的复查、随访评估及后续安排。\par
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/course-A-20261021/buc-05.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-A-20261027/buc-05.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:buc-05}\small 图\thefigure：BUC-05 自费与自付缴费业务用例图
 \end{center}
 主要执行者：患者；协作执行者：支付服务机构。办理结果：核对本人承担金额，取得真实付款结果和相应凭据。\par
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/course-A-20261021/buc-06.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-A-20261027/buc-06.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:buc-06}\small 图\thefigure：BUC-06 医保门诊结算业务用例图
 \end{center}
 主要执行者：患者；协作执行者：医保经办机构。办理结果：获知医保适用及分摊结果，确认办理后取得正式结算结果和自付说明。\par
 \clearpage
 \subsubsection{费用更正与业务衔接}
 \begin{center}
-\includegraphics[width=16cm,height=4.7cm,keepaspectratio]{diagrams/course-A-20261021/buc-07.pdf}
+\includegraphics[width=16cm,height=4.7cm,keepaspectratio]{diagrams/chain-A-20261027/buc-07.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:buc-07}\small 图\thefigure：BUC-07 费用更正与退费业务用例图
 \end{center}
 主要执行者：患者；协作执行者：支付服务机构、医保经办机构。办理结果：费用异议得到核实，取得更正及必要的医保处理、实际退补结果。\par
@@ -225,19 +226,31 @@ S-04 基础资料与岗位任职 & 负责人核实人员、账号及岗位，维
 \clearpage
 \subsection{现状业务序列图}
 \subsubsection{预约与到诊现状}
-BUC-01。预约确认与患者实际到店分别发生；前台分别查记录、向牙医和助理核实资源，再办理到诊交接。\par
+BUC-01。门店前台核对患者与本店接诊安排，分别查记录并向牙医和助理核实资源，再办理到诊交接。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=19.5cm,keepaspectratio]{diagrams/course-A-20261021/business-current-1.pdf}
+\includegraphics[width=16.2cm,height=19.5cm,keepaspectratio]{diagrams/chain-A-20261027/business-current-1.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:business-current-1}\small 图\thefigure：预约与到诊现状业务序列图
 \end{center}
 \clearpage
+\clearpage
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{297mm}\setlength{\paperheight}{420mm}
+\setlength{\textwidth}{259mm}\setlength{\textheight}{382mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=297mm,420mm}
 \subsubsection{检查诊断与口腔治疗现状}
-BUC-02。病历、患者决定与实际治疗分别保留；仅已发生项目交收费核对，准备和实物操作由牙医、助理完成。\par
+BUC-02。医疗方案、报价及两类患者决定分别保留；仅已发生项目交收费核对，准备和实物操作由牙医、助理完成。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/course-A-20261021/business-current-2.pdf}
+\includegraphics[width=25.9cm,height=33cm,keepaspectratio]{diagrams/dentalpin-review-20261026/business-current-2.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:business-current-2}\small 图\thefigure：检查诊断与口腔治疗现状业务序列图
 \end{center}
 \clearpage
+\clearpage
+\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=210mm,297mm}
 \subsubsection{处方与用药服务现状}
 BUC-03。院外交付处方与院内实际发药为替代路径；院内业务按机构和人员条件启用。\par
 \begin{center}
@@ -245,13 +258,23 @@ BUC-03。院外交付处方与院内实际发药为替代路径；院内业务�
 \par\smallskip\refstepcounter{figure}\label{fig:business-current-3}\small 图\thefigure：处方与用药服务现状业务序列图
 \end{center}
 \clearpage
-\subsubsection{复诊与随访现状}
-BUC-04。提出要求、联系、预约与实际评估分别交接；联系不上或暂缓时保留下次处理日期。\par
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{297mm}\setlength{\paperheight}{420mm}
+\setlength{\textwidth}{259mm}\setlength{\textheight}{382mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=297mm,420mm}
+\subsubsection{跨店复诊与随访现状}
+BUC-04。患者选择另一门店复诊时，两店前台协调身份与预约，牙医按授权交接必要的诊疗资料；联系不上或暂缓时保留后续安排。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/course-A-20261021/business-current-4.pdf}
-\par\smallskip\refstepcounter{figure}\label{fig:business-current-4}\small 图\thefigure：复诊与随访现状业务序列图
+\includegraphics[width=25.9cm,height=33cm,keepaspectratio]{diagrams/chain-A-20261027/business-current-4.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:business-current-4}\small 图\thefigure：跨店复诊与随访现状业务序列图
 \end{center}
 \clearpage
+\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=210mm,297mm}
 \subsubsection{自费与自付缴费现状}
 BUC-05。原费用、患者承担和实际收到的款项分别核对；电子结果未知时回查原笔。\par
 \begin{center}
@@ -320,10 +343,16 @@ BUC-07。负责人先核实范围，必要医保原单处理完成后核对患�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=210mm,297mm}
 \clearpage
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{297mm}\setlength{\paperheight}{420mm}
+\setlength{\textwidth}{259mm}\setlength{\textheight}{382mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=297mm,420mm}
 \subsubsection{内部支持：日常经营与款项核对现状}
-内部支持流程S-03，衔接BUC-05、06、07。经营费用、患者实际资金及医保实际拨付分列，差异保留原单和责任。\par
+内部支持流程S-03，衔接BUC-05、06、07。门店分别核对费用、收付及医保拨付，门店负责人处理差异，连锁负责人汇总各店情况。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/course-A-20261021/business-current-10.pdf}
+\includegraphics[width=25.9cm,height=33cm,keepaspectratio]{diagrams/chain-A-20261027/business-current-10.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:business-current-10}\small 图\thefigure：日常经营与款项核对现状业务序列图
 \end{center}
 \clearpage
@@ -346,9 +375,9 @@ BUC-07。负责人先核实范围，必要医保原单处理完成后核对患�
 \special{papersize=297mm,420mm}
 \subsection{改进业务序列图}
 \subsubsection{预约与到诊改进}
-BUC-01。系统集中核对排班、时段及资源冲突；前台确认患者意向，助理核实准备，牙医确认实际开始。\par
+BUC-01。系统核对所选门店的排班、诊椅和设备，并检查牙医跨店时间冲突；前台确认患者意向，助理核实准备，牙医确认实际开始。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=31.8cm,keepaspectratio]{diagrams/course-A-20261021/business-improved-1.pdf}
+\includegraphics[width=25.9cm,height=31.8cm,keepaspectratio]{diagrams/chain-A-20261027/business-improved-1.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:business-improved-1}\small 图\thefigure：预约与到诊改进业务序列图
 \end{center}
 \clearpage
@@ -364,9 +393,9 @@ BUC-01。系统集中核对排班、时段及资源冲突；前台确认患者�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=297mm,420mm}
 \subsubsection{检查诊断与口腔治疗改进}
-BUC-02。系统保留同一患者、方案版本、患者决定及实际执行的来源，自动核对计费依据；实际诊疗和专业判断由牙医完成。\par
+BUC-02。系统保留同一患者、方案版本、独立报价、医疗同意及实际执行的来源，自动核对计费依据；实际诊疗和专业判断由牙医完成。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=33.0cm,keepaspectratio]{diagrams/course-A-20261021/business-improved-2.pdf}
+\includegraphics[width=25.9cm,height=33.0cm,keepaspectratio]{diagrams/dentalpin-review-20261026/business-improved-2.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:business-improved-2}\small 图\thefigure：检查诊断与口腔治疗改进业务序列图
 \end{center}
 \clearpage
@@ -382,13 +411,23 @@ BUC-03。处方、审核和发药按原处方交接；院外路径交付处方�
 \par\smallskip\refstepcounter{figure}\label{fig:business-improved-3}\small 图\thefigure：处方与用药服务改进业务序列图
 \end{center}
 \clearpage
-\subsubsection{复诊与随访改进}
-BUC-04。系统将原诊疗意见转换为联系待办，并连续保存联系、预约与评估；临床完成由实际评估条件决定。\par
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{297mm}\setlength{\paperheight}{420mm}
+\setlength{\textwidth}{259mm}\setlength{\textheight}{382mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=297mm,420mm}
+\subsubsection{跨店复诊与随访改进}
+BUC-04。系统关联统一患者身份、原复诊要求与目标门店预约；复诊牙医仅在获授权后查看必要诊疗资料，实际评估由牙医记录。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/course-A-20261021/business-improved-4.pdf}
-\par\smallskip\refstepcounter{figure}\label{fig:business-improved-4}\small 图\thefigure：复诊与随访改进业务序列图
+\includegraphics[width=25.9cm,height=33cm,keepaspectratio]{diagrams/chain-A-20261027/business-improved-4.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:business-improved-4}\small 图\thefigure：跨店复诊与随访改进业务序列图
 \end{center}
 \clearpage
+\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=210mm,297mm}
 \newgeometry{margin=19mm}
 \setlength{\paperwidth}{297mm}\setlength{\paperheight}{420mm}
 \setlength{\textwidth}{259mm}\setlength{\textheight}{382mm}
@@ -398,7 +437,7 @@ BUC-04。系统将原诊疗意见转换为联系待办，并连续保存联系�
 \subsubsection{自费与自付缴费改进}
 BUC-05。系统核对患者承担、保存原笔并汇总余额；平台受理与真实到账区分，未知结果持续回查。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=33.0cm,keepaspectratio]{diagrams/course-A-20261021/business-improved-5.pdf}
+\includegraphics[width=25.9cm,height=33.0cm,keepaspectratio]{diagrams/chain-A-20261027/business-improved-5.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:business-improved-5}\small 图\thefigure：自费与自付缴费改进业务序列图
 \end{center}
 \clearpage
@@ -434,7 +473,7 @@ BUC-06。系统关联身份、诊断、费用版本、编码和平台阶段结�
 \subsubsection{费用更正与退费改进}
 BUC-07。原项目、批准、医保和患者退款连续可追查；系统按真实阶段控制办理顺序，负责人确认及真实交付款仍由对应主体完成。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=33.0cm,keepaspectratio]{diagrams/course-A-20261021/business-improved-7.pdf}
+\includegraphics[width=25.9cm,height=33.0cm,keepaspectratio]{diagrams/chain-A-20261027/business-improved-7.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:business-improved-7}\small 图\thefigure：费用更正与退费改进业务序列图
 \end{center}
 \clearpage
@@ -479,13 +518,23 @@ S-02。系统集中反映预留、实际使用及停用影响；维修反馈与�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=210mm,297mm}
 \clearpage
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{297mm}\setlength{\paperheight}{420mm}
+\setlength{\textwidth}{259mm}\setlength{\textheight}{382mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=297mm,420mm}
 \subsubsection{内部支持：日常经营与款项核对改进}
-S-03。系统自动汇集和分列原业务，工作人员核实真实现金与外部收付，负责人跟进异常；待回款不计当日实收。\par
+S-03。系统按门店汇集和分列原业务，工作人员核实外部收付并登记结果；门店负责人跟进异常，连锁负责人按授权查看汇总。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/course-A-20261021/business-improved-10.pdf}
+\includegraphics[width=25.9cm,height=33cm,keepaspectratio]{diagrams/chain-A-20261027/business-improved-10.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:business-improved-10}\small 图\thefigure：日常经营与款项核对改进业务序列图
 \end{center}
 \clearpage
+\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=210mm,297mm}
 \subsubsection{系统承接的业务职责}
 改进流程将分散记录和跨岗位反复转抄汇入同一业务来源。系统处理可明确判定的信息规则，岗位完成沟通、专业判断、实物处理及真实结果核实。\par
 {\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.13}
@@ -514,9 +563,9 @@ S-03。系统自动汇集和分列原业务，工作人员核实真实现金与�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=841mm,594mm}
 \subsubsection{患者服务全过程}
-患者需求经过预约或现场接诊，衔接检查、方案确认、实际治疗及必要用药；费用按实际发生核对，医保和患者自付结果各自明确。资源清洁恢复与收费可分别推进。\par
+患者需求经过预约或现场接诊，衔接检查诊断、方案说明、独立报价及患者决定、实际治疗与必要用药。费用确认与医疗同意分别办理，实际治疗、资源清洁和收费按真实阶段交接；医保和患者自付结果各自明确。\par
 \begin{center}
-\includegraphics[width=80.3cm,height=50.4cm,keepaspectratio]{diagrams/course-A-20261021/business-patient-flow.pdf}
+\includegraphics[width=80.3cm,height=50.4cm,keepaspectratio]{diagrams/dentalpin-review-20261026/business-patient-flow.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:business-patient-flow}\small 图\thefigure：患者服务全过程
 \end{center}
 \clearpage
@@ -618,9 +667,9 @@ S-03。系统自动汇集和分列原业务，工作人员核实真实现金与�
 \section{需求}
 \subsection{系统用例图}
 \subsubsection{系统总体视图}
-系统按患者接诊、临床、收费复诊及物资管理组织功能。用户以个人账号进入相应岗位工作台。\par
+系统按患者接诊、临床、收费复诊及物资管理组织功能。工作人员以个人账号进入获授权的岗位和门店；付款只登记结果，不由系统发起资金交易。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=46.9cm,keepaspectratio]{diagrams/reference-review-20261026/system-overall.pdf}
+\includegraphics[width=38.2cm,height=46.9cm,keepaspectratio]{diagrams/chain-B-20261027/system-overall.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:system-overall}\small 图\thefigure：系统总体用例图
 \end{center}
 \clearpage
@@ -633,7 +682,7 @@ S-03。系统自动汇集和分列原业务，工作人员核实真实现金与�
 \subsubsection{前台用例视图}
 用例按岗位责任分配；兼岗工作人员以实际办理身份进入功能。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/integrated-20261019/system-role-1.pdf}
+\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-B-20261027/system-role-1.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:system-role-1}\small 图\thefigure：前台系统用例图
 \end{center}
 
@@ -641,7 +690,7 @@ S-03。系统自动汇集和分列原业务，工作人员核实真实现金与�
 \subsubsection{牙医与助理用例视图}
 用例按岗位责任分配；兼岗工作人员以实际办理身份进入功能。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/integrated-20261019/system-role-2.pdf}
+\includegraphics[width=16.2cm,height=21.4cm,keepaspectratio]{diagrams/chain-B-20261027/system-role-2.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:system-role-2}\small 图\thefigure：牙医与助理系统用例图
 \end{center}
 
@@ -649,7 +698,7 @@ S-03。系统自动汇集和分列原业务，工作人员核实真实现金与�
 \subsubsection{收费与负责人用例视图}
 用例按岗位责任分配；兼岗工作人员以实际办理身份进入功能。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/reference-review-20261026/system-role-3.pdf}
+\includegraphics[width=16.2cm,height=21.4cm,keepaspectratio]{diagrams/chain-B-20261027/system-role-3.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:system-role-3}\small 图\thefigure：收费与负责人系统用例图
 \end{center}
 
@@ -665,18 +714,18 @@ S-03。系统自动汇集和分列原业务，工作人员核实真实现金与�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.5cm}>{\raggedright\arraybackslash}p{9.8cm}>{\raggedright\arraybackslash}p{2.4cm}@{}}
 \toprule
 来源 & 采用的业务内容与边界 & 对应UC \\ \midrule
-业务范围与前后业务模型 & 1.1的岗位和范围、1.2的7个对外用例及4类内部支持、1.4的交接和异常；确定诊所主体业务、真实结果及负责岗位。 & 全部26例 \\
+业务范围与前后业务模型 & 1.1的岗位和范围、1.2的7个对外用例及4类内部支持、1.4的交接和异常；确定诊所主体业务、真实结果及负责岗位。 & 全部27例 \\
 \href{https://www.opendental.com/manual/appointments.html}{Open Dental：Appointments} & 参考患者预约历史、人员与诊椅日程、到诊候诊的组织方式；本项目另行规定必要设备、实际使用及清洁恢复的可用条件。 & \mbox{01—04}、24 \\
 \href{https://www.opendental.com/manual/treatmentplan.html}{Open Dental：Treatment Plan} & 参考方案、患者确认及计划项目与已完成项目分开记录；本项目按同意范围、实际执行和签署版本衔接诊疗与收费。 & \mbox{05—10}、\mbox{11—14} \\
 \href{https://www.opendental.com/manual/recall.html}{Open Dental：Recall} & 参考目标日期、联系状态、已约日期分别记录；本项目以实际后续目的及必要临床评估判定完成，不以约好时间代替完成。 & \mbox{15—17} \\
 \href{https://www.opendental.com/manual/supplyinventory.html}{Open Dental：Supply Inventory}；ERPNext v15批次及收货明细快照 & 参考供方、物资需求、采购，以及批次效期、到货与合格/拒收数量分解；本项目保留基础验收、领退用料和盘点。 & \mbox{18—20}、25 \\
 \href{https://www.opendental.com/site/quickmanual.html}{Open Dental官方手册与26.2结构} & 参考人员、接诊空间、项目目录、价目与实际完成记录分开；本系统保留职员、个人账号、诊椅及原计费依据，不照搬国外保险配置。 & 04、11、26 \\
-\href{https://demo.dentalpin.com/}{DentalPin公开演示} & 实际查看人员及角色、诊室资源、治疗目录分类与检索；采用兼岗、基础管理及目录组织方式，不采用其欧元报价和外国税务规则。 & 04、11、26 \\
+\href{https://demo.dentalpin.com/}{DentalPin公开演示} & 实际查看首页、预约日历与看板、患者工作区和牙位图、方案报价、账单收款、复诊、报表及后台设置；采用连续办理、独立报价和分区导航，不照搬国外税务。 & 01—17、21、26、27 \\
 参考价格资料 & 核对按次、颗、疗程及材料范围的差异，只用于演示拟价；缺少本诊所正式确认的价格不得计费。 & 07、08、11—14 \\
 \bottomrule
 \end{tabular}\par}
 \medskip
-公开产品用于核对通用流程；Open Dental 26.2结构与DentalPin管理页面于2026年10月26日核对。国内医保的资质、目录和正式分摊按实际接入规则核实；院内药学按机构人员条件启用，不照搬国外保险规则。ERPNext采用2026年10月15日保存的v15模型快照，来源见参考资料。\par\smallskip
+公开产品用于核对通用流程；DentalPin主要页面及三页模块目录已于2026年10月26日核对。库存、采购、技工及处方等未安装条目只作范围参考，不作为其完整流程已经验证的依据。国内医保的资质、目录和正式分摊按实际接入规则核实；院内药学按机构人员条件启用，不照搬国外保险规则。ERPNext采用2026年10月15日保存的v15模型快照，来源见参考资料。\par\smallskip
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.08}
 \refstepcounter{table}
 \noindent\textbf{表\thetable：主要涉众利益的取舍}\par\smallskip
@@ -694,8 +743,8 @@ S-03。系统自动汇集和分列原业务，工作人员核实真实现金与�
 \endgroup
 \clearpage
 \subsubsection{核心系统用例清单}
-UC-01至UC-25共用第\ref{sec:common-quality}节的Q-01至Q-08和C-01至C-03，按所涉及业务适用；各规约保留本例的补充质量要求与设计约束。\par
-{\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.13}
+UC-01至UC-27共用第\ref{sec:common-quality}节的Q-01至Q-08和C-01至C-03，按所涉及业务适用；各规约保留本例的补充质量要求与设计约束。\par
+{\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.03}
 \refstepcounter{table}
 \noindent\textbf{表\thetable：系统用例与执行者}\par\smallskip
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.472cm}>{\raggedright\arraybackslash}p{8.341cm}>{\raggedright\arraybackslash}p{5.887cm}@{}}
@@ -704,28 +753,30 @@ UC-01至UC-25共用第\ref{sec:common-quality}节的Q-01至Q-08和C-01至C-03，
 UC-01 & 维护患者资料 & 前台 \\
 UC-02 & 维护预约安排 & 前台 \\
 UC-03 & 登记到诊 & 前台 \\
-UC-04 & 维护排班与接诊安排 & 诊所负责人 \\
+UC-04 & 维护排班与接诊安排 & 门店负责人 \\
 UC-05 & 查阅患者诊疗资料 & 牙医 \\
 UC-06 & 记录检查诊断与健康资料 & 牙医 \\
 UC-07 & 制定治疗方案并记录患者确认 & 牙医 \\
 UC-08 & 登记实际治疗与完成项目 & 牙医 \\
 UC-09 & 签署及补充病历 & 牙医 \\
 UC-10 & 管理影像与诊疗文书 & 牙医、诊疗助理 \\
-UC-11 & 维护收费项目与价目 & 收费人员、诊所负责人 \\
+UC-11 & 维护收费项目与价目 & 收费人员、门店负责人 \\
 UC-12 & 查询账单与待结算费用 & 收费人员 \\
 UC-13 & 办理患者付款与到账核实 & 收费人员 \\
-UC-14 & 办理费用更正与退费 & 收费人员、诊所负责人 \\
+UC-14 & 办理费用更正与退费 & 收费人员、门店负责人 \\
 UC-15 & 提出复诊随访要求 & 牙医 \\
 UC-16 & 办理复诊联系与预约 & 前台 \\
 UC-17 & 记录复诊随访评估 & 牙医 \\
-UC-18 & 维护材料与批次资料 & 诊疗助理、诊所负责人 \\
-UC-19 & 登记基础采购与到货验收 & 诊疗助理、诊所负责人 \\
-UC-20 & 办理库存领用、退回与盘点 & 诊疗助理、诊所负责人 \\
-UC-21 & 核对日常经营与收付款 & 收费人员、诊所负责人 \\
+UC-18 & 维护材料与批次资料 & 诊疗助理、门店负责人 \\
+UC-19 & 登记基础采购与到货验收 & 诊疗助理、门店负责人 \\
+UC-20 & 办理库存领用、退回与盘点 & 诊疗助理、门店负责人 \\
+UC-21 & 核对日常经营与收付款 & 收费人员、门店负责人、连锁负责人 \\
 UC-22 & 核验医保身份并办理预结算 & 前台、收费人员 \\
-UC-23 & 办理医保结算、撤销与回款核对 & 收费人员、诊所负责人 \\
-UC-24 & 协调诊椅设备准备与停用恢复 & 牙医、诊疗助理、诊所负责人 \\
+UC-23 & 办理医保结算、撤销与回款核对 & 收费人员、门店负责人 \\
+UC-24 & 协调诊椅设备准备与停用恢复 & 牙医、诊疗助理、门店负责人 \\
 UC-25 & 开立处方并衔接院内外取药 & 牙医、药学岗位 \\
+UC-26 & 维护诊所基础资料与账号 & 门店负责人、连锁负责人 \\
+UC-27 & 编制报价并记录患者确认 & 牙医、收费人员 \\
 \bottomrule
 \end{tabular}\par}
 \medskip
@@ -733,7 +784,7 @@ UC-25 & 开立处方并衔接院内外取药 & 牙医、药学岗位 \\
 \clearpage
 \subsubsection{UC-01：维护患者资料}
 \begin{center}
-\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/integrated-20261019/uc-01.pdf}
+\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/chain-B-20261027/uc-01.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-01}\small 图\thefigure：UC-01 维护患者资料用例图
 \end{center}
 {\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.10}
@@ -745,7 +796,7 @@ UC-25 & 开立处方并衔接院内外取药 & 牙医、药学岗位 \\
 用例编号与名称 & UC-01 维护患者资料 \\
 执行者 & 前台（主）。患者提供核实资料，由前台操作系统。 \\
 涉众利益 & 患者：身份及联系资料准确，信息仅用于获准业务；前台：区分同名患者并复用档案；牙医及收费岗位：后续记录关联同一患者。 \\
-前置条件 & 前台已通过个人账号登录并有患者资料维护权限；已取得待核对的患者资料。更正时能选定原患者编号。 \\
+前置条件 & 前台已登录，并具有当前门店的患者资料维护权限；已取得待核对的患者资料。更正时能选定原患者编号。 \\
 成功后置条件 & 档案可按患者编号查询；新建取得唯一且稳定的编号，更正保留原编号，并留存修改前后值、原因、经办人及时间。 \\
 最低保证 & 校验未通过不保存；明确保存失败时原资料不变；结果未知先查本次办理，不重复建档。 \\
 \bottomrule
@@ -754,15 +805,15 @@ UC-25 & 开立处方并衔接院内外取药 & 牙医、药学岗位 \\
 \noindent\textbf{基本路径}\par\smallskip
 \begin{enumerate}\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
 \item 前台输入姓名及已知的出生日期、联系方式，请求查找患者。
-\item 系统列出候选档案及必要辨识信息，不自动合并同名或同电话患者。
+\item 系统在连锁统一患者档案中列出候选及必要辨识信息，不自动合并同名或同电话患者。
 \item 前台核实候选中无本次患者，选择新建档案。
 \item 前台录入姓名、已知出生日期和联系信息；电话未知时说明无法联系原因。
 \item 系统按R01-1、R01-2检查资料并反馈可保存内容。
 \item 前台确认保存，系统分配患者编号并保存档案。
-\item 系统返回患者编号、已保存资料及结果，供预约和后续诊疗引用。
+\item 系统返回连锁内统一患者编号及保存结果；预约和后续诊疗分别记录发生门店。
 \end{enumerate}
 \noindent\textbf{质量要求}\par\smallskip
-姓名与联系方式检索应满足Q-01；同一办理重复提交只产生一个结果；无维护权限不能保存，前台档案页面不展开无关病历正文。\par
+姓名与联系方式检索应满足Q-01；同一办理重复提交只产生一个结果；无对应门店维护权限不能保存；统一档案不授予临床正文访问权限。\par
 \noindent\textbf{设计约束}\par\smallskip
 中文网页表单区分患者编号、姓名及联系人；提交原患者编号和当前版本；经办人及保存时间由系统记录。系统编号、档案和变更记录按现有SQLite数据设计保存。\par
 \clearpage
@@ -783,9 +834,9 @@ UC-25 & 开立处方并衔接院内外取药 & 牙医、药学岗位 \\
 \toprule
 关联步骤 & 关键概念 & 字段及含义 \\ \midrule
 1、2 & 检索与候选 & 输入姓名、已知出生日期或电话；返回患者编号及必要身份信息，姓名和电话均非唯一标识。 \\
-4、5 & 患者资料 & 姓名必填；出生日期未知可空，已知时不得晚于当日。地址、联系偏好按实际需要录入。 \\
+4、5 & 患者资料 & 姓名必填；出生日期未知可空，已知时不得晚于当日。地址、联系渠道及适宜联系时段按患者实际告知录入，后续预约和复诊使用同一偏好。 \\
 4、5 & 联系方式 & 有电话须记本人或联系人及关系；无可用电话则填写无法联系原因，不填写虚假号码。 \\
-6、7 & 保存结果 & 患者编号、当前资料及保存结果；编号由系统产生，后续更正不改变编号。 \\
+6、7 & 保存结果 & 连锁统一患者编号、登记门店、当前资料及保存结果；后续更正不改变编号。 \\
 2a、6 & 资料变更 & 原患者、字段名、原值、新值、原因、经办人、发生时间；仅真实变化形成更正记录。 \\
 \bottomrule
 \end{tabular}\par}
@@ -796,7 +847,7 @@ UC-25 & 开立处方并衔接院内外取药 & 牙医、药学岗位 \\
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 规则及步骤 & 业务逻辑 \\ \midrule
-R01-1（2、3、6） & 患者编号唯一、恒定；同名或共享电话仅产生候选。已有诊疗关联的档案不通过删除重建来更正。 \\
+R01-1（2、3、6） & 患者编号在连锁范围内唯一、恒定；同名或共享电话仅产生候选。已有诊疗关联的档案不通过删除重建来更正。 \\
 R01-2（4、5） & 未知信息如实留空或说明；联系方式及出生日期按字段列表校验，不以当前日期替代未知生日。 \\
 R01-3（2a、6） & 更正仅限患者基本资料，原因必填；不改临床正文。新资料及变更记录共同保存，原编号和历史业务归属保留。 \\
 \bottomrule
@@ -806,7 +857,7 @@ R01-3（2a、6） & 更正仅限患者基本资料，原因必填；不改临床
 \clearpage
 \subsubsection{UC-02：维护预约安排}
 \begin{center}
-\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/integrated-20261019/uc-02.pdf}
+\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/chain-B-20261027/uc-02.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-02}\small 图\thefigure：UC-02 维护预约安排用例图
 \end{center}
 {\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.10}
@@ -818,7 +869,7 @@ R01-3（2a、6） & 更正仅限患者基本资料，原因必填；不改临床
 用例编号与名称 & UC-02 维护预约安排 \\
 执行者 & 前台（主）。患者确认意向；牙医及负责人协调接诊条件。 \\
 涉众利益 & 患者：获得明确安排及变更通知；前台：避免重复安排；牙医、助理：人员、诊椅及必要设备有可行时段；负责人：资源冲突可回查。 \\
-前置条件 & 前台已登录并有预约维护权限；选定的患者编号有效。改约、取消或核实未到时，原预约可查询。 \\
+前置条件 & 前台已登录，并具有所选门店的预约维护权限；患者编号有效。改约、取消或核实未到时，原预约可查询。 \\
 成功后置条件 & 新建得到状态为“已预约”的预约及所需资源预留；改约保留原安排并整体更新预留；取消或核实未到后保留依据并释放对应预约预留。 \\
 最低保证 & 冲突或资料不符时不生成有效新安排；改约失败仍保留原预约和原预留；结果未知先查原办理。 \\
 \bottomrule
@@ -826,11 +877,11 @@ R01-3（2a、6） & 更正仅限患者基本资料，原因必填；不改临床
 \medskip
 \noindent\textbf{基本路径}\par\smallskip
 \begin{enumerate}\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
-\item 前台选择患者及就诊需求，基本路径办理新建预约。
-\item 系统显示已发布排班，以及诊椅、必要设备的预留、实际占用和停用情况。
-\item 前台选择牙医、诊椅、预约起止时间及按诊疗需要确认的必要设备使用时段。
+\item 前台选择获授权门店、患者及就诊需求，办理新建预约。
+\item 系统显示该门店已发布排班，以及本店诊椅、必要设备的占用和停用情况。
+\item 前台按就诊目的与牙医核实的预计时长，选择牙医、诊椅、预约起止及必要设备使用时段。
 \item 系统按R02-1核对人员及资源有效性、时段包含关系和冲突。
-\item 系统展示患者、就诊目的、时间及全部所需资源的待确认安排。
+\item 系统展示患者、门店、就诊目的、时间及全部所需资源的待确认安排。
 \item 前台与患者确认安排并提交。
 \item 系统重查当前条件，共同保存预约及相应资源预留。
 \item 系统返回预约编号、已预约状态及安排；实际到店后由UC-03登记到诊。
@@ -838,7 +889,7 @@ R01-3（2a、6） & 更正仅限患者基本资料，原因必填；不改临床
 \noindent\textbf{质量要求}\par\smallskip
 两人同时提交同一资源的重叠时段，最多一个有效安排；改约保存失败时原预约与预留一致；查询及可用时段反馈满足Q-01。\par
 \noindent\textbf{设计约束}\par\smallskip
-网页展示日期、时间、牙医、诊椅及设备，不仅显示空闲数量；提交稳定编号和安排版本，由服务端重查并整体保存；预约成功信息与实际到诊入口分别显示。\par
+网页提供日历与当日状态看板，可按日期、牙医和诊椅筛选；显示起止和由其计算的预计时长，不按报价金额推算时长；提交稳定编号和安排版本，由服务端重查并整体保存；预约成功信息与实际到诊入口分别显示。\par
 \clearpage
 \begingroup\small\linespread{1.04}\selectfont
 \noindent\textbf{UC-02 维护预约安排（扩展、字段与规则）}\par\smallskip
@@ -859,7 +910,7 @@ R01-3（2a、6） & 更正仅限患者基本资料，原因必填；不改临床
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2cm}>{\raggedright\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{10.7cm}@{}}
 \toprule
 关联步骤 & 关键概念 & 字段及含义 \\ \midrule
-1、3 & 预约内容 & 患者编号、就诊目的、预约起止、牙医、诊椅；必要设备及各自使用时段按本次诊疗需要确定。 \\
+1、3 & 预约内容 & 门店及患者编号、就诊目的、预约起止、牙医、诊椅；必要设备及各自使用时段按本次诊疗需要确定。 \\
 2、4 & 可用性依据 & 发布日期排班、原预留、实际使用及清洁故障停用；记录所据安排版本。 \\
 5—8 & 确认与结果 & 患者确认的完整安排、预约编号、状态及当前版本；真实通知由经办人、时间及结果体现。 \\
 1a、1b & 变更依据 & 原预约与原安排、新安排（取消时无新安排）、原因、经办人和实际变更时间。 \\
@@ -873,9 +924,9 @@ R01-3（2a、6） & 更正仅限患者基本资料，原因必填；不改临床
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 规则及步骤 & 业务逻辑 \\ \midrule
-R02-1（3、4、7） & 采用左闭右开时段[start,end)，结束须晚于开始；两个时段满足a开始＜b结束且b开始＜a结束即重叠。患者、牙医、诊椅及同一必要设备不得发生冲突；设备只核对其实际所需时段。 \\
+R02-1（3、4、7） & 采用左闭右开时段[start,end)，结束须晚于开始；两个时段满足a开始＜b结束且b开始＜a结束即重叠。同一患者和牙医跨门店不得有重叠安排；诊椅与设备按所属门店和实际所需时段核对冲突。 \\
 R02-2（2、4、7） & 预约时段须落在已发布且有效的接诊安排内，必要资源在相应时段可用；实际使用未确认结束、清洁或故障限制未解除时，不能仅凭原计划结束时间判为空闲。 \\
-R02-3（1a—1c、7） & 改约、取消及未到仅处理相应预约预留；实际使用中的占用不得随预约变更释放。原安排、原因及真实通知历史保留，不自动将超时预约判为到诊或取消。 \\
+R02-3（1a—1c、7） & 前台仅在获授权门店办理；跨店改约须协调有权人员并经患者确认，失败保留原预约。改约、取消及未到仅处理相应预约预留；实际使用中的占用不得随预约变更释放。原安排、原因及真实通知历史保留，不自动将超时预约判为到诊或取消。 \\
 \bottomrule
 \end{tabular}\par}
 \medskip
@@ -883,7 +934,7 @@ R02-3（1a—1c、7） & 改约、取消及未到仅处理相应预约预留；�
 \clearpage
 \subsubsection{UC-03：登记到诊}
 \begin{center}
-\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/integrated-20261019/uc-03.pdf}
+\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/chain-B-20261027/uc-03.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-03}\small 图\thefigure：UC-03 登记到诊用例图
 \end{center}
 {\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.10}
@@ -895,7 +946,7 @@ R02-3（1a—1c、7） & 改约、取消及未到仅处理相应预约预留；�
 用例编号与名称 & UC-03 登记到诊 \\
 执行者 & 前台（主）。患者实际报到；牙医和助理承接候诊与准备信息。 \\
 涉众利益 & 患者：实际到店得到准确登记；前台：复用预约且不重复建就诊；牙医：取得正确候诊及病历草稿；助理：区分候诊安排与实际占用。 \\
-前置条件 & 前台已登录并有到诊登记权限；患者实际到店且身份已核对，患者编号有效。 \\
+前置条件 & 前台已登录并有本门店到诊登记权限；患者实际到店且身份已核对，患者编号有效。 \\
 成功后置条件 & 产生或返回本次唯一就诊及病历草稿；新登记状态为“候诊”，保留真实到诊时间、接诊安排；关联预约时该预约为已到诊。 \\
 最低保证 & 核对失败不产生新就诊或病历；重复登记返回原结果；登记不自动开始接诊、形成治疗费用或结束资源占用。 \\
 \bottomrule
@@ -903,10 +954,10 @@ R02-3（1a—1c、7） & 改约、取消及未到仅处理相应预约预留；�
 \medskip
 \noindent\textbf{基本路径}\par\smallskip
 \begin{enumerate}\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
-\item 前台选择实际到店患者，请求登记到诊。
+\item 前台选择实际到店门店及患者，请求登记到诊。
 \item 系统显示该患者原预约、本次接诊安排及已有候诊或就诊记录。
 \item 前台选定本次有效预约，核对患者、牙医及接诊安排。
-\item 系统按R03-1核对预约归属、状态及是否已建立同次就诊。
+\item 系统核对预约的患者与门店归属、状态及是否已建立同次就诊。
 \item 前台确认真实到诊时间及当次候诊安排。
 \item 系统共同保存本次就诊、病历草稿及安排关联，将原预约记为已到诊。
 \item 系统返回就诊编号、候诊状态、牙医及准备提示，供牙医接诊时查阅。
@@ -923,7 +974,7 @@ R02-3（1a—1c、7） & 改约、取消及未到仅处理相应预约预留；�
 \item[2a] 暂无明确的接诊安排：2a1 前台协调牙医及资源；已有已确认接诊安排但暂未清洁就绪时可继续登记候诊；完全未确定安排则先协调，确定后返回步骤3。
 \item[3a] 现场无预约：3a1 前台确认现场接诊牙医和安排，按R02-1核对需预留的时段与资源；3a2 返回步骤4核对同次就诊；步骤6记录来源为现场，预约关联为空，不补造历史预约。
 \item[4a] 已有对应就诊：4a1 系统返回已有就诊号及状态，本分支结束，不重复建立病历。
-\item[4b] 原预约已取消、未到或患者不符：4b1 系统说明原因，不覆盖原事实；核实为本次现场接诊时转3a，否则返回步骤2重选。
+\item[4b] 原预约已取消、未到或患者、门店不符：4b1 系统说明原因，不覆盖原事实；核实为本次现场接诊时转3a，否则返回步骤2重选。
 \item[5a] 到诊时间不符：5a1 系统指出晚于当前时间等问题；前台核实真实事实后重填，返回步骤5。
 \item[6a] 保存结果未知或重复登记：6a1 按本次办理及原预约查询；已有结果转步骤7，确认未保存后再重试，防止重复就诊。
 \end{description}
@@ -933,7 +984,7 @@ R02-3（1a—1c、7） & 改约、取消及未到仅处理相应预约预留；�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2cm}>{\raggedright\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{10.7cm}@{}}
 \toprule
 关联步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—4 & 患者及预约 & 患者编号必填；预约来源须有关联预约号；现场来源预约号为空，原预约不得属于另一患者。 \\
+1—4 & 患者及预约 & 患者及发生门店编号必填；预约来源须有关联预约号；现场来源预约号为空，原预约须属于同一患者及本次到诊门店。 \\
 3、5 & 接诊安排 & 承接牙医、当次日期安排及所需资源的候诊安排；清洁或故障准备结果单独反映。 \\
 5、6 & 实际到诊 & 真实到店时间、来源（预约或现场）、登记人及登记时间；到诊时间不得晚于当前时间。 \\
 6、7 & 就诊与病历 & 就诊编号、候诊状态及唯一当次病历草稿；接诊开始和结束时间此时为空。 \\
@@ -956,7 +1007,7 @@ R03-3（2a、7） & 实际到诊、接诊开始和诊疗结束分别记录。候
 \clearpage
 \subsubsection{UC-04：维护排班与接诊安排}
 \begin{center}
-\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/integrated-20261019/uc-04.pdf}
+\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/chain-B-20261027/uc-04.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-04}\small 图\thefigure：UC-04 维护排班与接诊安排用例图
 \end{center}
 {\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.10}
@@ -966,9 +1017,9 @@ R03-3（2a、7） & 实际到诊、接诊开始和诊疗结束分别记录。候
 \toprule
 项目 & 内容 \\ \midrule
 用例编号与名称 & UC-04 维护排班与接诊安排 \\
-执行者 & 诊所负责人（主）。牙医、前台和助理提供实际可出诊与资源协调信息。 \\
+执行者 & 门店负责人（主）。牙医、前台和助理提供实际可出诊与资源协调信息。 \\
 涉众利益 & 负责人：发布可执行安排并追踪调整；牙医：出诊安排无冲突；前台：按已发布安排预约及通知；患者：已有安排变动得到协调。 \\
-前置条件 & 负责人已登录并有排班发布及调整权限；牙医、诊椅基础记录可查询。调整或停诊时原排班可查询。 \\
+前置条件 & 负责人已登录并有相应门店的排班发布及调整权限；牙医、诊椅基础记录可查询。调整或停诊时原排班可查询。 \\
 成功后置条件 & 新发布排班为已确认，保留发布人和时间并可供前台查询；调整保留原安排与受影响预约处理依据；停诊保存原因和已停诊结果。 \\
 最低保证 & 未发布草稿不作为可预约时段；冲突或协调未完成时不替换原有效安排；停诊不删除历史或强制结束实际使用。 \\
 \bottomrule
@@ -976,8 +1027,8 @@ R03-3（2a、7） & 实际到诊、接诊开始和诊疗结束分别记录。候
 \medskip
 \noindent\textbf{基本路径}\par\smallskip
 \begin{enumerate}\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
-\item 负责人选择营业日期，提出新建出诊安排。
-\item 系统展示牙医、诊椅有效情况、已有排班及关联预约和占用。
+\item 负责人选择获授权门店及营业日期，提出新建出诊安排。
+\item 系统展示本店牙医、诊椅、已有安排与占用，以及该牙医跨店排班。
 \item 负责人录入牙医、诊椅及可接诊起止时间。
 \item 系统按R04-1核对日期时段、人员及诊椅有效性和重复安排。
 \item 负责人复核完整安排并确认发布。
@@ -985,7 +1036,7 @@ R03-3（2a、7） & 实际到诊、接诊开始和诊疗结束分别记录。候
 \item 系统返回排班编号、已确认状态及可查询的接诊时段。
 \end{enumerate}
 \noindent\textbf{质量要求}\par\smallskip
-无发布权限不能改变有效排班；两人并发发布冲突时段最多一个成功；调整前后及影响依据可查，前台查询不把草稿当可预约安排。\par
+无相应门店发布权限不能改变有效排班；两人并发发布冲突时段最多一个成功；调整前后及影响依据可查，前台查询不把草稿当可预约安排。\par
 \noindent\textbf{设计约束}\par\smallskip
 日期安排采用中文网页展示，确认界面列原安排和受影响预约；提交排班编号及版本，系统保存正式发布与变更依据；排班页面与实际资源恢复操作分开。\par
 \clearpage
@@ -1006,7 +1057,7 @@ R03-3（2a、7） & 实际到诊、接诊开始和诊疗结束分别记录。候
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2cm}>{\raggedright\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{10.7cm}@{}}
 \toprule
 关联步骤 & 关键概念 & 字段及含义 \\ \midrule
-1、3 & 排班内容 & 营业日期、牙医编号、诊椅编号、开始及结束时间；前台显示本地营业时间。 \\
+1、3 & 排班内容 & 门店、营业日期、牙医编号、诊椅编号、开始及结束时间；前台显示本地营业时间。 \\
 2、4 & 核对依据 & 人员在岗及出诊条件、诊椅可用期间、已发布排班、预约和实际占用；提交所据版本。 \\
 5—7 & 发布结果 & 排班编号、状态（草稿、已确认、已停诊）、确认人和确认时间；草稿无正式发布时间。 \\
 2a、2b & 调整与停诊 & 原安排快照、新安排或停诊、原因、受影响预约的处理依据、经办人及时间；实际通知保留真实结果。 \\
@@ -1019,7 +1070,7 @@ R03-3（2a、7） & 实际到诊、接诊开始和诊疗结束分别记录。候
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 规则及步骤 & 业务逻辑 \\ \midrule
-R04-1（3、4、6） & 结束晚于开始，按营业时区归入所选日期；同一牙医或诊椅的已确认安排不得重叠，重叠判断采用R02-1。新发布时核对人员在岗和诊椅可用。 \\
+R04-1（3、4、6） & 结束晚于开始，按门店营业日期和时段发布；午休、休假及停诊不发布可预约时段；同一牙医跨门店排班不得重叠；诊椅按所属门店核对，重叠判断采用R02-1。新发布时核对人员在岗和诊椅可用。 \\
 R04-2（2a、2b） & 变动先核对关联预约及占用；不直接删除或搬走患者原安排。有接诊中占用时不得覆盖当前安排或按停诊强制释放，急停与患者协调由UC-24衔接。 \\
 R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班发布仅提供可预约范围，具体预约仍按UC-02核对必要设备和资源预留，实际准备由UC-24记录。 \\
 \bottomrule
@@ -1030,7 +1081,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-05：查阅患者诊疗资料}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/integrated-20261019/uc-05.pdf}
+\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/chain-B-20261027/uc-05.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-05}\small 图\thefigure：UC-05 查阅患者诊疗资料用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1039,7 +1090,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医。 \\
 涉众利益 & 患者：隐私和资料归属正确；牙医：能辨认既往诊疗及未确定事项。 \\
-前置条件 & 牙医已登录，选定有效患者编号，具有该患者接诊或获准查阅权限。 \\
+前置条件 & 牙医已登录并具有当前门店的接诊权限；选定患者及资料来源，跨店查阅须有对应授权。 \\
 成功后置条件 & 返回所选患者的获准资料、来源和状态；无记录时明确反馈。 \\
 最低保证 & 查询不改变诊疗记录；无权限不返回正文或原件。 \\
 \bottomrule
@@ -1047,15 +1098,15 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 牙医选定患者，提出查阅请求。
-\item 系统核对权限，按患者列出历次就诊及诊疗资料。
+\item 牙医选定患者及当前门店，提出查阅请求。
+\item 系统核对牙医、患者、来源就诊及授权范围，仅列获准查看的资料。
 \item 牙医选择日期、就诊或资料类别。
-\item 系统展示所选病历、方案、实际治疗、处方和影像文书，标明状态及来源。
+\item 系统展示获准查看的健康资料、病历、方案、实际治疗、处方和影像文书，标明来源门店及状态。
 \item 牙医查看所需资料，系统保持原记录不变。
 \end{enumerate}
 \noindent\textbf{扩展路径}\par
 \begin{description}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item[2a] 无权限：2a1 系统拒绝展示，结束本次查阅。
+\item[2a] 无权限或跨店授权无效：2a1 系统拒绝返回正文及原件，记录访问结果并结束。
 \item[2b] 无既往资料：2b1 系统显示无记录，结束本次查阅，不推断患者无病史。
 \item[4a] 原件暂不可读：4a1 系统保留索引并提示原因；牙医可返回步骤3查看其他资料。
 \end{description}
@@ -1064,23 +1115,23 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—3 & 检索条件 & 患者编号、就诊编号、日期、资料类别；姓名不能代替患者编号。 \\
+1—3 & 检索条件 & 患者编号、当前门店、来源门店、就诊编号、日期及资料类别；姓名不能代替患者编号。 \\
 4 & 资料与状态 & 病历草稿/已签署、方案版本、实际完成项目、处方及发药事实、文件确认状态；附经办人和时间。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R05-1（2、4）：仅返回所选患者且执行者获准访问的资料；不同患者的资料不得因同名混入。\par
+\noindent R05-1（2、4）：仅返回所选患者及获准就诊范围的资料；跨店须核对明确授权，统一档案不授予临床权限。\par
 \noindent R05-2（4）：计划与实际、草稿与签署、处方与实际发药分别展示；补充内容随原病历可查，不覆盖原文。\par
 \smallskip
-\noindent\textbf{质量要求：}常用查询采用Q-01性能目标；无权限的页面和文件访问均应拒绝。\par
-\noindent\textbf{设计约束：}网页常驻患者摘要及就诊日期；原件经权限检查后读取，页面不暴露存储路径。\par
+\noindent\textbf{质量要求：}常用查询采用Q-01性能目标；无权限的页面、接口和文件访问均应拒绝；保留访问结果与经办记录。\par
+\noindent\textbf{设计约束：}网页常驻患者编号、必要辨识信息及所选就诊日期，以分区和时间顺序查阅资料；切换分区不更换患者，报价与实际费用分列；原件经权限检查后读取，页面不暴露存储路径。\par
 \endgroup
 \clearpage
 \subsubsection{UC-06：记录检查诊断与健康资料}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/integrated-20261019/uc-06.pdf}
+\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/chain-B-20261027/uc-06.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-06}\small 图\thefigure：UC-06 记录检查诊断与健康资料用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1089,7 +1140,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医。患者提供健康信息；助理确认接诊准备。 \\
 涉众利益 & 患者：健康风险不遗漏；牙医：保留本次检查依据；后续岗位：能区分事实、未知信息及草稿。 \\
-前置条件 & 牙医已登录且有本次接诊权限；患者已到诊，本次就诊和病历草稿存在。 \\
+前置条件 & 牙医已登录且有本门店、本次就诊的接诊权限；患者已到诊，病历草稿存在。 \\
 成功后置条件 & 保存本次病历草稿、检查所见及所据健康版本的复核，返回记录编号和状态。 \\
 最低保证 & 未成功保存不替换原草稿；已签署正文不在本例改写。 \\
 \bottomrule
@@ -1099,7 +1150,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
 \item 牙医核对患者、就诊及诊椅设备准备，确认开始实际接诊。
 \item 系统核对接诊安排和当前资源条件，记录接诊开始及实际使用。
-\item 牙医询问病史、过敏及用药，复核已有健康资料并记录变化或未知事项。
+\item 牙医询问病史、过敏及用药；已有资料按UC-05核验跨店权限，记录变化或未知事项。
 \item 牙医检查患者，记录主诉、牙位、检查所见、诊断及处理意见。
 \item 系统按R06-1、R06-2检查归属、字段和当前病历状态。
 \item 牙医确认保存；系统保存草稿、所见和健康复核并返回结果。
@@ -1116,24 +1167,24 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1、2 & 就诊与准备 & 患者、就诊、牙医、诊椅及必要设备、真实开始时间；预约预留不等于实际使用。 \\
+1、2 & 就诊与准备 & 患者、发生门店、就诊、牙医、诊椅及必要设备、真实开始时间；预约预留不等于实际使用。 \\
 3 & 健康复核 & 所据健康版本、病史/过敏/用药的有无或未知、信息来源、复核牙医及时间。 \\
 4—6 & 病历草稿 & 主诉、所见、诊断、处理意见；牙位适用时填写，有牙面须有牙位；保留当前版本。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R06-1（3、6）：未知不能记为无；健康新版及条目共同保存，已被历史就诊引用的版本不覆盖。\par
-\noindent R06-2（4—6）：一就诊一份病历；仅草稿可修改，正文、所见及复核归属同一患者。尚未完成的内容可暂存，签署完整性由UC-09校验。\par
+\noindent R06-1（3、6）：未知不能记为无；新版记录来源就诊并与条目共同保存，跨店健康资料按UC-05授权。来源不明的旧资料不返回其他门店，历史版本不覆盖。\par
+\noindent R06-2（4—6）：一就诊一份病历；仅草稿可修改，正文、所见及复核归属同一患者和就诊门店。尚未完成的内容可暂存，签署完整性由UC-09校验。\par
 \smallskip
 \noindent\textbf{质量要求：}同时修改时提示版本变化；保存失败可重新核对输入；性能目标引用Q-01。\par
-\noindent\textbf{设计约束：}网页区分健康复核与本次病历；系统记录经办身份、时间和版本，使用现有SQLite设计保存。\par
+\noindent\textbf{设计约束：}网页区分健康复核与本次病历，牙位图支持恒牙、乳牙选择并提供等价明细列表；所见、方案及实际执行分别标识，不把示意图覆盖成新的临床事实；系统记录经办身份、时间和版本，使用现有SQLite设计保存。\par
 \endgroup
 \clearpage
 \subsubsection{UC-07：制定治疗方案并记录患者确认}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.5cm,keepaspectratio]{diagrams/integrated-20261019/uc-07.pdf}
+\includegraphics[width=16cm,height=2.5cm,keepaspectratio]{diagrams/chain-B-20261027/uc-07.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-07}\small 图\thefigure：UC-07 制定治疗方案并记录患者确认用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1142,7 +1193,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医。患者作出治疗决定，由牙医记录。 \\
 涉众利益 & 患者：清楚治疗内容、费用估算和可选安排；牙医：明确本次获同意范围；收费岗位：不把计划计为实际费用。 \\
-前置条件 & 牙医已登录且有方案维护权限；患者有效，已有可核对的诊断依据。 \\
+前置条件 & 牙医已登录且有本门店方案维护权限；患者有效，已有获准查阅的诊断依据。 \\
 成功后置条件 & 保存方案版本、明细及患者决定；同意所覆盖项目可查，供实际执行核对。 \\
 最低保证 & 未确认的项目不作为获同意范围；修订不覆盖原方案及历史决定。 \\
 \bottomrule
@@ -1153,7 +1204,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \item 牙医选择患者及诊断依据，新建治疗方案。
 \item 牙医录入目标、项目、牙位、数量、顺序、预计安排及费用估算。
 \item 系统核对明细并形成待确认版本。
-\item 牙医向患者说明方案、风险、替代安排及估算，记录说明依据。
+\item 牙医说明方案、风险和替代安排；费用由UC-27出具确切版本报价，分别保留说明依据。
 \item 患者明确同意范围，牙医逐项记录决定和确认时间。
 \item 系统校验同版本项目及决定范围，共同保存并返回结果。
 \end{enumerate}
@@ -1170,7 +1221,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—3 & 方案版本 & 患者、诊断来源、目标、原版本、变更原因；明细含项目、牙位牙面、正数量、顺序和估算。 \\
+1—3 & 方案版本 & 患者、方案发生门店、诊断来源、目标、原版本、变更原因；明细含项目、牙位牙面、正数量、顺序和估算。 \\
 4、5 & 说明与决定 & 说明人/时间/依据、同意/暂缓/拒绝/撤回、决定时间、同版本项目及范围限制；有证明文件时关联确切版本。 \\
 6 & 结果与状态 & 方案编号、版本及患者决定；草稿、待确认及决定后的适用状态分别保存。 \\
 \bottomrule
@@ -1178,7 +1229,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{业务规则}\par
 \noindent R07-1（3、6）：同意只覆盖该版本所选项目及数量；实质调整须形成新版重新说明确认，旧版已执行事实保留。\par
-\noindent R07-2（2、5）：估算未知如实标明，不填成零；估算不产生账单。同意、暂缓、拒绝及撤回均按实际决定记录。\par
+\noindent R07-2（2、5）：估算未知如实标明，不填成零；估算及报价均不产生账单，费用接受不代替本例医疗同意。同意、暂缓、拒绝及撤回均按实际决定记录。\par
 \smallskip
 \noindent\textbf{质量要求：}再次打开能还原原版本和决定范围；重复提交不重复记录，查询性能引用Q-01。\par
 \noindent\textbf{设计约束：}页面并列显示方案项目、估算和确认范围；编号、版本、经办身份由服务端校验。\par
@@ -1187,7 +1238,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-08：登记实际治疗与完成项目}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/integrated-20261019/uc-08.pdf}
+\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/chain-B-20261027/uc-08.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-08}\small 图\thefigure：UC-08 登记实际治疗与完成项目用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1196,7 +1247,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医。 \\
 涉众利益 & 患者：按实际完成量计费；牙医：保留治疗事实；收费岗位：执行与价目可核对。 \\
-前置条件 & 牙医已登录且有本次接诊权限，就诊正在接诊；方案治疗有有效同意，常规检查有当次依据。 \\
+前置条件 & 牙医已登录且有本门店、本次就诊的接诊权限，就诊正在接诊；方案治疗有有效同意，常规检查有当次依据。 \\
 成功后置条件 & 保存实际执行及唯一计费来源；价目可确定时形成对应费用，否则保留待核价。 \\
 最低保证 & 不把未完成计划记为实际执行；执行和计费关联保存失败时不形成半条结果。 \\
 \bottomrule
@@ -1223,7 +1274,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1、2 & 执行依据 & 患者、就诊、项目；方案治疗关联版本、明细及有效决定。 \\
+1、2 & 执行依据 & 患者、实际执行门店、就诊、项目；方案治疗关联版本、明细及有效决定。 \\
 3 & 实际执行 & 执行人、完成时间、牙位牙面、经过、正的完成数量；更正含原执行及原因。 \\
 4、5 & 计费来源 & 执行编号、价目、数量、单价、金额或待核价状态；价格与执行分开保存。 \\
 \bottomrule
@@ -1231,7 +1282,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{业务规则}\par
 \noindent R08-1（2—4）：累计执行不得超过适用同意范围及数量；计划、未执行及未完成部分不能生成已完成收费。\par
-\noindent R08-2（4、5）：同一执行不重复计费；金额=实际计费数量×适用单价，以分保存。无适用价目保留待核价，不按零元或估算结清。\par
+\noindent R08-2（4、5）：同一执行与发生门店对应，不重复计费；金额=实际计费数量×适用单价，以分保存。无适用价目或与已接受报价范围存在待核实差异时保留待核价；先记录实际事实，不按零元或估算结清。\par
 \smallskip
 \noindent\textbf{质量要求：}重复提交不重复执行或计费；执行更正可回查原记录，性能目标引用Q-01。\par
 \noindent\textbf{设计约束：}页面区分计划量、已完成量和本次量；服务端校验来源，执行及费用以SQLite事务保存。\par
@@ -1240,7 +1291,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-09：签署及补充病历}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/integrated-20261019/uc-09.pdf}
+\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/chain-B-20261027/uc-09.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-09}\small 图\thefigure：UC-09 签署及补充病历用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1249,7 +1300,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医。 \\
 涉众利益 & 患者：诊疗记录完整且历史可信；牙医：签署责任明确，遗漏事项有独立补充；后续岗位：辨认已签署正文。 \\
-前置条件 & 牙医已登录且有该病历签署权限；原病历存在。基本路径处理草稿，补充路径处理已签署病历。 \\
+前置条件 & 牙医已登录且有原就诊门店及该病历签署权限；原病历存在。基本路径处理草稿，补充路径处理已签署病历。 \\
 成功后置条件 & 病历为已签署，保存签署人、时间及冻结版本；补充路径新增关联原病历的独立已签署补充。 \\
 最低保证 & 校验不通过仍为草稿；签署失败不显示成功；任何补充不覆盖原正文。 \\
 \bottomrule
@@ -1275,7 +1326,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—4 & 签署对象 & 患者、就诊、病历编号及当前版本；主诉、所见、健康复核、诊断和处理意见。 \\
+1—4 & 签署对象 & 患者、就诊门店、就诊、病历编号及当前版本；主诉、所见、健康复核、诊断和处理意见。 \\
 5 & 签署结果 & 已签署状态、签署牙医、真实时间、冻结正文版本及校验摘要。 \\
 1a & 独立补充 & 原病历编号、补充正文、原因、补充签署人和时间；原签署内容继续可查。 \\
 \bottomrule
@@ -1283,7 +1334,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{业务规则}\par
 \noindent R09-1（4、5）：主诉、诊断、处理意见、检查所见及健康复核齐全方可签署；诊断未定如实记载，不能填虚假结论。\par
-\noindent R09-2（1a、5）：签后正文和所见冻结。病历签署不代替真实操作结束、清洁确认或结算；实际资源交接由UC-24办理。\par
+\noindent R09-2（1a、5）：签后正文和所见冻结；跨店查阅授权不自动授予签署或补充权限。病历签署不代替真实操作结束、清洁确认或结算；实际资源交接由UC-24办理。\par
 \smallskip
 \noindent\textbf{质量要求：}签署后原文及历次补充可追溯；并发只能形成一次原文签署；查询性能引用Q-01。\par
 \noindent\textbf{设计约束：}网页区分草稿编辑和签后补充入口，签署前展示确认内容；系统核验权限并保存冻结版本。\par
@@ -1292,7 +1343,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-10：管理影像与诊疗文书}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/integrated-20261019/uc-10.pdf}
+\includegraphics[width=16cm,height=2.4cm,keepaspectratio]{diagrams/chain-B-20261027/uc-10.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-10}\small 图\thefigure：UC-10 管理影像与诊疗文书用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1301,7 +1352,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医、诊疗助理；牙医确认诊疗归属。 \\
 涉众利益 & 患者：文件归属正确且原件保留；牙医：资料可查可用；助理：上传结果清楚。 \\
-前置条件 & 执行者已登录且有相应文件权限；患者有效，相关就诊或方案可核对。 \\
+前置条件 & 执行者已登录且有相应门店文件权限；患者有效，相关就诊或方案可核对。 \\
 成功后置条件 & 保存文件及索引，返回编号和待核对/已确认状态；确认后供获准岗位查阅。 \\
 最低保证 & 上传失败不形成可用文件索引；无权限不读取原件，替换不覆盖原件。 \\
 \bottomrule
@@ -1326,13 +1377,13 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—3 & 文件资料 & 患者、就诊/方案、类型、来源、形成时间、原文件名、格式、大小及存储索引。 \\
+1—3 & 文件资料 & 患者、来源门店、就诊/方案、类型、来源、形成时间、原文件名、格式、大小及存储索引。 \\
 3—5 & 版本与核对 & 文件编号、版本、上传人/时间、待核对或已确认、核对人/时间/依据；替换关联原版本和原因。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R10-1（3、4）：关联对象须属于同一患者；牙医核对后才作已确认诊疗依据。补充文件不能冒充原就诊时已经存在。\par
+\noindent R10-1（3、4）：关联对象须属于同一患者及相应来源门店；跨店原件仅供获授权牙医查阅，牙医核对后才作已确认诊疗依据。补充文件不能冒充原就诊时已经存在。\par
 \noindent R10-2（3、4b）：原件及被引用版本保留；允许PDF、JPEG、PNG，单文件不超过10MB，不把扩展名当作实际格式。\par
 \smallskip
 \noindent\textbf{质量要求：}重复提交不产生重复版本；原件不可读时明确提示；索引查询性能引用Q-01。\par
@@ -1340,18 +1391,18 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \endgroup
 \clearpage
 \subsubsection{UC-11：维护收费项目与价目}
-\begingroup\small\linespread{1.04}\selectfont
+\begingroup\small\linespread{0.94}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-11.pdf}
+\includegraphics[width=16cm,height=1.9cm,keepaspectratio]{diagrams/chain-B-20261027/uc-11.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-11}\small 图\thefigure：UC-11 维护收费项目与价目用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{13.2cm}@{}}
 \toprule
 项目 & 内容 \\ \midrule
-执行者 & 收费人员提出价目；诊所负责人确认。 \\
+执行者 & 收费人员提出价目；门店负责人确认。 \\
 涉众利益 & 患者：收费依据清楚；收费人员：适用价唯一；负责人：调价可控，原收费可追查。 \\
-前置条件 & 执行者已登录并具有相应维护或确认权限；拟维护的收费项目可识别。 \\
+前置条件 & 执行者已登录且具备相应权限；项目属于连锁统一目录，价目按门店维护。 \\
 成功后置条件 & 保存项目及已确认可适用的价目、适用期间和确认人时间，可供后续核价引用。 \\
 最低保证 & 草稿或未通过确认的价目不参与正式核价；新价目不改写原账单快照。 \\
 \bottomrule
@@ -1359,8 +1410,8 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 收费人员按业务分类或名称检索收费项目，核对名称、编号、牙位或材料适用范围和计价单位。
-\item 收费人员填写单价、适用起止及制定或变更原因。
+\item 收费人员按业务分类或名称检索统一收费项目，核对名称、编号、牙位或材料适用范围和计价单位。
+\item 收费人员填写适用门店、单价、适用起止及变更原因。
 \item 系统按R11-1校验，保存为待负责人确认，返回价目编号。
 \item 负责人可稍后打开该待确认价目，核对价格及适用安排。
 \item 系统复查当前版本与适用区间；负责人确认。
@@ -1368,7 +1419,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \end{enumerate}
 \noindent\textbf{扩展路径}\par
 \begin{description}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item[1a] 新项目或停用：1a1 新项目填写业务分类、名称和单位后返回步骤2；可从参考项目复制拟价草稿，核对本诊所范围与价格后再提交；停用须由负责人确认，停止新计费使用，历史引用保留，本分支结束。
+\item[1a] 新项目或停用：1a1 有连锁目录权限时填写新项目分类、名称和单位后返回步骤2；拟价须核对门店范围；负责人确认停用后停止新计费，历史保留，本分支结束。
 \item[3a] 资料不足或区间冲突：3a1 系统指出原因；核对原价目及衔接安排后返回步骤2。
 \item[4a] 退回或暂不确认：4a1 负责人记退回原因，收费人员修改后返回步骤2；暂不处理则保持待确认，结束本次办理。
 \item[5a] 版本改变或重复确认：5a1 已确认返回原结果，其他变化返回步骤4重核，不覆盖新版本。
@@ -1378,16 +1429,16 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1、2 & 项目与价目 & 项目编号、名称、计价单位、非负单价（分）、适用起止、变更或零价原因。 \\
+1、2 & 项目与价目 & 门店、项目编号、名称、计价单位、非负单价（分）、适用起止、变更或零价原因。 \\
 3—6 & 确认结果 & 价目编号、草稿/待负责人确认/已确认可适用/已退回/不再用于新计费、经办及确认人时间。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R11-1（2、3、5）：期间采用左闭右开区间，终点为空表示持续适用，否则须晚于起点；同项目已确认区间不得重叠。零价须有明确免收依据。网络区间、活动起价、材料采购价不直接作为诊所正式单价。\par
+\noindent R11-1（2、3、5）：期间采用左闭右开区间，终点为空表示持续适用，否则须晚于起点；同门店同项目已确认区间不得重叠；其他门店价目不自动适用。零价须有明确免收依据。网络区间、活动起价、材料采购价不直接作为诊所正式单价。\par
 \noindent R11-2（4—6）：仅负责人确认后可核价；调价新增适用记录，原费用保留原单价与价目来源。已存在价目或实际引用的项目名称、计价单位不追改；牙位、材料或收费范围不同且需独立计价时另建可辨识项目。分类可有据核实，不改变原收费；停用不删除历史。\par
 \smallskip
-\noindent R11-3（1、2）：按次、颗或明确疗程计量，方案、实际完成和计费使用同一口径。整项根管、种植或正畸疗程不得在每次复诊重复计全程价；按阶段收费须事先拆为明确项目并说明范围。预收与分次收款按UC-13保存，不据此再生成治疗项目。\par
+\noindent R11-3（1、2）：按次、颗或疗程统一计量；整项疗程不得在复诊重复计全价，分阶段收费须事先明确范围。预收及分次收款按UC-13保存，不重复生成治疗项目。\par
 \noindent\textbf{质量要求：}两个重叠价目同时确认时最多一个成功；拒绝原因明确，常用查询性能引用Q-01。\par
 \noindent\textbf{设计约束：}网页区分维护与负责人确认入口，显示原价及适用期间；服务端校验权限、版本和区间。\par
 \endgroup
@@ -1395,7 +1446,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-12：查询账单与待结算费用}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-12.pdf}
+\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-12.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-12}\small 图\thefigure：UC-12 查询账单与待结算费用用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1404,7 +1455,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 收费人员。患者参与核对。 \\
 涉众利益 & 患者：项目、分摊和已付清楚；收费人员：应收、实际收款及可抵款不混算。 \\
-前置条件 & 收费人员已登录并有费用查询权限；选定患者及其账单，账单归属可核对。 \\
+前置条件 & 收费人员已登录并有相应门店费用查询权限；选定患者、门店及其账单。 \\
 成功后置条件 & 返回费用来源、调整、医保分摊、有效抵付和待付，或明确尚不能最终结算的原因。 \\
 最低保证 & 查询不新增收费、抵扣或退款，不改变原账目。 \\
 \bottomrule
@@ -1412,7 +1463,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 收费人员选定患者和账单，请求核对费用。
+\item 收费人员选定患者、所属门店和账单，请求核对费用。
 \item 系统列出实际诊疗或实际发药的项目、数量、单价及已生效调整。
 \item 系统核对定价及有效正式医保结果，按R12-1计算本账患者应付。
 \item 系统按R12-2汇总本账有效抵付，展示待付及相关原单。
@@ -1430,7 +1481,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1、2 & 账目明细 & 患者、账单、执行或发药来源、数量、单价快照、核价状态及带符号调整。 \\
+1、2 & 账目明细 & 患者、账单所属门店、执行或发药来源、数量、单价快照、核价状态及带符号调整。 \\
 3 & 分摊 & 总应收G、有效医保基金及个人账户合计I、患者其他应付P；自费I=0。 \\
 4、5 & 抵付与待付 & 本账有效付款分配和预付抵扣净合计S、待付、原付款及退费历史；患者全部收款另列。 \\
 \bottomrule
@@ -1438,27 +1489,27 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{业务规则}\par
 \noindent R12-1（2、3）：G=已核价项目金额合计+已生效调整；P=G-I。G、I、P均不得为负；缺价或医保结果未定时不输出最终待收。医保个人账户与基金均不再向患者现金收取。\par
-\noindent R12-2（4）：S含本账正向用途及已批准负向释放；待付=max(P-S,0)。实际退款另列，不再从已释放的S重复扣减；未确认到账、无关账目及未分配预款不计入S。\par
+\noindent R12-2（4）：S含本账正向用途及已批准负向释放；待付=max(P-S,0)。实际退款另列，不再从已释放的S重复扣减；未确认到账、无关账目及未分配预款不计入S；仅查询获授权门店账目。\par
 \smallskip
 \noindent\textbf{质量要求：}同一来源只汇总一次，金额可回查原单；查询性能引用Q-01。\par
-\noindent\textbf{设计约束：}页面分别显示应收、医保、抵付、待付及尚待处理原因；金额以整数分计算，展示为元。\par
+\noindent\textbf{设计约束：}页面分别显示应收、医保、抵付、待付及尚待处理原因；可核价时按真实抵付区分未结清、部分结清、已结清，缺价或医保未定优先显示待核对；报价不计入应收，金额以整数分计算，展示为元。\par
 \endgroup
 \clearpage
 \subsubsection{UC-13：办理患者付款与到账核实}
-\begingroup\small\linespread{1.04}\selectfont
+\begingroup\small\linespread{1.00}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-13.pdf}
+\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-13.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-13}\small 图\thefigure：UC-13 办理患者付款与到账核实用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{13.2cm}@{}}
 \toprule
 项目 & 内容 \\ \midrule
-执行者 & 收费人员（主）；支付平台（电子支付辅助）。 \\
+执行者 & 收费人员；渠道结果由工作人员核对后录入。 \\
 涉众利益 & 患者：不重复付款；收费人员：原单可查；负责人：钱款与用途相符。 \\
-前置条件 & 已登录且有收款权限；患者有效，账单待付或预收用途已核实。 \\
+前置条件 & 已登录且有收款门店权限；患者、账单所属门店及待付或预收用途已核实。 \\
 成功后置条件 & 保存已确认收款及用途，或原款抵扣；返回凭据、待付及未用预款。 \\
-最低保证 & 未知不记到账；失败不显示成功，实际收付保留线索核实。 \\
+最低保证 & 未知不记到账；失败不显示成功，实际收付保留线索核实；系统不发起真实支付。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
@@ -1473,8 +1524,8 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \end{enumerate}
 \noindent\textbf{扩展路径}\par
 \begin{description}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item[1a] 预收：1a1 核实用途及预收额，转步骤3；步骤5不分配账单或虚构诊疗。
-\item[3a] 电子支付：3a1 建立唯一原单并发起支付或登记终端交易；3a2 核实成功转步骤5，失败结束，未知转5a；找零为0。
+\item[1a] 预收：1a1 核实用途及预收额，可关联同患者报价号，转步骤3；步骤5只保存一次原付款，不分配虚构账单或诊疗；后续抵扣仍另核实实际账单。
+\item[3a] 电子支付：3a1 建立唯一登记原单，由工作人员在外部渠道办理或核对；3a2 系统登记核实结果，成功转步骤5，失败结束，未知转5a；找零为0。
 \item[3b] 预款抵扣：3b1 选择同患者可用原款及金额，系统保存抵扣，转步骤6，不新增收款。
 \item[5a] 结果未知或保存失败：5a1 查原笔，已有结果返回，确认未保存才重试步骤5。
 \item[5b] 金额或用途变化：5b1 重核已收及已用款，返回步骤2，不重复收款。
@@ -1484,7 +1535,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—3 & 收款用途 & 患者、账单或预收用途、金额、渠道；抵扣选择原已确认付款。 \\
+1—3 & 收款用途 & 患者、收款门店、账单或预收用途、金额、渠道；抵扣选择原已确认付款。 \\
 4、5 & 实际收款 & 实收、找零、净收、到账时刻、核实人及依据；电子原单、平台交易号及结果。 \\
 5、6 & 保存结果 & 付款号及待核实/到账已确认/未到账已核实、用途/抵扣金额、剩余待付。 \\
 \bottomrule
@@ -1492,26 +1543,26 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{业务规则}\par
 \noindent R13-1（2、4、5）：净收=实收-找零且大于0；账单抵付不超最新待付，部分付款保留差额；医保款不记为患者新收款。\par
-\noindent R13-2（2、3b）：原款可用额=确认净收-分配及抵扣净额-已确认退款-待办或待核实退款占用；抵扣不增加实收。\par
+\noindent R13-2（2、3b）：原款与账单须属于同一患者和门店；原款可用额=确认净收-分配及抵扣净额-已确认退款-待办或待核实退款占用；抵扣不增加实收。\par
 \noindent R13-3（2、3a、5）：核对原单金额、渠道及交易号一致且成功才确认一次到账；未知先查原笔，受理或患者截图不足为据。\par
 \smallskip
-\noindent\textbf{质量要求：}并发不重复记账或超用；查询性能见Q-01，外部等待显示待核实。\par
-\noindent\textbf{设计约束：}SQLite共同保存本地收款及用途；未接支付接口时据正式终端核实结果登记。\par
+\noindent\textbf{质量要求：}并发不重复记账或超用，外部等待显示待核实，适用共用Q要求。\par
+\noindent\textbf{设计约束：}本地保存付款记录及用途，不发起真实支付；渠道结果由工作人员核对后登记。\par
 \endgroup
 \clearpage
 \subsubsection{UC-14：办理费用更正与退费}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-14.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-14.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-14}\small 图\thefigure：UC-14 办理费用更正与退费用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{13.2cm}@{}}
 \toprule
 项目 & 内容 \\ \midrule
-执行者 & 收费人员提出并办理；诊所负责人审核。支付、医保平台按实际需要协作。 \\
+执行者 & 收费人员提出并办理；负责人审核。渠道结果由工作人员核对后登记，医保按条件办理。 \\
 涉众利益 & 患者：多收可退且不重复扣款；负责人：更正有依据；收费人员：批准额、可退额及真实结果清楚。 \\
-前置条件 & 执行者已登录并有相应权限；原账单或原付款可查且归属同患者，申请理由可核实。 \\
+前置条件 & 执行者已登录并有原业务门店相应权限；原账单或原付款归属同患者及门店，申请理由可核实。 \\
 成功后置条件 & 基本路径保存批准申请、费用调整、原用途释放及已确认退款，保留原账、原付款和凭据。 \\
 最低保证 & 未批准不调整或退款；外部结果未知保留待核实，已发生的调整及收付事实可查。 \\
 \bottomrule
@@ -1531,7 +1582,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \end{enumerate}
 \smallskip
 \noindent\textbf{质量要求：}并发或重复办理不超退；申请、审批、费用及实际退款分别可查；本地查询性能引用Q-01。\par
-\noindent\textbf{设计约束：}网页区分申请、负责人审核和实际办理入口；外部成功与本地保存分阶段核实，SQLite只保存本地事务。\par
+\noindent\textbf{设计约束：}网页区分申请、负责人审核和实际办理入口；工作人员在系统外办理退费并核实，系统仅登记结果；SQLite只保存本地事务。\par
 \endgroup
 \clearpage
 \begingroup\small\linespread{1.04}\selectfont
@@ -1542,7 +1593,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \item[5a] 退回、拒绝或撤回：5a1 退回说明缺项，返回步骤3补正重提；拒绝或未审核撤回保存决定并结束，均不调整退款。
 \item[6a] 涉及已医保结算费用：6a1 以批准更正明细办理必要的原单撤销及重新预结算、结算（UC-22、23）；6a2 核实适用最终分摊后返回步骤6保存本地调整；失败或未知保留待处理，不确认最终退补差额。
 \item[6b] 无应退或需补收：6b1 只保存批准的必要调整；无差额结束，需补收转UC-13，不强行退款。
-\item[7a] 原款为电子支付：7a1 关联原付款建立退款并占用额度，发起渠道办理；成功核实转步骤8，未知转8a，失败转8b。
+\item[7a] 原款为电子支付：7a1 关联原付款建立退款登记并占用额度，由工作人员在外部渠道办理；成功核实转步骤8，未知转8a，失败转8b。
 \item[8a] 退款结果未知或本地保存失败：8a1 保留原笔及占用额度，先查原办理；已有结果直接返回步骤9，确认未保存才补记，不重发退款。
 \item[8b] 明确失败：8b1 保存失败依据并释放未执行占用；需重办须关联原失败单、重核额度并以新办理号返回步骤7。
 \end{description}
@@ -1551,7 +1602,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—4 & 申请 & 患者、原账单/付款、原费用项目、拟调整和拟退额、原因、证据、提交版本及待审核状态。 \\
+1—4 & 申请 & 患者、原业务门店、原账单/付款、原费用项目、拟调整和拟退额、原因、证据、提交版本及待审核状态。 \\
 5 & 审核 & 批准调整额、批准退款上限、审核意见、人和时间；状态为已同意、已退回、已拒绝或已撤回。 \\
 6 & 费用及用途 & 调整明细与原项目、调整额、原付款分配/抵扣及释放额、更正后患者应付。 \\
 7—9 & 退款办理 & 申请号、原付款、唯一退款号、渠道、接收方核实、拟退与实际额、凭据、核实人/时间；待办理/待核实/已确认退款/已失败。 \\
@@ -1568,7 +1619,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-15：提出复诊随访要求}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-15.pdf}
+\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-15.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-15}\small 图\thefigure：UC-15 提出复诊随访要求用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1577,7 +1628,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医。前台承接已发布的联系任务。 \\
 涉众利益 & 患者：后续目的和时间清楚；牙医：诊后要求有承接人；前台：能按明确目的跟进。 \\
-前置条件 & 牙医已登录且有该患者诊疗权限；患者及来源就诊或方案版本可核对。 \\
+前置条件 & 牙医已登录且有来源门店及该患者诊疗权限；患者及来源就诊或方案版本可核对。 \\
 成功后置条件 & 保存已发布要求及编号，状态为待联系，明确目标日期、是否需评估及负责前台。 \\
 最低保证 & 待发布内容不进入正式联系待办；保存失败不显示发布成功，原要求和历史保留。 \\
 \bottomrule
@@ -1588,7 +1639,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \item 牙医选定患者及来源就诊或方案版本。
 \item 系统展示来源、既有要求及当前状态，供牙医核对。
 \item 牙医填写复诊或随访类型、目的、目标日期范围及是否需临床评估。
-\item 牙医指定负责前台，确认后续需要达到的结果并请求发布。
+\item 牙医指定负责门店及获授权前台，确认后续目标并请求发布。
 \item 系统按R15-1校验归属、必填及当前版本。
 \item 系统保存已发布的待联系要求，返回编号及负责岗位。
 \end{enumerate}
@@ -1604,13 +1655,13 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—4 & 要求内容 & 患者、来源就诊/方案版本（至少一项）、复诊或随访、目的、目标起止、是否需评估及负责前台。 \\
+1—4 & 要求内容 & 患者、来源门店及来源就诊/方案版本（至少一项）、目的、日期、是否需评估、负责门店及前台。 \\
 5、6 & 发布及变更 & 要求编号、待发布/待联系/待到诊或评估/已完成/已撤销、经办人时间；调整或撤销原因与依据。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R15-1（3—5）：来源均须属于本患者；目标终日不早于起日，单日可相同；目的、日期、负责前台及是否需评估须明确，涉及临床判断的目的须由牙医评估。\par
+\noindent R15-1（3—5）：来源须属于本患者及原门店，负责前台须有负责门店权限；目标终日不早于起日，单日可相同；目的、日期、负责前台及是否需评估须明确，涉及临床判断的目的须由牙医评估。\par
 \noindent R15-2（2a、6）：发布只产生后续待办；既有联系、预约和评估保留，修改或撤销不伪造完成，也不直接取消原预约；同次提交仅产生一条要求。\par
 \smallskip
 \noindent\textbf{质量要求：}可按患者、目标日期和状态查到本人获准任务；发布失败有明确原因，性能引用Q-01。\par
@@ -1620,7 +1671,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-16：办理复诊联系与预约}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-16.pdf}
+\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-16.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-16}\small 图\thefigure：UC-16 办理复诊联系与预约用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1629,7 +1680,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 前台；患者确认意向，牙医承接临床问题。 \\
 涉众利益 & 患者：安排准确；前台：联系可查；牙医：临床待办不误关。 \\
-前置条件 & 已登录且有权限；原要求已发布未关闭，患者和负责前台可核对。 \\
+前置条件 & 前台已登录且有负责门店权限；原要求已发布未关闭，患者和责任人可核对。 \\
 成功后置条件 & 保存联系及成功预约关联，要求为待到诊或评估，或分支的真实结果。 \\
 最低保证 & 预约失败仍保留联系；未联系上或仅约好时间不记到诊、评估或完成。 \\
 \bottomrule
@@ -1638,10 +1689,10 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
 \item 前台打开待联系要求，核对患者、目的、建议日期及评估要求。
-\item 前台实际联系患者，核对身份、复诊意向和可来时间。
+\item 前台实际联系患者，核对身份、目标门店、复诊意向和可来时间。
 \item 前台填写实际方式、时间、沟通结果，系统保存本次联系。
-\item 患者确认预约意向，前台调用UC-02选择牙医、诊椅及必要资源时段。
-\item 系统核对原要求仍有效及患者一致，关联UC-02成功返回的预约。
+\item 患者确认意向后，由目标门店获授权前台调用UC-02选择资源及预约时段。
+\item 系统核对原要求、患者及目标门店，关联UC-02成功返回的预约。
 \item 系统显示已联系及预约编号，将要求记为待到诊或评估。
 \end{enumerate}
 \noindent\textbf{扩展路径}\par
@@ -1658,22 +1709,22 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
 1—3 & 实际联系 & 要求、患者、方式/实际时间、前台、说明、结果（已联系/未联系上/拒绝/待跟进）。 \\
-4—6 & 后续安排 & 关联预约；继续时下次联系日，完成时事实依据、完成人及时间。 \\
+4—6 & 后续安排 & 来源门店、负责门店、目标门店及关联预约；继续时下次联系日，完成时事实依据、完成人及时间。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R16-1（3—6）：实际联系逐次记录；仅同患者成功预约可关联，人员和资源校验见UC-02；未确定时不自动建预约。\par
+\noindent R16-1（3—6）：实际联系逐次记录；跨店交接须由获授权前台办理，仅同患者、目标门店成功预约可关联；未确定时不自动建预约。\par
 \noindent R16-2（1b、3a、6）：需评估交UC-17，免评估仍须目的实际达成；拒绝/未到/逾期不自动关闭，继续联系须日期及责任人。\par
 \smallskip
 \noindent\textbf{质量要求：}同次办理不重复联系或预约；关联失败可查原单，查询性能见Q-01。\par
-\noindent\textbf{设计约束：}页面分开要求、联系、预约及到诊，前台不代写临床结论。\par
+\noindent\textbf{设计约束：}页面分开要求、联系、预约及到诊，前台仅见联系所需信息，不读取临床正文或代写结论。\par
 \endgroup
 \clearpage
 \subsubsection{UC-17：记录复诊随访评估}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-17.pdf}
+\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-17.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-17}\small 图\thefigure：UC-17 记录复诊随访评估用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1682,7 +1733,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医；患者提供真实复查或随访信息。 \\
 涉众利益 & 患者：后续意见明确；牙医：完成有据；前台：知晓跟进责任。 \\
-前置条件 & 已登录且有评估权限；已发布要求未关闭，具备实际复查或沟通条件。 \\
+前置条件 & 牙医已登录且有复诊门店评估权限；已发布要求未关闭，具备实际复查或沟通条件。 \\
 成功后置条件 & 保存评估及完成依据，要求为已完成，记录评估及完成人和时间。 \\
 最低保证 & 无实际评估不记完成；失败保留原要求及历史记录。 \\
 \bottomrule
@@ -1691,7 +1742,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
 \item 牙医选定患者的原要求，系统展示目的、来源及历史跟进。
-\item 牙医核对本次实际到诊及对应就诊，查阅前次资料。
+\item 牙医核对本次门店、实际到诊及对应就诊；跨店资料按UC-05核验授权后查阅。
 \item 牙医实施实际复查，判断原目的是否达到。
 \item 牙医记录到诊检查方式、评估时间、结论和处理意见，选择完成。
 \item 系统按R17-1、R17-2检查归属、内容及原要求状态。
@@ -1709,14 +1760,14 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—3 & 评估依据 & 原要求、患者、来源；到诊检查关联实际就诊，远程不虚构就诊。 \\
+1—3 & 评估依据 & 原要求、患者、来源及复诊门店；到诊检查关联实际就诊，远程不虚构就诊。 \\
 4、5 & 评估内容 & 方式（到诊检查/远程沟通）、时间、牙医、结论及意见；跟进须下次日期、责任人。 \\
 6 & 办理结果 & 评估、要求状态、完成依据及经办人时间；历史可查。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R17-1（2、5）：仅同患者实际就诊可关联；预约、联系或收费不能代替评估。远程结论限于实际信息，不足以判断则安排到诊。\par
+\noindent R17-1（2、5）：仅同患者、复诊门店实际就诊可关联；跨店资料无授权时不得读取；预约、联系或收费不能代替评估。远程结论限于实际信息，不足以判断则安排到诊。\par
 \noindent R17-2（4—6）：目的实际达到且评估完整才完成；跟进须日期及责任人，评估追加保留历史；新治疗与原目标分别判断。\par
 \smallskip
 \noindent\textbf{质量要求：}同次评估不重复保存或关闭；跟进日期及责任人可查，性能见Q-01。\par
@@ -1726,16 +1777,16 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-18：维护材料与批次资料}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-18.pdf}
+\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-18.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-18}\small 图\thefigure：UC-18 维护材料与批次资料用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{13.2cm}@{}}
 \toprule
 项目 & 内容 \\ \midrule
-执行者 & 诊疗助理录入；诊所负责人确认计量及放行。 \\
+执行者 & 诊疗助理录入；门店负责人确认计量及放行。 \\
 涉众利益 & 助理：批次与实物相符；负责人：单位与可用性可控；牙医：使用来源明确。 \\
-前置条件 & 已登录且有相应权限；材料及实物来源可核实，负责人可核对计量设置。 \\
+前置条件 & 已登录且有对应门店权限；材料及实物来源可核实，负责人可核对计量设置。 \\
 成功后置条件 & 保存材料计量设置、批次及编号，基本路径批次为待检；状态变更有依据可查。 \\
 最低保证 & 未核实不放行；登记批次不产生库存数量，原单位及使用历史保留。 \\
 \bottomrule
@@ -1743,11 +1794,11 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 助理录入材料名称、规格、类别及基本/采购单位、换算和精度。
+\item 获连锁目录权限的助理录入材料名称、规格、类别及单位、换算和精度。
 \item 系统按R18-1检查计量及管理设置。
 \item 负责人核对并确认单位、换算及批次效期要求，系统记录确认人时间。
-\item 助理登记实物批号、效期及来源。
-\item 系统核对材料归属、同材料批号唯一性及效期资料。
+\item 助理登记所属门店、实物批号、效期及来源。
+\item 系统核对材料归属、同门店同材料批号唯一性及效期资料。
 \item 系统保存待检批次并返回编号，实际入库由UC-19记录。
 \end{enumerate}
 \noindent\textbf{扩展路径}\par
@@ -1764,22 +1815,22 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
 1—3 & 材料设置 & 名称、规格、材料/药品、基本单位、采购单位、换算分子n/分母d、精度s（0—6）、批次及效期要求。 \\
-4—6、1b & 批次及决定 & 材料、批号、效期、来源；状态为待检/可用/隔离/停用/过期，变更含前后状态、原因及经办/确认人时间。 \\
+4—6、1b & 批次及决定 & 所属门店、材料、批号、效期、来源；状态为待检/可用/隔离/停用/过期，变更含前后状态、原因及经办/确认人时间。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R18-1（1—3）：1采购单位=n/d基本单位，n、d为正整数；按已确认精度保存，换算须精确。形成流水后单位、换算和精度固定，数量由来源流水形成。\par
+\noindent R18-1（1—3）：材料使用连锁统一基础目录；1采购单位=n/d基本单位，n、d为正整数；按已确认精度保存，换算须精确。形成流水后单位、换算和精度固定，数量由来源流水形成。\par
 \noindent R18-2（1b、5）：放行或恢复须负责人核实验收依据及效期；助理可立即隔离，恢复/停用须负责人确认。未知效期不默认无限，实际过期即禁止普通领用。\par
 \smallskip
-\noindent\textbf{质量要求：}同材料同批号不重复建档，变更与状态一致；查询性能见Q-01。\par
+\noindent\textbf{质量要求：}同门店同材料同批号不重复建档，变更与状态一致；查询性能见Q-01。\par
 \noindent\textbf{设计约束：}页面区分计量确认、批次登记和状态处理；服务端校验权限，SQLite共同保存状态及变化。\par
 \endgroup
 \clearpage
 \subsubsection{UC-19：登记基础采购与到货验收}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-19.pdf}
+\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-19.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-19}\small 图\thefigure：UC-19 登记基础采购与到货验收用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1788,7 +1839,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 助理提采购、验收；负责人确认采购及协调差异。 \\
 涉众利益 & 助理：入库有据；负责人：采购受控；牙医：材料可供。 \\
-前置条件 & 已登录获授权；计量、供方可核对，验收据已确认采购及实物。 \\
+前置条件 & 已登录且有采购门店权限；计量、供方可核对，验收据该店已确认采购及实物。 \\
 成功后置条件 & 保存采购及验收，新确认合格量形成流水并同步更新批次位置余额。 \\
 最低保证 & 采购确认不入库，拒收、待检不计可领库存；重复不重入。 \\
 \bottomrule
@@ -1796,7 +1847,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 助理选供方、材料，填需求、数量、单位、单价和交付约定。
+\item 助理选所属门店及统一目录中的供方、材料，填需求、数量、单位、单价和交付约定。
 \item 系统核对计量和明细，保存待确认采购。
 \item 负责人稍后核对并确认，系统保存已确认状态、确认人和时间。
 \item 到货后助理核对原采购、随货单及实物，登记待验收。
@@ -1817,13 +1868,13 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—3 & 采购 & 供方及联系资料、需求、材料、正数量、单位/换算/精度/单价快照、交付约定、确认人时间。 \\
+1—3 & 采购 & 所属门店、供方及联系资料、需求、材料、正数量、单位/换算/精度/单价快照、交付约定、确认人时间。 \\
 4—7 & 验收及入库 & 原采购、到货时间、随货单、批次位置、各类数量及说明、验收编号、入库增量和经办人。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R19-1（5、6）：按R18-1换算；到货=合格+拒收+待检，到货为正、其余非负；合格须有同材料批次和位置。\par
+\noindent R19-1（5、6）：按R18-1换算；到货=合格+拒收+待检，到货为正、其余非负；合格须有同门店、同材料批次和位置。\par
 \noindent R19-2（6、7）：只入新增合格量，累计不超合格及采购支持量；待检转合格只补增量，超供先协调；领用须UC-18批次可用。\par
 \smallskip
 \noindent\textbf{质量要求：}同次验收不重入，明细可追采购及批次；性能见Q-01。\par
@@ -1833,7 +1884,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-20：办理库存领用、退回与盘点}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-20.pdf}
+\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-20.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-20}\small 图\thefigure：UC-20 办理库存领用、退回与盘点用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1842,7 +1893,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 助理登记；负责人确认盘点差异。 \\
 涉众利益 & 助理：领退有据；负责人：差异可信；牙医：用料可查。 \\
-前置条件 & 已登录获授权，批次位置及库存可查，各分支有实际业务依据。 \\
+前置条件 & 已登录且有库存所属门店权限，批次、位置及库存可查，各办理有实际业务依据。 \\
 成功后置条件 & 保存领用流水及新余额，其他分支保存退回、用料或盘点结果。 \\
 最低保证 & 失败不扣库，重复不重记；实物差异保留核对依据。 \\
 \bottomrule
@@ -1850,7 +1901,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 助理选材料批次和位置，请求领用。
+\item 助理选所属门店、材料批次和位置，请求领用。
 \item 系统显示账面量、状态、效期及库存版本。
 \item 助理核对实物，填写本次领用量及用途。
 \item 系统按R20-1检查当前可用性及数量。
@@ -1869,14 +1920,14 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—5 & 库存办理 & 批次位置、版本、正数量及用途；退回指原领用，用料含就诊。 \\
+1—5 & 库存办理 & 门店、批次位置、版本、正数量及用途；退回指原领用，用料含就诊。 \\
 1c、5 & 盘点及结果 & 账面B、实点C、差异D=C-B、版本、原因及负责人决定；流水含前后量及来源。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R20-1（4、5）：各量用基本单位；余额后=余额前+变动≥0。普通领用须材料/批次可用且未过期，q≤当前量，变动=-q。\par
-\noindent R20-2（1a、1b）：同原领用：累计用量+未用退回量≤领用量；退回原批次位置，退回不放行，实际用料不再扣库。\par
+\noindent R20-1（4、5）：库存按门店独立核对，不自动跨店调拨；各量用基本单位；余额后=余额前+变动≥0。普通领用须材料/批次可用且未过期，q≤当前量，变动=-q。\par
+\noindent R20-2（1a、1b）：同门店原领用及就诊：累计用量+未用退回量≤领用量；退回原批次位置，退回不放行，实际用料不再扣库。\par
 \noindent R20-3（1c）：确认版本须同快照，否则记待重新核对，重实点后转1c1；通过按D调账，D=0不造流水。\par
 \smallskip
 \noindent\textbf{质量要求：}并发不超领或超退，流水与余额一致；查询性能见Q-01。\par
@@ -1886,16 +1937,16 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-21：核对日常经营与收付款}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-21.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-21.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-21}\small 图\thefigure：UC-21 核对日常经营与收付款用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{13.2cm}@{}}
 \toprule
 项目 & 内容 \\ \midrule
-执行者 & 收费人员核对，负责人查阅；支付、医保平台提供核对依据。 \\
+执行者 & 收费人员核对；门店负责人查阅本店，连锁负责人查看获授权门店及汇总。 \\
 涉众利益 & 负责人：业务与资金分清；收费人员：差异可追原单；患者：不因对账被重复收费。 \\
-前置条件 & 已登录且有统计或核对权限；营业日期范围及核对截止时点明确。 \\
+前置条件 & 已登录且有对应门店统计或核对权限；营业日期及截止时点明确。 \\
 成功后置条件 & 返回分类汇总及原单来源，保存本次实际收退款核对结果或明确待处理事项。 \\
 最低保证 & 缺数据不算已核平，查询与对账不直接改原费用、收退款或医保结果。 \\
 \bottomrule
@@ -1903,11 +1954,11 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 收费人员选择营业日期、截止时点和核对范围。
+\item 收费人员选择获授权门店、营业日期和截止时点。
 \item 系统按R21-1、R21-2分别汇总到诊、费用、患者收付及医保业务。
 \item 收费人员按现金记录和正式渠道依据核对对应收退款原单。
 \item 系统保存实际核对金额及一致结果，显示仍待核对的项目。
-\item 负责人查看汇总及原单，系统返回本次范围与分类结果。
+\item 负责人按授权查看门店汇总及原单；连锁负责人可查看各店和合计。
 \end{enumerate}
 \noindent\textbf{扩展路径}\par
 \begin{description}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
@@ -1920,13 +1971,13 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1、2 & 范围与分类 & 营业起止、截止时点、到诊及项目来源、费用、患者收退款、医保结算/撤销和实际回款。 \\
+1、2 & 范围与分类 & 授权门店及汇总范围、营业起止、截止时点、到诊及项目来源、费用、患者收退款、医保结算/撤销和实际回款。 \\
 3—5 & 核对结果 & 原支付单或退款单、原金额、渠道实际额、依据；待核对/一致/差异待处理/已处理及处理说明。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R21-1（1、2）：日期按诊所本地时间，起日00:00含、末日次日00:00不含；各业务按实际发生或生效时间归期，待付按截止时点另算。\par
+\noindent R21-1（1、2）：各店按业务发生门店归集；汇总只含获授权门店，不重复计原单。日期按诊所本地时间，起日00:00含、末日次日00:00不含；各业务按实际发生或生效时间归期，待付按截止时点另算。\par
 \noindent R21-2（2）：患者净收=本期确认收款-本期确认退款，可为负；预款抵扣不重复计收款。费用、医保结算与实际回款分列，未知结果不算到账。\par
 \noindent R21-3（4a）：差异只记核对事实，补记或更正转UC-13、14、23按原单办理；不得直接改统计合计或把医保核减转成患者欠费。\par
 \smallskip
@@ -1937,7 +1988,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-22：核验医保身份并办理预结算}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-22.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-22.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-22}\small 图\thefigure：UC-22 核验医保身份并办理预结算用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -1946,7 +1997,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 前台核验登记，收费人员预结算；医保平台辅助。 \\
 涉众利益 & 患者：知悉分摊后选择；前台：身份归属准确；收费人员：有适用费用及核验依据。 \\
-前置条件 & 定点、联网及岗位授权条件满足后启用；人员已登录，患者同意核验且本次就诊可核对。 \\
+前置条件 & 本次就诊门店具备定点、联网及岗位授权条件后启用；患者同意核验且就诊可核对。 \\
 成功后置条件 & 保存身份及办理依据、有效预结算分摊、费用版本和患者实际选择，未形成正式结算。 \\
 最低保证 & 核验未知不记未通过或通过；预估不作正式到账，患者未确认医保不进入正式结算。 \\
 \bottomrule
@@ -1954,7 +2005,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 前台选患者及实际就诊，核对参保凭证和办理意向。
+\item 前台选患者、实际就诊及其门店，核对参保凭证和办理意向。
 \item 系统以唯一业务号请求平台核验并登记，保存核验通过、适用期和原办理依据。
 \item 诊疗及核价完成后，收费人员核对诊断、账单、费用版本、地区及适用项目标识。
 \item 系统按R22-1校验，提交本次范围的诊疗费用并申请预结算，保存平台实际预估。
@@ -1983,14 +2034,14 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1、2 & 身份及登记 & 患者、实际就诊、参保地区及必要人员编号、机构编码、核验结果/适用期、原业务号及办理依据。 \\
+1、2 & 身份及登记 & 患者、就诊门店、实际就诊、参保地区及必要人员编号、该门店机构编码、核验结果/适用期、原业务号及办理依据。 \\
 3、4 & 本次提交 & 账单、费用版本、诊断、所需费用范围、原项目/药品、平台适用编码或自费标识、数量及分金额。 \\
 4—6 & 预估与选择 & 范围内总费及基金/个账/其他自付预估、范围外自费、结果依据；患者选择为待确认/医保/自费及确认时间。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R22-1（2—4）：患者、就诊、身份及账单同归属，预结算前补齐资料；核验、机构和编码须适用本地区及日期。核验通过不代表所有项目可报销。\par
+\noindent R22-1（2—4）：患者、就诊、身份及账单同归属，预结算前补齐资料；核验、门店机构和编码须适用本地区及日期；其他门店资格不自动继承。核验通过不代表所有项目可报销。\par
 \noindent R22-2（4、5）：同一提交范围总费=预估基金+个账+其他自付，各额非负，范围外自费另列。待遇取平台结果，不固定报销比例，也不把预估计为已结算。\par
 \noindent R22-3（5、6）：费用版本或适用条件变更后旧预估不可复用；须向患者说明本次结果，再记录选择。医保正式结算另由UC-23办理。\par
 \endgroup
@@ -1998,7 +2049,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-23：办理医保结算、撤销与回款核对}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-23.pdf}
+\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-23.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-23}\small 图\thefigure：UC-23 办理医保结算、撤销与回款核对用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -2007,7 +2058,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 收费人员办理，负责人核实撤销及差异；医保平台辅助。 \\
 涉众利益 & 患者：按真实正式分摊付款；收费人员：原单可查、不重结算；负责人：医保应收与到账清楚。 \\
-前置条件 & 医保业务按定点及联网条件启用，人员已登录获授权；基本路径有有效预结算及患者医保确认。 \\
+前置条件 & 原就诊门店具备医保定点及联网条件，人员有该门店权限；基本路径有有效预结算及患者医保确认。 \\
 成功后置条件 & 基本路径保存有效正式结算号和分摊，原办理为已结算；撤销及实际回款各按独立分支保存。 \\
 最低保证 & 未知先查原笔，不凭超时判失败；正式结算不代表资金已回款，也不代表患者现金已收齐。 \\
 \bottomrule
@@ -2015,7 +2066,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 收费人员选择原办理，核对有效预结算、费用版本和患者医保选择。
+\item 收费人员选择原门店办理，核对有效预结算、费用版本和患者医保选择。
 \item 系统按R23-1重查未决原单及适用条件，按稳定业务号请求正式结算。
 \item 平台返回明确成功结果，系统核对归属、正式结算号及范围内分摊。
 \item 系统保存有效正式结算和最终分摊，将原办理记为已结算。
@@ -2043,24 +2094,24 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—4 & 正式结算 & 原办理、有效身份及费用版本、上传范围、患者确认、正式结算号、总费T/基金F/个账A/其他自付P、确认时间及有效/已撤销。 \\
+1—4 & 正式结算 & 就诊门店、原办理、有效身份及费用版本、上传范围、患者确认、正式结算号、总费T/基金F/个账A/其他自付P、确认时间及有效/已撤销。 \\
 1a & 撤销 & 原结算、原因、适用批准依据、独立撤销号、平台结果及核实时间；待办理/待核实/已成功/已失败。 \\
 1b & 实际回款 & 原结算、拨付或退回、正的实际分金额、实际时间、医保/银行依据及经办人；分次逐笔保存。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R23-1（1、2）：仅核验通过、预结算仍适用且患者已确认医保时结算；相同费用不得重复参与有效结算，有未决原单先核实。\par
+\noindent R23-1（1、2）：仅原门店条件有效、核验通过、预结算仍适用且患者已确认医保时结算；相同费用不得重复参与有效结算，有未决原单先核实。\par
 \noindent R23-2（3、4）：同一结算范围T=F+A+P，各额非负，正式结果和预估分开保存；账单其他自费另列，患者最终待付按UC-12计算。\par
 \noindent R23-3（1a）：平台撤销成功才记已撤销，未知不推定撤销或退钱；患者退款另按UC-14，重结算重新预结算并取得确认。\par
 \noindent R23-4（1b）：有效结算医保应拨额=F+A，已撤销为0；净到账=实际拨付-实际退回；差额=应拨额-净到账，正为待收、负为待退。同次原款不重记，差异不能自动转患者欠费。\par
 \endgroup
 \clearpage
 \subsubsection{UC-24：协调诊椅设备准备与停用恢复}
-\begingroup\small\linespread{1.04}\selectfont
+\begingroup\small\linespread{0.98}\selectfont
 \setlength{\parskip}{0.1em}
 \begin{center}
-\includegraphics[width=16cm,height=3.8cm,keepaspectratio]{diagrams/integrated-20261019/uc-24.pdf}
+\includegraphics[width=16cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-24.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-24}\small 图\thefigure：UC-24 协调诊椅设备准备与停用恢复用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -2069,7 +2120,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医确认使用结束，助理准备核查；负责人协调故障及恢复。 \\
 涉众利益 & 患者：准备合格才接诊；牙医：不误放占用；助理：交接与恢复有据。 \\
-前置条件 & 已登录获授权，资源已登记；基本路径有原就诊及实际使用。 \\
+前置条件 & 已登录且有资源所属门店权限，资源已登记；基本路径有本店原就诊及实际使用。 \\
 成功后置条件 & 保存实际结束、核查及解除依据，返回当前可用性和影响安排。 \\
 最低保证 & 未完成或未知不记合格；预计结束、故障登记不自动释放实际使用。 \\
 \bottomrule
@@ -2077,7 +2128,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{基本路径}\par
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
-\item 牙医选择原就诊及所用诊椅、设备，确认实际使用结束。
+\item 牙医选择实际门店的原就诊及所用诊椅、设备，确认实际使用结束。
 \item 系统核对原归属，保存实际结束及占用释放，同时建立清洁准备限制。
 \item 助理核对现有各项限制，实际完成清洁、器械处理及环境设备核查。
 \item 助理提交真实处理结果、依据、经办人和时间。
@@ -2095,14 +2146,14 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1、2 & 实际结束 & 原就诊/预约、诊椅设备、实际结束、确认人、占用原单及释放依据。 \\
+1、2 & 实际结束 & 所属门店、原就诊/预约、诊椅设备、实际结束、确认人、占用原单及释放依据。 \\
 3—5 & 准备与限制 & 资源、原因、起始/预计结束、核查结果、经办时间；生效中/已解除、实际解除时间和依据。 \\
 1b、5a & 影响协调 & 受影响预约、延时/维修反馈、负责人、后续安排及患者沟通。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
 \noindent\textbf{业务规则}\par
-\noindent R24-1（3—5）：恢复须资源有效、无未结束使用、清洁器械环境核查合格且无其他未解除限制；解除一项不代表全部可用。\par
+\noindent R24-1（3—5）：仅处理所属门店资源；恢复须资源有效、无未结束使用、清洁器械环境核查合格且无其他未解除限制；解除一项不代表全部可用。\par
 \noindent R24-2（1、2、5）：设备占用为已预留/使用中/已释放；实际结束须衔接清洁限制，不留可抢占空档。病历签署、收费不代替实际结束。\par
 \noindent R24-3（1b、5）：取消只释放预约预留；安排仍按UC-02查冲突。故障恢复须负责人核实维修及复核，预计结束不自动解除限制。\par
 \smallskip
@@ -2113,7 +2164,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \subsubsection{UC-25：开立处方并衔接院内外取药}
 \begingroup\small\linespread{1.04}\selectfont
 \begin{center}
-\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/integrated-20261019/uc-25.pdf}
+\includegraphics[width=16cm,height=3.1cm,keepaspectratio]{diagrams/chain-B-20261027/uc-25.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:uc-25}\small 图\thefigure：UC-25 开立处方并衔接院内外取药用例图
 \end{center}
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
@@ -2122,7 +2173,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 项目 & 内容 \\ \midrule
 执行者 & 牙医开立及处理审方意见；具备相应资格的药学岗位审核、发药。 \\
 涉众利益 & 患者：取得有效处方及指导；牙医：处方原意可查；药学岗位：有依据审核核发；收费：仅计实际供药。 \\
-前置条件 & 牙医已登录且有相应处方权限，患者及实际就诊可核对；院内分支另须机构与人员条件满足。 \\
+前置条件 & 牙医已登录且有就诊门店处方权限，患者及实际就诊可核对；院内发药另须该店机构与人员条件满足。 \\
 成功后置条件 & 基本路径保存已开立处方、院外取药及开立依据并交付；院内分支另保存实际审核和交付结果。 \\
 最低保证 & 草稿不作为有效处方；开立不等于发药，不自动扣库存或计药费；既有处方和实际交付事实保留。 \\
 \bottomrule
@@ -2159,7 +2210,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}p{12.3cm}@{}}
 \toprule
 步骤 & 关键概念 & 字段及含义 \\ \midrule
-1—5、4a & 处方与交付 & 患者、就诊、开立牙医、药品名称规格、用法用量/疗程、正数量及单位、院内/院外路径；草稿/已开立/已作废、开立时间及更正依据。 \\
+1—5、4a & 处方与交付 & 患者、就诊门店、就诊、开立牙医、药品名称规格、用法用量/疗程、正数量及单位、院内/院外路径；草稿/已开立/已作废、开立时间及更正依据。 \\
 5a、5b & 院内审核 & 院内待审/已通过/待医师处理；审核人、实际意见及医师重新处理依据，院外取药单列且不冒充院内审核通过。 \\
 5a、5c、5d & 实际发药 & 原处方明细、实际正数量、药品批次位置及出库流水、交付时间、核发人和用药交代；费用来源、适用价格及未发量。 \\
 \bottomrule
@@ -2167,7 +2218,7 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \smallskip
 \noindent\textbf{业务规则}\par
 \noindent R25-1（1—4）：处方与就诊同一患者，开立人有权限，药品规格、用法用量、数量及单位明确；有疑问由牙医核实，系统格式校验不能替代专业审方。\par
-\noindent R25-2（5a—5c）：院内须有效处方及适用审核已通过，批次可用且未过期；逐明细累计实际发药量≤有效开立量，按R18-1换算，不超可用库存；未发量不产生交付事实。\par
+\noindent R25-2（5a—5c）：院内须本门店具备相应条件、有效处方及适用审核已通过，本门店批次可用且未过期；逐明细累计实际发药量≤有效开立量，按R18-1换算，不超可用库存；未发量不产生交付事实。\par
 \noindent R25-3（5、5a、5d）：院外不产生诊所出库及药品应收；院内仅按实际发药形成同源出库和费用，不重复扣库或计费。缺价保留实际发药及待核价；预收另按UC-13，不能因开立就确认供药收入。\par
 \endgroup
 \clearpage
@@ -2177,70 +2228,108 @@ R04-3（1a、6、7） & 发布确认和版本变化保留经办依据；排班�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=210mm,297mm}
 \subsubsection{UC-26：维护诊所基础资料与账号}
+\begingroup\small\linespread{1.02}\selectfont
 \begin{center}
-\includegraphics[width=16.0cm,height=3.0cm,keepaspectratio]{diagrams/reference-review-20261026/uc-26.pdf}
+\includegraphics[width=16cm,height=2.5cm,keepaspectratio]{diagrams/chain-B-20261027/uc-26.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:ref-uc-26}\small 图\thefigure：UC-26 维护诊所基础资料与账号用例图
 \end{center}
-{\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.08}
-\refstepcounter{table}
-\noindent\textbf{表\thetable：UC-26规约概要}\par\smallskip
-\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{12.7cm}@{}}
+{\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{13.2cm}@{}}
 \toprule
-项目 & 内容 \\
-\midrule
-用例编号与名称 & UC-26 维护诊所基础资料与账号 \\
-执行者 & 诊所负责人。 \\
-涉众利益 & 负责人：人员与接诊资源可维护；工作人员：按本人已核实岗位办理；患者：人员或资源变动不使原安排失管。 \\
-前置条件 & 负责人以有效个人账号登录，具有基础管理权限；变更时原人员、账号、授权或诊椅记录可查询。 \\
-成功后置条件 & 保存职员与独立账号、核实后的任职授予，或账号启停、岗位撤销、诊椅登记退役结果；经办依据与原历史可查。 \\
-最低保证 & 失败保持原记录；不能停用当前本人管理账号、破坏最后管理入口或绕过有效排班和实际使用；不删除原责任人及历史业务。 \\
+项目 & 内容 \\ \midrule
+执行者 & 连锁负责人及门店负责人，按授权范围办理。 \\
+涉众利益 & 负责人：资料和授权可维护；工作人员：按本人已核实岗位办理；患者：人员资源变化不使原安排失管。 \\
+前置条件 & 有效个人账号及对应管理权限；变更时原门店、人员、授权或诊椅可查询。 \\
+成功后置条件 & 保存门店、职员账号、门店岗位授权或启停、撤销、诊椅登记退役结果；原编号及历史保留。 \\
+最低保证 & 失败保持原记录；不破坏最后管理入口，不绕过未协调排班及实际占用。 \\
 \bottomrule
 \end{tabular}\par}
-\medskip
-\noindent\textbf{基本路径}\par
-\begin{enumerate}\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
-\item 负责人打开基础管理，选择新增职员及个人账号。
-\item 系统展示既有人员、账号状态、获准岗位和诊椅目录。
-\item 负责人填写人员姓名、在岗日期、独立登录名和初始口令，选择实际核实后的岗位与适用截止，记录核实依据。
-\item 系统核对身份、格式、登录名唯一、任职条件及岗位范围，不从职位名称自动推定临床资格。
-\item 负责人确认本次人员及任职授权。
-\item 系统共同保存职员、口令慢哈希、个人账号、任职和授予依据及操作责任。
-\item 系统返回稳定编号与实际状态，新人员按获准岗位登录办理；接诊仍须正式排班。
-\end{enumerate}
-\noindent\textbf{质量要求}\par
-无管理权限不能查询人员授权或变更目录；账号、任职及授予共同保存。页面、成功回执和操作日志不返回明文口令或口令哈希；重复提交返回原结果。\par
-\noindent\textbf{设计约束}\par
-负责人工作台设置独立基础管理入口；既有岗位权限矩阵只读，药学任职沿UC-25条件核实。个人口令不写入业务日志或浏览器持久存储。\par
-\clearpage
-\noindent\textbf{UC-26（扩展、字段与规则）}\par
-\noindent\textbf{扩展路径}\par
-\begin{description}\setlength{\itemsep}{2pt}\setlength{\parsep}{0pt}
-\item[1a] 核实岗位变化：选择原人员及未结束授权，填写新增任职或原岗位撤销依据；系统核对当前任职、版本和排班影响，保存新的授予或撤销事实，保留原授权。
-\item[1b] 停用或恢复账号：负责人核实任职及影响。停用时使原会话失效；恢复按当前仍有效任职核对，不重新授予已撤销岗位。
-\item[1c] 新增或退役诊椅：新增填写实际资源名称和依据；永久退役须先协调有效排班、预约及实际使用。临时清洁、故障和维修恢复转UC-24，不以退役代替临时停用。
-\item[4a] 同名账号、条件不足或授权不当：提示具体原因，返回步骤3；不保留半套人员和授权。
-\item[4b] 有未协调安排或将失去管理入口：列明原因，先按UC-02、04、24协调；维持原有效资料，不强制取消原患者安排。
-\item[6a] 版本变化、保存失败或结果未知：重查当前版本；未知先查原办理号，确认结果后继续，不重复建账号或诊椅。
-\end{description}
-{\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.08}
-\refstepcounter{table}
-\noindent\textbf{表\thetable：UC-26关键字段}\par\smallskip
-\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{12.7cm}@{}}
-\toprule
-概念 & 字段及含义 \\
-\midrule
-人员与账号 & 稳定职员号、姓名、在岗开始及结束、个人登录名、账号启停、授权版本；口令仅受控录入，存储慢哈希。 \\
-任职与授予 & 岗位、核实人、核实依据、起止、授予人和时间、原授权及撤销原因；获准岗位可兼任。 \\
-诊椅与影响 & 稳定诊椅号、名称、启用与退役时刻；相关已确认排班、预约和实际占用；版本、变更依据和办理结果。 \\
-\bottomrule
-\end{tabular}\par}
-\medskip
-\noindent\textbf{业务规则}\par
-\noindent R26-1（3—6、1a）：个人账号唯一关联一名职员；同一职员可有多个核实岗位。管理岗位不自动取得牙医或药学权限，授权须有当时有效的任职及依据。\par
-\noindent R26-2（1a、1b、4b）：不得停用当前本人管理账号或移除最后有效管理入口。撤销牙医岗位或停用人员账号前先协调有效排班及在诊占用；原记录继续引用原职员。\par
-\noindent R26-3（1c）：诊椅登记只建立资源目录，正式排班后方可供预约核对。永久退役保留原编号及有效期间；临时停用与恢复沿UC-24，预计恢复时间不等于已经可用。\par
-\noindent R26-4（6、6a）：同次人员、账号、任职、授予及审计共同保存；口令不参与业务展示。岗位权限矩阵使用已定义规则，页面隐藏按钮不能替代后端授权。\par
 
+\smallskip\noindent\textbf{基本路径}\par
+\begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
+\item 负责人打开基础管理，系统按权限显示门店、人员、账号、任职和诊椅。
+\item 负责人填写新职员、在岗日期、个人登录名及独立口令，选择核实后的门店、岗位和期间，记录依据。
+\item 系统核对登录名、任职条件、门店及岗位范围；负责人确认后共同保存人员、账号和授予责任。
+\item 系统返回稳定编号及实际状态；接诊仍须正式排班。
+\end{enumerate}
+\noindent\textbf{扩展路径}\par
+\begin{description}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
+\item[1a] 任职变化或账号启停：核对原人员、版本、有效任职及影响，追加授予或撤销依据；停用使原会话失效，恢复不重授已撤销岗位。
+\item[1b] 诊椅登记退役：核实资源及有效期间，退役前先协调排班、预约和实际占用；临时故障清洁转UC-24。
+\item[1c] 跨店病历查阅：获授权负责人核对牙医、患者、原就诊及范围，记录授权或撤销、依据和时间；不赋予签署权限。
+\item[3a] 条件不足、当前本人停用或将失去最后管理入口：指出原因，不保存；有未协调安排先按UC-02、04、24办理。
+\item[3b] 版本变化或结果未知：先查当前原记录与本次结果，确认未保存后才重试。
+\end{description}
+\noindent\textbf{字段列表}\par
+人员及账号：稳定职员号、姓名、在岗期间、登录名、启停、授权版本；任职：门店、岗位、核实依据、核实及授予人时间、截止与撤销；诊椅：所属门店、稳定编号、名称、有效期间及影响安排。\par
+\noindent\textbf{业务规则}\par
+R26-1：一账号归属一职员，可经授权在多个门店兼任核实岗位；门店负责人仅管理获授权门店，连锁负责人按授权管理连锁基础资料；管理身份不自动取得专业资格。R26-2：禁止本人停用及移除最后有效管理入口，牙医任职和诊椅退出先协调有效安排，原责任和业务不删除。R26-3：账号、任职、授予及审计共同保存；新增诊椅须排班才可预约，临时限制不以永久退役代替。\par
+\noindent\textbf{质量要求：}无管理权限不得查询或改动；不展示明文口令及慢哈希；重复提交仅一份结果，适用Q-01至Q-08。\par
+\noindent\textbf{设计约束：}基础管理分区呈现，既有权限矩阵只读；跨店临床查阅授权按牙医、患者及原就诊范围登记与撤销，并按UC-05校验；授权管理不显示病历正文。药学任职按UC-25核实。当前生效状态按账号、任职及资格期间共同判断。\par
+\endgroup
+\clearpage
+\subsubsection{UC-27：编制报价并记录患者确认}
+\begingroup\small\linespread{1.04}\selectfont
+\begin{center}
+\includegraphics[width=16.2cm,height=2.8cm,keepaspectratio]{diagrams/chain-B-20261027/uc-27.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:uc-27}\small 图\thefigure：UC-27 编制报价并记录患者确认用例图
+\end{center}
+{\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{13.2cm}@{}}
+\toprule
+项目 & 内容 \\ \midrule
+执行者 & 牙医编制及说明治疗范围；收费人员核价、出具并记录费用决定。患者作出真实决定。 \\
+涉众利益 & 患者：明确项目、范围、价格和期间；牙医：方案与费用一致；收费人员：原报价、预收及实际费用可核对；负责人：价格有确认依据。 \\
+前置条件 & 操作者有报价门店对应岗位权限，患者有效；关联方案时原患者、方案版本及明细可查询，拟出具价目经该门店确认。 \\
+成功后置条件 & 报价有恒定编号、确切版本和明细快照；出具、有效期间及患者逐项决定可查，报价与原方案、后续付款及实际费用能关联。 \\
+最低保证 & 失败保留原版本；未确认、过期未接受的项目不能推定接受；报价不直接形成治疗、账单或到账。 \\
+\bottomrule
+\end{tabular}\par}
+
+\smallskip\noindent\textbf{基本路径}\par
+\begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}\setlength{\topsep}{2pt}
+\item 牙医选择患者、报价门店及原方案项目，编制独立报价草稿；独立检查可不关联方案。
+\item 系统核对归属；牙医明确项目、牙位、数量、顺序及材料、疗程的包含范围。
+\item 收费人员核对项目和报价门店出具时适用的已确认价目，填写接受有效期间及说明。
+\item 系统核对数量、金额、价目及版本，保存并出具冻结的费用说明，返回报价编号和版本。
+\item 牙医说明治疗内容，收费人员说明费用条件；患者逐项接受、暂缓或拒绝，获准人员记录真实时间及依据。
+\item 系统追加各明细决定并返回接受范围；预约转UC-02，医疗同意转UC-07，实际执行转UC-08，预收或收款另由UC-13核实。
+\end{enumerate}
+\noindent\textbf{质量要求：}再次打开还原原报价版本和当时价格；重复出具或决定不产生副本；冻结明细不可被目录调价追改，适用共用Q要求。\par
+\noindent\textbf{设计约束：}报价与方案、账单和收款流水独立展示并保留来源链接；打印显示患者、报价号、版本、有效期间、明细金额及范围，费用接受不显示为医疗同意或已收款。\par
+\endgroup
+\clearpage
+\begingroup\small\linespread{1.04}\selectfont
+\noindent\textbf{UC-27（扩展、字段与规则）}\par
+\noindent\textbf{扩展路径}\par
+\begin{description}\setlength{\itemsep}{1pt}\setlength{\parsep}{0pt}
+\item[2a] 无原方案的独立检查报价：明确检查项目及用途，不补造方案；需要治疗计划时由牙医建立后返回步骤2。
+\item[3a] 缺价、范围或期间未定：保留草稿并指出缺项；转UC-11核实，完整后返回步骤3，不将未知金额写成零。
+\item[4a] 调整已出具报价：保留原版本、原因和历史决定，新建后继版本，重新完成步骤2—5；旧版停止新增接受，已履约事实保留。
+\item[5a] 部分接受、暂缓或拒绝：按明细范围追加真实决定，不把未决定部分自动接受；合计状态据实际范围显示。
+\item[5b] 超过接受期间或撤回：未确认部分停止新增接受；保留既有决定和履约。撤回不自动删除治疗、退钱或撤销医疗同意，分别协调后续业务。
+\item[6a] 预付款：UC-13核实真实到账并可引用报价号；只保存一次原款，报价引用不产生第二份资金或虚构应收；后续据实际账单另办抵扣。
+\item[6b] 实际项目或价目与已接受报价不符：执行前重新说明并确认新版；已发生事实如实保留，差异未核对前保持待核价，不直接多收。
+\item[4b] 版本变化、保存失败或结果未知：重查原报价及本次办理，确认未保存后才重试，不复制原报价和收款。
+\end{description}
+\noindent\textbf{字段列表}\par
+{\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}p{13.2cm}@{}}
+\toprule
+概念 & 关键字段及含义 \\ \midrule
+报价与版本 & 报价号、报价门店、患者、可空原方案；来源方案版本、版本号、前版本、变更原因、草稿/出具/决定状态、接受开始及截止日期、出具人和真实时间。 \\
+报价明细 & 原方案明细、项目及价目编号、名称及单位快照、牙位牙面、正数量、整数分单价及金额、包含范围和顺序。 \\
+逐项决定 & 确切版本明细、接受/暂缓/拒绝/撤回、实际决定时间、确认方式和依据、记录人；追加不覆盖。 \\
+后续来源 & 患者付款可空报价号；应收项目可空报价明细号；同患者同实际来源，不以报价金额替代真实资金。 \\
+\bottomrule
+\end{tabular}\par}
+
+\smallskip\noindent\textbf{业务规则}\par
+R27-1：报价编号恒定，版本递增；报价、方案和明细同患者，关联明细来自同一确切方案版本。出具后内容冻结，实质变化另建新版，不搬用另一版本决定。\par
+R27-2：出具须有报价门店有效价目、明确单位范围和接受期间，金额=数量乘单价；接受在有效期内。已接受范围不因后来超过截止而抹除，超期未接受部分须重新报价。\par
+R27-3：费用接受、医疗同意、实际完成、应收形成、收款到账分别记录。原报价不因调价追改，后续差异重新说明确认；全部履约与原款保留。\par
+R27-4：可关联报价的预付款仍归同患者、同门店原款，后续抵扣按真实账单及可用余额核实；不将报价接受率、出具额或预收额统计为已完成治疗收入。\par
+\endgroup
 \clearpage
 \subsection{共用质量要求与设计约束}
 \label{sec:common-quality}
@@ -2252,14 +2341,14 @@ Q编号为验收目标，不代表已完成测试；各用例补充项与下表�
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{1.45cm}>{\raggedright\arraybackslash}p{2.45cm}>{\raggedright\arraybackslash}p{11.8cm}@{}}
 \toprule
 编号 & 适用方面 & 要求及核验方法 \\ \midrule
-Q-01 & 常用本地查询 & 在下述环境及数据集、6岗位并发下，患者检索、当日安排、诊疗历史、账单、复诊待办及库存查询各执行100次；从操作发起至首屏可用，至少95次不超过2秒。文件传输及外部平台等待单独记录。 \\
+Q-01 & 常用本地查询 & 在下述环境及数据集、6岗位并发下，患者检索、当日安排、诊疗历史、报价账单、复诊待办及库存查询各执行100次；从操作发起至首屏可用，至少95次不超过2秒。文件传输及外部平台等待单独记录。 \\
 Q-02 & 保存与并发正确性 & 对预约占用、到诊、签署、付款用途、退款、验收入库和发药分别检查重复及冲突提交：同次办理只生效一次，不超占、超用、超退或扣成负库存；明确失败不留半份本地结果，未知先查原笔。 \\
 Q-03 & 权限与隐私 & 按岗位及各例执行者授权。用无权账号直接访问页面、业务接口和原件均须被拒绝，不返回受限正文；兼岗操作可定位本人及当时权限，负责人不因管理身份取得临床改写权。 \\
 Q-04 & 可用性与反馈 & 分别按规约完成预约到诊、病历签署、收退款及验收入库的成功和异常场景；页面显示患者或原单、当前状态和可继续动作。失败指出原因及可保留输入；待核实不得显示成功或结清。 \\
 Q-05 & 历史与可核对性 & 抽查患者更正、签后补充、费用更正和库存调整：原记录、前后结果、原因、经办人和时间可追查；账单与经营结果能按相同范围回查原单，金额及数量与生效事实一致。 \\
 Q-06 & 备份与恢复 & 每营业日至少一次形成数据库及影像文书的一致备份，每周保留独立副本。按验收数据集演练恢复：丢失范围不超过1营业日，2小时内可继续核心办理；核对患者、安排、款项、库存及文件可读性。 \\
-Q-07 & 维护与扩展 & 新增价目、材料、诊椅及调整岗位授权通过相应维护入口完成。替换支付或医保渠道时更换对应接入模块，保留原单与结果含义；变更后重新核对预约到诊、诊疗收费和库存主流程。 \\
-Q-08 & 外部业务可靠性 & 适用于支付、退款及医保。分别检查超时、断网、重复回传和外部成功而本地保存失败：保留原业务号和实际结果，先查原笔再补记；受理、预估和患者截图不直接作为正式到账依据。 \\
+Q-07 & 维护与扩展 & 新增价目、材料、诊椅及调整岗位授权通过相应维护入口完成。变更付款登记方式或医保渠道时调整对应处理模块，保留原单与结果含义；变更后重新核对预约到诊、诊疗收费和库存主流程。 \\
+Q-08 & 外部业务可靠性 & 适用于付款、退款登记及医保。分别检查外部结果未知、重复登记和实际已办理而本地保存失败：保留原业务号和实际结果，先查原笔再补记；受理、预估和患者截图不直接作为正式到账依据。 \\
 \bottomrule
 \end{tabular}\par}
 \medskip
@@ -2300,7 +2389,7 @@ C-03 & 金额以整数分，数量按已确认单位与精度；经办身份、�
 \bottomrule
 \end{tabular}\par}
 \medskip
-表内编号指UC-01至UC-25。按患者、就诊和原业务单逐项核对，办理失败、暂缓及结果未知均保留真实状态。\par
+表内编号指UC-01至UC-27。按患者、就诊和原业务单逐项核对，办理失败、暂缓及结果未知均保留真实状态。\par
 
 \endgroup
 \clearpage
@@ -2359,11 +2448,11 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \end{center}
 
 \clearpage
-\subsubsection{外部支付医保接口与控制}
+\subsubsection{医保接口与控制}
 \par
 \begin{center}
-\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/course-C1-20261022/analysis-boundaries-external.pdf}
-\par\smallskip\refstepcounter{figure}\label{fig:analysis-boundaries-external}\small 图\thefigure：外部支付医保接口与控制类
+\includegraphics[width=16.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-boundaries-external.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:analysis-boundaries-external}\small 图\thefigure：医保接口与控制类
 \end{center}
 
 \clearpage
@@ -2376,8 +2465,16 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \subsubsection{身份与接诊实体关系}
 患者及变更取自UC-01，安排、预约与就诊取自UC-02—04，实际使用和准备恢复取自UC-06、24。资料、预约及安排变更分别归属原对象，历史共同保留；已生效记录不删除。\par
 \begin{center}
-\includegraphics[width=55.6cm,height=33cm,keepaspectratio]{diagrams/course-C1-20261022/analysis-entities-1.pdf}
+\includegraphics[width=55.6cm,height=33cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-1.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-1}\small 图\thefigure：身份与接诊分析实体类图
+\end{center}
+\clearpage
+\special{papersize=594mm,420mm}
+\subsubsection{连锁门店与授权实体关系}
+连锁统一患者身份，门店岗位授权限定工作人员的办理范围。跨店病历查阅授权关联牙医及原就诊，并核对患者和资料范围；就诊归属实际发生门店。\par
+\begin{center}
+\includegraphics[width=55.6cm,height=33cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-chain-entities.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:analysis-chain-entities}\small 图\thefigure：连锁门店与授权分析实体类图
 \end{center}
 \clearpage
 \setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
@@ -2394,9 +2491,9 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=594mm,420mm}
 \subsubsection{病历与诊疗文书实体关系}
-健康资料按版本保留，复核关联本次就诊；病历签署冻结正文及所见，遗漏由独立补充记录。文件引用确切原件版本。处方开立、专业审核和实际发药分别记录，院外取药不形成诊所药品应收。同名跨组实体沿用原定义；经办、复核、签署及核发身份分别关联职员，按办理时的授权核对。\par
+健康版本记录来源就诊；病历、文件及处方保留来源门店。跨店临床资料由授权牙医按范围查看，来源不明的历史健康资料不返回其他门店。健康资料按版本保留，复核关联本次就诊；病历签署冻结正文及所见，遗漏由独立补充记录。文件引用确切原件版本。处方开立、专业审核和实际发药分别记录，院外取药不形成诊所药品应收。同名跨组实体沿用原定义；经办、复核、签署及核发身份分别关联职员，按办理时的授权核对。\par
 \begin{center}
-\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/course-C1-clinical-20261022/analysis-entities-2.pdf}
+\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-2.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-2}\small 图\thefigure：病历与诊疗文书分析实体类图
 \end{center}
 \clearpage
@@ -2414,9 +2511,9 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=594mm,420mm}
 \subsubsection{治疗方案与实际执行实体关系}
-方案版本、逐项患者决定和实际执行分别保留；同意数量限定到该版本项目，撤回仅影响后续。实际完成或实际发药才形成费用来源，估算不形成账单。同名跨组实体沿用原定义；经办、复核、签署及核发身份分别关联职员，按办理时的授权核对。\par
+方案与实际执行保留发生门店，方案版本、逐项患者决定和实际执行分别保留；同意数量限定到该版本项目，撤回仅影响后续。实际完成或实际发药才形成费用来源，估算不形成账单。同名跨组实体沿用原定义；经办、复核、签署及核发身份分别关联职员，按办理时的授权核对。\par
 \begin{center}
-\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/course-C1-clinical-20261022/analysis-entities-3.pdf}
+\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-3.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-3}\small 图\thefigure：治疗方案与实际执行分析实体类图
 \end{center}
 \clearpage
@@ -2434,9 +2531,9 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=594mm,420mm}
 \subsubsection{价目、账单与收款实体关系}
-价目由负责人确认后参与核价，原账保留单价快照；实际应收、医保承担、患者确认到账和款项用途分别核算。预收可不关联账单，后续抵扣不新增实收；退款占用从原款可用额扣除。同名跨组实体沿用原定义；经办、审核和核实身份分别关联职员，按办理时的授权核对。\par
+价目按门店确认后参与核价，原账保留单价快照；实际应收、医保承担、患者确认到账和款项用途分别核算。预收可不关联账单，抵扣须同患者同门店且不新增实收；退款占用从原款可用额扣除。同名跨组实体沿用原定义；经办、审核和核实身份分别关联职员，按办理时的授权核对。\par
 \begin{center}
-\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/reference-review-20261026/analysis-entities-4a.pdf}
+\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-4a.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-4}\small 图\thefigure：价目与患者资金分析实体类图
 \end{center}\clearpage
 \newgeometry{margin=19mm}
@@ -2447,7 +2544,7 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \special{papersize=594mm,420mm}
 \noindent\textbf{电子原单与实际账目分析类图}\par
 \begin{center}
-\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/reference-review-20261026/analysis-entities-4b.pdf}
+\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-4b.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-4b}\small 图\thefigure：电子原单与实际账目分析类图
 \end{center}
 \clearpage
@@ -2459,7 +2556,7 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \special{papersize=594mm,420mm}
 \noindent\textbf{付款用途与预付抵扣分析类图}\par
 \begin{center}
-\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/reference-review-20261026/analysis-entities-4c.pdf}
+\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-4c.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-4c}\small 图\thefigure：付款用途与预付抵扣分析类图
 \end{center}
 
@@ -2480,7 +2577,7 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \subsubsection{费用更正与退费实体关系}
 费用申请、负责人审核、调整生效和真实退款分别保存。调整回溯原项目，必要用途释放与调整共同生效；退款以原付款及批准剩余额双重限额，未知先核实原笔。同名跨组实体沿用原定义；经办、审核和核实身份分别关联职员，按办理时的授权核对。\par
 \begin{center}
-\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/course-C1-fees-20261022/analysis-entities-5.pdf}
+\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-5.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-5}\small 图\thefigure：费用更正与退费分析实体类图
 \end{center}
 \clearpage
@@ -2498,9 +2595,9 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,297mm}
 \subsubsection{复诊与随访实体关系}
-诊后要求、实际联系和临床评估分别保留。要求有同患者的就诊或方案依据；前台只关联真实成功预约，牙医按原目的作评估。免评估事项也须核实目的达成，未到或拒绝不自动完成。同名跨组实体沿用原定义，办理身份按相应用例关联职员并核对授权。\par
+诊后要求保留来源及负责门店，实际联系和临床评估分别保留。要求有同患者的就诊或方案依据；前台只关联真实成功预约，牙医按原目的作评估。免评估事项也须核实目的达成，未到或拒绝不自动完成。同名跨组实体沿用原定义，办理身份按相应用例关联职员并核对授权。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.2cm,keepaspectratio]{diagrams/course-C1-operations-20261022/analysis-entities-6.pdf}
+\includegraphics[width=38.2cm,height=20.2cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-6.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-6}\small 图\thefigure：复诊与随访分析实体类图
 \end{center}
 \clearpage
@@ -2518,9 +2615,9 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=297mm,420mm}
 \subsubsection{材料与库存实体关系}
-材料计量及批次状态与库存数量分别管理。合格入库、领用、未用退回和盘点形成有据变动；实际用料只分配原领用量，不再扣库。状态可用与实际效期同时满足才可普通领用。同名跨组实体沿用原定义，办理身份按相应用例关联职员并核对授权。\par
+材料计量及批次状态与库存数量分别管理，批次、位置和库存归属相应门店。合格入库、领用、未用退回和盘点形成有据变动；实际用料只分配原领用量，不再扣库。状态可用与实际效期同时满足才可普通领用。同名跨组实体沿用原定义，办理身份按相应用例关联职员并核对授权。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=32cm,keepaspectratio]{diagrams/course-C1-operations-20261022/analysis-entities-7.pdf}
+\includegraphics[width=25.9cm,height=32cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-7.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-7}\small 图\thefigure：材料与库存分析实体类图
 \end{center}
 \clearpage
@@ -2538,9 +2635,9 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,297mm}
 \subsubsection{基础采购与验收实体关系}
-助理提出采购，由负责人确认；到货后逐次验收并按批次位置区分合格、拒收和待检。待检后续沿用原到货记录，只将新确认合格增量入库，超采购支持量先协调。同名跨组实体沿用原定义，办理身份按相应用例关联职员并核对授权。\par
+助理提出本门店采购，由门店负责人确认；到货后逐次验收并按批次位置区分合格、拒收和待检。待检后续沿用原到货记录，只将新确认合格增量入库，超采购支持量先协调。同名跨组实体沿用原定义，办理身份按相应用例关联职员并核对授权。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.2cm,keepaspectratio]{diagrams/course-C1-operations-20261022/analysis-entities-8.pdf}
+\includegraphics[width=38.2cm,height=20.2cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-8.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-8}\small 图\thefigure：基础采购与验收分析实体类图
 \end{center}
 \clearpage
@@ -2558,9 +2655,9 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=594mm,420mm}
 \subsubsection{门诊医保与结算款实体关系}
-医保业务在机构定点、联网及岗位授权条件满足后启用。身份、实际费用、预估分摊、正式结果和实际收付分别保留；自费标识不伪装成医保编码，撤销成功才改变原结算。结算款差额单独跟进，不自动增加患者欠费。同名跨组实体沿用原定义，办理及核实身份按用例关联职员。\par
+医保业务在本次就诊门店的定点、联网及岗位授权条件满足后启用。身份、实际费用、预估分摊、正式结果和实际收付分别保留；自费标识不伪装成医保编码，撤销成功才改变原结算。结算款差额单独跟进，不自动增加患者欠费。同名跨组实体沿用原定义，办理及核实身份按用例关联职员。\par
 \begin{center}
-\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/course-C1-insurance-20261022/analysis-entities-9.pdf}
+\includegraphics[width=55.6cm,height=32cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-entities-9.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-entities-9}\small 图\thefigure：门诊医保与结算款分析实体类图
 \end{center}
 \clearpage
@@ -2615,6 +2712,7 @@ UC-23 办理医保结算、撤销与回款核对 & 医保就诊办理、医保�
 UC-24 协调诊椅设备准备与停用恢复 & 诊椅、诊疗设备、资源停用时段、设备占用、接诊占用 \\
 UC-25 开立处方并衔接院内外取药 & 处方、处方明细、实际发药、材料、库存变动、应收项目 \\
 UC-26 维护诊所基础资料与账号 & 职员、职员账号、诊椅；复用任职与授权的共用核对 \\
+UC-27 编制报价并记录患者确认 & 治疗报价单、报价版本、报价明细、报价确认；关联原方案、价目、患者付款及应收项目 \\
 \bottomrule
 \end{tabular}\par}
 \medskip
@@ -2631,9 +2729,9 @@ UC-26 维护诊所基础资料与账号 & 职员、职员账号、诊椅；复�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,297mm}
 \subsubsection{基础管理的边界、控制与实体职责}
-UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人互斥子类。获准岗位由任职与授予关系推导；控制协调当前身份、原记录和排班影响。\par
+UC-26复用职员、账号及诊椅，以门店岗位授权限定管理范围，并管理跨店病历查阅授权；兼岗保留同一职员身份。控制协调当前身份、原记录和排班影响。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/reference-review-20261026/analysis-clinic.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-clinic.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:ref-analysis-clinic}\small 图\thefigure：UC-26基础管理分析类图
 \end{center}
 \clearpage
@@ -2649,11 +2747,36 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=297mm,420mm}
+\clearpage
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{420mm}\setlength{\paperheight}{297mm}
+\setlength{\textwidth}{382mm}\setlength{\textheight}{259mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=420mm,297mm}
+\subsubsection{独立报价及原业务关联}
+报价单标识所属门店、患者及原方案，版本保存当时费用条件，明细固定项目价格与范围，确认按确切明细追加。患者付款和应收项目仅补充可空来源引用；报价不替代医疗同意、实际执行或到账。\par
+\begin{center}
+\includegraphics[width=38.2cm,height=19.8cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-quotes.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:analysis-quotes}\small 图\thefigure：独立报价分析实体类图
+\end{center}
+\clearpage
+\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=210mm,297mm}
+\clearpage
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{297mm}\setlength{\paperheight}{420mm}
+\setlength{\textwidth}{259mm}\setlength{\textheight}{382mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=297mm,420mm}
 \subsection{分析序列图}
 \subsubsection{UC-01：维护患者资料}
 先核实候选，再选择新建或更正；仅真实更正形成变更，原编号及历史保留。保存前复核版本和同次办理结果。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/course-C2-arrival-20261022/analysis-seq-01.pdf}
+\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-01.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-01}\small 图\thefigure：UC-01 维护患者资料分析序列图
 \end{center}
 \clearpage
@@ -2673,7 +2796,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-02：维护预约安排}
 新建、改约、取消与未到分别处理。必要设备按本次需求核对，预约预留与实际使用分开；改约的全部资源变更共同保存。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-arrival-20261022/analysis-seq-02.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-02.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-02}\small 图\thefigure：UC-02 维护预约安排分析序列图
 \end{center}
 \clearpage
@@ -2693,7 +2816,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-03：登记到诊}
 预约与现场来源分别登记，重复返回原就诊；就诊、病历草稿、安排关联及预约状态共同保存。候诊不代表开始接诊或资源已就绪。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=51.2cm,keepaspectratio]{diagrams/course-C2-arrival-20261022/analysis-seq-03.pdf}
+\includegraphics[width=38.2cm,height=51.2cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-03.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-03}\small 图\thefigure：UC-03 登记到诊分析序列图
 \end{center}
 \clearpage
@@ -2713,7 +2836,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-04：维护排班与接诊安排}
 负责人维护牙医与诊椅的日期安排；调整先落实受影响预约，草稿不参与预约，停诊不强制结束实际使用。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-arrival-20261022/analysis-seq-04.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-04.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-04}\small 图\thefigure：UC-04 维护排班与接诊安排分析序列图
 \end{center}
 \clearpage
@@ -2731,9 +2854,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=297mm,420mm}
 \subsubsection{UC-05：查阅患者诊疗资料}
-牙医按患者和就诊查阅授权范围内资料，分别核对病历、方案、处方和文件归属；查阅保持只读，原件另核权限。\par
+牙医按患者、来源门店和原就诊查阅资料；跨店时核验对应授权，无权不返回正文或原件。查阅保持只读，原件另核权限。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/course-C2-clinical-20261022/analysis-seq-05.pdf}
+\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-05.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-05}\small 图\thefigure：UC-05 查阅患者诊疗资料分析序列图
 \end{center}
 \clearpage
@@ -2753,7 +2876,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-06：记录检查诊断与健康资料}
 接诊开始与草稿保存分别确认。健康变化建立新版，复核关联当次实际版本；草稿、所见与复核共同保存，未知不记为无。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-clinical-20261022/analysis-seq-06.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-06.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-06}\small 图\thefigure：UC-06 记录检查诊断与健康资料分析序列图
 \end{center}
 \clearpage
@@ -2773,7 +2896,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-07：制定治疗方案并记录患者确认}
 患者决定固定到具体方案版本、项目及数量；修订重新说明，撤回阻止所撤范围后续执行，既有实际事实保留。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-clinical-20261022/analysis-seq-07.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-07.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-07}\small 图\thefigure：UC-07 制定治疗方案并记录患者确认分析序列图
 \end{center}
 \clearpage
@@ -2793,7 +2916,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-08：登记实际治疗与完成项目}
 只登记真实完成，部分完成按实际数量处理；执行和唯一收费来源共同保存。缺价保留待核价，更正保留原事实并另办费用调整。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-clinical-20261022/analysis-seq-08.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-08.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-08}\small 图\thefigure：UC-08 登记实际治疗与完成项目分析序列图
 \end{center}
 \clearpage
@@ -2813,7 +2936,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-09：签署及补充病历}
 签署前核对完整性和当前版本，签后补充单独签署并保留原文。病历签署、实际结束、资源恢复与费用结清分别办理。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-clinical-20261022/analysis-seq-09.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-09.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-09}\small 图\thefigure：UC-09 签署及补充病历分析序列图
 \end{center}
 \clearpage
@@ -2833,7 +2956,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-10：管理影像与诊疗文书}
 牙医或助理登记原件，牙医确认临床归属。原件、索引与待确认版本共同保存；替换保留旧版及引用，未知先核原结果。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-clinical-20261022/analysis-seq-10.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-10.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-10}\small 图\thefigure：UC-10 管理影像与诊疗文书分析序列图
 \end{center}
 \clearpage
@@ -2853,7 +2976,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-11：维护收费项目与价目}
 收费人员提交待确认价目，负责人复查版本及适用期间后确认；新价目只影响新计费，原收费快照保留。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-fees-20261023/analysis-seq-11.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-11.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-11}\small 图\thefigure：UC-11 维护收费项目与价目分析序列图
 \end{center}
 \clearpage
@@ -2873,7 +2996,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-12：查询账单与待结算费用}
 按同一查询时点核对实际费用、正式医保分摊及本账有效抵付。查询不新增收付，缺价或医保未定时不输出最终待收。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/course-C2-fees-20261023/analysis-seq-12.pdf}
+\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-12.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-12}\small 图\thefigure：UC-12 查询账单与待结算费用分析序列图
 \end{center}
 \clearpage
@@ -2891,9 +3014,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,594mm}
 \subsubsection{UC-13：办理患者付款与到账核实}
-新收款、电子到账核实与原预款抵扣分别处理；真实到账与用途共同保存，原款抵扣不增加实收，未知先查原笔。\par
+工作人员在系统外完成收款并核实，系统只登记付款结果和用途；原预款抵扣限同患者同门店，未知先核实原笔。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-fees-20261023/analysis-seq-13.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-13.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-13}\small 图\thefigure：UC-13 办理患者付款与到账核实分析序列图
 \end{center}
 \clearpage
@@ -2913,7 +3036,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-14：办理费用更正与退费}
 申请、负责人审核与费用生效分阶段办理；调整和必要用途释放共同保存，医保更正未明确时不确认最终差额。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-fees-20261023/analysis-seq-14a.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-14a.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-14}\small 图\thefigure：UC-14 办理费用更正与退费分析序列图（申请与费用调整）
 \end{center}
 \clearpage
@@ -2931,9 +3054,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,594mm}
 \noindent\textbf{UC-14 办理费用更正与退费（续：实际退款与结果核实）}\par
-依据原批准及已生效调整办理真实退款。新笔先占用额度再实际交付，未知保留原笔及占用，失败与成功分别核实。\par
+依据原批准及已生效调整登记退款。工作人员在系统外办理并核实结果；未知保留原笔及占用，失败与成功分别记录。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-fees-20261023/analysis-seq-14b.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-14b.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-14b}\small 图\thefigure：UC-14 办理费用更正与退费分析序列图（实际退款与结果核实）
 \end{center}
 \clearpage
@@ -2953,7 +3076,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-15：提出复诊随访要求}
 牙医提出明确的诊后目的、日期和责任人；发布后交前台联系，暂存、撤销和后续预约分别处理。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/course-C2-followup-20261023/analysis-seq-15.pdf}
+\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-15.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-15}\small 图\thefigure：UC-15 提出复诊随访要求分析序列图
 \end{center}
 \clearpage
@@ -2971,9 +3094,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=297mm,420mm}
 \subsubsection{UC-16：办理复诊联系与预约}
-先记录真实联系，再按患者意向安排预约；预约失败仍保留联系，需临床评估的任务不能由前台直接完成。\par
+先记录真实联系，再由目标门店获授权前台安排预约；预约失败仍保留联系，前台不读取临床正文。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/course-C2-followup-20261023/analysis-seq-16.pdf}
+\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-16.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-16}\small 图\thefigure：UC-16 办理复诊联系与预约分析序列图
 \end{center}
 \clearpage
@@ -2991,9 +3114,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=297mm,420mm}
 \subsubsection{UC-17：记录复诊随访评估}
-牙医依据实际到诊或远程沟通作出评估；目的达到才完成，否则明确后续日期及责任人。\par
+牙医按实际门店权限评估；跨店资料按UC-05核验授权。目的达到才完成，否则明确后续日期及责任人。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/course-C2-followup-20261023/analysis-seq-17.pdf}
+\includegraphics[width=25.9cm,height=32.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-17.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-17}\small 图\thefigure：UC-17 记录复诊随访评估分析序列图
 \end{center}
 \clearpage
@@ -3013,7 +3136,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-18：维护材料与批次资料}
 助理录入实物资料，负责人确认计量与批次放行；登记批次不增加库存，隔离、恢复和停用分别留有依据。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-operations-20261023/analysis-seq-18.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-18.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-18}\small 图\thefigure：UC-18 维护材料与批次资料分析序列图
 \end{center}
 \clearpage
@@ -3033,7 +3156,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-19：登记基础采购与到货验收}
 采购确认、实物到货与验收分阶段办理。只入本次新增合格量，待检后确认沿用原到货记录，拒收和待检不计可领库存。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-operations-20261023/analysis-seq-19.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-19.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-19}\small 图\thefigure：UC-19 登记基础采购与到货验收分析序列图
 \end{center}
 \clearpage
@@ -3053,7 +3176,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-20：办理库存领用、退回与盘点}
 领用、未用退回、实际用料和盘点各有依据；用料不重复扣库，盘点差异经负责人确认后才调整库存。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-operations-20261023/analysis-seq-20.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-20.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-20}\small 图\thefigure：UC-20 办理库存领用、退回与盘点分析序列图
 \end{center}
 \clearpage
@@ -3071,9 +3194,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,594mm}
 \subsubsection{UC-21：核对日常经营与收付款}
-按营业日期及截止时点分别核对费用、患者实际收付、医保结算与回款；差异回查原单，不直接改统计或原收付。\par
+按获授权门店、营业日期及截止时点分别核对费用、患者实际收付、医保结算与回款；差异回查原单，不直接改统计或原收付。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-operations-20261023/analysis-seq-21.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-21.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-21}\small 图\thefigure：UC-21 核对日常经营与收付款分析序列图
 \end{center}
 \clearpage
@@ -3091,9 +3214,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,594mm}
 \subsubsection{UC-22：核验医保身份并办理预结算}
-医保按定点及联网条件启用。前台核验身份，收费人员按本次费用申请预结算并说明分摊，患者实际选择后再衔接正式结算。\par
+医保按就诊门店定点及联网条件启用。前台核验身份，收费人员按本次费用申请预结算并说明分摊，患者实际选择后再衔接正式结算。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-final-20261023/analysis-seq-22.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-22.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-22}\small 图\thefigure：UC-22 核验医保身份并办理预结算分析序列图
 \end{center}
 \clearpage
@@ -3113,7 +3236,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-23：办理医保结算、撤销与回款核对}
 正式结算、原单撤销和实际回款分别办理；未知保留原单核实，撤销成功才停用原结算，不把正式结算当作患者收款或医保到账。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-final-20261023/analysis-seq-23.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-23.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-23}\small 图\thefigure：UC-23 办理医保结算、撤销与回款核对分析序列图
 \end{center}
 \clearpage
@@ -3133,7 +3256,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-24：协调诊椅设备准备与停用恢复}
 牙医确认实际使用结束，助理完成清洁准备及核查；故障由负责人协调恢复，解除本次限制不代表其他限制也已解除。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-final-20261023/analysis-seq-24.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-24.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-24}\small 图\thefigure：UC-24 协调诊椅设备准备与停用恢复分析序列图
 \end{center}
 \clearpage
@@ -3153,7 +3276,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{UC-25：开立处方并衔接院内外取药}
 牙医开立有效处方并指导用药；院外取药不作诊所供药。具备院内条件时，由药学岗位审核并按真实交付形成出库与费用。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/course-C2-final-20261023/analysis-seq-25.pdf}
+\includegraphics[width=38.2cm,height=52.5cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-seq-25.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-25}\small 图\thefigure：UC-25 开立处方并衔接院内外取药分析序列图
 \end{center}
 \clearpage
@@ -3174,9 +3297,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,594mm}
 \subsubsection{UC-26：维护诊所基础资料与账号}
-边界收集当前维护对象和依据，控制调用职员、账号与诊椅规则，核对有效管理入口及原安排影响；原业务和任职历史保留。\par
+边界收集门店、维护对象和依据，控制核对门店岗位权限、跨店查阅授权及原安排影响；原业务和授权历史保留。\par
 \begin{center}
-\includegraphics[width=38.1cm,height=49cm,keepaspectratio]{diagrams/reference-review-20261026/analysis-sequence-26.pdf}
+\includegraphics[width=38.1cm,height=49cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-sequence-26.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:ref-analysis-sequence-26}\small 图\thefigure：UC-26基础管理分析序列图
 \end{center}
 \clearpage
@@ -3185,6 +3308,24 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=210mm,297mm}
 \clearpage
+\clearpage
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{420mm}\setlength{\paperheight}{594mm}
+\setlength{\textwidth}{382mm}\setlength{\textheight}{556mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=420mm,594mm}
+\subsubsection{UC-27：编制报价并记录患者确认}
+牙医与收费人员在获授权的报价门店办理；控制将归属、快照、可出具条件和逐项决定交给对应实体，分别返回草稿、出具及决定结果。真实收款与医疗同意不在报价提交中自动完成。\par
+\begin{center}
+\includegraphics[width=38.19cm,height=48cm,keepaspectratio]{diagrams/chain-C-20261027/analysis-sequence-27.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-27}\small 图\thefigure：UC-27 报价分析序列图
+\end{center}
+\clearpage
+\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=210mm,297mm}
 \subsection{分析状态机图}
 \subsubsection{预约与就诊}
 \noindent\textbf{预约状态机图}\par
@@ -3255,9 +3396,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \par\smallskip\refstepcounter{figure}\label{fig:state-refund}\small 图\thefigure：费用申请分析状态机图
 \end{center}
 \noindent\textbf{支付单状态机图}\par
-受理、患者截图和超时均不能作为到账依据；未知先查原号，明确失败另办新笔，成功及本地补记只确认一次原付款。\par
+电子收款由工作人员在系统外办理，系统记录核实结果；受理、患者截图和超时均不能作为到账依据。未知先查原号，成功及补记只确认一次。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=16cm,keepaspectratio]{diagrams/course-C3-final-20261023/state-payment.pdf}
+\includegraphics[width=25.9cm,height=16cm,keepaspectratio]{diagrams/chain-C-20261027/state-payment.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:state-payment}\small 图\thefigure：支付单分析状态机图
 \end{center}
 \clearpage\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
@@ -3285,53 +3426,62 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother\special{papersize=210mm,297mm}
 
 \clearpage
+\clearpage
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{297mm}\setlength{\paperheight}{420mm}
+\setlength{\textwidth}{259mm}\setlength{\textheight}{382mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=297mm,420mm}
 \subsubsection{处方开立与取药}
 \noindent\textbf{处方状态机图}\par
 处方效力、审方结果和实际发药分别记录。院内待审、已通过、待医师处理或院外取药另记，不替代处方状态；审方待处理须牙医核实，需更正则另开处方。已发药或院外取药不明不能直接作废抹去事实。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=18.5cm,keepaspectratio]{diagrams/course-C3-final-20261023/state-prescription.pdf}
+\includegraphics[width=25.9cm,height=14cm,keepaspectratio]{diagrams/course-C3-final-20261023/state-prescription.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:state-prescription}\small 图\thefigure：处方分析状态机图
 \end{center}
 
+\noindent\textbf{报价版本状态机图}\par
+未确认出具额不等于应收；接受、部分接受和拒绝据真实决定保存。接受截止限制新增决定，不抹除已接受范围。新版本保留原报价和已发生履约。\par
+\begin{center}
+\includegraphics[width=25.9cm,height=13cm,keepaspectratio]{diagrams/dentalpin-review-20261026/state-quote.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:state-quote}\small 图\thefigure：报价版本分析状态机图
+\end{center}
 \clearpage
+\clearpage
+\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=210mm,297mm}
 \section{设计}
 \subsection{建立数据层}
 \subsubsection{三层职责与部署}
-应用服务调用领域实体完成规则判断，并通过存取接口组织本地共同保存。数据访问采用数据映射器，负责SQL、字段转换及关联装配；支付、医保和原件分别经适配接口衔接。\par
+应用服务调用领域实体完成规则判断，并通过存取接口组织本地共同保存。数据访问采用数据映射器，负责SQL、字段转换及关联装配；医保和原件分别经适配接口衔接；收付款由工作人员在系统外办理，系统仅记录核实结果。\par
+
+\medskip
+\subsubsection{连锁门店与授权数据结构}
+连锁诊所、门店分别映射为\texttt{clinic\_\allowbreak{}chain}和\texttt{clinic\_\allowbreak{}branch}。\par
+岗位授权映射为\texttt{branch\_\allowbreak{}staff\_\allowbreak{}role}，跨店查阅授权映射为\texttt{cross\_\allowbreak{}branch\_\allowbreak{}record\_\allowbreak{}access}。患者与职员沿用统一身份。就诊关联发生门店；跨店授权关联牙医、患者、原就诊、来源及目标门店，保留范围、有效期和撤销依据。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=10.0cm,keepaspectratio]{diagrams/course-D1-mapper-prescription-20261023/architecture.pdf}
-\par\smallskip\refstepcounter{figure}\label{fig:architecture}\small 图\thefigure：三层职责及外部服务协作
+\includegraphics[width=16.2cm,height=5.3cm,keepaspectratio]{diagrams/chain-D-20261027/database-chain-core.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:database-chain-core}\small 图\thefigure：连锁门店与授权数据库关系图
 \end{center}
-
-\medskip
-\subsubsection{业务保存及失败反馈}
-{\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.13}
-\refstepcounter{table}
-\noindent\textbf{表\thetable：业务协作要求}\par\smallskip
-\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.944cm}>{\raggedright\arraybackslash}p{12.756cm}@{}}
-\toprule
-办理 & 共同保存的结果 \\ \midrule
-预约到诊 & 预约及预留；到诊时的就诊及病历草稿。 \\
-治疗记录 & 实际完成项目及计费依据；实际结束与占用释放、清洁准备限制共同保存。 \\
-签署病历 & 签署人和时间、采用的健康复核、冻结正文版本及病历状态。 \\
-收费退费 & 收款与用途共同保存；调整与释放共同保存；实际退款另按原笔核实。 \\
-复诊跟进 & 要求、实际联系、预约及临床评估。 \\
-库存变动 & 来源流水、前后余额及实际用料关联。 \\
-\bottomrule
-\end{tabular}\par}
-\medskip
-输入缺项先补正，版本变化先重核；外部支付或医保结果与本地保存分开核实，结果不明先查原笔，不重发收退款。\par
-
+授权须核验目标门店牙医岗位、患者、就诊、资料范围和有效期；撤销后不得读取。门店医保及院内发药按实际条件启用，不能因隶属同一连锁自动继承。复合外键核对原就诊、患者及来源门店；岗位资格、权限及时间区间由服务端核验。\par
+现有81表已按统一身份、直接门店归属、原业务继承和待核定分类。候选规则中，患者资金按“门店、患者”唯一，材料批次按“门店、材料、批号”唯一；账单与原款、批次与库存位置须核对同一门店。收费项目、材料和供应商使用统一基础目录，价目和库存按门店管理。健康资料历史来源仍待核实。后续连锁总图为候选设计，旧表字段和历史数据迁移尚待落实。\par
 \clearpage
 \subsubsection{分析类与核心表对应（一）}
 核心实体及关联类映射为对应表；主外键与关系见后续结构图，主要字段集中列出。来源列采用现行系统用例编号。\par
-\begingroup\small\linespread{1.02}\selectfont
-{\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.07}
+\begingroup\small\linespread{0.98}\selectfont
+{\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.00}
 \refstepcounter{table}
 \noindent\textbf{表\thetable：类表对应（一）}\par\smallskip
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{3.1cm}>{\raggedright\arraybackslash}p{6.5cm}>{\raggedright\arraybackslash}p{6.1cm}@{}}
 \toprule
 分析类 & 数据表 & 需求来源 \\ \midrule
+连锁诊所 & clinic\_\allowbreak{}chain & UC-26 \\
+门店 & clinic\_\allowbreak{}branch & UC-02—04、UC-21、UC-26 \\
+门店岗位授权 & branch\_\allowbreak{}staff\_\allowbreak{}role & UC-26及门店岗位用例 \\
+跨店病历查阅授权 & cross\_\allowbreak{}branch\_\allowbreak{}record\_\allowbreak{}access & UC-05、UC-10、UC-26 \\
 患者 & patient & UC-01、UC-02、UC-03、UC-05 \\
 职员 & staff & UC-02、UC-04、UC-26 \\
 患者资料变更 & patient\_\allowbreak{}change & UC-01 \\
@@ -3413,6 +3563,10 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 医保结算 & insurance\_\allowbreak{}settlement & UC-12、UC-14、UC-21、UC-23 \\
 医保撤销办理 & insurance\_\allowbreak{}reversal & UC-14、UC-23 \\
 医保结算款收付 & insurance\_\allowbreak{}fund\_\allowbreak{}receipt & UC-21、UC-23 \\
+治疗报价单 & treatment\_\allowbreak{}quote & UC-27 \\
+报价版本 & quote\_\allowbreak{}version & UC-27 \\
+报价明细 & quote\_\allowbreak{}item & UC-27 \\
+报价确认 & quote\_\allowbreak{}decision & UC-27 \\
 \bottomrule
 \end{tabular}\par}
 \endgroup
@@ -3425,10 +3579,10 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=841mm,1189mm}
 \subsubsection{数据库关系总图}
-本图包含69张主业务表及8张历史存储表，共77张物理表。历史表映射同一分析实体的历次办理，以外键回溯原业务；跨区引用沿用原表。分区图展开主要关联，重复的快照归属及经办外键保留在完整逻辑模型。\par
+本图按业务分区列出81张原业务及历史表与4张连锁候选表，共85张。组内关系用连线表示，跨区关联在相应字段以“字段→目标表”表示；分区图门店字段均引用门店表，继承来源的记录按原业务核对。原表门店归属和约束仍为候选，健康资料历史来源待核实；现有数据库尚未迁移。\par
 \begin{center}
-\includegraphics[width=80.3cm,height=109.9cm,keepaspectratio]{diagrams/course-D1-business-history-20261023/database-overall.pdf}
-\par\smallskip\refstepcounter{figure}\label{fig:database-overall}\small 图\thefigure：核心业务数据库关系总图
+\includegraphics[width=80.3cm,height=109.9cm,keepaspectratio]{diagrams/chain-D-20261027/database-overview-grouped.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:database-overall}\small 图\thefigure：连锁业务数据库关系总览图（候选）
 \end{center}
 \clearpage
 \setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
@@ -3446,7 +3600,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{身份与接诊数据结构}
 日期安排确定牙医、诊椅和时段，预约、到诊及设备占用分别保存；改约与排班变更保留前后资源。停用记录只对应诊椅或设备之一，预计结束不代表已恢复；实际使用须据实结束后释放。图中保留岗位和资源归属，其他经办身份见逻辑模型。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=33.0cm,keepaspectratio]{diagrams/course-D1-arrival-clinical-followup-20261023/database-region-1.pdf}
+\includegraphics[width=25.9cm,height=33.0cm,keepaspectratio]{diagrams/chain-D-20261027/database-region-1.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-region-1}\small 图\thefigure：身份与接诊数据库关系图
 \end{center}
 \clearpage
@@ -3465,7 +3619,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{病历与诊疗文书数据结构}
 就诊建立唯一病历，签署固定采用的健康复核；文件版本保存牙医确认依据。处方分别记录开立、处方文件交付、药学审核和实际发药，院外处方交付不代表已取药；作废保存原因、牙医和时间，重开引用原方，保留原内容与实际交付事实。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/course-D1-business-history-20261023/database-region-2.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-D-20261027/database-region-2.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-region-2}\small 图\thefigure：病历与诊疗文书数据库关系图
 \end{center}
 \clearpage
@@ -3484,7 +3638,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{治疗方案与实际执行数据结构}
 两张决定关联表分别以\texttt{(decision\_id, plan\_item\_id)}、\texttt{(decision\_id, document\_version\_id)}为联合主键，两列均非空且各自是外键。限定数量用\texttt{scope\_quantity}保存：仅明确选择整项时为空，非空须为正且不超计划量；未填写范围不能默认同意。按生效同意、撤回及实际完成核对余量，原件固定确认时版本。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/course-D1-plan-payment-20261023/database-region-3.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-D-20261027/database-region-3.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-region-3}\small 图\thefigure：治疗方案与实际执行数据库关系图
 \end{center}
 \clearpage
@@ -3503,7 +3657,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{价目、账单与收款数据结构}
 电子支付单必须关联患者资金，\texttt{bill\_id}可空以支持预收；有关联账单或确认付款时须同一资金归属，收款还须同渠道、同金额。实际治疗或发药分别唯一对应应收来源；负向用途引用原正向用途。收退款核对仍只选一种原单，常见经办职员外键在模型统一保留。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/course-D1-business-history-20261023/database-region-4.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-D-20261027/database-region-4.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-region-4}\small 图\thefigure：价目、账单与收款数据库关系图
 \end{center}
 \clearpage
@@ -3523,7 +3677,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{费用更正与退费数据结构}
 申请可针对原账单或未用预款，调整明细回溯原应收项目，实际退款逐笔引用原付款。批准、调整与真实退款分别保存；待办理和待核实占用拟退额度，同时核对批准上限与原款可用额。只有明确失败才可关联原失败单重办。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=12.0cm,keepaspectratio]{diagrams/course-D1-business-history-20261023/database-region-5.pdf}
+\includegraphics[width=25.9cm,height=12.0cm,keepaspectratio]{diagrams/chain-D-20261027/database-region-5.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-region-5}\small 图\thefigure：费用更正与退费数据库关系图
 \end{center}
 \clearpage
@@ -3544,7 +3698,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{复诊与随访数据结构}
 要求至少有同患者的就诊或方案来源，发布时固定牙医与时间，并明确负责前台。联系可关联真实成功预约；到诊评估必须关联实际就诊，远程评估注明依据与局限。继续跟进保留日期与责任人，完成按原目的核实，联系成功不代替临床评估。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=12.0cm,keepaspectratio]{diagrams/course-D1-business-history-20261023/database-region-6.pdf}
+\includegraphics[width=25.9cm,height=12.0cm,keepaspectratio]{diagrams/chain-D-20261027/database-region-6.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-region-6}\small 图\thefigure：复诊与随访数据库关系图
 \end{center}
 \clearpage
@@ -3564,7 +3718,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{材料与库存数据结构}
 批次状态与批次位置余额分别管理。验收增量、领用、未用退回、盘点及处方实际发药形成有据流水；实际用料分配原领用，不再扣库。同原领用累计用料与退回不超领用量；盘点比对原版本，零差异不造流水。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/course-D1-business-history-20261023/database-region-7.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-D-20261027/database-region-7.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-region-7}\small 图\thefigure：材料与库存数据库关系图
 \end{center}
 \clearpage
@@ -3583,7 +3737,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{基础采购与验收数据结构}
 采购确认不等于到货或入库，取消须保存原因并保留已有事实。验收逐行核对原采购、批次和位置，到货等于合格、拒收与待检之和；待检后确认只补新合格入库增量。供应商保存供货联系资料和启用状态。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/course-D1-business-history-20261023/database-region-8.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-D-20261027/database-region-8.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-region-8}\small 图\thefigure：基础采购与验收数据库关系图
 \end{center}
 \clearpage
@@ -3602,7 +3756,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \subsubsection{门诊医保与结算款数据结构}
 费用提交保留原项目、费用版本及编码快照；明确自费时不伪造医保映射。撤销有负责人批准依据及真实核实结果，未知不使原结算失效；成功后重办引用原办理并重新确认。正式分摊与预估、实际回款分别保存，回款差额不自动增加患者欠费。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/course-D1-business-history-20261023/database-region-9.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-D-20261027/database-region-9.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-region-9}\small 图\thefigure：门诊医保与结算款数据库关系图
 \end{center}
 \clearpage
@@ -3612,8 +3766,39 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \special{papersize=210mm,297mm}
 
 \clearpage
+\clearpage
+\newgeometry{margin=19mm}
+\setlength{\paperwidth}{594mm}\setlength{\paperheight}{420mm}
+\setlength{\textwidth}{556mm}\setlength{\textheight}{382mm}
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=594mm,420mm}
+\subsubsection{独立报价数据结构}
+四个新增分析实体分别映射四张表，主键恒定；原方案、项目、价目及真实付款按外键连接。报价版本和决定各自保留，患者付款及应收项目只增加可空来源引用，不复制资金和费用。\par
+\begin{center}
+\includegraphics[width=55.6cm,height=24cm,keepaspectratio]{diagrams/chain-D-20261027/database-quotes.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:database-quotes}\small 图\thefigure：独立报价及原收款费用关联结构
+\end{center}
+\begingroup\small
+{\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
+\noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{12cm}>{\raggedright\arraybackslash}p{24cm}>{\raggedright\arraybackslash}p{19.1cm}@{}}
+\toprule
+实体及表 & 关键字段 & 关键约束 \\ \midrule
+治疗报价单 treatment\_quote & id、record\_no、patient\_id、treatment\_plan\_id & 报价号唯一；原方案可空，存在时须同患者。 \\
+报价版本 quote\_version & quote\_id、source\_plan\_version\_id、version\_no、previous\_version\_id、有效期间、状态、出具人时间 & 同报价版本号唯一，前版本同报价且递增；出具后冻结，已接受历史保留。 \\
+报价明细 quote\_item & quote\_version\_id、plan\_item\_id、service\_id、service\_price\_id、牙位、快照、数量金额及范围 & 同版本顺序唯一；数量为正，金额相乘一致；出具时价目及范围完整。 \\
+报价确认 quote\_decision & quote\_item\_id、decision\_type、decided\_at、confirmation\_basis、recorded\_by & 按确切明细追加；接受在有效期间内，历史不覆盖。 \\
+既有患者付款／应收项目 & patient\_payment.quote\_id；bill\_item.quote\_item\_id & 均可空；核对同患者和真实来源，付款用途和账单抵扣另行办理。 \\
+\bottomrule
+\end{tabular}\par}
+\endgroup
+\clearpage
+\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
+\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
+\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
+\special{papersize=210mm,297mm}
 \subsubsection{关键业务字段}
-以下按业务分组列出69张主业务表的关键字段及保存内容，与前述分析类、数据库总图和分区图对应。主外键见关系图，必要保存规则见本节末表；金额用整数分保存，日期、文字和状态采用TEXT，数量按业务精度保存。共同的编号、经办人和时间见后述存储约定。\par
+以下73张旧主业务表的字段为单店基线；连锁候选门店字段见总图和各分区图。患者资金与材料批次的唯一性按门店重新核定。迁移前备份并核对来源门店，来源不明不自动分配；重建时识别并恢复跨表触发器及索引，核对原记录与外键，失败回滚。金额用整数分保存，日期、文字和状态采用TEXT，数量按业务精度保存。\par
 \begingroup\small\linespread{1.02}\selectfont
 \setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.04}
 \setlength{\LTpre}{5pt}\setlength{\LTpost}{5pt}
@@ -3650,7 +3835,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 数据表 & 关键字段（类型） & 主要业务内容 \\ \midrule
 \endhead
 \bottomrule\endfoot
-健康版本\newline health\_\allowbreak{}version & formed\_\allowbreak{}at (TEXT)\newline change\_\allowbreak{}reason (TEXT)\newline version\_\allowbreak{}no (INTEGER)\newline effective\_\allowbreak{}at (TEXT) & 版本号、形成时间；变更原因、形成牙医。 \\
+健康版本\newline health\_\allowbreak{}version & formed\_\allowbreak{}at (TEXT)\newline change\_\allowbreak{}reason (TEXT)\newline version\_\allowbreak{}no (INTEGER)\newline source\_\allowbreak{}visit\_\allowbreak{}id (INTEGER，候选) & 版本号、形成时间、来源就诊；旧资料来源不明时保持待核。 \\
 健康条目\newline health\_\allowbreak{}item & category (TEXT)\newline content (TEXT)\newline certainty (TEXT)\newline reported\_\allowbreak{}at (TEXT)\newline source (TEXT) & 类别、内容；有／无／未知、来源；报告时间、发生时间。 \\
 健康复核\newline health\_\allowbreak{}review & reviewed\_\allowbreak{}at (TEXT)\newline conclusion (TEXT) & 复核结论；复核牙医、实际时间。 \\
 病历\newline clinical\_\allowbreak{}record & status (TEXT)\newline chief\_\allowbreak{}complaint (TEXT)\newline diagnosis (TEXT)\newline treatment\_\allowbreak{}advice (TEXT)\newline signed\_\allowbreak{}at (TEXT) & 主诉、诊断、处理意见；草稿／已签署、正文版本；签署牙医、时间、冻结摘要。 \\
@@ -3689,7 +3874,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \endhead
 \bottomrule\endfoot
 患者资金\newline patient\_\allowbreak{}funds & opened\_\allowbreak{}at (TEXT) & 建立时间、归属经办人；同患者资金收付汇总。 \\
-收费项目\newline service & category (TEXT)\newline name (TEXT)\newline billing\_\allowbreak{}unit (TEXT)\newline is\_\allowbreak{}active (INTEGER) & 项目编号、分类、名称、计价单位与适用范围；启用状态。 \\
+收费项目\newline service & category (TEXT)\newline name (TEXT)\newline billing\_\allowbreak{}unit (TEXT)\newline is\_\allowbreak{}active (INTEGER) & 连锁统一项目编号、分类、名称、计价单位与适用范围；启用状态。 \\
 价目\newline service\_\allowbreak{}price & status (TEXT)\newline unit\_\allowbreak{}price\_\allowbreak{}cents (INTEGER)\newline valid\_\allowbreak{}from (TEXT)\newline valid\_\allowbreak{}until (TEXT)\newline change\_\allowbreak{}reason (TEXT) & 非负单价、适用起止；调价或零价原因、确认状态；提出及确认人、时间、意见。 \\
 应收账目\newline bill & formed\_\allowbreak{}at (TEXT)\newline period\_\allowbreak{}start (TEXT)\newline period\_\allowbreak{}end (TEXT) & 形成时间、计费期间；G总应收、/I正式医保承担；P患者应付、/S有效抵付；待付、/不能最终结算原因。 \\
 应收项目\newline bill\_\allowbreak{}item & quantity (INTEGER)\newline unit\_\allowbreak{}price\_\allowbreak{}cents (INTEGER)\newline priced\_\allowbreak{}at (TEXT) & 实际数量、单价快照；核价状态、计费时点；核价人及依据。 \\
@@ -3735,7 +3920,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 数据表 & 关键字段（类型） & 主要业务内容 \\ \midrule
 \endhead
 \bottomrule\endfoot
-材料\newline material & category (TEXT)\newline name (TEXT)\newline specification (TEXT)\newline base\_\allowbreak{}unit (TEXT)\newline purchase\_\allowbreak{}unit (TEXT) & 名称、类别、规格、启用状态；基本单位、采购单位、换算分子分母；数量精度、批次及效期要求；计量确认人和时间。 \\
+材料\newline material & category (TEXT)\newline name (TEXT)\newline specification (TEXT)\newline base\_\allowbreak{}unit (TEXT)\newline purchase\_\allowbreak{}unit (TEXT) & 连锁统一名称、类别、规格、启用状态；基本单位、采购单位、换算分子分母；数量精度、批次及效期要求；计量确认人和时间。 \\
 材料批次\newline material\_\allowbreak{}batch & status (TEXT)\newline batch\_\allowbreak{}no (TEXT)\newline expiry\_\allowbreak{}date (TEXT)\newline source\_\allowbreak{}note (TEXT) & 实际批号、真实效期、来源；待检／可用／隔离／停用／过期。 \\
 批次变更\newline batch\_\allowbreak{}change & old\_\allowbreak{}status (TEXT)\newline new\_\allowbreak{}status (TEXT)\newline reason (TEXT)\newline confirmed\_\allowbreak{}at (TEXT) & 前后状态、原因；经办及确认身份、实际时间。 \\
 存放位置\newline stock\_\allowbreak{}location & name (TEXT)\newline purpose (TEXT)\newline is\_\allowbreak{}active (INTEGER) & 位置名称、用途、启用状态。 \\
@@ -3753,7 +3938,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 数据表 & 关键字段（类型） & 主要业务内容 \\ \midrule
 \endhead
 \bottomrule\endfoot
-供应商\newline supplier & name (TEXT)\newline contact\_\allowbreak{}name (TEXT)\newline phone (TEXT)\newline address (TEXT)\newline is\_\allowbreak{}active (INTEGER) & 名称、联系人、电话、地址；启用状态。 \\
+供应商\newline supplier & name (TEXT)\newline contact\_\allowbreak{}name (TEXT)\newline phone (TEXT)\newline address (TEXT)\newline is\_\allowbreak{}active (INTEGER) & 连锁统一名称、联系人、电话、地址；启用状态。 \\
 采购\newline purchase\_\allowbreak{}order & status (TEXT)\newline agreed\_\allowbreak{}at (TEXT)\newline delivery\_\allowbreak{}terms (TEXT)\newline confirmed\_\allowbreak{}at (TEXT)\newline request\_\allowbreak{}reason (TEXT) & 需求依据、交付约定；待确认／已确认／已取消；提出及确认人、时间、取消原因。 \\
 采购项目\newline purchase\_\allowbreak{}order\_\allowbreak{}item & status (TEXT)\newline ordered\_\allowbreak{}quantity\_\allowbreak{}scaled (INTEGER)\newline unit\_\allowbreak{}price\_\allowbreak{}cents (INTEGER)\newline purchase\_\allowbreak{}unit (TEXT)\newline conversion\_\allowbreak{}numerator (INTEGER) & 材料、正的采购数量；单位、换算、精度、单价快照。 \\
 验收\newline purchase\_\allowbreak{}receipt & status (TEXT)\newline arrived\_\allowbreak{}at (TEXT)\newline delivery\_\allowbreak{}evidence (TEXT)\newline accepted\_\allowbreak{}at (TEXT) & 实际到货时间、随货单依据；验收状态、经办及确认时间。 \\
@@ -3780,7 +3965,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \clearpage
 \clearpage
 \subsubsection{数据完整性与业务保存}
-{\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.13}
+{\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.02}
 \refstepcounter{table}
 \noindent\textbf{表\thetable：主要完整性规则}\par\smallskip
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.944cm}>{\raggedright\arraybackslash}p{12.756cm}@{}}
@@ -3789,25 +3974,26 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 患者与就诊 & 患者编号贯穿业务。候诊无起止时间，接诊中有开始且无结束，结束须有真实起止，时间有序；结束与占用释放、清洁限制共同保存，不以病历签署或收费代替。 \\
 预约及资源 & 同时核对牙医、诊椅、必要设备及停用；停用记录恰选一种资源，恢复据实核验，实际占用不因预计结束自动释放。 \\
 病历及方案 & 签署固定同次就诊的健康复核及正文；患者决定按同版本项目与限定数量保留，撤回只停止后续，实际完成不超有效同意。 \\
-账单与付款 & 金额用整数分；实际治疗或发药恰选其一作为唯一应收来源。电子预收有患者资金归属而无账单，不自动抵费；收款确认核对归属、渠道及金额。核对原单的三个来源外键恰有一个非空，不倒改原款。 \\
+账单与付款 & 金额用整数分；实际治疗或发药恰选其一作为唯一应收来源。电子预收有患者资金归属而无账单，不自动抵费；账单与付款须同患者、同门店，收款确认核对渠道及金额。核对原单的三个来源外键恰有一个非空，不倒改原款。 \\
 医保及患者承担 & 登记阶段可暂缺尚未取得的资料，预结算前补齐身份、诊断及费用；有效预结算且患者确认医保后才正式办理。最终总费用等于基金、个账及患者其他自付，医保实际收付另记。 \\
 材料及库存 & 采购和待检不计可用库存，只入新合格增量；实际用料不重扣，累计用料与未用退回不超原领用，余额与流水共同保存。 \\
+门店与权限 & 办理时核验岗位和门店授权；跨店临床资料另核验患者、原就诊及授权范围。旧交接不自动转为跨店授权；新业务提交和审计记录门店，同一提交号跨店复用须拒绝；旧会话切换后失效并保留审计。 \\
 业务更正 & 记录原因、经办人和时间，相关业务结果共同保存。 \\
 \bottomrule
 \end{tabular}\par}
 \medskip
-主键和外键保障记录归属，本地关联结果共同保存。跨支付、医保平台按真实阶段衔接，超时或本地保存失败时核实原笔，不把外部已成功的结果视为未办理；页面显示可核对的当前状态。\par
+主键和外键保障记录归属，本地关联结果共同保存。收退款由工作人员在系统外办理并登记；医保按真实阶段衔接。结果不明或本地保存失败时核实原笔，页面显示可核对状态。\par
 
 \medskip
 \subsubsection{共享字段与存储安排}
-{\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.13}
+{\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.02}
 \refstepcounter{table}
 \noindent\textbf{表\thetable：统一存储约定}\par\smallskip
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.944cm}>{\raggedright\arraybackslash}p{12.756cm}@{}}
 \toprule
 内容 & 安排 \\ \midrule
 编号与经办信息 & 主键唯一且不改号；普通表用稳定id，两张决定关联表用联合主键。经办人和时间按真实办理保存。 \\
-类与关联映射 & 职员统一身份，兼岗按授权区分；1:n外键置于多方，两张决定连接表拆分m:n，自反外键保留原版本或原单。医保项目对应独立存表，稳定状态用受控取值保存。 \\
+类与关联映射 & 职员统一身份，兼岗及门店按授权区分；1:n外键置于多方，两张决定连接表拆分m:n，自反外键保留原版本或原单。医保项目对应独立存表，稳定状态用受控取值保存。 \\
 金额及数量 & 金额为整数分；材料数量遵循已确认的基本单位及精度。 \\
 影像与文书 & 结构化表保存患者及就诊索引，文件存储保存原文件。 \\
 数据访问 & 采用数据映射器，负责SQL、对象与字段转换及关联装配；业务服务调用存取接口确定共同保存范围，实体负责规则。映射器执行版本比对与保存，常用查询按患者、日期及原单建索引。 \\
@@ -3820,7 +4006,7 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \clearpage
 
 \subsubsection{业务历史保存}
-历史存储是同一分析实体的附加物理映射。69张主业务表保存当前结果，下列8张表按真实事件追加当时内容、原因、经办人和时间，合计77张物理表；主外键及必要来源见前述总图和分区图。\par
+历史存储是同一分析实体的附加物理映射。73张旧主业务表保存当前结果，下列8张表追加实际办理内容，合计81张单店基线表；4张连锁候选表见前述总图。\par
 \medskip
 \begingroup\small\linespread{1.04}\selectfont
 {\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.13}
@@ -3877,9 +4063,9 @@ UC-26复用职员、职员账号和诊椅，不因兼岗另建医生或负责人
 \special{papersize=420mm,297mm}
 \subsection{精化业务层}
 \subsubsection{接诊服务职责精化}
-UC-01—04及UC-24的控制落实为接诊应用服务方法。患者负责身份与资料规则；预约、日期安排和占用对象核对资源与时段，就诊记录真实开始结束，停用对象核对恢复依据。存取接口装配同一批领域对象，映射器在本地事务保存关联及变更；同名实体复用C1定义。\par
+UC-01—04及UC-24的控制落实为接诊应用服务方法。患者负责身份与资料规则；预约、日期安排和占用对象核对资源与时段，就诊记录真实开始结束，停用对象核对恢复依据。服务先核验所选门店岗位权限，预约与排班核对患者、牙医跨店时段及本店资源；存取接口按门店装配对象，映射器在本地事务保存关联及变更。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/course-D-final-20261023/design-classes-1.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-D-20261027/design-classes-1.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:design-classes-1}\small 图\thefigure：接诊服务设计类协作图
 \end{center}
 
@@ -3896,9 +4082,9 @@ UC-01—04及UC-24的控制落实为接诊应用服务方法。患者负责身�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,297mm}
 \subsubsection{临床服务职责精化}
-UC-05—10分别提供查阅、草稿与健康复核、方案决定、实际治疗、病历签署和文件核对。应用服务协调既有实体，签署固定正文及确切健康复核，执行核对有效同意与累计完成；文件更正保留原件及原索引。存取接口共同保存本次结果和对应历史，原件另经受控文件存取。\par
+UC-05—10分别提供查阅、草稿与健康复核、方案决定、实际治疗、病历签署和文件核对。应用服务先核验当前门店接诊权限；跨店查阅另核验患者、来源就诊和授权范围，无权不返回临床正文或原件。签署固定正文及确切健康复核，执行核对有效同意与累计完成；文件更正保留原件及原索引。存取接口共同保存本次结果和对应历史，原件另经受控文件存取。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/course-D-final-20261023/design-classes-2.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-D-20261027/design-classes-2.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:design-classes-2}\small 图\thefigure：临床服务设计类协作图
 \end{center}
 
@@ -3915,9 +4101,9 @@ UC-05—10分别提供查阅、草稿与健康复核、方案决定、实际治�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=594mm,420mm}
 \subsubsection{收费与复诊服务职责精化}
-UC-11—17及UC-21保留独立办理方法：价目确认、当前待付、真实收款、费用更正和退款、诊后要求、实际联系、临床评估及经营原单核对。应收、原款可用额、退款额度和随访完成分别交对应实体判断；经营查询读取原始事实，资金、预估与实际回款按原口径分别核算。\par
+UC-11—17及UC-21保留独立办理方法：价目确认、当前待付、真实收款、费用更正和退款、诊后要求、实际联系、临床评估及经营原单核对。应收、原款可用额、退款额度和随访完成分别交对应实体判断；办理前核对门店岗位及原单归属，价目、账单和原款按门店核对；经营查询按授权范围汇总，资金、预估与实际回款分别核算。收退由工作人员在系统外办理，系统仅登记核实结果。\par
 \begin{center}
-\includegraphics[width=55.6cm,height=32.5cm,keepaspectratio]{diagrams/course-D-final-20261023/design-classes-3.pdf}
+\includegraphics[width=55.6cm,height=32.5cm,keepaspectratio]{diagrams/chain-D-20261027/design-classes-3.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:design-classes-3}\small 图\thefigure：收费与复诊服务设计类协作图
 \end{center}
 
@@ -3934,9 +4120,9 @@ UC-11—17及UC-21保留独立办理方法：价目确认、当前待付、真�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,297mm}
 \subsubsection{物资与库存服务职责精化}
-UC-18—20由材料批次、采购、验收项目、存量、流水和盘点对象协作。验收入库按新合格增量，领用、未用退回、实际用料和盘点分别核对来源；实际用料分配原领用，盘点重核保留旧快照。存取接口以原办理号和版本共同保存历史、必要流水及余额。\par
+UC-18—20由材料批次、采购、验收项目、存量、流水和盘点对象协作。验收入库按新合格增量，领用、未用退回、实际用料和盘点分别核对来源；实际用料分配原领用，盘点重核保留旧快照。材料和供应商使用统一目录，采购、批次及库存归属门店；存取接口核对门店与原办理号、版本，共同保存历史、必要流水及余额。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/course-D-final-20261023/design-classes-4.pdf}
+\includegraphics[width=38.2cm,height=20.7cm,keepaspectratio]{diagrams/chain-D-20261027/design-classes-4.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:design-classes-4}\small 图\thefigure：物资与库存服务设计类协作图
 \end{center}
 
@@ -3953,9 +4139,9 @@ UC-18—20由材料批次、采购、验收项目、存量、流水和盘点对�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=594mm,420mm}
 \subsubsection{医保与药学服务职责精化}
-UC-22、23、25分开医保核验预结算、正式结算撤销回款及处方取药。预结算明细和正式结果固定原提交，患者选择对应当次有效结果；处方按开立、交付、审方和实际发药分阶段保存。机构及岗位条件由服务端核对，外部平台调用在本地事务结束后执行，核实原号再保存真实结果。\par
+UC-22、23、25分开医保核验预结算、正式结算撤销回款及处方取药。预结算明细和正式结果固定原提交，患者选择对应当次有效结果；处方按开立、交付、审方和实际发药分阶段保存。就诊门店的机构及岗位条件由服务端核对，医保平台调用在本地事务结束后执行，核实原号再保存真实结果。\par
 \begin{center}
-\includegraphics[width=55.6cm,height=32.5cm,keepaspectratio]{diagrams/course-D-final-20261023/design-classes-5.pdf}
+\includegraphics[width=55.6cm,height=32.5cm,keepaspectratio]{diagrams/chain-D-20261027/design-classes-5.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:design-classes-5}\small 图\thefigure：医保与药学服务设计类协作图
 \end{center}
 
@@ -3972,9 +4158,9 @@ UC-22、23、25分开医保核验预结算、正式结算撤销回款及处方�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,594mm}
 \subsubsection{办理费用更正与退费业务协作}
-申请提交与负责人审核使用原申请及各自当前版本；批准调整和必要用途释放共同生效。患者退款先保存原号及占额，再实际办理，核实成功、未知、失败分别保存。必要医保结果未明时保留待办；外部办理期间不持有SQLite本地事务。\par
+申请提交与负责人审核使用原申请及各自当前版本；批准调整和必要用途释放共同生效。患者退款先保存原号及占额，工作人员在系统外办理并核实，系统登记成功、未知或失败。必要医保结果未明时保留待办；外部办理期间不持有SQLite本地事务。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=51.2cm,keepaspectratio]{diagrams/course-D-final-20261023/design-seq-14.pdf}
+\includegraphics[width=38.2cm,height=51.2cm,keepaspectratio]{diagrams/chain-D-20261027/design-seq-14.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:design-seq-14}\small 图\thefigure：UC-14 办理费用更正与退费设计序列图
 \end{center}
 
@@ -3991,9 +4177,9 @@ UC-22、23、25分开医保核验预结算、正式结算撤销回款及处方�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=420mm,594mm}
 \subsubsection{核验医保身份并办理预结算业务协作}
-前台登记核验与收费人员稍后预结算分时办理。每次费用提交先固定原请求及所属明细，平台结果、失效和患者选择分别追加；身份核验阶段只保存已有身份与登记资料。费用或条件变化后重新说明确认，未知先查询原提交。\par
+前台登记核验与收费人员稍后预结算分时办理，各阶段核验就诊门店权限及本店医保启用条件。每次费用提交先固定原请求及所属明细，平台结果、失效和患者选择分别追加；身份核验阶段只保存已有身份与登记资料。费用或条件变化后重新说明确认，未知先查询原提交。\par
 \begin{center}
-\includegraphics[width=38.2cm,height=51.2cm,keepaspectratio]{diagrams/course-D-final-20261023/design-seq-22.pdf}
+\includegraphics[width=38.2cm,height=51.2cm,keepaspectratio]{diagrams/chain-D-20261027/design-seq-22.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:design-seq-22}\small 图\thefigure：UC-22 核验医保身份并办理预结算设计序列图
 \end{center}
 
@@ -4003,21 +4189,23 @@ UC-22、23、25分开医保核验预结算、正式结算撤销回款及处方�
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=210mm,297mm}
 \clearpage
-\setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
-\setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
-\makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
-\special{papersize=210mm,297mm}
 \newgeometry{margin=19mm}
-\setlength{\paperwidth}{420mm}\setlength{\paperheight}{297mm}
-\setlength{\textwidth}{382mm}\setlength{\textheight}{259mm}
+\setlength{\paperwidth}{297mm}\setlength{\paperheight}{420mm}
+\setlength{\textwidth}{259mm}\setlength{\textheight}{382mm}
 \setlength{\headwidth}{\textwidth}\setlength{\columnwidth}{\textwidth}\setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
-\special{papersize=420mm,297mm}
+\special{papersize=297mm,420mm}
 \subsubsection{基础管理服务职责精化}
-UC-26由基础管理应用服务协调人员、账号及资源实体。存取接口装配原记录、有效任职和排班影响，映射器在同一事务保存任职授予与审计；代码入口为Clinic，表沿用既有定义。项目分类仅组织目录查询，单价仍经UC-11独立确认，不改变历史费用。\par
+UC-26由基础管理应用服务协调人员、账号及资源实体。服务核对管理者获授权的门店或连锁范围，存取接口装配原记录、门店岗位授权、跨店查阅授权及排班影响；映射器共同保存授权变更与审计。项目分类仅组织目录查询，单价仍经UC-11独立确认，不改变历史费用。\par
 \begin{center}
-\includegraphics[width=38.1cm,height=20.5cm,keepaspectratio]{diagrams/reference-review-20261026/design-clinic.pdf}
+\includegraphics[width=25.9cm,height=12.5cm,keepaspectratio]{diagrams/chain-D-20261027/design-clinic.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:ref-design-clinic}\small 图\thefigure：基础管理服务与存取职责设计
+\end{center}
+\subsubsection{报价服务职责精化}
+UC-27报价应用服务核验当前门店及岗位权限，协调本店报价编制、核价出具、决定及新版建立；领域实体判断归属、快照、有效期间和确认范围。报价存取接口装配确切版本与原项目条件，SQLite映射器只负责持久化；出具及决定在本地共同保存，真实付款沿收款服务办理。\par
+\begin{center}
+\includegraphics[width=25.9cm,height=11cm,keepaspectratio]{diagrams/chain-D-20261027/design-quotes.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:design-quotes}\small 图\thefigure：报价应用服务、领域实体与数据存取设计
 \end{center}
 \clearpage
 \setlength{\paperwidth}{210mm}\setlength{\paperheight}{297mm}\restoregeometry
@@ -4033,9 +4221,9 @@ UC-26由基础管理应用服务协调人员、账号及资源实体。存取接
 \special{papersize=297mm,420mm}
 \subsection{精化表示层}
 \subsubsection{岗位导航}
-个人账号按获准的当前办理身份进入工作台。跨岗位工作通过待办及业务状态衔接，各岗位从自己的授权入口办理；同一页面按身份显示相应信息和可用动作。\par
+个人账号选择获授权门店和岗位后进入首页；切换门店重新核验权限并刷新门店数据，集中显示本人可办的今日安排、在诊异常、复诊及费用待办。接诊临床、收费医保和运营配置分组导航；待办由原业务查询汇总，不新造一套任务事实。跨岗位工作通过待办及业务状态衔接，各岗位从自己的授权入口办理；同一页面按身份显示相应信息和可用动作。\par
 \begin{center}
-\includegraphics[width=25.9cm,height=12.0cm,keepaspectratio]{diagrams/reference-review-20261026/screen-navigation.pdf}
+\includegraphics[width=25.9cm,height=12.0cm,keepaspectratio]{diagrams/chain-D-20261027/screen-navigation.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:screen-navigation}\small 图\thefigure：岗位导航与授权入口
 \end{center}
 \subsubsection{页面与岗位权限}
@@ -4046,15 +4234,16 @@ UC-26由基础管理应用服务协调人员、账号及资源实体。存取接
 \toprule
 岗位 & 授权入口及办理范围 \\ \midrule
 前台 & 患者资料、预约与到诊；复诊联系及成功预约关联；医保身份核验登记。 \\
-牙医 & 查阅诊疗、检查草稿、方案与患者决定、实际治疗、签署补充、原件确认；复诊要求与临床评估、处方开立交付、真实接诊结束。 \\
+牙医 & 患者工作区、检查草稿、方案及独立报价编制、医疗同意、实际治疗、签署补充、原件确认；复诊要求与临床评估、处方开立交付、真实接诊结束。 \\
 诊疗助理 & 原件上传、材料批次与采购验收、库存领退及实际用料、盘点提交；资源准备与实际清洁核查。 \\
-收费人员 & 费用及患者付款核实、费用申请和实际退款；医保预结算、正式结算及回款核对、经营原单核对。 \\
-诊所负责人 & 职员账号、核实岗位及诊椅基础管理；排班和受影响预约协调；价目、费用申请、采购、盘点审核确认；批次决定、故障恢复、医保撤销与差异依据。 \\
+收费人员 & 报价核价出具及费用决定、账单与患者付款核实、费用申请和实际退款；医保预结算、正式结算及回款核对、经营原单核对。 \\
+门店负责人 & 本店人员及诊椅、排班、价目、费用申请、采购和盘点等按授权办理。 \\
+连锁负责人 & 按授权管理门店及岗位，查看各店和连锁经营汇总。 \\
 药学岗位 & 条件满足后处理处方审核及意见、实际调配核发和用药交代；牙医更正原处方由相应牙医入口处理。 \\
 \bottomrule
 \end{tabular}\par}
 \smallskip
-服务端按用例及当前办理身份授权；兼岗保留本人和当时身份。按钮启用状态取服务端核对结果，负责人管理身份按对应权限处理，临床正文另按牙医权限控制。\par
+服务端按用例、当前门店及办理身份授权，切换门店后重新核验；兼岗保留本人和当时身份。按钮启用状态取服务端核对结果，负责人管理身份按对应权限处理，临床正文另按牙医权限控制。\par
 \subsubsection{共享组件与服务接口}
 采用HTML、CSS与JavaScript模块构成统一页面框架：岗位外壳组织页面模块，共享组件负责输入与展示，请求模块调用D2的用例应用服务。实体规则、金额及数量结果由服务端返回，页面保留可核对的患者或原单和真实状态。\par
 {\small\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.08}
@@ -4063,14 +4252,14 @@ UC-26由基础管理应用服务协调人员、账号及资源实体。存取接
 \noindent\begin{tabular}{@{}>{\raggedright\arraybackslash}p{4.1cm}>{\raggedright\arraybackslash}p{7.9cm}>{\raggedright\arraybackslash}p{13.45cm}@{}}
 \toprule
 共享组件 & 对应服务或接口 & 职责与业务反馈 \\ \midrule
-岗位框架 RoleShell & 当前身份与授权；五组业务入口 & 展示当前身份及获准导航；待办留原业务号。跨岗位审批分别从各自工作台处理。 \\
-患者摘要 PatientBanner & 接诊及临床资料查询（按岗位裁剪） & 显示患者编号及必要辨识资料；临床正文按授权读取，避免同名患者误选。 \\
+岗位框架 RoleShell & 当前身份与授权；五组业务入口 & 展示当前门店、身份及获准导航；切换门店重验权限，待办留原业务号。跨岗位审批分别从各自工作台处理。 \\
+患者摘要 PatientBanner & 接诊及临床资料查询（按岗位裁剪） & 显示患者编号及必要辨识资料；跨店临床正文仅经授权的牙医读取并标明来源，避免同名患者误选。 \\
 明细与历史 DetailTable & 临床、费用、经营及历史查询 & 按同一范围展示来源、单位、原版本及真实结果；可回查原项目和原单。 \\
-业务表单 BusinessForm & 26个用例的应用服务方法 & 收集规约关键字段和当前版本，统一必填及格式；缺项指明位置，保存失败保留可补正输入。 \\
+业务表单 BusinessForm & 27个用例的应用服务方法 & 收集规约关键字段和当前版本，统一必填及格式；缺项指明位置，保存失败保留可补正输入。 \\
 办理确认 ConfirmPanel & 签署、收退款、验收、资源恢复等办理方法 & 提交前列患者或原单、数量金额、依据及当前可办范围；后端重查版本，变化时先重核。 \\
 受控原件 FileViewer & 临床文件核对及受控文件存取 & 展示确切版本及核对状态；上传校验格式大小，替换保留原件，缺失或不可读如实提示。 \\
 结果与待办 ResultPanel & 原办理查询及对应历史 & 成功显示编号和真实阶段；未知显示待核实及原号查询入口，医保预估、受理和正式到账分别标明。 \\
-请求模块 ApiClient & D2控制入口与相应应用服务 & 统一请求、授权反馈及原办理号；重复查询原结果，列表刷新保留日期和筛选。外部等待单独显示。 \\
+请求模块 ApiClient & D2控制入口与相应应用服务 & 请求携带当前门店，服务端重验授权和原单归属；重复办理核对原结果，列表刷新保留日期和筛选。外部等待单独显示。 \\
 \bottomrule
 \end{tabular}\par}
 
@@ -4084,36 +4273,36 @@ UC-26由基础管理应用服务协调人员、账号及资源实体。存取接
 \noindent\textbf{患者与预约页面}\par
 对应UC-01、UC-02、UC-03；前台。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/course-D-final-20261023/screen-1.pdf}
+\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/chain-D-20261027/screen-1.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:screen-1}\small 图\thefigure：患者与预约页面结构
 \end{center}
-冲突或未就绪先协调；登记到诊只建立候诊，不自动开始接诊。\par
+日历与看板共用原预约和就诊，状态另列实际资源限制；登记到诊只建立候诊，不自动开始接诊。\par
 \smallskip
 \noindent\textbf{牙医接诊页面}\par
 对应UC-05、UC-06、UC-08、UC-09；牙医。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/course-D-final-20261023/screen-2.pdf}
+\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/chain-D-20261027/screen-2.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:screen-2}\small 图\thefigure：牙医接诊页面结构
 \end{center}
-已签署正文只读，补充另存；实际结束与签署分别办理。\par
+患者摘要固定，分区切换保留患者和所选就诊；牙位图与明细列表引用同一所见及执行。已签署正文只读，实际结束与签署分别办理。\par
 \smallskip
 \clearpage
 \subsubsection{岗位页面2}
-\noindent\textbf{方案与影像页面}\par
-对应UC-07、UC-10；牙医；助理上传原件。\par
+\noindent\textbf{方案、报价与影像页面}\par
+对应UC-07、UC-10、UC-27；牙医编制和说明，收费人员核价出具；助理上传原件。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/course-D-final-20261023/screen-3.pdf}
-\par\smallskip\refstepcounter{figure}\label{fig:screen-3}\small 图\thefigure：方案与影像页面结构
+\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/dentalpin-review-20261026/screen-3.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:screen-3}\small 图\thefigure：方案、报价与影像页面结构
 \end{center}
-只执行有效同意范围；替换留原件，牙医确认后作诊疗依据。\par
+方案、报价和原件分区，医疗同意及费用确认分别留据；仅有效医疗同意范围可执行，报价出具后变更另建新版。\par
 \smallskip
 \noindent\textbf{账单与收款页面}\par
-对应UC-11、UC-12、UC-13；收费人员；负责人确认价目。\par
+对应UC-11、UC-12、UC-13、UC-27；收费人员；负责人确认价目。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/course-D-final-20261023/screen-4.pdf}
+\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/chain-D-20261027/screen-4.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:screen-4}\small 图\thefigure：账单与收款页面结构
 \end{center}
-费用或医保未定时只列待核对；结果未知先查原笔。\par
+显示账单所属门店；收款在系统外完成，页面仅登记核实结果。费用或医保未定时只列待核对，结果未知先查原笔。\par
 \smallskip
 \clearpage
 \subsubsection{岗位页面3}
@@ -4123,12 +4312,12 @@ UC-26由基础管理应用服务协调人员、账号及资源实体。存取接
 \includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/course-D-final-20261023/screen-5.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:screen-5}\small 图\thefigure：费用更正与退费页面结构
 \end{center}
-审批、调整和实际退款分开；医保处理未明不确认最终差额。\par
+审批、调整和系统外实际退款分开；页面仅登记核实结果，医保处理未明不确认最终差额。\par
 \smallskip
 \noindent\textbf{复诊与随访页面}\par
 对应UC-15、UC-16、UC-17；牙医提出及评估；前台联系。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/course-D-final-20261023/screen-6.pdf}
+\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/dentalpin-review-20261026/screen-6.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:screen-6}\small 图\thefigure：复诊与随访页面结构
 \end{center}
 未联系上、未到或拒绝不自动完成；临床目的由牙医核实。\par
@@ -4156,10 +4345,10 @@ UC-26由基础管理应用服务协调人员、账号及资源实体。存取接
 \noindent\textbf{排班与经营页面}\par
 对应UC-04、UC-21；负责人维护排班；收费人员核对原单。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/course-D-final-20261023/screen-9.pdf}
+\includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/chain-D-20261027/screen-9.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:screen-9}\small 图\thefigure：排班与经营页面结构
 \end{center}
-安排变更先协调受影响预约；经营查询不改原账。\par
+排班维护与经营报表是独立入口，前者按当前门店办理并核对牙医跨店冲突，后者按授权范围查看本店或连锁汇总。午休、休假和停诊据实际日期安排核对；经营指标区分完成项目、净应收、患者净收与医保实际回款，可下钻原单。\par
 \smallskip
 \noindent\textbf{医保办理页面}\par
 对应UC-22、UC-23；前台核验；收费预结算及结算；负责人核实撤销。\par
@@ -4195,8 +4384,14 @@ UC-26由基础管理应用服务协调人员、账号及资源实体。存取接
 \subsubsection{基础管理页面}
 对应UC-26；诊所负责人。\par
 \begin{center}
-\includegraphics[width=16.2cm,height=12cm,keepaspectratio]{diagrams/reference-review-20261026/screen-clinic.pdf}
+\includegraphics[width=16.2cm,height=8.8cm,keepaspectratio]{diagrams/reference-review-20261026/screen-clinic.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:ref-screen-clinic}\small 图\thefigure：诊所基础管理页面结构
 \end{center}
 人员账号、任职授予及诊椅分区呈现；有影响的停用先协调，不删除原患者或接诊事实。分类及拟价仍从收费价目页面维护。\par
+\smallskip\noindent\textbf{岗位首页与原业务待办}\par
+\begin{center}
+\includegraphics[width=16.2cm,height=7.5cm,keepaspectratio]{diagrams/dentalpin-review-20261026/screen-home.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:screen-home}\small 图\thefigure：岗位首页与业务待办结构
+\end{center}
+按岗位显示原业务编号、真实状态和下一步；前台关注预约及复诊，牙医关注候诊及临床待办，收费关注待核价和原笔结果，助理及负责人关注资源、验收和审核。首页不直接改写业务记录。\par
 \end{document}

@@ -1,0 +1,38 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const {setupFollowups}=require('./helpers/v2-followups');
+const {installTrialSchema}=require('../src/v2/chain-schema-trial');
+const {ChainFollowupTrial}=require('../src/v2/chain-followup-trial');
+const {ChainGrantsTrial}=require('../src/v2/chain-grants-trial');
+test('跨店复诊须有来源病历授权及目标店实际接诊',t=>{
+ const a=setupFollowups(t),f=a.createFollowup();a.signSource();a.advance('2026-10-20T01:00:00Z');const booking=a.book();a.advance('2026-10-20T03:05:00Z');const visit=a.startFollowupVisit(booking.id),db=a.db;installTrialSchema(db);
+ db.exec("ALTER TABLE followup_requirement ADD COLUMN source_branch_id INTEGER REFERENCES clinic_branch(id); ALTER TABLE followup_requirement ADD COLUMN responsible_branch_id INTEGER REFERENCES clinic_branch(id); INSERT INTO clinic_chain(id,name) VALUES(1,'演示'); INSERT INTO clinic_branch(id,chain_id,branch_code,name) VALUES(1,1,'A','一店'),(2,1,'B','二店'); UPDATE visit SET branch_id=1; UPDATE followup_requirement SET source_branch_id=1,responsible_branch_id=2;");db.prepare('UPDATE visit SET branch_id=2 WHERE id=?').run(visit.id);
+ const doctor=a.auth.session(a.d.token).staff_id,manager=a.auth.session(a.m.token).staff_id,front=a.auth.session(a.f.token).staff_id,now=a.auth.now();const grant=db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(?,?,?,'2026-10-01T00:00:00Z',?,?,'演示授权')");for(const [b,s,r] of [[1,manager,'branch_manager'],[2,manager,'branch_manager'],[2,doctor,'dentist'],[2,front,'frontdesk']])grant.run(b,s,r,manager,now);
+ const service=new ChainFollowupTrial(a),req={action:'assess',branchId:2,followupId:f.id,expectedRevision:a.followup(f.id).revision,method:'到诊检查',visitId:visit.id,advice:'完成',assessmentCompleted:true,assessedAt:now,result:'复诊评估',requestKey:'cross-assess',commandVersion:1};assert.throws(()=>service.command(a.d,req),/授权/);
+ new ChainGrantsTrial(a).command(a.m,{action:'grant',sourceBranchId:1,targetBranchId:2,dentistId:doctor,patientId:1,visitId:a.v.id,scope:'record',validUntil:'2026-10-21T00:00:00Z',reason:'患者同意',requestKey:'cross-followup-grant',commandVersion:1});
+ assert.ok(service.list(a.d,2).items.some(x=>x.id===f.id));assert.throws(()=>service.command(a.d,{...req,method:'远程沟通',visitId:null,requestKey:'cross-remote'}),/实际接诊/);const result=service.command(a.d,req);assert.equal(db.prepare('SELECT visit_id FROM clinical_assessment WHERE id=?').get(result.id).visit_id,visit.id);assert.equal(a.followup(f.id).status,'已完成');
+});
+test('牙医可对本店实际复诊接诊评估并完成，拒绝原就诊及远程关联到诊',t=>{
+ const a=setupFollowups(t);a.enableSecondFrontdesk();const f=a.createFollowup();a.signSource();a.advance('2026-10-20T01:00:00Z');const booking=a.book();a.advance('2026-10-20T03:05:00Z');const visit=a.startFollowupVisit(booking.id),db=a.db;
+ installTrialSchema(db);db.exec("ALTER TABLE followup_requirement ADD COLUMN source_branch_id INTEGER REFERENCES clinic_branch(id); ALTER TABLE followup_requirement ADD COLUMN responsible_branch_id INTEGER REFERENCES clinic_branch(id); INSERT INTO clinic_chain(id,name) VALUES(1,'演示'); INSERT INTO clinic_branch(id,chain_id,branch_code,name) VALUES(1,1,'A','一店'); UPDATE visit SET branch_id=1; UPDATE followup_requirement SET source_branch_id=1,responsible_branch_id=1;");
+ const dentist=a.auth.session(a.d.token).staff_id,manager=a.auth.session(a.m.token).staff_id,now=a.auth.now();db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(1,?,'dentist','2026-10-01T00:00:00Z',?,?,'演示授权')").run(dentist,manager,now);
+ const front=a.auth.session(a.f.token).staff_id;db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(1,?,'frontdesk','2026-10-01T00:00:00Z',?,?,'演示授权')").run(front,manager,now);
+ const nextFront=a.auth.session(a.frontdesk2.token).staff_id;db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(1,?,'frontdesk','2026-10-01T00:00:00Z',?,?,'演示授权')").run(nextFront,manager,now);
+ const service=new ChainFollowupTrial(a),req={action:'assess',branchId:1,followupId:f.id,expectedRevision:a.followup(f.id).revision,method:'到诊检查',advice:'完成',assessmentCompleted:true,assessedAt:now,result:'虚构复诊评估',requestKey:'visit-assessment',commandVersion:1};
+ assert.throws(()=>service.command(a.d,{...req,visitId:a.v.id}),/实际开展/);
+ assert.throws(()=>service.command(a.d,{...req,method:'远程沟通',visitId:visit.id}),/不能关联/);
+ assert.throws(()=>service.command(a.d,{...req,visitId:visit.id,assessmentCompleted:false}),/确认/);
+ assert.throws(()=>service.command(a.f,{...req,visitId:visit.id}),/无权|权限|岗位/);
+ const listed=service.list(a.d,1);assert.ok(listed.visits.some(x=>x.id===visit.id));
+ db.exec("CREATE TEMP TRIGGER followup_visit_audit_fail BEFORE INSERT ON operation_audit WHEN NEW.object_kind='clinical_assessment' BEGIN SELECT RAISE(ABORT,'assessment audit failed'); END");
+ assert.throws(()=>service.command(a.d,{...req,visitId:visit.id}),/assessment audit failed/);assert.notEqual(a.followup(f.id).status,'已完成');assert.equal(db.prepare('SELECT count(*) n FROM clinical_assessment WHERE followup_requirement_id=?').get(f.id).n,0);db.exec('DROP TRIGGER followup_visit_audit_fail');
+ const follow={...req,visitId:visit.id,advice:'继续跟进',nextDate:'2026-10-21',requestKey:'continue-followup'};
+ assert.throws(()=>service.command(a.d,{...follow,nextDate:'2026-10-19'}),/不能早于/);
+ db.prepare("UPDATE branch_staff_role SET revoked_at=?,revoked_by=? WHERE branch_id=1 AND staff_id=? AND role_code='frontdesk'").run(now,manager,front);
+ assert.throws(()=>service.command(a.d,follow),/未获本店授权/);
+ service.command(a.d,{...follow,responsibleFrontdeskId:nextFront});assert.equal(a.followup(f.id).status,'待联系');assert.equal(a.followup(f.id).next_contact_date,'2026-10-21');assert.equal(a.followup(f.id).responsible_frontdesk_id,nextFront);req.expectedRevision=a.followup(f.id).revision;
+ const done=service.command(a.d,{...req,visitId:visit.id});assert.equal(a.followup(f.id).status,'已完成');assert.equal(db.prepare('SELECT visit_id FROM clinical_assessment WHERE id=?').get(done.id).visit_id,visit.id);assert.equal(service.command(a.d,{...req,visitId:visit.id}).replayed,true);
+ const clinical=service.list(a.d,1).items.find(x=>x.id===f.id);assert.equal(clinical.assessments.length,2);assert.equal(clinical.assessments[0].advice,'继续跟进');assert.equal(clinical.assessments[1].visit_id,visit.id);
+ db.exec('ALTER TABLE appointment ADD COLUMN branch_id INTEGER REFERENCES clinic_branch(id); UPDATE appointment SET branch_id=1');
+ const reception=service.list(a.frontdesk2,1).items.find(x=>x.id===f.id);assert.equal(reception.status,'已完成');assert.equal(Object.hasOwn(reception,'assessments'),false);assert.doesNotMatch(JSON.stringify(reception),/虚构复诊评估/);
+});

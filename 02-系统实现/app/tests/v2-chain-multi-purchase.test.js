@@ -1,0 +1,16 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const {createChainDemo}=require('../src/v2/chain-demo-server');
+test('多材料采购单可审核并按项目到货',async t=>{
+ const demo=createChainDemo();await new Promise(r=>demo.server.listen(0,'127.0.0.1',r));t.after(async()=>{await new Promise(r=>demo.server.close(r));demo.db.close();});const base='http://127.0.0.1:'+demo.server.address().port;
+ async function login(user){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:user,password:'Clinic123!'})});const d=await r.json();return {'content-type':'application/json',cookie:r.headers.get('set-cookie').split(';')[0],'x-csrf-token':d.csrf,'x-clinic-role':user};}
+ const a=await login('assistant'),m=await login('manager');async function post(path,body,headers){const r=await fetch(base+path,{method:'POST',headers,body:JSON.stringify(body)});assert.equal(r.status,200,await r.clone().text());return r.json();}const baseCommand={branchId:1,commandVersion:1};
+ const created=await post('/api/catalog',{...baseCommand,action:'material',name:'虚构口罩',specification:'演示',baseUnit:'个',purchaseUnit:'个',conversionNumerator:1,conversionDenominator:1,quantityScale:0,requiresTrace:false,requiresExpiry:false,isDrug:false,reason:'演示',requestKey:'multi-material'},a);
+ await post('/api/catalog',{...baseCommand,action:'confirmMaterial',materialId:created.id,expectedRevision:1,reason:'演示',requestKey:'multi-material-confirm'},m);
+ let data=await (await fetch(base+'/api/purchases?branchId=1',{headers:a})).json();const materials=[data.materials.find(x=>x.id!==created.id),data.materials.find(x=>x.id===created.id)],supplier=data.suppliers[0];
+ const order=await post('/api/purchases',{...baseCommand,action:'create',supplierId:supplier.id,expectedSupplierRevision:supplier.revision,items:materials.map(x=>({materialId:x.id,expectedMaterialRevision:x.revision,quantityScaled:10,unitPriceCents:100})),agreedAt:'2026-10-19T01:35:00Z',deliveryTerms:'演示到货',reason:'日常采购',requestKey:'multi-order'},a);
+ await post('/api/purchases',{...baseCommand,action:'approve',purchaseId:order.id,expectedRevision:1,expectedSupplierRevision:supplier.revision,reviewNote:'确认',requestKey:'multi-approve'},m);
+ data=await (await fetch(base+'/api/purchases?branchId=1',{headers:a})).json();const result=data.orders.find(x=>x.id===order.id);assert.equal(result.items.length,2);assert.equal(result.status,'已确认');assert.deepEqual(result.items.map(x=>x.material_id),materials.map(x=>x.id));
+ const item=result.items[0],batch=data.batches.find(x=>x.material_id===item.material_id);await post('/api/purchases',{...baseCommand,action:'receive',purchaseId:result.id,expectedPurchaseRevision:result.revision,purchaseItemId:item.id,expectedItemRevision:item.revision,batchId:batch.id,locationId:data.locations[0].id,quantityScaled:10,acceptedScaled:10,rejectedScaled:0,pendingScaled:0,arrivedAt:'2026-10-19T01:35:00Z',deliveryEvidence:'多材料送货单',inspectionNote:'验收合格',requestKey:'multi-receive'},a);
+ data=await (await fetch(base+'/api/purchases?branchId=1',{headers:a})).json();const updated=data.orders.find(x=>x.id===order.id);assert.equal(updated.receipts[0].items[0].purchase_order_item_id,item.id);assert.equal(updated.items.length,2);
+});

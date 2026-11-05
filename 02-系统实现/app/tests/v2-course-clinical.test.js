@@ -41,6 +41,11 @@ test('UC-09 repeated signature with a new submission returns original result wit
  const again=a.clinical.sign(a.d,command({action:'sign',recordId:before.id,expectedRevision:before.signed_revision,confirmed:true}));
  assert.equal(again.id,first.id);assert.equal(again.code,'ALREADY_SIGNED');assert.deepEqual(record(a),before);
 });
+test('a separate treatment plan can be drafted after signing while care is still active without altering the signed record',t=>{
+ const a=setup(t);health(a);save(a);sign(a);const before=record(a),v=a.draft();
+ assert.equal(a.db.prepare('SELECT status FROM visit WHERE id=?').get(a.v.id).status,'接诊中');assert.ok(v.id);
+ assert.deepEqual(record(a),before);assert.equal(a.clinical.detail(a.d,a.context).signedIntegrity,true);assert.equal(a.bills().total,0);
+});
 test('UC-07 requires explicit quantity or explicit whole-item scope, rejects missing and contradictory choices atomically',t=>{
  const a=setup(t),v=a.draft();a.publish(v.id);const i=a.info().plans[0].versions[0].items[0];
  for(const extra of [{itemIds:[i.id]},{itemIds:[i.id],itemScopes:[{itemId:i.id,quantity:0}]},{itemIds:[i.id],itemScopes:[{itemId:i.id,quantity:4}]},{itemIds:[i.id],itemScopes:[{itemId:i.id,wholeItem:true,quantity:1}]}])

@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "患者" as P
+actor "原门店牙医" as D1
+actor "原门店前台" as F1
+actor "复诊门店前台" as F2
+actor "复诊门店牙医" as D2
+entity "连锁诊所管理系统" as S
+D1 -> S : 提出复诊目的、来源及日期
+F1 -> S : 查待联系事项及患者身份
+F1 -> P : 联系并核对复诊意向
+P --> F1 : 告知意向及目标门店
+alt 患者选择另一门店复诊
+ F1 -> S : 登记意向并交接复诊门店
+ F2 -> S : 选择复诊门店并核对可用安排
+ S -> S : 核对本店资源及牙医跨店冲突
+ S --> F2 : 返回可协调的时段
+ F2 -> P : 说明安排并确认意向
+ P --> F2 : 确认预约
+ F2 -> S : 记录复诊门店、预约与关联来源
+else 未联系上或暂缓
+ F1 -> S : 保存实际联系结果及后续日期
+end
+opt 患者实际到达复诊门店
+D2 -> S : 请求查阅跨店诊疗资料
+S -> S : 核对牙医、患者、就诊与授权范围
+alt 已获授权
+ S --> D2 : 返回获准查看的必要资料
+ D2 -> P : 按实际情况复查或随访
+ P --> D2 : 反馈恢复情况
+ D2 -> S : 记录复诊门店评估及后续意见
+else 未获授权
+ S --> D2 : 拒绝提供原病历正文
+end
+end
+@enduml

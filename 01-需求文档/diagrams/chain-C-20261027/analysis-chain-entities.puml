@@ -1,0 +1,65 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam classAttributeIconSize 0
+skinparam ClassBackgroundColor white
+skinparam ArrowColor black
+skinparam linetype polyline
+skinparam nodesep 60
+skinparam ranksep 130
+left to right direction
+hide circle
+class "连锁诊所" as Chain <<entity>> {
+ 连锁编号及名称
+}
+class "门店" as Branch <<entity>> {
+ 门店编号、名称及状态
+ 医保及院内药学启用条件
+ --
+ +核对门店条件()
+}
+class "职员" as Staff <<entity>> {
+ 职员编号与姓名
+ 在岗期间
+}
+class "门店岗位授权" as RoleGrant <<entity>> {
+ 岗位、有效期间与撤销依据
+ --
+ +核对门店岗位权限()
+ +授予或撤销()
+}
+class "患者" as Patient <<entity>> {
+ 连锁统一患者编号
+ 基本身份与联系资料
+}
+class "就诊" as Visit <<entity>> {
+ 就诊编号、到诊及接诊时间
+ --
+ +核对患者与发生门店()
+}
+class "跨店病历查阅授权" as AccessGrant <<entity>> {
+ 患者编号、资料范围及有效期间
+ 授权及撤销依据
+ --
+ +核对牙医、患者及原就诊()
+ +核对授权范围()
+ +登记或撤销授权及依据()
+}
+Chain "1" -- "1..*" Branch
+Staff "1" -- "0..*" RoleGrant
+Branch "1" -- "0..*" RoleGrant
+Branch "1" -- "0..*" Visit
+Patient "1" -- "0..*" Visit
+Staff "1" -- "0..*" AccessGrant : 被授权牙医
+' 患者由原就诊关联并核验一致
+Visit "1" -- "0..*" AccessGrant : 原就诊
+note bottom of AccessGrant
+跨店资料仅在授权范围内查阅；
+授权不等于签署或修改权限。
+end note
+@enduml
+
+
+

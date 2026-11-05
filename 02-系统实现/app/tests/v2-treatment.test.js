@@ -78,6 +78,19 @@ test('correction chains count only leaves, never branch or overwrite original ch
   a.execute(s.id, { planItemId: itemId, toothCode: '46', surfaceCode: 'O', quantity: 2 });
   assert.equal(a.info().plans[0].versions[0].items[0].effectiveQuantity, 3);
 });
+test('corrected actual time must remain within consent at that time and must not overwrite the original bill',t=>{
+  const a=setup(t),v=a.draft();a.publish(v.id);
+  a.setClock('2026-10-19T01:36:00Z');a.decide(v.id);
+  const item=a.info().plans[0].versions[0].items[0],s=a.service();a.price(s.id);
+  a.setClock('2026-10-19T01:37:00Z');const original=a.execute(s.id,{planItemId:item.id,toothCode:'46',surfaceCode:'O'});const bill=a.bills();
+  a.setClock('2026-10-19T01:38:00Z');a.decide(v.id,3,{decision:'撤回'});
+  a.setClock('2026-10-19T01:39:00Z');
+  rejects(()=>a.execute(s.id,{planItemId:item.id,originalExecutionId:original.id,toothCode:'46',surfaceCode:'O',completedAt:'2026-10-19T01:35:30Z',reason:'更正时间'}),'CORRECTION_CONSENT_TIME');
+  rejects(()=>a.execute(s.id,{planItemId:item.id,originalExecutionId:original.id,toothCode:'46',surfaceCode:'O',completedAt:'2026-10-19T01:38:30Z',reason:'更正时间'}),'CORRECTION_CONSENT_TIME');
+  assert.equal(a.db.prepare('SELECT count(*) n FROM treatment_execution').get().n,1);assert.deepEqual(a.bills().totals,bill.totals);
+  const corrected=a.execute(s.id,{planItemId:item.id,originalExecutionId:original.id,toothCode:'46',surfaceCode:'O',completedAt:'2026-10-19T01:36:30Z',reason:'更正时间'});
+  assert.equal(corrected.code,'EXECUTION_CORRECTED_FEE_REVIEW');assert.equal(a.db.prepare('SELECT count(*) n FROM treatment_execution').get().n,2);assert.deepEqual(a.bills().totals,bill.totals);
+});
 test('independent check needs a real stated basis; quantity and tooth scope cannot be spoofed', t => {
   const a = setup(t), s = a.service();
   rejects(() => a.execute(s.id), 'INDEPENDENT_BASIS_REQUIRED');
@@ -86,6 +99,13 @@ test('independent check needs a real stated basis; quantity and tooth scope cann
   const v = consented(a);
   rejects(() => a.execute(s.id, { planItemId: v.items[0].id, toothCode: '47', surfaceCode: 'O' }), 'EXECUTION_SCOPE');
   assert.equal(a.db.prepare('SELECT count(*) n FROM treatment_execution').get().n, 1);
+});
+test('a disabled service cannot be newly performed but its historical execution can be corrected without overwriting the bill', t => {
+  const a=setup(t),s=a.service();a.price(s.id);const execution=a.execute(s.id,{independentCheck:true,independentBasis:'虚构当次检查依据'});
+  const before=a.bills().totals.receivableCents;a.billing.manageService(a.m,command({action:'stop',serviceId:s.id,expectedRevision:1,reason:'隔离演示停止新计费'}));
+  rejects(()=>a.execute(s.id,{independentCheck:true,independentBasis:'新执行不得使用停用项目'}),'SERVICE_DISABLED');
+  const correction=a.execute(s.id,{originalExecutionId:execution.id,reason:'补正原检查记录'});const row=a.db.prepare('SELECT * FROM treatment_execution WHERE id=?').get(correction.id);
+  assert.equal(row.original_execution_id,execution.id);assert.equal(row.service_id,s.id);assert.equal(a.bills().totals.receivableCents,before);assert.equal(a.db.prepare('SELECT count(*) n FROM bill_item').get().n,1);
 });
 test('cross-role, cross-patient and unassigned-clinician access is denied', t => {
   const a = setup(t);

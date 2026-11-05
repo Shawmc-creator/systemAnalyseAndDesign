@@ -1,6 +1,7 @@
 'use strict';
 const { fail, text, id, instant, dateOnly, day, utc, insert, fact, row, revision, recordNo } = require('./common');
 const MAX = BigInt(Number.MAX_SAFE_INTEGER);
+const {assessExecution}=require('./quote-rules');
 function safe(value) {
   if (value > MAX || value < -MAX) fail(422, 'MONEY_RANGE', '汇总金额超出安全整数分范围，请缩小业务范围并核对原单');
   return Number(value);
@@ -13,8 +14,8 @@ class Billing {
     if (!Number.isSafeInteger(value) || value < (zero ? 0 : 1)) fail(422, 'INVALID_MONEY', '金额必须是安全范围内的整数分');
     return value;
   }
-  fromExecution(execution, visit, ctx, now) {
-    return this.fromFact({patientId:visit.patient_id,at:execution.completed_at,serviceId:execution.service_id,quantity:execution.completed_quantity,quantityScale:0,executionId:execution.id},ctx,now);
+  fromExecution(execution, visit, ctx, now,quoteItemId=null) {
+    return this.fromFact({patientId:visit.patient_id,at:execution.completed_at,serviceId:execution.service_id,quantity:execution.completed_quantity,quantityScale:0,executionId:execution.id,planItemId:execution.plan_item_id,toothCode:execution.tooth_code,surfaceCode:execution.surface_code,quoteItemId},ctx,now);
   }
   fromDispense(d,item,p,ctx,now){return this.fromFact({patientId:p.patient_id,at:d.dispensed_at,serviceId:item.billing_service_id,quantity:d.quantity_scaled,quantityScale:item.quantity_scale,dispenseId:d.id},ctx,now);}
   fromFact(source,ctx,now){
@@ -26,19 +27,21 @@ class Billing {
     if (!bill) bill = row(this.db, 'bill', insert(this.db, 'bill', fact(now, { patient_id: visit.patient_id, patient_funds_id: funds.id, formed_at: now,
       period_start: start, period_end: end, created_by: ctx.session.staff_id, record_no: recordNo('BILL') })));
     else this.db.prepare('UPDATE bill SET updated_at=?,revision=revision+1 WHERE id=?').run(now, bill.id);
-    const price = this.db.prepare(`SELECT * FROM service_price WHERE service_id=? AND status='已确认可适用'
+    let price = this.db.prepare(`SELECT * FROM service_price WHERE service_id=? AND status='已确认可适用'
       AND valid_from<=? AND (valid_until IS NULL OR valid_until>?) ORDER BY valid_from DESC LIMIT 1`).get(execution.service_id, execution.completed_at, execution.completed_at);
+    const quoted=source.executionId?assessExecution(this.db,source,price,now):{quoteItemId:null,hold:null};
+    if(quoted.hold)price=null;
     if (price) safe(BigInt(price.unit_price_cents) * BigInt(execution.completed_quantity));
     const key = insert(this.db, 'bill_item', fact(now, { bill_id: bill.id, treatment_execution_id: execution.id, dispense_record_id:source.dispenseId||null,service_price_id: price?.id || null,
       quantity: execution.completed_quantity,quantity_scale:source.quantityScale, unit_price_cents: price?.unit_price_cents ?? null, priced_at: execution.completed_at,
-      pricing_note: price ? '按实际执行发生时点引用已确认价目；依据：' + price.change_reason : '执行事实已保存；缺少适用的已确认价目，待负责人核价',
+      quote_item_id:quoted.quoteItemId,pricing_note: quoted.hold ? '执行事实已保存；待核对报价：'+quoted.hold : price ? '按实际执行发生时点引用已确认价目；依据：' + price.change_reason : '执行事实已保存；缺少适用的已确认价目，待负责人核价',
       pricing_status: price ? '已核价' : '待核价', priced_by: price ? ctx.session.staff_id : null }));
     ctx.authority.billItemId = key; ctx.authority.priceId = price?.id || null;
     // Include every priced line and signed adjustment, using integer arithmetic before returning a receipt.
     this.billSummary(bill.id);
     return key;
   }
-  draft(credentials, input) {
+  draft(credentials, input, {scopeGuard=null}={}) {
     return this.unit.command(credentials, 'uc05.draft', input, (ctx, now) => {
       if(input.action==='reference'){
         const example=require('../../config/reference-services.example.json').items.find(i=>i.id===input.referenceId);if(!example)fail(422,'REFERENCE_SERVICE','请选择参考项目');
@@ -77,7 +80,7 @@ class Billing {
       this.db.prepare("UPDATE service_price SET status='待负责人确认',review_note=NULL,confirmed_at=NULL,confirmed_by=NULL,updated_at=?,revision=revision+1 WHERE id=?").run(now, price.id);
       this.unit.financialHistory.append('service_price',price.id,'提交',price.change_reason,ctx,input,now);
       return { kind: 'service_price', key: price.id, beforeRevision: price.revision, revision: price.revision + 1 };
-    });
+    },scopeGuard);
   }
   approve(credentials, input) {
     return this.unit.command(credentials, 'uc05.approve', input, (ctx, now) => {
@@ -105,13 +108,15 @@ class Billing {
     const source=this.lines(item.bill_id).find(i=>i.id===item.id),execution={service_id:source.service_id}, price = row(this.db, 'service_price', input.priceId);
     if (price.status !== '已确认可适用' || price.service_id !== execution.service_id || price.valid_from > item.priced_at || (price.valid_until && price.valid_until <= item.priced_at)) fail(409, 'PRICE_NOT_APPLICABLE', '请选择覆盖原执行发生时点的已确认价目');
     safe(BigInt(price.unit_price_cents) * BigInt(item.quantity));
-    this.db.prepare("UPDATE bill_item SET service_price_id=?,unit_price_cents=?,pricing_note=?,pricing_status='已核价',priced_by=?,updated_at=?,revision=revision+1 WHERE id=?").run(
-      price.id, price.unit_price_cents, text(input.reviewNote, '核价意见', 2000) + '\n价目依据：' + price.change_reason, ctx.session.staff_id, now, item.id);
+    let quoteItemId=item.quote_item_id;
+    if(item.treatment_execution_id){const e=row(this.db,'treatment_execution',item.treatment_execution_id),v=row(this.db,'visit',e.visit_id),quoted=assessExecution(this.db,{patientId:v.patient_id,at:e.completed_at,serviceId:e.service_id,quantity:e.completed_quantity,executionId:e.id,planItemId:e.plan_item_id,toothCode:e.tooth_code,surfaceCode:e.surface_code,quoteItemId:input.quoteItemId??item.quote_item_id},price,now,{forPricing:true});if(quoted.hold)fail(409,'QUOTE_PRICE_REVIEW',quoted.hold);quoteItemId=quoted.quoteItemId;}
+    this.db.prepare("UPDATE bill_item SET service_price_id=?,unit_price_cents=?,quote_item_id=?,pricing_note=?,pricing_status='已核价',priced_by=?,updated_at=?,revision=revision+1 WHERE id=?").run(
+      price.id, price.unit_price_cents, quoteItemId,text(input.reviewNote, '核价意见', 2000) + '\n价目依据：' + price.change_reason, ctx.session.staff_id, now, item.id);
     this.db.prepare('UPDATE bill SET updated_at=?,revision=revision+1 WHERE id=?').run(now, item.bill_id);
     this.billSummary(item.bill_id);
     return { kind: 'bill_item', key: item.id, beforeRevision: item.revision, revision: item.revision + 1, reason: '按原实际发生时点确认待核价项目' };
   }
-  manageService(credentials,input){return this.unit.command(credentials,'uc05.approve',input,(ctx,now)=>{
+  manageService(credentials,input,{scopeGuard=null}={}){return this.unit.command(credentials,'uc05.approve',input,(ctx,now)=>{
     const service=row(this.db,'service',input.serviceId);revision(service,input.expectedRevision);const reason=text(input.reason,'项目启停或资料修订依据',2000);
     if(input.action==='edit'){
       const name=text(input.name,'项目名称',100),unit=text(input.billingUnit,'计价单位',50),category=input.category||service.category;if(!SERVICE_CATEGORIES.includes(category))fail(422,'SERVICE_CATEGORY','项目分类无效');
@@ -123,11 +128,16 @@ class Billing {
       this.db.prepare('UPDATE service SET is_active=?,updated_at=?,revision=revision+1 WHERE id=?').run(active,now,service.id);
     }else fail(422,'INVALID_ACTION','项目操作无效');
     return {kind:'service',key:service.id,beforeRevision:service.revision,revision:service.revision+1,reason};
-  });}
-  catalog(credentials) {
+  },scopeGuard);}
+  quotePricingOptions(item){
+    if(!item.treatment_execution_id)return [];
+    const e=row(this.db,'treatment_execution',item.treatment_execution_id),v=row(this.db,'visit',e.visit_id);
+    return this.db.prepare(`SELECT i.id,i.unit_price_cents,i.quantity,i.scope_note,q.record_no,v.version_no,v.status FROM quote_item i JOIN quote_version v ON v.id=i.quote_version_id JOIN treatment_quote q ON q.id=v.quote_id WHERE q.patient_id=? AND i.service_id=? AND i.plan_item_id IS ? AND i.tooth_code IS ? AND i.surface_code IS ? AND v.issued_at IS NOT NULL AND v.id=(SELECT n.id FROM quote_version n WHERE n.quote_id=q.id AND n.issued_at IS NOT NULL ORDER BY n.version_no DESC LIMIT 1) ORDER BY q.id DESC`).all(v.patient_id,e.service_id,e.plan_item_id,e.tooth_code,e.surface_code);
+  }
+  catalog(credentials,input={}) {
     const permission = credentials.role === 'dentist' ? 'uc04.execute' : credentials.role === 'manager' ? 'uc05.approve' : 'uc05.draft';
-    return this.unit.query(credentials, permission, () => ({ categories:SERVICE_CATEGORIES,services: this.db.prepare('SELECT * FROM service ORDER BY id').all(), prices: this.db.prepare('SELECT * FROM service_price ORDER BY service_id,valid_from,id').all().map(p=>({...p,...(credentials.role==='dentist'?{}:{history:this.unit.financialHistory.list('service_price',p.id),historyCoverage:'历史仅展示实际记录的提交及审核；未记录的早期内容不作推断。'})})),
-      ...(credentials.role==='manager'?{pendingItems:this.lines().filter(i=>i.pricing_status==='待核价').slice(0,100)}: {}) }));
+    return this.unit.query(credentials, permission, () => ({ categories:SERVICE_CATEGORIES,services: this.db.prepare('SELECT * FROM service ORDER BY id').all(), prices: this.db.prepare('SELECT * FROM service_price ORDER BY service_id,valid_from,id').all().filter(p=>input.priceId==null||p.id===id(Number(input.priceId))).map(p=>({...p,...(credentials.role==='dentist'?{}:{history:this.unit.financialHistory.list('service_price',p.id),historyCoverage:'历史仅展示实际记录的提交及审核；未记录的早期内容不作推断。'})})),
+      ...(credentials.role==='manager'?{pendingItems:this.lines().filter(i=>i.pricing_status==='待核价'&&(input.billItemId==null||i.id===id(Number(input.billItemId)))).slice(0,100).map(i=>({...i,quoteOptions:this.quotePricingOptions(i)}))}: {}) }));
   }
   lines(billId=null){return this.db.prepare(`SELECT i.*,coalesce(e.service_id,pi.billing_service_id) service_id,
     CASE WHEN d.id IS NOT NULL THEN pi.drug_name ELSE s.name END service_name,coalesce(pi.unit,s.billing_unit) billing_unit,
@@ -144,9 +154,11 @@ class Billing {
     const allocated = sum(this.db.prepare('SELECT amount_cents FROM payment_allocation WHERE bill_id=?').all(billId), 'amount_cents');
     const offset = sum(this.db.prepare('SELECT amount_cents FROM prepayment_offset WHERE bill_id=?').all(billId), 'amount_cents');
     const insuranceCents=require('./settlement-rules').insuranceShare(this.db,billId);
+    const insurancePending=!!this.db.prepare("SELECT id FROM insurance_case WHERE bill_id=? AND status<>'已撤销' AND status<>'已结算' AND patient_choice<>'自费'").get(billId);
+    const insuranceReversalPending=!!this.db.prepare("SELECT r.id FROM insurance_reversal r JOIN insurance_settlement s ON s.id=r.settlement_id JOIN insurance_case c ON c.id=s.insurance_case_id WHERE c.bill_id=? AND r.status IN ('待办理','待核实')").get(billId);
     const pending = items.length - priced.length, unpaid = charges + adjustments - allocated - offset-BigInt(insuranceCents);
     return { pricedCents: safe(charges), adjustmentCents: safe(adjustments), receivableCents: safe(charges + adjustments), allocatedCents: safe(allocated),
-      offsetCents: safe(offset), insuranceCents,patientDueCents:safe(charges+adjustments-BigInt(insuranceCents)),unpaidCents: safe(unpaid), pendingPricingCount: pending, settled: items.length > 0 && pending === 0 && unpaid === 0n };
+      offsetCents: safe(offset), insuranceCents,insurancePending,insuranceReversalPending,patientDueCents:safe(charges+adjustments-BigInt(insuranceCents)),unpaidCents: safe(unpaid), pendingPricingCount: pending, settled: items.length > 0 && pending === 0 && unpaid === 0n };
   }
   fundsSummary(patientId) {
     const funds = this.db.prepare('SELECT * FROM patient_funds WHERE patient_id=?').get(patientId);
@@ -200,7 +212,7 @@ class Billing {
       const total = field => safe(bills.reduce((n, b) => n + BigInt(b.summary[field]), 0n));
       return { patient: { id: patient.id, recordNo: patient.record_no, name: patient.name }, computedAt: this.unit.auth.now(), total: bills.length, page, pageSize: size, items,
         totals: { receivableCents: total('receivableCents'), allocatedCents: total('allocatedCents'), offsetCents: total('offsetCents'), unpaidCents: total('unpaidCents'), pendingPricingCount: bills.reduce((n, b) => n + b.summary.pendingPricingCount, 0) },
-        funds: this.fundsSummary(patient.id),paymentOrders:this.db.prepare('SELECT o.*,f.patient_id,p.name patient_name FROM payment_order o JOIN patient_funds f ON f.id=o.patient_funds_id JOIN patient p ON p.id=f.patient_id WHERE f.patient_id=? ORDER BY o.id DESC LIMIT 100').all(patient.id) };
+        funds: this.fundsSummary(patient.id),paymentOrders:this.db.prepare('SELECT o.*,f.patient_id,p.name patient_name FROM payment_order o JOIN patient_funds f ON f.id=o.patient_funds_id JOIN patient p ON p.id=f.patient_id WHERE f.patient_id=? AND (? IS NULL OR o.id=?) ORDER BY o.id DESC LIMIT 100').all(patient.id,input.orderId==null?null:id(Number(input.orderId)),input.orderId==null?null:id(Number(input.orderId))) };
     });
   }
 }

@@ -1,0 +1,103 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 35
+hide circle
+skinparam linetype ortho
+left to right direction
+entity "治疗报价单\ntreatment_quote" as treatment_quote {
+ * id : INTEGER <<PK>>
+* branch_id : INTEGER <<FK>>
+ patient_id : INTEGER <<FK>>
+ treatment_plan_id : INTEGER <<FK>>
+ record_no : TEXT
+ created_by : INTEGER <<FK>>
+}
+entity "报价版本\nquote_version" as quote_version {
+ * id : INTEGER <<PK>>
+ quote_id : INTEGER <<FK>>
+ source_plan_version_id : INTEGER <<FK>>
+ version_no : INTEGER
+ previous_version_id : INTEGER <<FK>>
+ valid_from : TEXT
+ valid_until : TEXT
+ status : TEXT
+ issued_at : TEXT
+ issued_by : INTEGER <<FK>>
+ change_reason : TEXT
+ created_by : INTEGER <<FK>>
+}
+entity "报价明细\nquote_item" as quote_item {
+ * id : INTEGER <<PK>>
+ quote_version_id : INTEGER <<FK>>
+ plan_item_id : INTEGER <<FK>>
+ service_id : INTEGER <<FK>>
+ service_price_id : INTEGER <<FK>>
+ description_snapshot : TEXT
+ tooth_code : TEXT
+ surface_code : TEXT
+ quantity : INTEGER
+ billing_unit_snapshot : TEXT
+ unit_price_cents : INTEGER
+ amount_cents : INTEGER
+ scope_note : TEXT
+ sequence_no : INTEGER
+}
+entity "报价确认\nquote_decision" as quote_decision {
+ * id : INTEGER <<PK>>
+ quote_item_id : INTEGER <<FK>>
+ decision_type : TEXT
+ decided_at : TEXT
+ confirmation_basis : TEXT
+ recorded_by : INTEGER <<FK>>
+}
+entity "患者\npatient" as patient {
+ * id <<PK>>
+  created_branch_id : INTEGER <<FK>>
+}
+entity "治疗方案\ntreatment_plan" as treatment_plan {
+ * id <<PK>>
+* branch_id : INTEGER <<FK>>
+}
+entity "方案明细\nplan_item" as plan_item {
+ * id <<PK>>
+}
+entity "收费项目\nservice" as service {
+ * id <<PK>>
+}
+entity "价目\nservice_price" as service_price {
+ * id <<PK>>
+* branch_id : INTEGER <<FK>>
+}
+entity "患者付款\npatient_payment" as patient_payment {
+ * id <<PK>>
+* branch_id : INTEGER <<FK>>
+ quote_id : INTEGER <<FK>>
+}
+entity "应收项目\nbill_item" as bill_item {
+ * id <<PK>>
+ quote_item_id : INTEGER <<FK>>
+}
+patient ||--o{ treatment_quote
+treatment_plan |o--o{ treatment_quote
+treatment_quote ||--o{ quote_version
+quote_version |o--o{ quote_version
+quote_version ||--o{ quote_item
+plan_item |o--o{ quote_item
+service ||--o{ quote_item
+service_price |o--o{ quote_item
+quote_item ||--o{ quote_decision
+treatment_quote |o--o{ patient_payment
+quote_item |o--o{ bill_item
+entity "方案版本\nplan_version" as plan_version {
+ * id <<PK>>
+}
+plan_version |o--o{ quote_version
+@enduml

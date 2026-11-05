@@ -18,7 +18,7 @@ class Clinic{
   const q=insert(this.db,'staff_role_qualification',{staff_id:person.id,role_id:role.id,valid_from:now,valid_until:end,verified_by:ctx.session.staff_id,verification_basis:basis,revoked_at:null,revoked_by:null,revocation_reason:null,created_at:now});
   const key=insert(this.db,'account_role',{account_id:a.id,role_id:role.id,qualification_id:q,granted_by:ctx.session.account_id,granted_at:now,valid_until:end,grant_reason:basis,revoked_by:null,revoked_at:null,revocation_reason:null});ctx.authority.newGrant={grantId:key,qualificationId:q,role:role.code};
  }
- staff(credentials,input){return this.unit.command(credentials,'clinic.manage',input,(ctx,now)=>{
+ staff(credentials,input,{scopeGuard=null,afterCreate=null}={}){return this.unit.command(credentials,'clinic.manage',input,(ctx,now)=>{
   const reason=text(input.reason,'基础资料变更依据',2000);
   if(input.action==='create'){
    const from=dateOnly(input.employedFrom||day(now));if(from>day(now))fail(422,'STAFF_START','当前建档入职日期不能在未来');
@@ -27,7 +27,7 @@ class Clinic{
    if(input.password==='Clinic123!')fail(422,'CLINIC_PASSWORD','新个人账号请设置独立口令，不沿用公开演示口令');
    const id=insert(this.db,'staff',fact(now,{name:text(input.name,'职员姓名',80),employed_from:from,employed_until:null,created_by:ctx.session.staff_id,record_no:recordNo('STAFF')}));
    const a=insert(this.db,'user_account',{staff_id:id,login_name:login,password_hash:encodePassword(input.password),status:'启用',auth_version:1,password_changed_at:now,created_at:now,updated_at:now,disabled_at:null,disabled_reason:null,revision:1});
-   this.grant(row(this.db,'staff',id),row(this.db,'user_account',a),input,ctx,now);return {kind:'staff',key:id,revision:1,reason};
+   this.grant(row(this.db,'staff',id),row(this.db,'user_account',a),input,ctx,now);if(afterCreate)afterCreate(ctx,now,id);return {kind:'staff',key:id,revision:1,reason};
   }
   const person=row(this.db,'staff',input.staffId);revision(person,input.expectedRevision);const a=this.account(person.id);if(!a)fail(409,'CLINIC_ACCOUNT','此人员缺少个人账号，先由维护人员核对历史数据');
   if(input.action==='grant')this.grant(person,a,input,ctx,now);
@@ -48,7 +48,7 @@ class Clinic{
    this.db.prepare("UPDATE user_account SET status='启用',disabled_at=NULL,disabled_reason=NULL,auth_version=auth_version+1,updated_at=?,revision=revision+1 WHERE id=?").run(now,a.id);
   }else fail(422,'INVALID_ACTION','职员账号操作无效');
   return {...this.touch(person,now),reason};
- });}
+ },scopeGuard);}
  chair(credentials,input){return this.unit.command(credentials,'clinic.manage',input,(ctx,now)=>{
   const reason=text(input.reason,'诊椅资料或停用依据',2000),old=input.chairId?row(this.db,'dental_chair',input.chairId):null;if(old)revision(old,input.expectedRevision);
   if(input.action==='create'){

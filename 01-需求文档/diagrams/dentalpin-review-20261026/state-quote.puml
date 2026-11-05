@@ -1,0 +1,38 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 35
+hide empty description
+state "草稿" as D
+state "已出具" as I
+state "已确认范围保留" as CONF {
+ state "部分接受" as P
+ state "已接受" as A
+ P --> A : 有效期内追加接受剩余
+}
+state "已拒绝" as R
+state "已到期" as E
+state "已撤回" as W
+state "已替代" as S
+[*] --> D
+D --> D : 补正内容
+D --> I : 核价及期间完整／实际出具
+I --> P : 有效期内接受部分
+I --> A : 有效期内接受全部
+I --> R : 明确全部拒绝
+I --> E : 未确认且超过接受截止
+I --> W : 核实撤回
+I --> S : 新版出具／原版停止新增接受
+CONF --> W : 撤回后续范围／保留原履约
+CONF --> S : 新版重新说明确认
+R -[hidden]right-> E
+E -[hidden]right-> W
+W -[hidden]right-> S
+@enduml

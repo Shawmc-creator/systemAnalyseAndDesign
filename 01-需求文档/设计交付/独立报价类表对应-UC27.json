@@ -1,0 +1,427 @@
+{
+  "source": "DentalPin实际报价页面及用户确认的独立报价范围",
+  "usecase": "UC-27",
+  "entities": [
+    {
+      "class": "治疗报价单",
+      "table": "treatment_quote",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定内部主键。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "primary_key": true
+        },
+        {
+          "name": "patient_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "报价归属患者。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "patient",
+          "unique": false
+        },
+        {
+          "name": "treatment_plan_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "选定原治疗方案；独立检查报价可空，不伪造方案。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "treatment_plan",
+          "unique": false
+        },
+        {
+          "name": "record_no",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "系统分配的唯一恒定报价编号。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "unique": true
+        },
+        {
+          "name": "created_by",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次获准建单人员。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "staff",
+          "unique": false
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "建立时刻，UTC。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "最近合法变更时刻，UTC。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "revision",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "正整数并发版本；更改须比对原版本。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        }
+      ],
+      "rules": [
+        "患者及原方案归属一致；报价不是应收账目或实际治疗。",
+        "同一报价的版本号递增，旧版本及原决定保留。"
+      ]
+    },
+    {
+      "class": "报价版本",
+      "table": "quote_version",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定内部主键。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "primary_key": true
+        },
+        {
+          "name": "quote_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "所属报价单。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "treatment_quote",
+          "unique": false
+        },
+        {
+          "name": "source_plan_version_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "foreign_key": "plan_version",
+          "unique": false,
+          "description": "确切来源方案版本；独立检查报价可空。存在时须属于报价头的原方案，各关联方案明细必须来自该版本。",
+          "source": "UC-27 报价版本与来源方案版本的可核对关系"
+        },
+        {
+          "name": "version_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同报价内递增正整数版本号。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "previous_version_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "同报价的前版本；首版为空。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "quote_version",
+          "unique": false
+        },
+        {
+          "name": "valid_from",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "接受报价有效期开始，当地日期；出具前必须明确。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "valid_until",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "接受报价有效期截止，当地日期，含当天；出具前必须明确。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "status",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "草稿、已出具、已接受、部分接受、已拒绝、已撤回、已到期、已替代。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "issued_at",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "实际出具UTC时刻；草稿为空。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "issued_by",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "实际核价出具人员；草稿为空。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "staff",
+          "unique": false
+        },
+        {
+          "name": "change_reason",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "首版建立或后续变更依据。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "created_by",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "编制人员。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "staff",
+          "unique": false
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "建立时刻，UTC。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "最近合法变更时刻，UTC。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "revision",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "正整数并发版本；更改须比对原版本。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        }
+      ],
+      "rules": [
+        "UNIQUE(quote_id,version_no)。前版本须同报价且版本号较小，禁止自环。",
+        "出具时有效期间、出具人及时刻齐全；已出具内容冻结，实质修改另建新版。",
+        "接受时间在有效期内；已接受范围不因后来超过截止而被抹除，超期未确认部分不得新增接受。",
+        "来源方案版本与报价头的方案、患者一致；报价明细不得混用另一方案版本的明细。"
+      ]
+    },
+    {
+      "class": "报价明细",
+      "table": "quote_item",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定内部主键。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "primary_key": true
+        },
+        {
+          "name": "quote_version_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "所属确切报价版本。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "quote_version",
+          "unique": false
+        },
+        {
+          "name": "plan_item_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "来源方案明细；独立检查可空；必须同患者同方案。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "plan_item",
+          "unique": false
+        },
+        {
+          "name": "service_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "项目目录稳定编号。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "service",
+          "unique": false
+        },
+        {
+          "name": "service_price_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "核价时选定的已确认价目；草稿可空，出具时须有依据。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "service_price",
+          "unique": false
+        },
+        {
+          "name": "description_snapshot",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "出具时项目名称与说明快照。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "tooth_code",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "适用时的规范牙位；无牙位不填牙面。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "surface_code",
+          "type": "TEXT",
+          "nullable": true,
+          "description": "适用牙面。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "正的报价数量，单位见快照。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "billing_unit_snapshot",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "按次、颗或约定疗程等明确单位快照。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "unit_price_cents",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "报价整数分单价；草稿未知可空，出具时明确。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "amount_cents",
+          "type": "INTEGER",
+          "nullable": true,
+          "description": "整数分金额，等于数量乘报价单价；未知不冒充零。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "scope_note",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "材料、牙位、包含及不包含范围；疗程须说明复诊和保持器等范围。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "sequence_no",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "同版本内正整数显示顺序。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "建立时刻，UTC。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "updated_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "最近合法变更时刻，UTC。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "revision",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "正整数并发版本；更改须比对原版本。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        }
+      ],
+      "rules": [
+        "UNIQUE(quote_version_id,sequence_no)；数量大于0，单价与金额非负且相乘一致。",
+        "所选价目同项目、已确认且覆盖出具时点；出具后名称、单位、数量及价格不追改。",
+        "来源方案明细归属同患者同方案；报价接受不代替医疗知情同意。"
+      ]
+    },
+    {
+      "class": "报价确认",
+      "table": "quote_decision",
+      "fields": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "恒定内部主键。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "primary_key": true
+        },
+        {
+          "name": "quote_item_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "本次决定覆盖的确切版本明细。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "quote_item",
+          "unique": false
+        },
+        {
+          "name": "decision_type",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "接受、暂缓、拒绝、撤回；按真实患者决定追加。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "decided_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "患者实际作出决定的UTC时刻。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "confirmation_basis",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "说明内容、实际确认方式及依据；不能由发送或打开推定接受。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        },
+        {
+          "name": "recorded_by",
+          "type": "INTEGER",
+          "nullable": false,
+          "description": "记录决定的获准人员。",
+          "source": "UC-27 独立报价及其与原业务的衔接",
+          "foreign_key": "staff",
+          "unique": false
+        },
+        {
+          "name": "created_at",
+          "type": "TEXT",
+          "nullable": false,
+          "description": "系统记入UTC时刻。",
+          "source": "UC-27 独立报价及其与原业务的衔接"
+        }
+      ],
+      "rules": [
+        "决定只能追加；查询当前范围按明细的最近真实决定核对。",
+        "接受须在出具后且有效期间内，不同患者、版本和明细的决定不得混用。",
+        "报价撤回不抹除已发生治疗、收款、原同意或原报价；后续分别协调。"
+      ]
+    }
+  ],
+  "existingReferences": [
+    {
+      "class": "患者付款",
+      "field": "quote_id",
+      "table": "patient_payment"
+    },
+    {
+      "class": "应收项目",
+      "field": "quote_item_id",
+      "table": "bill_item"
+    }
+  ],
+  "storedFacts": "费用说明和患者费用决定；不代替医疗同意、实际执行或真实资金",
+  "originalBaseSqlSha256": "6a36c7f73a91de2418851da9f662bd5fe0b00e1c5655073d65c71149efce383d",
+  "implementation": "仅目标设计；运行系统不自动使用本补充SQL"
+}

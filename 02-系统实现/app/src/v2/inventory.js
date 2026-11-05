@@ -31,7 +31,7 @@ class Inventory {
     return insert(this.db,'inventory_movement',fact(now,{batch_stock_id:stock.id,original_movement_id:null,stock_count_id:null,purchase_receipt_item_id:null,purchase_issue_id:null,
       before_scaled:stock.quantity_scaled,after_scaled:after,occurred_at:now,operator_id:ctx.session.staff_id,...fields}));
   }
-  record(credentials,input) {
+  record(credentials,input,{scopeGuard=null}={}) {
     return this.unit.command(credentials,'uc32.record',input,(ctx,now)=>{
       if(input.action==='material') {
         const fields=this.materialFields(input); let key=input.materialId;
@@ -64,7 +64,7 @@ class Inventory {
       }
       if(input.action==='isolate') return this.changeBatch(ctx,now,input,'隔离');
       fail(422,'INVALID_ACTION','材料维护操作无效');
-    });
+    },scopeGuard);
   }
   changeBatch(ctx,now,input,status) {
     const {batch,material}=this.batchContext(input.batchId); revision(batch,input.expectedRevision);
@@ -82,7 +82,7 @@ class Inventory {
     insert(this.db,'batch_change',fact(now,{material_batch_id:batch.id,old_status:batch.status,new_status:status,reason,confirmed_at:now,operator_id:ctx.session.staff_id,confirmed_by:ctx.session.staff_id}));
     return {kind:'material_batch',key:batch.id,beforeRevision:batch.revision,revision:batch.revision+1,reason,changes:[{field:'status',before:batch.status,after:status},{field:'expiry_date',before:batch.expiry_date,after:expiry}]};
   }
-  approve(credentials,input) {
+  approve(credentials,input,{scopeGuard=null}={}) {
     return this.unit.command(credentials,'uc32.approve',input,(ctx,now)=>{
       if(input.action==='confirmMaterial' || input.action==='deactivateMaterial') {
         const m=row(this.db,'material',input.materialId); revision(m,input.expectedRevision);
@@ -100,7 +100,7 @@ class Inventory {
       }
       if(!statuses[input.action]) fail(422,'INVALID_ACTION','批次确认操作无效');
       return this.changeBatch(ctx,now,input,statuses[input.action]);
-    });
+    },scopeGuard);
   }
   recordMovement(credentials,input) {
     return this.unit.command(credentials,'uc18.record',input,(ctx,now)=>{
@@ -191,7 +191,7 @@ class Inventory {
       const entries=[];
       for(const batch of batches) {
         const material=materials.find(m=>m.id===batch.material_id);
-        const stocks=this.db.prepare('SELECT * FROM batch_stock WHERE material_batch_id=? ORDER BY id').all(batch.id).filter(s=>input.locationId==null||s.stock_location_id===Number(input.locationId));
+        const stocks=this.db.prepare('SELECT * FROM batch_stock WHERE material_batch_id=? ORDER BY id').all(batch.id).filter(s=>(input.locationId==null||s.stock_location_id===Number(input.locationId))&&(input.stockId==null||s.id===id(Number(input.stockId))));
         if(!stocks.length && input.locationId==null) entries.push({batch,material,stock:null,availableQuantityScaled:0,availability:'尚无分处库存'});
         for(const stock of stocks) {
           const location=row(this.db,'stock_location',stock.stock_location_id),available=this.available(batch,material,location,this.unit.auth.now());

@@ -1,0 +1,42 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ActorBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam ParticipantBackgroundColor white
+skinparam UsecaseBackgroundColor white
+skinparam ActivityBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 180
+hide footbox
+autonumber
+actor "收费人员" as C
+actor "门店负责人" as M
+actor "连锁负责人" as H
+entity "连锁诊所管理系统" as S
+participant "支付平台" as Pay
+participant "医保平台" as I
+C -> S : 选择本门店、营业日期与核对范围
+S -> S : 汇集原实际项目、费用、付款及退款
+C -> S : 提交现金清点与真实交接依据
+C -> Pay : 在渠道核对原交易及金额
+Pay --> C : 返回原笔结果及差异依据
+C -> S : 登记已核对的原交易结果
+C -> I : 核对正式结算及拨付依据
+I --> C : 返回结算与拨付信息
+C -> S : 按真实医保或银行依据核实实际收付
+S -> S : 分列费用、患者实际收付、医保承担\n及实际医保收付，未知不计实收
+S --> C : 提供各项核对及可回查原单
+M -> S : 查看差异、欠费与待回款
+M -> S : 指定责任人、处理日期与后续安排
+... 后续取得真实处理结果 ...
+C -> S : 追加核实依据及处理结果
+S -> S : 保留原核对与后续处理关联
+M -> S : 复核本店已处理或继续跟进事项
+H -> S : 按授权查看各店及汇总经营结果
+@enduml

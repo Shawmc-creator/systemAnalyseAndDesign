@@ -1,0 +1,67 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam EntityBackgroundColor white
+skinparam EntityBorderColor black
+skinparam linetype polyline
+skinparam nodesep 38
+skinparam ranksep 110
+hide circle
+left to right direction
+entity "连锁诊所\nclinic_chain" as chain {
+ * id : INTEGER <<PK>>
+ * name : TEXT
+ * status : TEXT
+}
+entity "门店\nclinic_branch" as branch {
+ * id : INTEGER <<PK>>
+ * chain_id : INTEGER <<FK>>
+ * branch_code, name : TEXT
+ * status : TEXT
+ * insurance_enabled : INTEGER
+ * dispensing_enabled : INTEGER
+}
+entity "职员\nstaff" as staff {
+ * id : INTEGER <<PK>>
+}
+entity "门店岗位授权\nbranch_staff_role" as role {
+ * id : INTEGER <<PK>>
+ * branch_id, staff_id : INTEGER <<FK>>
+ * role_code, valid_from : TEXT
+   valid_until, revoked_at : TEXT
+ * granted_by : INTEGER <<FK>>
+ * granted_at, evidence : TEXT
+   revoked_by : INTEGER <<FK>>
+}
+entity "患者\npatient" as patient {
+ * id : INTEGER <<PK>>
+}
+entity "就诊\nvisit" as visit {
+ * id : INTEGER <<PK>>
+ * patient_id : INTEGER <<FK>>
+ * branch_id : INTEGER <<FK>>
+}
+entity "跨店病历查阅授权\ncross_branch_record_access" as grant {
+ * id : INTEGER <<PK>>
+ * dentist_id : INTEGER <<FK>>
+ * visit_id, patient_id : INTEGER <<FK>>
+ * source_branch_id : INTEGER <<FK>>
+ * target_branch_id : INTEGER <<FK>>
+ * scope, valid_from : TEXT
+   valid_until, revoked_at : TEXT
+ * granted_by : INTEGER <<FK>>
+ * granted_at, evidence : TEXT
+   revoked_by : INTEGER <<FK>>
+}
+chain ||--o{ branch
+branch ||--o{ role
+staff ||--o{ role
+branch ||--o{ visit
+patient ||--o{ visit
+staff ||--o{ grant : 被授权牙医
+visit ||--o{ grant : 原就诊与患者、来源门店
+branch ||--o{ grant : 目标门店
+@enduml

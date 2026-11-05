@@ -31,7 +31,7 @@ test('v2 retains implementation data and adds resources, dispensing, settlements
   const before = fs.readFileSync(file);
   assert.throws(() => openDatabase(file), /拒绝/); assert.deepEqual(fs.readFileSync(file), before);
   const a = setup(t);
-  assert.equal(a.db.prepare("SELECT count(*) n FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get().n, 108);
+  assert.equal(a.db.prepare("SELECT count(*) n FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get().n, 112);
   assert.deepEqual(a.db.prepare('PRAGMA foreign_key_check').all(), []);
 });
 test('one request yields one receipt; changed payload with same key is refused; revoked privilege prevents replay', t => {
@@ -84,7 +84,7 @@ test('arrival atomically links appointment, visit, occupancy and clinical draft;
   assert.equal(a.db.prepare('SELECT status FROM appointment WHERE id=?').get(b.id).status, '已到诊');
   assert.equal(a.db.prepare('SELECT visit_id FROM resource_occupancy WHERE appointment_id=? AND released_at IS NULL').get(b.id).visit_id, visit.id);
   assert.equal(a.db.prepare('SELECT status FROM clinical_record WHERE visit_id=?').get(visit.id).status, '草稿');
-  assert.throws(() => a.reception.arrive(a.f, { ...input, requestKey: 'different-arrival' }), e => e.code === 'ALREADY_ARRIVED');
+  assert.throws(() => a.reception.arrive(a.f, { ...input, requestKey: 'different-arrival' }), e => e.code === 'ALREADY_ARRIVED' && e.details.visitId === visit.id && e.details.status === '候诊' && e.message.includes(e.details.visitNo));
 });
 test('arrival refuses different patient, future date and wrong dentist without leaving a visit', t => {
   const a = setup(t), s = schedule(a), b = a.reception.appointment(a.f, book(a, s));

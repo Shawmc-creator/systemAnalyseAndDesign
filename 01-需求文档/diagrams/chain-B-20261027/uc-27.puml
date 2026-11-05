@@ -1,0 +1,20 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 35
+left to right direction
+actor "牙医" as D
+actor "收费人员" as C
+rectangle "牙科连锁诊所管理系统" {
+usecase "UC-27\n编制报价并记录患者确认" as Q
+}
+D -- Q
+Q -- C
+@enduml

@@ -1,0 +1,46 @@
+'use strict';
+const test=require('node:test');const assert=require('node:assert/strict');const {createChainDemo}=require('../src/v2/chain-demo-server');
+test('连锁前台建档与本店排班互相衔接，跨店冲突和有效占用不可绕过',async t=>{
+ const demo=createChainDemo();await new Promise(resolve=>demo.server.listen(0,'127.0.0.1',resolve));t.after(async()=>{await new Promise(resolve=>demo.server.close(resolve));demo.db.close();});const base=`http://127.0.0.1:${demo.server.address().port}`;
+ async function login(name,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:name,password:'Clinic123!'})});assert.equal(r.status,200);const p=await r.json();return {cookie:r.headers.get('set-cookie').split(';')[0],'content-type':'application/json','x-clinic-role':role,'x-csrf-token':p.csrf};}
+ const front=await login('frontdesk','frontdesk'),manager=await login('manager','manager'),other=await login('assistant','manager');
+ const get=(url,h)=>fetch(base+url,{headers:h}),post=(url,value,h)=>fetch(base+url,{method:'POST',headers:h,body:JSON.stringify(value)});
+ assert.equal((await get('/api/schedules?branchId=1',front)).status,403);assert.equal((await get('/api/schedules?branchId=1',other)).status,403);
+ const opts=await (await get('/api/schedules?branchId=2',manager)).json();const dentist=opts.dentists[0].id,chair=opts.chairs[0].id;
+ const schedule={action:'publish',branchId:2,dentistId:dentist,chairId:chair,businessDate:'2026-10-22',startsAt:'2026-10-22T01:00:00Z',endsAt:'2026-10-22T09:00:00Z',reason:'演示排班',requestKey:'setup-schedule',commandVersion:1};
+ assert.equal((await post('/api/setup',schedule,front)).status,403);assert.equal((await post('/api/setup',{...schedule,branchId:1},other)).status,403);
+ const created=await post('/api/setup',schedule,manager);assert.equal(created.status,200,await created.clone().text());const scheduleId=(await created.json()).id;assert.equal((await (await post('/api/setup',schedule,manager)).json()).replayed,true);
+ assert.equal((await post('/api/setup',{...schedule,requestKey:'schedule-overlap'},manager)).status,409);
+ const chair2=(await (await get('/api/schedules?branchId=1',manager)).json()).chairs[0].id;
+ assert.equal((await post('/api/setup',{...schedule,branchId:1,chairId:chair2,requestKey:'schedule-cross-conflict'},manager)).status,409);
+ const patient={action:'patient',branchId:2,fields:{name:'虚构新患者',phone:'13800001111',phone_owner:'本人'},reason:'演示建档',requestKey:'setup-patient',commandVersion:1};
+ assert.equal((await post('/api/setup',patient,manager)).status,403);
+ demo.db.exec("CREATE TEMP TRIGGER setup_audit_failure BEFORE INSERT ON operation_audit WHEN NEW.object_kind='patient' AND NEW.event_type='变更' BEGIN SELECT RAISE(ABORT,'audit failure'); END");
+ assert.equal((await post('/api/setup',patient,front)).status,500);assert.equal(demo.db.prepare('SELECT COUNT(*) n FROM patient WHERE name=?').get(patient.fields.name).n,0);demo.db.exec('DROP TRIGGER setup_audit_failure');
+ const patientResponse=await post('/api/setup',patient,front);assert.equal(patientResponse.status,200,await patientResponse.clone().text());const patientId=(await patientResponse.json()).id;assert.equal((await (await post('/api/setup',patient,front)).json()).replayed,true);
+ const noPhone={action:'patient',branchId:2,fields:{name:'虚构无电话患者',phone:'',phone_owner:'',contact_unavailable_reason:''},reason:'患者资料核实',requestKey:'patient-no-phone',commandVersion:1};
+ assert.equal((await post('/api/setup',noPhone,front)).status,422);
+ const noPhoneResult=await post('/api/setup',{...noPhone,fields:{...noPhone.fields,birth_date:'1990-05-06',contact_unavailable_reason:'患者暂未提供联系电话'}},front);assert.equal(noPhoneResult.status,200,await noPhoneResult.clone().text());
+ const noPhoneId=(await noPhoneResult.json()).id,noPhoneRecord=demo.db.prepare('SELECT phone,phone_owner,contact_unavailable_reason,birth_date FROM patient WHERE id=?').get(noPhoneId);assert.equal(noPhoneRecord.phone,null);assert.equal(noPhoneRecord.phone_owner,null);assert.equal(noPhoneRecord.contact_unavailable_reason,'患者暂未提供联系电话');assert.equal(noPhoneRecord.birth_date,'1990-05-06');
+ assert.equal((await post('/api/setup',{...noPhone,requestKey:'future-birth',fields:{...noPhone.fields,birth_date:'2099-01-01',contact_unavailable_reason:'暂无电话'}},front)).status,422);
+ assert.equal((await post('/api/setup',{...patient,requestKey:'duplicate'},front)).status,409);
+ assert.equal((await get('/api/patients?branchId=2',manager)).status,403);
+ const list=await (await get('/api/patients?branchId=2',front)).json();assert.equal(list.patients.find(p=>p.id===patientId).revision,1);
+ const edit={action:'patient-update',branchId:2,patientId,expectedRevision:1,fields:{phone:'13800002222',phone_owner:'本人'},reason:'患者核实更新',requestKey:'patient-edit',commandVersion:1};
+ assert.equal((await post('/api/setup',edit,manager)).status,403);assert.equal((await post('/api/setup',edit,front)).status,200);assert.equal((await (await post('/api/setup',edit,front)).json()).replayed,true);
+ assert.equal((await post('/api/setup',{...edit,requestKey:'stale-edit'},front)).status,409);assert.equal(demo.db.prepare('SELECT COUNT(*) n FROM patient_change WHERE patient_id=?').get(patientId).n,1);
+ const changed={...schedule,action:'change',scheduleId,expectedRevision:1,startsAt:'2026-10-22T01:30:00Z',requestKey:'schedule-change'};
+ assert.equal((await post('/api/setup',changed,manager)).status,200);assert.equal((await (await post('/api/setup',changed,manager)).json()).replayed,true);
+ assert.equal(demo.db.prepare('SELECT change_kind FROM schedule_change WHERE dated_schedule_id=?').get(scheduleId).change_kind,'调整');
+
+ const reception=await (await get('/api/reception/options?branchId=2',front)).json();assert.ok(reception.patients.some(p=>p.id===patientId));
+ assert.equal(reception.patients.find(p=>p.id===noPhoneId).birth_date,'1990-05-06');
+ assert.equal(reception.patients.find(p=>p.id===patientId).birth_date,null);
+ const book={action:'create',branchId:2,patientId,scheduleId,scheduleRevision:2,startsAt:'2026-10-22T02:00:00Z',endsAt:'2026-10-22T02:30:00Z',reason:'演示预约',requestKey:'new-patient-book',commandVersion:1};
+ const booked=await post('/api/reception',book,front);assert.equal(booked.status,200,await booked.clone().text());const appointmentId=(await booked.json()).id;
+ assert.equal((await post('/api/setup',{...changed,expectedRevision:2,requestKey:'change-occupied'},manager)).status,409);
+ const close={action:'close',branchId:2,scheduleId,expectedRevision:2,reason:'演示停诊',requestKey:'schedule-close',commandVersion:1};assert.equal((await post('/api/setup',close,manager)).status,409);
+ const cancel={action:'cancel',branchId:2,appointmentId,expectedRevision:1,reason:'患者取消',requestKey:'new-patient-cancel',commandVersion:1};assert.equal((await post('/api/reception',cancel,front)).status,200);
+ const closed=await post('/api/setup',close,manager);assert.equal(closed.status,200,await closed.clone().text());assert.equal((await (await post('/api/setup',close,manager)).json()).replayed,true);
+ assert.equal(demo.db.prepare('SELECT status FROM dated_schedule WHERE id=?').get(scheduleId).status,'已停诊');assert.equal(demo.db.prepare('PRAGMA foreign_key_check').all().length,0);
+});

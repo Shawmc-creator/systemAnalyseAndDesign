@@ -4,7 +4,7 @@ const {integer,safe,receiptAmount}=require('./inventory-gates');
 const {historicalPurchase,writablePurchase,acceptanceLimit}=require('./legacy-scope');
 class Purchases {
   constructor(db,unit,inventory) { Object.assign(this,{db,unit,inventory}); }
-  supplier(credentials,input) {
+  supplier(credentials,input,{scopeGuard=null}={}) {
     return this.unit.command(credentials,'uc27.supplier',input,(ctx,now)=>{
       if(typeof input.isActive!=='boolean') fail(422,'SUPPLIER_FIELDS','须明确供应商是否启用');
       const fields={name:text(input.name,'供应商名称'),contact_name:text(input.contactName,'联系人'),phone:text(input.phone,'联系电话',100),
@@ -17,7 +17,7 @@ class Purchases {
       }
       const key=insert(this.db,'supplier',fact(now,{...fields,created_by:ctx.session.staff_id,verified_by:ctx.session.staff_id,record_no:recordNo('SUP')}));
       return {kind:'supplier',key,revision:1,reason};
-    });
+    },scopeGuard);
   }
   itemFields(input) {
     const m=row(this.db,'material',input.materialId);revision(m,input.expectedMaterialRevision);

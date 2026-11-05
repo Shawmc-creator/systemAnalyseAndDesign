@@ -5,6 +5,9 @@
 *.sqlite3
 **/data/backups/
 **/uploads/
+**/data/chain-demo/
+**/data/chain-live-demo/
+**/data/clinical-files/
 03-数据/运行备份/
 03-数据/示例导出/
 04-测试与验收/测试结果/

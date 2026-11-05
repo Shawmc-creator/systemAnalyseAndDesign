@@ -1,0 +1,6 @@
+.chain-main{margin:0 auto;max-width:1100px;padding:28px 20px}
+.chain-error{color:#a63b32}
+.chain-main .filters label{min-width:170px}
+#reason-dialog{width:min(90vw,500px);border:1px solid #dce5e9;border-radius:6px;padding:24px;color:#233d4d}
+#reason-dialog::backdrop{background:#233d4d88}
+#reason-dialog footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}

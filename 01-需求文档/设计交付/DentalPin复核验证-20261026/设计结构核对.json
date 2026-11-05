@@ -1,0 +1,78 @@
+{
+  "mode": "ISOLATED_TARGET_DDL_DESIGN_CHECK",
+  "liveDatabaseTouched": false,
+  "applicationCodeChanged": false,
+  "baseRuntimeVersion": 2026102601,
+  "designTables": 81,
+  "designFields": 1036,
+  "temporaryPhysicalTables": 112,
+  "checks": [
+    {
+      "name": "81张设计表的1036个字段定义及指定外键、唯一列与目标DDL一致",
+      "passed": true
+    },
+    {
+      "name": "报价明细金额与数量单价一致",
+      "passed": true
+    },
+    {
+      "name": "同报价版本号唯一",
+      "passed": true
+    },
+    {
+      "name": "原患者和方案归属标识不可追改",
+      "passed": true
+    },
+    {
+      "name": "出具必须有期间与出具责任人",
+      "passed": true
+    },
+    {
+      "name": "无效起止期间不能出具",
+      "passed": true
+    },
+    {
+      "name": "出具后不得覆盖明细",
+      "passed": true
+    },
+    {
+      "name": "出具后不得删除明细",
+      "passed": true
+    },
+    {
+      "name": "出具后不得插入补造明细",
+      "passed": true
+    },
+    {
+      "name": "出具后不能退回草稿追改",
+      "passed": true
+    },
+    {
+      "name": "出具后不能追改接受截止",
+      "passed": true
+    },
+    {
+      "name": "报价确认须有实际依据",
+      "passed": true
+    },
+    {
+      "name": "报价确认只能追加，不能改写或删除",
+      "passed": true
+    },
+    {
+      "name": "引用必须存在的报价明细",
+      "passed": true
+    },
+    {
+      "name": "中途错误可整体回滚报价头与版本",
+      "passed": true
+    }
+  ],
+  "foreignKeyErrors": 0,
+  "integrity": "ok",
+  "limits": [
+    "仅为新增目标DDL的结构及列示约束检查，不是报价应用服务已实现的证明",
+    "岗位授权、跨患者业务归属、有效价目、接受期间、金额差异协调及收款关联仍须应用服务实现和验收",
+    "演示数据只在本次内存数据库存在"
+  ]
+}

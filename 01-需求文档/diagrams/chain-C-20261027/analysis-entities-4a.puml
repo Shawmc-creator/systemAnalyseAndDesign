@@ -1,0 +1,79 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 20
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam NoteBackgroundColor white
+skinparam NoteBorderColor black
+skinparam PackageBackgroundColor white
+skinparam PackageBorderColor black
+skinparam classAttributeIconSize 0
+skinparam minClassWidth 210
+skinparam linetype ortho
+skinparam nodesep 35
+skinparam ranksep 45
+hide circle
+hide empty members
+package "价目提出与负责人确认" as P {
+class "收费项目" as service <<entity>> {
+ 项目编号、分类、名称、计价单位
+ 启用状态
+ --
+ +核对项目及计价单位()
+ +停用新计费(负责人确认)
+}
+class "价目" as service_price <<entity>> {
+ 所属门店
+ 非负单价、适用起止
+ 调价或零价原因、确认状态
+ 提出及确认人、时间、意见
+ --
+ +核对适用区间(同项目价目)
+ +提交负责人确认()
+ +确认适用价目(当前版本)
+ +退回修改(原因)
+}
+service "1" *-- "0..*" service_price
+note bottom of service_price
+适用期间左闭右开；已确认区间不重叠。
+零价有依据；调价不改原账单快照。
+已用项目换单位另建项目，停用保留历史。
+end note
+}
+package "患者资金与真实到账" as F {
+' @reference patient
+class "患者" as patient_f <<entity>>
+' @reference patient_refund
+class "退款办理" as refund_f <<entity>>
+class "患者资金" as patient_funds <<entity>> {
+ 所属门店
+ 建立时间、归属经办人
+ /同患者资金收付汇总
+ --
+ +核对患者及门店归属()
+ +汇总确认收付与未用款()
+}
+class "患者付款" as patient_payment <<entity>> {
+ 所属门店
+ 实收、找零、渠道、核实状态
+ 到账时间、核实人及凭据
+ /净收、/原款可用额
+ --
+ +核对实收找零与净收()
+ +确认实际到账(原单与依据)
+ +记录未到账核实(依据)
+ +计算原款可用额(用途与退款)
+}
+patient_f "1" -- "0..*" patient_funds
+patient_funds "1" -- "0..*" patient_payment
+patient_payment "1" -- "0..*" refund_f
+note bottom of patient_payment
+净收＝实收－找零＞0；电子支付找零为0。
+原款可用＝确认净收－用途净额－已确认退款
+－待办或待核实退款占用；未知不记到账。
+未分配预收不计本账抵付，抵扣不增加实收。
+end note
+}
+@enduml

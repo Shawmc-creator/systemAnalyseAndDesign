@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const {setup,command}=require('./helpers/v2-settlements');
 test('正式医保600元分摊400元、患者200元；预结算及正式结算均不虚记医保现金',t=>{
- const a=setup(t);a.ready();assert.equal(a.bill().summary.unpaidCents,60000);assert.throws(()=>a.order(),e=>e.code==='INSURANCE_PENDING');a.submit();a.settle();const b=a.bill();assert.equal(b.summary.insuranceCents,40000);assert.equal(b.summary.unpaidCents,20000);assert.equal(a.bills().funds.confirmedReceivedCents,0);
+ const a=setup(t);a.ready();assert.equal(a.bill().summary.unpaidCents,60000);assert.equal(a.bill().summary.insurancePending,true);assert.throws(()=>a.order(),e=>e.code==='INSURANCE_PENDING');a.submit();a.settle();const b=a.bill();assert.equal(b.summary.insurancePending,false);assert.equal(b.summary.insuranceReversalPending,false);assert.equal(b.summary.insuranceCents,40000);assert.equal(b.summary.unpaidCents,20000);assert.equal(a.bills().funds.confirmedReceivedCents,0);
  const o=a.order();assert.equal(a.bills().funds.confirmedReceivedCents,0);const cmd=command(a.orderResult(o.id));a.settlements.verifyOrder(a.c,cmd);assert.equal(a.settlements.verifyOrder(a.c,cmd).replayed,true);assert.equal(a.bill().summary.unpaidCents,0);assert.equal(a.bills().funds.confirmedReceivedCents,20000);
  const q=a.settlements.query(a.m,{from:'2026-10-19'});assert.equal(q.totals.receivableCents,60000);assert.equal(q.totals.patientReceivedCents,20000);assert.equal(q.totals.insurancePendingCents,40000);assert.equal(q.totals.insuranceActualNetCents,0);
 });

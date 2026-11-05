@@ -1,0 +1,532 @@
+{
+  "status": "逐表候选方案；未用于修改实际数据库或替代81表正式模型",
+  "source": "核心业务数据模型.json（81表单店基线）",
+  "candidate_new_tables": [
+    "clinic_chain",
+    "clinic_branch",
+    "branch_staff_role",
+    "cross_branch_record_access"
+  ],
+  "table_count": 81,
+  "rows": [
+    {
+      "table": "patient",
+      "mode": "统一身份",
+      "basis": "连锁统一患者身份；登记门店仅作来源，不限制患者跨店就诊",
+      "provenance_candidate": {
+        "field": "created_branch_id",
+        "references": "clinic_branch.id",
+        "new_records": "必填",
+        "legacy_records": "原始来源无法确认时不臆造门店"
+      }
+    },
+    {
+      "table": "staff",
+      "mode": "统一身份",
+      "basis": "连锁统一人员身份，岗位与门店由授权表决定"
+    },
+    {
+      "table": "patient_change",
+      "mode": "新增门店外键",
+      "field": "operator_branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "user_account",
+      "mode": "统一身份",
+      "basis": "个人账号归属职员，不因兼岗复制账号"
+    },
+    {
+      "table": "dental_chair",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "dated_schedule",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "schedule_change",
+      "mode": "沿原业务归属",
+      "via": "dated_schedule_id",
+      "parent": "dated_schedule"
+    },
+    {
+      "table": "resource_occupancy",
+      "mode": "沿原业务归属",
+      "via": "dated_schedule_id",
+      "parent": "dated_schedule"
+    },
+    {
+      "table": "appointment",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "appointment_change",
+      "mode": "沿原业务归属",
+      "via": "appointment_id",
+      "parent": "appointment"
+    },
+    {
+      "table": "visit",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "clinical_equipment",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "resource_block",
+      "mode": "沿原业务归属",
+      "via": "dental_chair_id/equipment_id",
+      "parent": "dental_chair/clinical_equipment"
+    },
+    {
+      "table": "equipment_occupancy",
+      "mode": "沿原业务归属",
+      "via": "equipment_id",
+      "parent": "clinical_equipment"
+    },
+    {
+      "table": "health_version",
+      "mode": "待核定",
+      "basis": "候选新增source_visit_id关联健康版本形成就诊；新增版本必填，旧版本来源待核实；跨店查阅按原就诊授权",
+      "provenance_candidate": {
+        "field": "source_visit_id",
+        "references": "visit.id",
+        "new_records": "必填并核对同患者",
+        "legacy_records": "可空，未经核实不返回跨店临床内容"
+      }
+    },
+    {
+      "table": "health_item",
+      "mode": "待核定",
+      "basis": "继承健康版本来源；原版本来源不明时不推定跨店访问权限"
+    },
+    {
+      "table": "health_review",
+      "mode": "沿原业务归属",
+      "via": "visit_id",
+      "parent": "visit"
+    },
+    {
+      "table": "clinical_record",
+      "mode": "沿原业务归属",
+      "via": "visit_id",
+      "parent": "visit"
+    },
+    {
+      "table": "clinical_finding",
+      "mode": "沿原业务归属",
+      "via": "clinical_record_id",
+      "parent": "clinical_record"
+    },
+    {
+      "table": "record_addendum",
+      "mode": "沿原业务归属",
+      "via": "clinical_record_id",
+      "parent": "clinical_record"
+    },
+    {
+      "table": "clinical_document",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "document_version",
+      "mode": "沿原业务归属",
+      "via": "clinical_document_id",
+      "parent": "clinical_document"
+    },
+    {
+      "table": "prescription",
+      "mode": "沿原业务归属",
+      "via": "visit_id",
+      "parent": "visit"
+    },
+    {
+      "table": "prescription_item",
+      "mode": "沿原业务归属",
+      "via": "prescription_id",
+      "parent": "prescription"
+    },
+    {
+      "table": "dispense_record",
+      "mode": "沿原业务归属",
+      "via": "prescription_item_id",
+      "parent": "prescription_item"
+    },
+    {
+      "table": "treatment_plan",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "plan_version",
+      "mode": "沿原业务归属",
+      "via": "treatment_plan_id",
+      "parent": "treatment_plan"
+    },
+    {
+      "table": "plan_item",
+      "mode": "沿原业务归属",
+      "via": "plan_version_id",
+      "parent": "plan_version"
+    },
+    {
+      "table": "patient_decision",
+      "mode": "沿原业务归属",
+      "via": "plan_version_id",
+      "parent": "plan_version"
+    },
+    {
+      "table": "decision_plan_item",
+      "mode": "沿原业务归属",
+      "via": "decision_id",
+      "parent": "patient_decision"
+    },
+    {
+      "table": "decision_file_version",
+      "mode": "沿原业务归属",
+      "via": "decision_id",
+      "parent": "patient_decision"
+    },
+    {
+      "table": "treatment_execution",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "patient_funds",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "service",
+      "mode": "统一目录",
+      "basis": "连锁统一收费项目基础目录；价格按门店分别设置"
+    },
+    {
+      "table": "service_price",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "bill",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "bill_item",
+      "mode": "沿原业务归属",
+      "via": "bill_id",
+      "parent": "bill"
+    },
+    {
+      "table": "patient_payment",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "payment_allocation",
+      "mode": "沿原业务归属",
+      "via": "patient_payment_id",
+      "parent": "patient_payment"
+    },
+    {
+      "table": "prepayment_offset",
+      "mode": "沿原业务归属",
+      "via": "patient_payment_id",
+      "parent": "patient_payment"
+    },
+    {
+      "table": "payment_order",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "payment_reconciliation",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "fee_request",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "fee_adjustment",
+      "mode": "沿原业务归属",
+      "via": "fee_request_id",
+      "parent": "fee_request"
+    },
+    {
+      "table": "fee_adjustment_item",
+      "mode": "沿原业务归属",
+      "via": "fee_adjustment_id",
+      "parent": "fee_adjustment"
+    },
+    {
+      "table": "patient_refund",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "followup_requirement",
+      "mode": "来源与负责门店",
+      "fields": [
+        "source_branch_id",
+        "responsible_branch_id"
+      ],
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "contact_history",
+      "mode": "新增门店外键",
+      "field": "operator_branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "clinical_assessment",
+      "mode": "新增门店外键",
+      "field": "assessment_branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "material",
+      "mode": "统一目录",
+      "basis": "连锁统一材料基础目录；批次与库存按门店分别管理"
+    },
+    {
+      "table": "material_batch",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "batch_change",
+      "mode": "沿原业务归属",
+      "via": "material_batch_id",
+      "parent": "material_batch"
+    },
+    {
+      "table": "stock_location",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "batch_stock",
+      "mode": "沿原业务归属",
+      "via": "stock_location_id",
+      "parent": "stock_location"
+    },
+    {
+      "table": "inventory_movement",
+      "mode": "沿原业务归属",
+      "via": "batch_stock_id",
+      "parent": "batch_stock"
+    },
+    {
+      "table": "material_usage",
+      "mode": "沿原业务归属",
+      "via": "inventory_movement_id",
+      "parent": "inventory_movement"
+    },
+    {
+      "table": "stock_count",
+      "mode": "沿原业务归属",
+      "via": "batch_stock_id",
+      "parent": "batch_stock"
+    },
+    {
+      "table": "supplier",
+      "mode": "统一目录",
+      "basis": "连锁统一供应商基础目录；采购及验收记录按门店归属"
+    },
+    {
+      "table": "purchase_order",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "purchase_order_item",
+      "mode": "沿原业务归属",
+      "via": "purchase_order_id",
+      "parent": "purchase_order"
+    },
+    {
+      "table": "purchase_receipt",
+      "mode": "沿原业务归属",
+      "via": "purchase_order_id",
+      "parent": "purchase_order"
+    },
+    {
+      "table": "purchase_receipt_item",
+      "mode": "沿原业务归属",
+      "via": "purchase_receipt_id",
+      "parent": "purchase_receipt"
+    },
+    {
+      "table": "insurance_identity",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "insurance_item_mapping",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "insurance_case",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "insurance_fee",
+      "mode": "沿原业务归属",
+      "via": "insurance_case_id",
+      "parent": "insurance_case"
+    },
+    {
+      "table": "insurance_settlement",
+      "mode": "沿原业务归属",
+      "via": "insurance_case_id",
+      "parent": "insurance_case"
+    },
+    {
+      "table": "insurance_reversal",
+      "mode": "沿原业务归属",
+      "via": "settlement_id",
+      "parent": "insurance_settlement"
+    },
+    {
+      "table": "insurance_fund_receipt",
+      "mode": "沿原业务归属",
+      "via": "settlement_id",
+      "parent": "insurance_settlement"
+    },
+    {
+      "table": "fee_request_history",
+      "mode": "沿原业务归属",
+      "via": "fee_request_id",
+      "parent": "fee_request"
+    },
+    {
+      "table": "service_price_history",
+      "mode": "沿原业务归属",
+      "via": "service_price_id",
+      "parent": "service_price"
+    },
+    {
+      "table": "followup_history",
+      "mode": "沿原业务归属",
+      "via": "followup_requirement_id",
+      "parent": "followup_requirement"
+    },
+    {
+      "table": "stock_count_history",
+      "mode": "沿原业务归属",
+      "via": "stock_count_id",
+      "parent": "stock_count"
+    },
+    {
+      "table": "receipt_item_history",
+      "mode": "沿原业务归属",
+      "via": "purchase_receipt_item_id",
+      "parent": "purchase_receipt_item"
+    },
+    {
+      "table": "insurance_preestimate_history",
+      "mode": "沿原业务归属",
+      "via": "insurance_case_id",
+      "parent": "insurance_case"
+    },
+    {
+      "table": "document_correction",
+      "mode": "沿原业务归属",
+      "via": "document_version_id",
+      "parent": "document_version"
+    },
+    {
+      "table": "prescription_review_history",
+      "mode": "沿原业务归属",
+      "via": "prescription_id",
+      "parent": "prescription"
+    },
+    {
+      "table": "treatment_quote",
+      "mode": "新增门店外键",
+      "field": "branch_id",
+      "references": "clinic_branch.id"
+    },
+    {
+      "table": "quote_version",
+      "mode": "沿原业务归属",
+      "via": "quote_id",
+      "parent": "treatment_quote"
+    },
+    {
+      "table": "quote_item",
+      "mode": "沿原业务归属",
+      "via": "quote_version_id",
+      "parent": "quote_version"
+    },
+    {
+      "table": "quote_decision",
+      "mode": "沿原业务归属",
+      "via": "quote_item_id",
+      "parent": "quote_item"
+    }
+  ],
+  "critical_constraints": [
+    "patient_funds由UNIQUE(patient_id)改为UNIQUE(branch_id,patient_id)，同患者预款仅限同门店抵扣；既有资金须核对来源门店。",
+    "material_batch由UNIQUE(material_id,batch_no)改为UNIQUE(branch_id,material_id,batch_no)，批次、位置、库存流水及实际就诊须核对同一门店。",
+    "service_price同一门店同项目有效区间不重叠；insurance_item_mapping按门店核验地区、项目及有效期。",
+    "预约、排班、诊椅、设备、到诊及资源占用的门店一致；同一牙医和患者的时间冲突跨门店检查。",
+    "跨店改约应保留原安排、原门店与变更依据；已到诊预约不得通过变更门店覆盖原就诊事实。",
+    "历史记录不得直接赋予未知来源门店；迁移须由真实来源核对、记录映射及异常处理。",
+    "跨店病历授权不授予签署或修改权限；岗位及授权范围在服务端和文件访问时核验。"
+  ],
+  "validation": {
+    "coverage": "81张旧表逐项覆盖；收费项目、材料与供应商统一目录；归属链无循环",
+    "isolated_sqlite": "验证健康资料按来源就诊及授权范围读取，来源不明的跨店读取被拒绝；患者资金与库存的门店复合外键另经样例检查",
+    "readonly_current_db": "当前运行库只读核对112张应用表；SQLite备份快照quick_check通过且foreign_key_check无违规；不代表迁移已实施",
+    "pending": "历史健康资料的来源须核实；真实数据库表约束、迁移及代码尚未实施",
+    "full_snapshot_fixture": {
+      "scope": "运行库的只读SQLite一致快照，112张应用表；仅在隔离副本操作",
+      "fixture": "将旧数据模拟映射至A店，仅为测试，不代表实际历史归属",
+      "checks": [
+        "缺少映射拒绝执行",
+        "模拟中途失败后逐表比对原可见列、行数、显式索引和全部触发器",
+        "成功试验后逐表比对原可见列与行数，核对自增序列、显式索引、全部触发器及完整性、外键",
+        "仅在隔离副本验证同患者和同批号可按不同门店区分，同店重复拒绝"
+      ],
+      "limitations": "原触发器保持旧逻辑；新增字段暂未完整强制，31张额外运行表仅核对保留未完成连锁设计；未验证应用层权限、并发冲突、真实旧店映射及完整迁移"
+    }
+  }
+}

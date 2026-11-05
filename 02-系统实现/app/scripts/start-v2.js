@@ -3,8 +3,9 @@ const fs=require('node:fs'),path=require('node:path'),net=require('node:net'),{s
 const businessDemo=process.argv.includes('--business-demo'),port=businessDemo?3002:3001;
 const appRoot=path.resolve(__dirname,'..'),base='http://127.0.0.1:'+port;
 const {VERSION}=require('../src/v2/database');
+const {BUILD}=require('../src/v2/release');
 async function status(){try{const r=await fetch(base+'/api/v2/status',{signal:AbortSignal.timeout(1000)});return r.ok?await r.json():null;}catch{return null;}}
-const current=s=>s?.application==='qinghe-dental-v2'&&s.schemaVersion===VERSION&&s.insuranceApi?.implemented?.includes('fundReceipts')&&(businessDemo?s.settlementApi?.mode==='isolatedSimulation':s.settlementApi?.mode==='officialTerminalVerification');
+const current=s=>s?.application==='qinghe-dental-v2'&&s.schemaVersion===VERSION&&s.buildVersion===BUILD&&s.insuranceApi?.implemented?.includes('fundReceipts')&&(businessDemo?s.settlementApi?.mode==='isolatedSimulation':s.settlementApi?.mode==='officialTerminalVerification');
 function occupied(){return new Promise(resolve=>{const s=net.connect({host:'127.0.0.1',port});let done=false;const end=value=>{if(!done){done=true;s.destroy();resolve(value);}};s.once('connect',()=>end(true));s.once('error',()=>end(false));s.setTimeout(500,()=>end(false));});}
 function openBrowser(){if(process.argv.includes('--no-browser'))return;const child=spawn(process.env.ComSpec||'cmd.exe',['/d','/c','start','',base],{detached:true,windowsHide:true,stdio:'ignore'});child.on('error',()=>console.log('Open '+base+' in your browser.'));child.unref();}
 (async()=>{

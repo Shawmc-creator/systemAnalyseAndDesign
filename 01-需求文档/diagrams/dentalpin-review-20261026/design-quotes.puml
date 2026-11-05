@@ -1,0 +1,38 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 35
+left to right direction
+class 报价应用服务 {
+ 编制报价()
+ 出具报价()
+ 记录患者决定()
+ 建立新版()
+ 查阅报价及原收款()
+}
+class 治疗报价单
+class 报价版本
+class 报价明细
+class 报价确认
+interface 报价存取接口 {
+ 读取原报价及关联条件()
+ 保存版本及决定()
+}
+class SQLite报价映射器 {
+ 装配报价与确切版本()
+ 持久化本次共同结果()
+}
+报价应用服务 ..> 治疗报价单
+报价应用服务 ..> 报价版本
+报价应用服务 ..> 报价明细
+报价应用服务 ..> 报价确认
+报价应用服务 ..> 报价存取接口
+报价存取接口 <|.. SQLite报价映射器
+@enduml

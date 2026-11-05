@@ -97,7 +97,7 @@ function previous(t){
 }
 test('108-table migration preserves original rows, generated money, sealed prescription hashes and reserved sequence; backup is readable once',t=>{
  const f=previous(t),db=f.track(openDatabase(f.file));assert.equal(db.prepare('PRAGMA user_version').get().user_version,VERSION);
- for(const[name,old]of f.original){const current=db.prepare('SELECT * FROM '+name+' ORDER BY rowid').all().map(r=>Object.fromEntries(old.columns.map(c=>[c,r[c]])));assert.equal(JSON.stringify(current),old.rows,name);}
+ for(const[name,old]of f.original){const current=db.prepare('SELECT * FROM '+name+' ORDER BY rowid').all().filter(r=>!['access_permission','role_permission'].includes(name)||JSON.parse(old.rows).some(o=>o.id===r.id)).map(r=>Object.fromEntries(old.columns.map(c=>[c,r[c]])));assert.equal(JSON.stringify(current),old.rows,name);}
  assert.equal(db.prepare('SELECT patient_funds_id FROM payment_order').get().patient_funds_id,db.prepare('SELECT patient_funds_id FROM bill').get().patient_funds_id);assert.equal(db.prepare('SELECT content_hash FROM prescription').get().content_hash,f.signed);validatePrescriptions(db);assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);assert.equal(db.prepare('SELECT seq FROM sqlite_sequence WHERE name=?').get('payment_order').seq,100);
  const backups=fs.readdirSync(path.join(f.folder,'backups'));assert.equal(backups.length,1);const b=new DatabaseSync(path.join(f.folder,'backups',backups[0]),{readOnly:true});assert.equal(b.prepare('PRAGMA user_version').get().user_version,2026102303);b.close();openDatabase(f.file).close();assert.equal(fs.readdirSync(path.join(f.folder,'backups')).length,1);
 });

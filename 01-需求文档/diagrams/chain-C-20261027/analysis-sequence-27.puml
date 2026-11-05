@@ -1,0 +1,56 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 35
+autonumber
+actor "牙医" as D
+actor "收费人员" as C
+boundary "报价边界" as B
+control "编制报价并记录患者确认控制" as CT
+entity "q:治疗报价单" as Q
+entity "v:报价版本" as V
+entity "i:报价明细" as I
+entity "c:报价确认" as CF
+D -> B : 选择患者、原方案及拟报价项目
+B -> CT : 编制报价(门店、患者、方案、明细、依据)
+CT -> CT : 核验牙医的报价门店权限
+break 无门店权限
+ CT --> B : 拒绝办理，不返回受限资料
+end
+CT -> Q : 核对患者与方案()
+CT -> Q : 建立报价版本()
+CT -> CT : 核对价目适用报价门店
+CT -> I : 核对项目与价目()
+CT -> I : 形成报价快照()
+CT --> B : 返回草稿与缺失项
+B --> D : 显示报价编号、版本及范围
+C -> B : 核价并确认实际出具
+B -> CT : 出具(门店、原版本、有效期间、核实依据)
+CT -> CT : 核验收费人员的报价门店权限
+break 无门店权限或报价归属不符
+ CT --> B : 拒绝出具，不修改原报价
+end
+CT -> V : 核对可出具条件()
+break 条件不足或原版本变化
+ CT --> B : 返回待补正原因，保留原版本；不记录决定
+end
+CT -> V : 出具费用说明()
+CT --> B : 返回冻结的报价内容及出具结果
+C -> B : 据实际沟通记录患者逐项决定
+B -> CT : 记录决定(原明细、决定时间、确认依据)
+CT -> CT : 重核经办人及报价门店权限
+break 权限失效或报价归属不符
+ CT --> B : 拒绝记录决定，保留原报价
+end
+CT -> CF : 核对确认范围()
+CT -> CF : 记录逐项决定()
+CT --> B : 返回已接受范围及原报价
+B --> C : 分别衔接预约、医疗同意与真实收款
+@enduml

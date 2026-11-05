@@ -57,6 +57,7 @@ class Payments {
       }
       let payment;
       if (input.action === 'receive') {
+        const quoteId=require('./quote-rules').paymentQuote(this.db,input.quoteId??null,funds.patient_id,now);
         const received = this.billing.amount(input.receivedCents), change = this.billing.amount(input.changeCents, true);
         if (change >= received || !['现金', '银行卡', '微信', '支付宝'].includes(input.channel) || (input.channel !== '现金' && change !== 0)) fail(422, 'PAYMENT_AMOUNT_CHANNEL', '请核对实收、找零及渠道；非现金不能找零');
         if (!['confirmed', 'pending'].includes(input.verification)) fail(422, 'PAYMENT_VERIFICATION', '须明确已核实到账或待核实');
@@ -69,7 +70,7 @@ class Payments {
           channel: input.channel, received_at: confirmed ? this.receivedAt(input.receivedAt, now) : null,
           transaction_evidence: text(input.transactionEvidence, '实际到账或待核实依据', 4000), external_reference: reference,
           verified_at: confirmed ? now : null, operator_id: ctx.session.staff_id, verified_by: confirmed ? ctx.session.staff_id : null,
-          status: confirmed ? '到账已确认' : '待核实', record_no: recordNo('PAY') }));
+          status: confirmed ? '到账已确认' : '待核实', record_no: recordNo('PAY'),quote_id:quoteId }));
         payment = row(this.db, 'patient_payment', key);
       } else if (input.action === 'verify') {
         payment = row(this.db, 'patient_payment', input.paymentId); revision(payment, input.expectedPaymentRevision);

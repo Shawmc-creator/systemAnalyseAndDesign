@@ -1,0 +1,68 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 19
+skinparam ArrowColor black
+skinparam ClassBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 32
+skinparam ranksep 35
+allowmixing
+hide circle
+left to right direction
+boundary "报价边界" as QB
+control "编制报价并记录患者确认控制" as QC
+QB -- QC
+QC ..> Q
+QC ..> V
+QC ..> I
+QC ..> C
+class "患者" as P <<entity>>
+class "治疗方案" as T <<entity>>
+class "方案版本" as PV <<entity>>
+class "治疗报价单" as Q <<entity>> {
+ 报价编号、患者、可空原方案
+ --
+ 核对患者与方案()
+ 建立报价版本()
+}
+class "报价版本" as V <<entity>> {
+ 版本号、前版本、来源方案版本
+ 有效期间、出具信息、状态
+ --
+ 核对可出具条件()
+ 出具费用说明()
+ 建立后继版本()
+ 终止接受()
+}
+class "报价明细" as I <<entity>> {
+ 项目、原方案明细、牙位牙面
+ 数量、单位及单价快照、金额、范围
+ --
+ 核对项目与价目()
+ 形成报价快照()
+}
+class "报价确认" as C <<entity>> {
+ 明细、决定、真实时间、依据、记录人
+ --
+ 记录逐项决定()
+ 核对确认范围()
+}
+class "患者付款" as PAY <<entity>> {
+ 可空报价用途引用
+}
+class "应收项目" as B <<entity>> {
+ 可空原报价明细引用
+}
+P "1" -- "0..*" Q
+T "0..1" -- "0..*" Q
+Q "1" *-- "1..*" V
+PV "0..1" -- "0..*" V
+V "1" *-- "1..*" I
+V "0..1" <-- "0..*" V
+I "1" *-- "0..*" C
+Q "0..1" -- "0..*" PAY : 仅用途，不代替到账
+I "0..1" -- "0..*" B : 实际发生后引用
+@enduml

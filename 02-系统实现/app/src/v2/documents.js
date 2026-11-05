@@ -23,7 +23,7 @@ class Documents{
         })};
     });
   }
-  query(credentials,input){
+  query(credentials,input,{scopeGuard=null}={}){
     return this.unit.query(credentials,'uc23.upload',ctx=>{
       const visit=this.context(ctx,input),patient=row(this.db,'patient',visit.patient_id);
       const documents=this.db.prepare('SELECT * FROM clinical_document WHERE visit_id=? ORDER BY id DESC').all(visit.id).map(doc=>{
@@ -34,14 +34,14 @@ class Documents{
       });
       const plans=this.db.prepare(`SELECT v.id,v.version_no,p.goal FROM plan_version v JOIN treatment_plan p ON p.id=v.treatment_plan_id WHERE v.source_visit_id=? AND p.patient_id=? ORDER BY v.id DESC`).all(visit.id,patient.id);
       return {visit:{id:visit.id,record_no:visit.record_no,status:visit.status},patient:{id:patient.id,name:patient.name,record_no:patient.record_no},documents,plans};
-    });
+    },scopeGuard);
   }
-  mutate(credentials,input,permission,handler){
+  mutate(credentials,input,permission,handler,scopeGuard=null){
     const writes=[];
-    try{const result=this.unit.command(credentials,permission,input,(ctx,now)=>handler(ctx,now,writes));writes.forEach(w=>w.commit());return result;}
+    try{const result=this.unit.command(credentials,permission,input,(ctx,now)=>handler(ctx,now,writes),scopeGuard);writes.forEach(w=>w.commit());return result;}
     catch(error){for(const w of writes.reverse())w.rollback();throw error;}
   }
-  upload(credentials,input){
+  upload(credentials,input,{scopeGuard=null}={}){
     return this.mutate(credentials,input,'uc23.upload',(ctx,now,writes)=>{
       const visit=this.context(ctx,input,'documents'),file=decodeFile(input),reason=text(input.reason,'上传或补充依据',2000);
       const capturedAt=input.capturedAt?instant(input.capturedAt,'实际拍摄或形成时间'):null;
@@ -63,9 +63,9 @@ class Documents{
       this.db.prepare('UPDATE clinical_document SET revision=revision+1,updated_at=? WHERE id=?').run(now,doc.id);
       ctx.authority.documentId=doc.id;
       return {kind:'document_version',key,revision:1,reason,changes:[{field:'sha256',after:file.sha256},{field:'clinical_document_id',after:doc.id}],relatedChanges:[{kind:'clinical_document',key:doc.id,beforeRevision:doc.revision,revision:doc.revision+1,reason}]};
-    });
+    },scopeGuard);
   }
-  verify(credentials,input){
+  verify(credentials,input,{scopeGuard=null}={}){
     return this.mutate(credentials,input,'uc23.confirm',(ctx,now,writes)=>{
       const version=row(this.db,'document_version',id(input.versionId)),doc=this.own(ctx,version.clinical_document_id,'documents');revision(version,input.expectedRevision);
       const note=text(input.verificationNote,'核对结论',2000);let status;
@@ -87,7 +87,7 @@ class Documents{
       this.db.prepare('UPDATE document_version SET status=?,verification_note=?,confirmed_at=?,confirmed_by=?,updated_at=?,revision=revision+1 WHERE id=?').run(status,note,input.action==='confirm'?now:version.confirmed_at,input.action==='confirm'?ctx.session.staff_id:version.confirmed_by,now,version.id);
       ctx.authority.documentId=doc.id;
       return {kind:'document_version',key:version.id,beforeRevision:version.revision,revision:version.revision+1,reason:note,changes:[{field:'status',before:version.status,after:status}]};
-    });
+    },scopeGuard);
   }
   correct(credentials,input){
     return this.mutate(credentials,input,'uc23.confirm',(ctx,now,writes)=>{
@@ -109,12 +109,12 @@ class Documents{
       return {kind:'document_version',key:newVersion,revision:1,reason,changes:[{field:'corrected_from_version_id',after:version.id},{field:'clinical_document_id',after:key}],relatedChanges:[{kind:'document_version',key:version.id,beforeRevision:version.revision,revision:version.revision+1,reason,changes:[{field:'corrected_to_version_id',after:newVersion}]}]};
     });
   }
-  download(credentials,versionId){
+  download(credentials,versionId,{scopeGuard=null}={}){
     return this.unit.query(credentials,'uc23.upload',ctx=>{
       const v=row(this.db,'document_version',Number(versionId));this.own(ctx,v.clinical_document_id);
       if(!this.store.available(v))fail(409,'FILE_UNAVAILABLE','原件缺失或内容校验不符，请牙医核对后恢复');
       ctx.authority.documentVersionId=v.id;return {name:v.original_name,mediaType:v.media_type,bytes:this.store.read(v.storage_key)};
-    });
+    },scopeGuard);
   }
   requireEvidence(versionId){
     const v=row(this.db,'document_version',versionId);

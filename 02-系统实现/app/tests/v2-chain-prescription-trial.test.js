@@ -1,0 +1,21 @@
+'use strict';
+const test=require('node:test'),assert=require('node:assert/strict');
+const {setup,command}=require('./helpers/v2-prescriptions');
+const {installTrialSchema}=require('../src/v2/chain-schema-trial');
+const {ChainPrescriptionTrial}=require('../src/v2/chain-prescription-trial');
+test('院外处方隔离试验核验门店、医生、患者及重放权限，保留开方规则',t=>{
+ const a=setup(t);a.review();a.record();const drug2=a.inventory.record(a.i,command({action:'material',name:'第二种虚构演示药品',specification:'演示规格',baseUnit:'片',purchaseUnit:'盒',conversionNumerator:10,conversionDenominator:1,quantityScale:0,requiresTrace:true,requiresExpiry:true,isDrug:true,reason:'虚构目录'}));a.inventory.approve(a.m,command({action:'confirmMaterial',materialId:drug2.id,expectedRevision:1,reason:'虚构药品核对'}));const db=a.db;installTrialSchema(db);
+ db.exec("INSERT INTO clinic_chain(id,name) VALUES(1,'演示'); INSERT INTO clinic_branch(id,chain_id,branch_code,name) VALUES(1,1,'A','一店'),(2,1,'B','二店'); UPDATE visit SET branch_id=1;");
+ const staff=a.auth.session(a.d.token).staff_id,manager=a.auth.session(a.m.token).staff_id,now=a.auth.now();db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(1,?,'dentist','2026-10-01T00:00:00Z',?,?,'演示资格')").run(staff,manager,now);
+ const service=new ChainPrescriptionTrial(a),draft=command({...a.context,branchId:1,action:'draft',collectionRoute:'院外',diagnosis:'虚构诊断',guidanceNote:'仅作流程演示',reason:'演示草稿',items:[{materialId:a.drug.id,expectedMaterialRevision:2,quantityScaled:7,directions:'虚构用法'},{materialId:drug2.id,expectedMaterialRevision:2,quantityScaled:3,directions:'第二项虚构用法'}]});
+ assert.throws(()=>service.write(a.f,draft),/牙医/);assert.throws(()=>service.write(a.d,{...draft,branchId:2}),/无权/);assert.throws(()=>service.write(a.d,{...draft,patientId:999}),/同一患者/);assert.throws(()=>service.write(a.d,{...draft,collectionRoute:'院内'}),/院外/);
+ assert.throws(()=>service.query(a.f,{...a.context,branchId:1}),/牙医/);assert.throws(()=>service.query(a.d,{...a.context,branchId:2}),/无权/);assert.equal(service.query(a.d,{...a.context,branchId:1}).prescriptions.length,0);
+ db.exec("CREATE TEMP TRIGGER chain_rx_audit_failure BEFORE INSERT ON operation_audit WHEN NEW.object_kind='prescription' AND NEW.event_type='变更' BEGIN SELECT RAISE(ABORT,'chain rx audit failed'); END");assert.throws(()=>service.write(a.d,draft),/chain rx audit failed/);assert.equal(db.prepare('SELECT count(*) n FROM prescription').get().n,0);db.exec('DROP TRIGGER chain_rx_audit_failure');
+ const first=service.write(a.d,draft);assert.equal(service.write(a.d,draft).replayed,true);
+ assert.equal(db.prepare('SELECT count(*) n FROM prescription_item WHERE prescription_id=?').get(first.id).n,2);
+ assert.ok(db.prepare("SELECT id FROM operation_audit WHERE object_kind='prescription' AND outcome_code='COMMITTED' AND json_extract(authority_snapshot,'$.branchId')=1").get());
+ const issue=command({...a.context,branchId:1,action:'issue',prescriptionId:first.id,expectedRevision:first.revision,expectedPatientRevision:1,expectedRecordRevision:a.clinical.recordFor(a.v.id).revision,expectedHealthReviewId:db.prepare('SELECT id FROM health_review WHERE visit_id=?').get(a.v.id).id,confirmed:true,reason:'虚构核对'});
+ service.write(a.d,issue);assert.equal(db.prepare('SELECT status FROM prescription WHERE id=?').get(first.id).status,'已开立');for(const table of ['bill','patient_funds','inventory_movement'])assert.equal(db.prepare('SELECT count(*) n FROM '+table).get().n,0);
+ assert.equal(service.query(a.d,{...a.context,branchId:1}).prescriptions[0].status,'已开立');
+ db.prepare("UPDATE branch_staff_role SET revoked_at=?,revoked_by=? WHERE branch_id=1 AND staff_id=? AND role_code='dentist'").run(now,manager,staff);assert.throws(()=>service.write(a.d,draft),/无权/);
+});

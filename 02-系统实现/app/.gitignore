@@ -3,3 +3,6 @@ data/clinical-files/
 data/pharmacy-config.json
 
 /data/insurance-config.json
+
+# Local chain demonstration snapshots contain user-entered data.
+/data/chain-demo/

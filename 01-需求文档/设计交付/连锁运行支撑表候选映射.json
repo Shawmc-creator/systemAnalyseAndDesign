@@ -1,0 +1,321 @@
+{
+  "status": "运行支撑表候选规则；未应用到现有数据库或代码",
+  "base_tables": 81,
+  "support_tables": 31,
+  "support_rows": [
+    {
+      "table": "access_permission",
+      "mode": "连锁通用配置",
+      "policy": "权限定义统一；实际办理同时核验门店授权。",
+      "existing_parent_tables": []
+    },
+    {
+      "table": "access_role",
+      "mode": "连锁通用配置",
+      "policy": "岗位定义统一，不代表自动取得各店权限。",
+      "existing_parent_tables": []
+    },
+    {
+      "table": "account_role",
+      "mode": "历史权限",
+      "policy": "保留原授权与撤销依据；不能自动扩展到所有门店。",
+      "existing_parent_tables": [
+        "access_role",
+        "staff_role_qualification",
+        "user_account"
+      ]
+    },
+    {
+      "table": "audit_change",
+      "mode": "审计明细",
+      "policy": "保留并关联原审计事件；不自动扩大可查看范围。",
+      "existing_parent_tables": [
+        "operation_audit"
+      ]
+    },
+    {
+      "table": "authentication_event",
+      "mode": "认证历史",
+      "policy": "保留认证结果及会话引用，不作为门店授权依据。",
+      "existing_parent_tables": [
+        "login_session",
+        "user_account"
+      ]
+    },
+    {
+      "table": "backup_artifact",
+      "mode": "备份历史",
+      "policy": "保留备份及文件版本对应关系。",
+      "existing_parent_tables": [
+        "backup_run",
+        "document_version"
+      ]
+    },
+    {
+      "table": "backup_copy",
+      "mode": "备份历史",
+      "policy": "保留备份副本记录，不自动清理已有备份。",
+      "existing_parent_tables": [
+        "backup_run",
+        "user_account"
+      ]
+    },
+    {
+      "table": "backup_run",
+      "mode": "备份历史",
+      "policy": "保留全库备份记录；数据库与文件一致备份、恢复验证。",
+      "existing_parent_tables": [
+        "staff",
+        "user_account"
+      ]
+    },
+    {
+      "table": "cash_reconciliation",
+      "mode": "门店核对",
+      "policy": "候选增加branch_id，收付款核对按门店、营业日期及渠道区分。",
+      "existing_parent_tables": [
+        "staff"
+      ],
+      "candidate_branch_field": "branch_id",
+      "legacy_nullable": true,
+      "new_branch_business": "门店核对必填"
+    },
+    {
+      "table": "clinical_handover",
+      "mode": "历史临床交接",
+      "policy": "原范围可能含指定就诊和操作，但没有来源与目标门店；保留依据，不自动转换为跨店授权。",
+      "existing_parent_tables": [
+        "patient",
+        "staff"
+      ]
+    },
+    {
+      "table": "instrument_pack",
+      "mode": "既有低频历史",
+      "policy": "原器械资料保留，本轮不新增相关业务。",
+      "existing_parent_tables": [
+        "staff"
+      ]
+    },
+    {
+      "table": "instrument_pack_cycle",
+      "mode": "既有低频历史",
+      "policy": "原器械处理记录保留，本轮不新增相关业务。",
+      "existing_parent_tables": [
+        "instrument_pack",
+        "instrument_processing",
+        "staff"
+      ]
+    },
+    {
+      "table": "instrument_processing",
+      "mode": "既有低频历史",
+      "policy": "原器械处理记录保留，本轮不新增相关业务。",
+      "existing_parent_tables": [
+        "instrument_processing",
+        "processing_equipment",
+        "staff"
+      ]
+    },
+    {
+      "table": "instrument_use",
+      "mode": "既有低频历史",
+      "policy": "原使用记录及就诊引用保留，本轮不新增相关业务。",
+      "existing_parent_tables": [
+        "instrument_pack_cycle",
+        "staff",
+        "visit"
+      ]
+    },
+    {
+      "table": "issue_followup",
+      "mode": "既有混合来源",
+      "policy": "关联收款核对或原器械处理；按原来源核对，器械部分不扩展新业务。",
+      "existing_parent_tables": [
+        "cash_reconciliation",
+        "instrument_processing",
+        "staff"
+      ]
+    },
+    {
+      "table": "login_session",
+      "mode": "会话历史",
+      "policy": "保留原会话以维持审计引用；切换后更换运行会话标识并重新登录。",
+      "existing_parent_tables": [
+        "user_account"
+      ]
+    },
+    {
+      "table": "operation_audit",
+      "mode": "审计记录",
+      "policy": "新门店操作记录门店及权限结果；历史未知保持未知，不推定来源。",
+      "existing_parent_tables": [
+        "access_permission",
+        "login_session",
+        "request_submission",
+        "staff",
+        "user_account"
+      ],
+      "candidate_branch_field": "branch_id",
+      "legacy_nullable": true,
+      "new_branch_business": "所涉门店必填；连锁级事件按用途保留空值"
+    },
+    {
+      "table": "patient_proxy",
+      "mode": "历史代理信息",
+      "policy": "保留原患者代理范围及核验依据；不自动授予跨店临床资料权限。",
+      "existing_parent_tables": [
+        "patient",
+        "staff"
+      ]
+    },
+    {
+      "table": "processing_equipment",
+      "mode": "既有低频历史",
+      "policy": "原处理设备资料保留，本轮不新增相关业务。",
+      "existing_parent_tables": [
+        "staff"
+      ]
+    },
+    {
+      "table": "processing_monitor",
+      "mode": "既有低频历史",
+      "policy": "原处理监测记录保留，本轮不新增相关业务。",
+      "existing_parent_tables": [
+        "instrument_processing",
+        "staff"
+      ]
+    },
+    {
+      "table": "purchase_issue",
+      "mode": "既有低频历史",
+      "policy": "原采购差异及来源保留，本轮不扩展精细供应商结算。",
+      "existing_parent_tables": [
+        "purchase_order_item",
+        "purchase_receipt_item",
+        "staff"
+      ]
+    },
+    {
+      "table": "reconciliation_item",
+      "mode": "门店核对明细",
+      "policy": "沿原核对记录确定门店，引用的收退款应同门店。",
+      "existing_parent_tables": [
+        "cash_reconciliation",
+        "patient_payment",
+        "patient_refund",
+        "supplier_payment",
+        "supplier_refund"
+      ]
+    },
+    {
+      "table": "request_submission",
+      "mode": "办理记录",
+      "policy": "新门店业务记录门店；提交摘要包含门店，重放前重核权限；旧无门店记录先核实。",
+      "existing_parent_tables": [
+        "access_permission",
+        "user_account"
+      ],
+      "candidate_branch_field": "branch_id",
+      "legacy_nullable": true,
+      "new_branch_business": "所涉门店必填；连锁级事件按用途保留空值"
+    },
+    {
+      "table": "restore_check",
+      "mode": "备份历史",
+      "policy": "保留原恢复验证检查结果。",
+      "existing_parent_tables": [
+        "restore_verification"
+      ]
+    },
+    {
+      "table": "restore_verification",
+      "mode": "备份历史",
+      "policy": "保留隔离恢复验证及原备份引用。",
+      "existing_parent_tables": [
+        "backup_copy",
+        "backup_run",
+        "user_account"
+      ]
+    },
+    {
+      "table": "role_permission",
+      "mode": "连锁通用配置",
+      "policy": "保留岗位功能映射，不替代职员门店授权。",
+      "existing_parent_tables": [
+        "access_permission",
+        "access_role"
+      ]
+    },
+    {
+      "table": "staff_role_qualification",
+      "mode": "人员资格",
+      "policy": "保留资格及有效期；资格不自动赋予门店岗位权限。",
+      "existing_parent_tables": [
+        "access_role",
+        "staff"
+      ]
+    },
+    {
+      "table": "supplier_allocation",
+      "mode": "既有低频历史",
+      "policy": "原供方付款分配及采购来源保留，本轮不扩展相关业务。",
+      "existing_parent_tables": [
+        "purchase_issue",
+        "purchase_order",
+        "purchase_receipt",
+        "staff",
+        "supplier_allocation",
+        "supplier_payment"
+      ]
+    },
+    {
+      "table": "supplier_funds",
+      "mode": "既有低频历史",
+      "policy": "原供方资金记录保留，不能将其当作患者资金。",
+      "existing_parent_tables": [
+        "staff",
+        "supplier"
+      ]
+    },
+    {
+      "table": "supplier_payment",
+      "mode": "既有低频历史",
+      "policy": "原供方付款事实保留；本系统不发起真实支付。",
+      "existing_parent_tables": [
+        "staff",
+        "supplier_funds",
+        "supplier_payment"
+      ]
+    },
+    {
+      "table": "supplier_refund",
+      "mode": "既有低频历史",
+      "policy": "原供方退款事实保留；不自动产生真实退款。",
+      "existing_parent_tables": [
+        "purchase_issue",
+        "staff",
+        "supplier_funds",
+        "supplier_payment"
+      ]
+    }
+  ],
+  "checks": [
+    "名称与真实SQLite表结构逐项核对",
+    "原外键目标均存在",
+    "不读取患者或操作明细"
+  ],
+  "limitations": [
+    "候选规则未实现；不得以此声称门店权限或跨店隔离已在现有系统生效",
+    "历史旧店与旧授权的真实范围须核实"
+  ],
+  "isolated_validation": {
+    "scope": "独立SQLite内存样例；不是现有应用实现",
+    "cases": [
+      "旧交接及原接诊牙医身份不能自动获得跨店授权",
+      "切换运行标识后旧会话失效且原认证事件引用保留",
+      "提交号重放先验权限；跨店复用拒绝；旧记录无门店须核实"
+    ],
+    "limitations": "未验证完整应用接口、真实门店授权、并发和实际迁移；旧功能保留不表示扩展业务范围"
+  }
+}

@@ -30,6 +30,15 @@ test('HTTP login, candidate escaping, CSRF, role guard and own submission scope'
   assert.equal((await request('/auth/logout', f, {})).status, 200);
   assert.equal((await request('/auth/me', f)).status, 401);
 });
+test('front desk can distinguish same-name candidates by a known birth date without inventing unknown dates', async t => {
+  const a=await start(t),f=await a.login('frontdesk');
+  const c={token:f.Cookie.split('=')[1],csrf:f['X-CSRF-Token'],role:'frontdesk'};
+  a.reception.patient(c,{requestKey:'candidate-known-birthday',commandVersion:1,fields:{name:'陈晨（演示）',birth_date:'2000-01-02',contact_unavailable_reason:'暂未提供'},reason:'隔离验证患者身份'});
+  const get=async q=>{const r=await fetch(a.base+'/api/v2/patients/candidates?'+q,{headers:f});return {status:r.status,body:await r.json()};};
+  const all=await get('q='+encodeURIComponent('陈晨（演示）'));assert.equal(all.body.items.length,3);assert.equal(all.body.items.filter(p=>p.birth_date===null).length,2);
+  const exact=await get('q='+encodeURIComponent('陈晨（演示）')+'&birthDate=2000-01-02');assert.equal(exact.body.items.length,1);assert.equal(exact.body.items[0].birth_date,'2000-01-02');
+  assert.equal((await get('birthDate=2000-02-30')).status,422);
+});
 test('concurrent HTTP retries commit exactly one appointment and enforce slot conflict', async t => {
   const a = await start(t), f = await a.login('frontdesk'), m = await a.login('manager');
   const post = (route, who, body) => fetch(a.base + '/api/v2' + route, { method: 'POST', headers: { ...who, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });

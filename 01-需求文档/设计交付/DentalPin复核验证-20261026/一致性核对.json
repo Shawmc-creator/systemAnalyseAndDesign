@@ -1,0 +1,19 @@
+{
+  "declaredTablesInOverall": 81,
+  "all81ModelTablesInOverall": true,
+  "newC2EntityCallsDefinedInC1": [
+    "出具费用说明",
+    "建立报价版本",
+    "形成报价快照",
+    "核对可出具条件",
+    "核对患者与方案",
+    "核对确认范围",
+    "核对项目与价目",
+    "记录逐项决定"
+  ],
+  "systemUsecaseRegulations": 27,
+  "runtimeFilesCompared": 146,
+  "runtimeCodeUnchanged": true,
+  "liveDatabaseTouched": false,
+  "baseSqlUnchanged": true
+}

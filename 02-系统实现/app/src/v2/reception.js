@@ -61,31 +61,35 @@ class Reception {
   schedule(credentials, input) {
     return this.unit.command(credentials, 'uc15.schedule', input, (ctx, now) => {
       const action = input.action;
-      if (!['publish', 'change', 'close'].includes(action)) fail(422, 'INVALID_ACTION', '排班操作无效');
-      const old = action === 'publish' ? null : row(this.db, 'dated_schedule', input.scheduleId);
-      if (old) { revision(old, input.expectedRevision); if (old.status !== '已确认') fail(409, 'INVALID_STATE', '该安排不能再次调整'); }
+      if (!['draft', 'publish', 'change', 'close'].includes(action)) fail(422, 'INVALID_ACTION', '排班操作无效');
+      const old = input.scheduleId == null ? null : row(this.db, 'dated_schedule', input.scheduleId);
+      if (old) {
+        revision(old, input.expectedRevision);
+        if ((['draft','publish'].includes(action) && old.status !== '草稿') || (['change','close'].includes(action) && old.status !== '已确认')) fail(409, 'INVALID_STATE', '排班状态已改变，请重新核对');
+      } else if (['change','close'].includes(action)) fail(422, 'INVALID_INPUT', '请选择原排班');
       const start = action === 'close' ? old.starts_at : instant(input.startsAt, '排班开始');
       const end = action === 'close' ? old.ends_at : instant(input.endsAt, '排班结束');
       const dentist = action === 'close' ? old.dentist_id : id(input.dentistId, '牙医');
       const chairId = action === 'close' ? old.dental_chair_id : id(input.chairId, '诊椅');
       const businessDate = action === 'close' ? old.business_date : dateOnly(input.businessDate);
       if (end <= start || day(start) !== businessDate || day(end) !== businessDate) fail(422, 'INVALID_INPUT', '排班起止应在同一营业日期内');
-      if (action !== 'close') {
+      if (action !== 'close' && action !== 'draft') {
         if (end <= now) fail(422, 'PAST_SCHEDULE', '不能发布已经结束的排班');
         this.dentistAvailable(dentist, start, end);
         const chair = row(this.db, 'dental_chair', chairId);
         if (chair.available_from > start || (chair.available_until && chair.available_until < end)) fail(409, 'CHAIR_UNAVAILABLE', '诊椅在排班时段不可用');
       }
       const reason = text(input.reason, '排班依据');
+      if (action === 'draft') { row(this.db,'staff',dentist); row(this.db,'dental_chair',chairId); }
       const values = { dentist_id: dentist, dental_chair_id: chairId, business_date: businessDate, starts_at: start, ends_at: end,
-        confirmed_at: now, confirmed_by: ctx.session.staff_id, status: action === 'close' ? '已停诊' : '已确认', closure_reason: action === 'close' ? reason : null };
+        confirmed_at: action === 'draft' ? null : now, confirmed_by: action === 'draft' ? null : ctx.session.staff_id, status: action === 'draft' ? '草稿' : action === 'close' ? '已停诊' : '已确认', closure_reason: action === 'close' ? reason : null };
       let key;
       if (!old) key = insert(this.db, 'dated_schedule', fact(now, { ...values, created_by: ctx.session.staff_id }));
       else {
         const occupied = this.db.prepare(`SELECT o.id,a.record_no,o.visit_id FROM resource_occupancy o LEFT JOIN appointment a ON a.id=o.appointment_id WHERE o.dated_schedule_id=? AND o.released_at IS NULL`).all(old.id);
         if (occupied.length) fail(409, 'ACTIVE_OCCUPANCY', '请先逐项改约、取消或完成在诊占用，再提交排班变更', { affected: occupied });
         this.db.prepare(`UPDATE dated_schedule SET dentist_id=?,dental_chair_id=?,business_date=?,starts_at=?,ends_at=?,confirmed_at=?,confirmed_by=?,status=?,closure_reason=?,updated_at=?,revision=revision+1 WHERE id=?`).run(...Object.values(values), now, old.id);
-        insert(this.db, 'schedule_change', fact(now, { dated_schedule_id: old.id, old_business_date: old.business_date, old_starts_at: old.starts_at, old_ends_at: old.ends_at,
+        if (old.status === '已确认') insert(this.db, 'schedule_change', fact(now, { dated_schedule_id: old.id, old_business_date: old.business_date, old_starts_at: old.starts_at, old_ends_at: old.ends_at,
           new_business_date: businessDate, new_starts_at: start, new_ends_at: end, reason, occurred_at: now, change_kind: action === 'close' ? '停诊' : '调整', affected_handling: '已核对无有效预约及在诊占用',
           operator_id: ctx.session.staff_id, old_dentist_id: old.dentist_id, new_dentist_id: dentist, old_chair_id: old.dental_chair_id, new_chair_id: chairId }));
         key = old.id;
@@ -172,8 +176,8 @@ class Reception {
       let schedule, occupancy;
       if (appointment) {
         if (appointment.patient_id !== patient.id) fail(409, 'PATIENT_MISMATCH', '患者与预约不一致');
-        const existing = this.db.prepare('SELECT id FROM visit WHERE appointment_id=?').get(appointment.id);
-        if (existing) fail(409, 'ALREADY_ARRIVED', '该预约已经登记到诊', { visitId: existing.id });
+        const existing = this.db.prepare('SELECT id,record_no,status FROM visit WHERE appointment_id=?').get(appointment.id);
+        if (existing) fail(409, 'ALREADY_ARRIVED', `该预约已经登记到诊，就诊号 ${existing.record_no}，当前状态 ${existing.status}；请查阅原就诊`, { visitId: existing.id, visitNo: existing.record_no, status: existing.status });
         revision(appointment, input.expectedRevision);
         if (appointment.status !== '已预约' || day(appointment.planned_start) !== day(now)) fail(409, 'INVALID_STATE', '只能登记当日有效预约到诊');
         occupancy = this.db.prepare('SELECT * FROM resource_occupancy WHERE appointment_id=? AND released_at IS NULL').get(appointment.id);

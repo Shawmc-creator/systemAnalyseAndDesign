@@ -106,7 +106,7 @@ function previous(t){
 }
 test('102-table upgrade preserves all original columns and facts, creates empty histories and takes exactly one readable backup',t=>{
  const f=previous(t),db=f.track(openDatabase(f.file));assert.equal(db.prepare('PRAGMA user_version').get().user_version,VERSION);
- for(const[name,rows]of f.originals){const original=JSON.parse(rows),columns=original.length?Object.keys(original[0]):[];const current=db.prepare('SELECT * FROM '+name+' ORDER BY rowid').all().map(r=>columns.length?Object.fromEntries(columns.map(c=>[c,r[c]])):r);assert.equal(JSON.stringify(current),rows,name);}
+ for(const[name,rows]of f.originals){const original=JSON.parse(rows),columns=original.length?Object.keys(original[0]):[];const current=db.prepare('SELECT * FROM '+name+' ORDER BY rowid').all().filter(r=>!['access_permission','role_permission'].includes(name)||original.some(o=>o.id===r.id)).map(r=>columns.length?Object.fromEntries(columns.map(c=>[c,r[c]])):r);assert.equal(JSON.stringify(current),rows,name);}
  for(const c of Object.values(CONFIG))assert.equal(db.prepare('SELECT count(*) n FROM '+c.table).get().n,0,'no fabricated old histories');assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
  const backups=fs.readdirSync(path.join(f.folder,'backups'));assert.equal(backups.length,1);const b=new DatabaseSync(path.join(f.folder,'backups',backups[0]),{readOnly:true});assert.equal(b.prepare('PRAGMA user_version').get().user_version,2026102302);b.close();openDatabase(f.file).close();assert.equal(fs.readdirSync(path.join(f.folder,'backups')).length,1);
 });

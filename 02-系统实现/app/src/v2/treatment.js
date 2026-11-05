@@ -189,6 +189,11 @@ class Treatment {
         const item = row(this.db, 'plan_item', itemId), version = row(this.db, 'plan_version', item.plan_version_id), plan = row(this.db, 'treatment_plan', version.treatment_plan_id);
         if (plan.patient_id !== visit.patient_id) fail(409, 'PATIENT_MISMATCH', '方案项目与当前患者不一致');
         if (item.tooth_code !== teeth.tooth_code || item.surface_code !== teeth.surface_code) fail(409, 'EXECUTION_SCOPE', '实际牙位牙面须符合所选方案项目，范围变动先改版');
+        if (correcting) {
+          const oldScope=consentFor(this.db,item.id,original.completed_at), newScope=consentFor(this.db,item.id,completed);
+          if (!newScope.approval || newScope.approval.created_at>completed || newScope.latest?.created_at>completed || oldScope.latest?.id!==newScope.latest?.id)
+            fail(409,'CORRECTION_CONSENT_TIME','更正时间跨越患者决定，或早于有效同意；请核对患者决定和原执行记录后另行处理');
+        }
         if (!correcting) {
           const latest = this.db.prepare('SELECT id FROM plan_version WHERE treatment_plan_id=? ORDER BY version_no DESC LIMIT 1').get(plan.id);
           if (version.status !== '已确认' || plan.status !== '进行中' || latest.id !== version.id) fail(409, 'PLAN_NOT_EXECUTABLE', '方案未确认、被后续版本替代、停止或结束，不能新增正常执行');
@@ -208,7 +213,7 @@ class Treatment {
         original_execution_id: original?.id || null, ...teeth, completed_quantity: quantity, procedure_note: basis ? note + '\n独立检查咨询依据：' + basis : note,
         completed_at: completed, correction_reason: correcting ? text(input.reason, '更正依据', 2000) : null,
         execution_kind: correcting ? '更正记录' : '首次记录', performed_by: ctx.session.staff_id, record_no: recordNo('EXEC') }));
-      if (!correcting) this.billing.fromExecution(row(this.db, 'treatment_execution', key), visit, ctx, now);
+      if (!correcting) this.billing.fromExecution(row(this.db, 'treatment_execution', key), visit, ctx, now,input.quoteItemId??null);
       ctx.authority.originalExecutionId = original?.id || null;
       return { kind: 'treatment_execution', key, revision: 1, code: correcting ? 'EXECUTION_CORRECTED_FEE_REVIEW' : 'COMMITTED',
         reason: correcting ? '追加临床更正；既有应收保留，费用变化另走费用申请' : '确认真实执行并共同形成计费依据' };
@@ -224,10 +229,10 @@ class Treatment {
             itemIds: this.db.prepare('SELECT plan_item_id FROM decision_plan_item WHERE decision_id=? ORDER BY plan_item_id').all(d.id).map(i => i.plan_item_id),
             itemScopes:this.db.prepare('SELECT plan_item_id itemId,scope_quantity quantity FROM decision_plan_item WHERE decision_id=? ORDER BY plan_item_id').all(d.id),
             documentVersionIds: this.db.prepare('SELECT document_version_id FROM decision_file_version WHERE decision_id=? ORDER BY document_version_id').all(d.id).map(f => f.document_version_id) })) })) })),
-        executions: this.db.prepare(`SELECT e.*,s.name service_name,b.id bill_item_id,b.bill_id,b.pricing_status,
+        executions: this.db.prepare(`SELECT e.*,s.name service_name,s.billing_unit,b.id bill_item_id,b.bill_id,b.pricing_status,
           NOT EXISTS(SELECT 1 FROM treatment_execution n WHERE n.original_execution_id=e.id) is_effective
           FROM treatment_execution e JOIN service s ON s.id=e.service_id LEFT JOIN bill_item b ON b.treatment_execution_id=e.id WHERE e.visit_id=? ORDER BY e.id`).all(visit.id) };
     });
   }
 }
-module.exports = { Treatment };
+module.exports = { Treatment, toothFields };

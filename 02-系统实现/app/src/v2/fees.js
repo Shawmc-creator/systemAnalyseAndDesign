@@ -267,7 +267,8 @@ class Fees {
       const funds = this.db.prepare('SELECT * FROM patient_funds WHERE patient_id=?').get(patient.id);
       const identity={id:patient.id,name:patient.name,recordNo:patient.record_no};
       if (!funds) return { patientId: patient.id,patient:identity, total: 0, page, pageSize: size, items: [], funds: this.billing.fundsSummary(patient.id) };
-      const all = this.db.prepare('SELECT * FROM fee_request WHERE patient_funds_id=? AND (? IS NULL OR status=?) ORDER BY submitted_at DESC,id DESC').all(funds.id, input.status ?? null, input.status ?? null);
+      const requestId=input.requestId==null?null:id(Number(input.requestId));if(requestId&&row(this.db,'fee_request',requestId).patient_funds_id!==funds.id)fail(403,'PATIENT_MISMATCH','原申请与当前患者不一致');
+      const all = this.db.prepare('SELECT * FROM fee_request WHERE patient_funds_id=? AND (? IS NULL OR status=?) AND (? IS NULL OR id=?) ORDER BY submitted_at DESC,id DESC').all(funds.id, input.status ?? null, input.status ?? null,requestId,requestId);
       const items = all.slice((page - 1) * size, page * size).map(request => {
         const auditHistory = this.db.prepare(`SELECT a.id,a.occurred_at,a.staff_id,a.after_revision,a.authority_snapshot,a.reason FROM operation_audit a
           WHERE a.object_kind='fee_request' AND a.object_key=? AND a.event_type='变更' ORDER BY a.id`).all(String(request.id)).map(a => ({ id: a.id, occurredAt: a.occurred_at, staffId: a.staff_id, revision: a.after_revision, reason: a.reason,

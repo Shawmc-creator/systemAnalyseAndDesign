@@ -12,12 +12,16 @@ const {validatePharmacy}=require('./pharmacy');
 const {validateSettlements}=require('./settlement-rules');
 const {FinancialHistoryRepository,snapshotFinancialHistory,validateFinancialHistory}=require('./financial-history');
 const {WorkflowHistoryRepository}=require('./workflow-history');
-const RESULT_TABLES = new Set(['staff','dental_chair','patient', 'dated_schedule', 'appointment', 'visit', 'health_review', 'clinical_record', 'record_addendum',
+const RESULT_TABLES = new Set(['clinic_branch','treatment_quote','quote_version','quote_item','quote_decision','staff','dental_chair','patient', 'dated_schedule', 'appointment', 'visit', 'health_review', 'clinical_record', 'record_addendum',
   'treatment_plan', 'plan_version', 'patient_decision', 'treatment_execution', 'service', 'service_price', 'bill_item', 'patient_payment', 'patient_funds', 'fee_request', 'patient_refund',
   'followup_requirement', 'contact_history', 'clinical_assessment', 'material', 'material_batch', 'stock_location', 'inventory_movement', 'material_usage', 'stock_count', 'supplier', 'purchase_order', 'purchase_receipt', 'purchase_issue', 'supplier_funds', 'supplier_payment', 'supplier_refund',
   'clinical_equipment','resource_block','equipment_occupancy','clinical_document','document_version','prescription','dispense_record','staff_role_qualification',
   'payment_order','payment_reconciliation','cash_reconciliation','issue_followup','insurance_identity','insurance_item_mapping','insurance_case','insurance_settlement','insurance_reversal','insurance_fund_receipt']);
 const SQL_ERRORS = {
+  quote_item_frozen:['QUOTE_FROZEN','已出具报价明细不能修改，请建立新版本'],
+  quote_version_frozen:['QUOTE_FROZEN','已出具报价内容和原版本来源不能修改'],
+  quote_identity_frozen:['QUOTE_IDENTITY','报价患者、来源及已记录的收费关联不能改写'],
+  quote_decision_frozen:['QUOTE_DECISION_FROZEN','患者费用决定只能追加，不能改写原记录'],
   service_identity_frozen:['SERVICE_IDENTITY_FROZEN','项目已有价目或业务引用，名称及计价单位不能改写；请另建项目并保留旧目录'],
   insurance_contract_context:['INSURANCE_SOURCE','医保原提交、费用标识、批准或重新办理来源不一致'],
   payment_order_context:['PAYMENT_ORDER_SOURCE','支付原单与患者资金、原账单或确认的实际付款不一致'],
@@ -98,7 +102,7 @@ class UnitOfWork {
       audit_id: auditId, field_name: change.field, value_type: typeof change.after === 'number' ? 'integer' : 'text',
       before_value: change.before == null ? null : canonical(change.before), after_value: change.after == null ? null : canonical(change.after), sequence_no: i + 1 });
   }
-  command(credentials, permission, input, handler) {
+  command(credentials, permission, input, handler, scopeGuard = null) {
     const requestKey = text(input.requestKey, '提交号', 128);
     if (input.commandVersion !== 1) fail(422, 'COMMAND_VERSION', '不支持的命令版本，请刷新页面');
     const digest = hash(canonical({ permission, commandVersion: 1, input }));
@@ -107,6 +111,7 @@ class UnitOfWork {
     try {
       // Re-evaluate authorization under the write lock, including replay requests.
       ctx = this.auth.authorize(credentials.token, credentials.role, permission, credentials.csrf ?? '');
+      if (scopeGuard) scopeGuard(ctx, this.auth.now());
       const old = this.db.prepare('SELECT * FROM request_submission WHERE account_id=? AND request_key=?').get(ctx.session.account_id, requestKey);
       if (old) {
         if (old.permission_id !== ctx.permission.id || old.payload_digest !== digest) fail(409, 'REQUEST_KEY_REUSED', '同一提交号的内容已变化，请核实原结果后新建提交');
@@ -172,10 +177,11 @@ class UnitOfWork {
       throw mapped;
     }
   }
-  query(credentials, permission, handler) {
+  query(credentials, permission, handler, scopeGuard = null) {
     this.db.exec('BEGIN');
     try {
       const ctx = this.auth.authorize(credentials.token, credentials.role, permission);
+      if (scopeGuard) scopeGuard(ctx, this.auth.now());
       const result = handler(ctx);
       this.db.exec('COMMIT');
       this.audit(ctx, '查询', 'QUERY_OK', { kind: 'query', key: permission }, null, '按授权范围查询');
