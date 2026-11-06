@@ -44,6 +44,8 @@ async function refresh(){
  state.clinicalVersion++;
  state.financeVersion++;
  $('#branch-summary').replaceChildren();
+ resetCashPatient();
+ clearVisitContext();
  clearScheduleEdit();clearAppointmentChange();$('#quote-issue-form').hidden=true;for(const kind of ['offset','request','refund'])$('#prepay-'+kind+'-form').hidden=true;prepayState=null;state.options=null;state.bills=[];state.record=null;state.health=null;state.followups=null;state.followupBooking=null;state.inventory=null;$('#appointments').replaceChildren();$('#bills').replaceChildren();$('#payment-form').hidden=true;$('#record-form').hidden=true;$('#health-area').hidden=true;$('#addendum-area').hidden=true;$('#followup-create-form').hidden=true;
  $('#clinical-result').hidden=true;$('#clinical-result').replaceChildren();$('#clinical-grants').replaceChildren();$('#prescription-list').replaceChildren();$('#prescription-draft-form').hidden=true;$('#prescription-issue-form').hidden=true;$('#prescription-handover-form').hidden=true;$('#prescription-void-form').hidden=true;$('#prescription-empty').hidden=true;
  $('#reception').hidden=state.role!=='frontdesk';$('#finance').hidden=state.role!=='cashier';$('#dentist').hidden=state.role!=='dentist';$('#manager').hidden=state.role!=='manager';
@@ -148,20 +150,41 @@ async function clinicalGrants(){
    const out=$('#clinical-result');out.replaceChildren();for(const [label,value] of [['来源门店',g.source_name],['主诉',result.record.chief_complaint],['诊断',result.record.diagnosis],['诊疗建议',result.record.treatment_advice],...result.findings.map(x=>['检查所见'+(x.tooth_code?'（牙位 '+x.tooth_code+(x.surface_code?' '+x.surface_code:'')+'）':''),x.finding_text]),...result.addenda.map(x=>['签署后补充',x.content+'；原因：'+x.reason])]){const p=document.createElement('p');p.textContent=label+'：'+(value||'未记录');out.append(p);}out.hidden=false;message('已查阅授权范围内的病历。');});line.append(button);list.append(line);}
 }
 async function treatment(preferredVisitId=null){
- const branch=state.branch,role=state.role,viewVersion=state.viewVersion,data=await api('/api/treatment/options?branchId='+branch);if(state.branch!==branch||state.role!==role||state.viewVersion!==viewVersion)return;state.treatment=data;
+ const version = (state.visitRequest || 0) + 1;
+ state.visitRequest = version;
+
+ const branch=state.branch,role=state.role,viewVersion=state.viewVersion,data=await api('/api/treatment/options?branchId='+branch);if(state.branch!==branch||state.role!==role||state.viewVersion!==viewVersion||state.visitRequest!==version)return;state.treatment=data;
+ const context = $('#clinic-visit');
+ const area = $('#dentist');
+ if (area) area.dataset.caseReady = 'false';
+ if (context) {
+   const cases = data.visits.filter(v => ['接诊中','诊疗结束'].includes(v.status));
+   const wanted = preferredVisitId ?? Number(context.value);
+   const selected = cases.find(v => v.id === wanted) || cases.find(v => v.status === '接诊中') || cases[0];
+   if (context.dataset.visit !== String(selected?.id ?? '')) resetClinicalDrafts();
+   context.dataset.visit = String(selected?.id ?? '');
+   context.replaceChildren();
+   for (const v of cases) option(context,v.id,visitPatientLabel(v)+' / '+v.record_no+' / '+v.status);
+   context.value = context.dataset.visit;
+   context.disabled = !selected;
+   preferredVisitId = selected?.id ?? null;
+   $('#visit-context-note').textContent = selected ? '' : '当前门店暂无本人已接诊的就诊，请先从队列开始接诊。';
+ }
  if(preferredVisitId==null&&!$('#record-form').elements.visit.value&&!$('#plan-visit').value)preferredVisitId=data.visits.find(v=>v.status==='接诊中')?.id??null;
  const form=$('#treatment-form'),visits=form.elements.visit,services=form.elements.service,previousVisit=preferredVisitId==null?visits.value:String(preferredVisitId);visits.replaceChildren();services.replaceChildren();
  const rxVisit=$('#prescription-visit'),oldRxVisit=preferredVisitId==null?rxVisit.value:String(preferredVisitId);rxVisit.replaceChildren();for(const v of data.visits.filter(v=>['接诊中','诊疗结束'].includes(v.status)))option(rxVisit,v.id,visitPatientLabel(v)+' / '+v.record_no);if([...rxVisit.options].some(x=>x.value===oldRxVisit))rxVisit.value=oldRxVisit;$('#prescription-load').disabled=!rxVisit.options.length;const waiting=$('#waiting-visits');waiting.replaceChildren();const waitingItems=data.visits.filter(v=>v.status==='候诊');if(!waitingItems.length)waiting.textContent='当前没有候诊患者。';
  for(const v of waitingItems){const line=document.createElement('p');line.textContent=visitPatientLabel(v)+' / '+v.record_no+'　';const button=document.createElement('button');button.type='button';button.textContent='开始接诊';button.onclick=()=>act(button,async()=>{await api('/api/treatment/start',command({visitId:v.id,expectedVisitRevision:v.revision,startedAt:fixedNow}));message('已开始接诊。');await Promise.all([treatment(v.id),followups()]);});line.append(button);waiting.append(line);}
  for(const v of data.visits.filter(v=>v.status==='接诊中'))option(visits,v.id,visitPatientLabel(v)+' / '+v.record_no);if([...visits.options].some(x=>x.value===previousVisit))visits.value=previousVisit;
+ if (context && preferredVisitId != null) visits.value = String(preferredVisitId);
  const active=$('#active-visits');active.replaceChildren();const activeItems=data.visits.filter(v=>v.status==='接诊中');if(!activeItems.length)active.textContent='当前没有接诊中的患者。';
  for(const v of activeItems){const line=document.createElement('p');line.textContent=visitPatientLabel(v)+' / '+v.record_no+'　';const button=document.createElement('button');button.type='button';button.textContent='确认实际结束并交接';button.disabled=!v.occupancy_revision;button.onclick=()=>act(button,async()=>{const reason=await askReason('确认实际结束并填写交接依据');if(!reason)return;await api('/api/resources',command({action:'finish',visitId:v.id,expectedVisitRevision:v.revision,expectedOccupancyRevision:v.occupancy_revision,endedAt:fixedNow,confirmed:true,reason}));message('实际操作已结束，诊椅等待清洁核验。');await treatment();});line.append(button);active.append(line);}
  for(const s of data.services)option(services,s.id,s.name+' / '+s.billing_unit);
- form.hidden=!visits.options.length||!data.services.length;$('#dentist-empty').hidden=!form.hidden;
+ form.hidden=!visits.value||!data.services.length;$('#dentist-empty').hidden=!form.hidden;
  const recordForm=$('#record-form'),recordVisits=recordForm.elements.visit,previousRecordVisit=preferredVisitId==null?recordVisits.value:String(preferredVisitId);recordVisits.replaceChildren();
  for(const v of data.visits.filter(v=>['接诊中','诊疗结束'].includes(v.status)))option(recordVisits,v.id,visitPatientLabel(v)+' / '+v.record_no+' / '+v.status);if([...recordVisits.options].some(x=>x.value===previousRecordVisit))recordVisits.value=previousRecordVisit;
- const planVisit=$('#plan-visit'),planForm=$('#plan-draft-form'),previousPlanVisit=preferredVisitId==null?planVisit.value:String(preferredVisitId);planVisit.replaceChildren();for(const v of data.visits.filter(v=>['接诊中','诊疗结束'].includes(v.status)))option(planVisit,v.id,visitPatientLabel(v)+' / '+v.record_no);if([...planVisit.options].some(x=>x.value===previousPlanVisit))planVisit.value=previousPlanVisit;$('#plan-edit-cancel').click();planForm.hidden=!planVisit.options.length||!data.services.length;planVisit.onchange=()=>{if(planForm.dataset.versionId)$('#plan-edit-cancel').click();act(planVisit,loadPlans);};visits.onchange=()=>act(visits,loadExecutionPlans);if(planVisit.options.length)await loadPlans();else $('#plan-list').textContent='当前没有可建立方案的就诊。';if(visits.options.length)await loadExecutionPlans();if(state.branch!==branch||state.role!==role)return;
+ const planVisit=$('#plan-visit'),planForm=$('#plan-draft-form'),previousPlanVisit=preferredVisitId==null?planVisit.value:String(preferredVisitId);planVisit.replaceChildren();for(const v of data.visits.filter(v=>['接诊中','诊疗结束'].includes(v.status)))option(planVisit,v.id,visitPatientLabel(v)+' / '+v.record_no);if([...planVisit.options].some(x=>x.value===previousPlanVisit))planVisit.value=previousPlanVisit;$('#plan-edit-cancel').click();planForm.hidden=!planVisit.options.length||!data.services.length;planVisit.onchange=()=>{if(planForm.dataset.versionId)$('#plan-edit-cancel').click();act(planVisit,loadPlans);};visits.onchange=()=>act(visits,loadExecutionPlans);if(planVisit.options.length)await loadPlans();else $('#plan-list').textContent='当前没有可建立方案的就诊。';if(visits.value)await loadExecutionPlans();if(state.visitRequest!==version)return;if(state.branch!==branch||state.role!==role)return;
  recordForm.hidden=!recordVisits.options.length;$('#record-empty').hidden=!recordForm.hidden;$('#health-area').hidden=recordForm.hidden;if(recordForm.hidden){$('#addendum-area').hidden=true;$('#record-executions').textContent='当前没有可查看的接诊记录。';}recordVisits.onchange=()=>act(recordVisits,loadRecord);if(!recordForm.hidden)await loadRecord();
+ if(area && state.visitRequest===version && state.viewVersion===viewVersion)area.dataset.caseReady=String(!!context?.value);
 }
 async function fetchPlans(visitId){return api('/api/plans?branchId='+state.branch+'&visitId='+visitId);}
 async function loadExecutionPlans(){const f=$('#treatment-form'),branch=state.branch,visitId=Number(f.elements.visit.value);if(!visitId)return;const data=await fetchPlans(visitId);if(state.branch!==branch||state.role!=='dentist'||Number(f.elements.visit.value)!==visitId)return;const select=f.elements.planItem;select.replaceChildren();option(select,'','独立检查');for(const p of data.plans.filter(p=>p.is_latest&&p.status==='已确认'))for(const i of p.items.filter(i=>i.remaining>0))option(select,i.id,i.item_description+(i.tooth_code?' / 牙位 '+i.tooth_code+(i.surface_code?' '+i.surface_code:''):'')+' / 可执行 '+i.remaining);select.onchange=()=>{f.elements.basis.required=!select.value;f.elements.tooth.readOnly=!!select.value;f.elements.surface.readOnly=!!select.value;if(select.value){const item=data.plans.flatMap(p=>p.items).find(i=>i.id===Number(select.value));const service=state.treatment.services.find(s=>item?.item_description===s.record_no+'｜'+s.name+'（'+s.billing_unit+'）');f.elements.tooth.value=item?.tooth_code||'';f.elements.surface.value=item?.surface_code||'';if(service)f.elements.service.value=String(service.id);else message('原方案项目已变化，请核对项目后再执行。',true);}else{f.elements.tooth.value='';f.elements.surface.value='';}};select.onchange();}
@@ -198,7 +221,7 @@ function updateFollowupCreate(){const f=$('#followup-create-form'),can=state.rec
 function eligibleFollowupVisits(visits,item,now){return (visits||[]).filter(v=>item&&v.patient_id===item.patient_id&&v.id!==item.source_visit_id&&v.started_at>=item.created_at&&v.started_at<=now&&(!v.ended_at||v.ended_at>=now));}
 async function followups(){const branch=state.branch,role=state.role,viewVersion=state.viewVersion,data=await api('/api/followups?branchId='+branch);if(state.branch!==branch||state.role!==role||state.viewVersion!==viewVersion)return;state.followups=data;
  const list=role==='dentist'?$('#dentist-followups'):$('#front-followups');list.replaceChildren();if(!data.items.length)list.textContent='当前没有本人负责的复诊事项。';
- for(const item of data.items){const line=document.createElement('p');line.textContent=visitPatientLabel(item)+'　'+item.followup_type+'：'+item.purpose+'；目标 '+item.target_start+' 至 '+item.target_end+'；'+item.status+(item.next_contact_date?'；下次联系 '+item.next_contact_date:'')+'；'+(item.requires_assessment?'需要牙医评估':'无需临床评估')+(item.contactInfo?'；联系方式：'+(item.contactInfo.phone||'未记录')+'；联系偏好：'+(item.contactInfo.contact_preference||'未记录')+(item.contactInfo.contact_unavailable_reason?'；不可联系原因：'+item.contactInfo.contact_unavailable_reason:''):'');if(role==='frontdesk'&&item.status==='待联系'){const b=document.createElement('button');b.type='button';b.textContent='为该患者安排复诊';b.onclick=()=>{if(state.branch!==branch||state.role!==role||state.viewVersion!==viewVersion)return;const form=$('#appointment-form'),patient=form.elements.patient,schedules=state.options?.schedules||[];$('#patient-filter').value='';applyPatientFilter();patient.value=String(item.patient_id);if(!patient.value){message('未找到患者档案，请先刷新患者资料。',true);return;}const schedule=schedules.find(s=>s.ends_at>fixedNow&&localInput(s.starts_at).slice(0,10)>=item.target_start&&localInput(s.starts_at).slice(0,10)<=item.target_end);if(schedule){form.elements.schedule.value=String(schedule.id);form.elements.schedule.onchange?.();}form.elements.reason.value=item.purpose;state.followupBooking={id:item.id,patientId:item.patient_id,branch};message(schedule?'已选择复诊患者及目标日期内排班，请核对预约时间。':'已选择复诊患者，请先发布或选择目标日期内排班。');form.scrollIntoView({behavior:'smooth',block:'center'});};line.append(b);}list.append(line);
+ for(const item of data.items){const line=document.createElement('p');line.textContent=visitPatientLabel(item)+'　'+item.followup_type+'：'+item.purpose+'；目标 '+item.target_start+' 至 '+item.target_end+'；'+item.status+(item.next_contact_date?'；下次联系 '+item.next_contact_date:'')+'；'+(item.requires_assessment?'需要牙医评估':'无需临床评估')+(item.contactInfo?'；联系方式：'+(item.contactInfo.phone||'未记录')+'；联系偏好：'+(item.contactInfo.contact_preference||'未记录')+(item.contactInfo.contact_unavailable_reason?'；不可联系原因：'+item.contactInfo.contact_unavailable_reason:''):'');if(role==='frontdesk'&&item.status==='待联系'){const b=document.createElement('button');b.type='button';b.textContent='为该患者安排复诊';b.onclick=()=>{if(state.branch!==branch||state.role!==role||state.viewVersion!==viewVersion)return;const form=$('#appointment-form'),patient=form.elements.patient,schedules=state.options?.schedules||[];$('#patient-filter').value='';applyPatientFilter();patient.value=String(item.patient_id);if(!patient.value){message('未找到患者档案，请先刷新患者资料。',true);return;}const schedule=schedules.find(s=>s.ends_at>fixedNow&&localInput(s.starts_at).slice(0,10)>=item.target_start&&localInput(s.starts_at).slice(0,10)<=item.target_end);if(schedule){form.elements.schedule.value=String(schedule.id);form.elements.schedule.onchange?.();}form.elements.reason.value=item.purpose;state.followupBooking={id:item.id,patientId:item.patient_id,branch};message(schedule?'已选择复诊患者及目标日期内排班，请核对预约时间。':'已选择复诊患者，请先发布或选择目标日期内排班。');revealTask(form);};line.append(b);}list.append(line);
   for(const c of item.contacts){const detail=document.createElement('p');detail.textContent='联系记录：'+date(c.contacted_at)+' '+c.method+' '+c.result+'；'+c.note+(c.appointment_id?'；关联预约 '+c.appointment_id:'');list.append(detail);}for(const a of item.assessments||[]){const detail=document.createElement('p');detail.textContent='临床评估：'+date(a.assessed_at)+' '+a.method+'；'+a.result+'；处理意见：'+a.advice+(a.visit_id?'；关联本店复诊就诊 '+a.visit_id:'');list.append(detail);}}
  const active=data.items.filter(x=>['待联系','待到诊或评估'].includes(x.status));
  if(role==='dentist'){const f=$('#followup-create-form'),front=f.elements.frontdesk;front.replaceChildren();for(const person of data.frontdesks)option(front,person.id,person.name);updateFollowupCreate();const assess=$('#followup-assess-form'),select=assess.elements.followup;select.replaceChildren();for(const item of active)option(select,item.id,visitPatientLabel(item)+' / '+item.purpose+' / '+item.status);const updateVisits=()=>{const item=active.find(x=>x.id===Number(select.value)),visits=assess.elements.visit;const remote=Array.from(assess.elements.method.options||[]).find(x=>x.value==='远程沟通');if(remote)remote.disabled=!!item&&item.source_branch_id!==branch;if(remote?.disabled&&assess.elements.method.value==='远程沟通')assess.elements.method.value='到诊检查';visits.replaceChildren();for(const v of eligibleFollowupVisits(data.visits,item,fixedNow))option(visits,v.id,v.record_no+' / '+date(v.started_at));const inPerson=assess.elements.method.value==='到诊检查';$('#followup-visit-label').hidden=!inPerson;$('#followup-visit-empty').hidden=!inPerson||visits.options.length>0;visits.required=inPerson;};const updateOwner=()=>{const item=active.find(x=>x.id===Number(select.value)),owner=assess.elements.responsibleFrontdesk;owner.replaceChildren();option(owner,'','请选择');for(const person of data.frontdesks)option(owner,person.id,person.name);owner.value=data.frontdesks.some(p=>p.id===item?.responsible_frontdesk_id)?String(item.responsible_frontdesk_id):'';};select.onchange=()=>{updateVisits();updateOwner();};assess.elements.method.onchange=updateVisits;const updateAdvice=()=>{const continuing=assess.elements.advice.value==='继续跟进';$('#followup-next-label').hidden=!continuing;$('#followup-owner-label').hidden=!continuing;assess.elements.nextDate.required=continuing;assess.elements.responsibleFrontdesk.required=continuing;};assess.elements.advice.onchange=updateAdvice;updateAdvice();updateOwner();updateVisits();assess.hidden=!active.length;}
@@ -272,11 +295,97 @@ async function reception(){
  schedules.onchange=setTime;setTime();form.querySelector('button').disabled=!data.schedules.length||!data.patients.length;
  const walk=$('#walkin-form');walk.elements.patient.replaceChildren();walk.elements.schedule.replaceChildren();for(const p of data.patients)option(walk.elements.patient,p.id,patientLabel(p));for(const s of data.schedules.filter(s=>localInput(s.starts_at).slice(0,10)===localInput(fixedNow).slice(0,10)&&Math.floor(Date.parse(s.ends_at)/60000)*60000>Math.ceil(Math.max(Date.parse(fixedNow),Date.parse(s.starts_at))/60000)*60000))option(walk.elements.schedule,s.id,date(s.starts_at)+' — '+date(s.ends_at)+'，'+s.dentist_name+' / '+s.chair_name);const walkTime=()=>{const s=data.schedules.find(x=>x.id===Number(walk.elements.schedule.value));if(!s)return;const start=Math.ceil(Math.max(Date.parse(s.starts_at),Date.parse(fixedNow))/60000)*60000,end=Math.min(start+1800000,Math.floor(Date.parse(s.ends_at)/60000)*60000);walk.elements.start.value=localInput(new Date(start).toISOString());walk.elements.end.value=localInput(new Date(end).toISOString());};walk.elements.schedule.onchange=walkTime;walkTime();walk.hidden=!walk.elements.patient.options.length||!walk.elements.schedule.options.length;$('#walkin-empty').hidden=!walk.hidden;
  applyPatientFilter();const queue=$('#front-visits');queue.replaceChildren();if(!data.visits.length)queue.textContent='本店暂无候诊或接诊中的患者。';for(const v of data.visits){const p=document.createElement('p'),patient=data.patients.find(x=>x.id===v.patient_id);p.textContent=(patient?patientLabel(patient):'患者 '+v.patient_id)+' / '+v.record_no+' / '+v.dentist_name+' / '+v.status+' / 到诊 '+date(v.arrived_at);queue.append(p);}
- const list=$('#appointments');list.replaceChildren();if(!data.appointments.length){list.textContent='本店暂无预约。';return;}
- for(const a of data.appointments){const line=document.createElement('p'),patient=data.patients.find(p=>p.id===a.patient_id);line.textContent=(patient?patientLabel(patient):'患者 '+a.patient_id)+'　'+date(a.planned_start)+' — '+date(a.planned_end)+'　'+a.status+'　';
+
+ renderAgenda(data);
+}
+let agendaWeekStart = '';
+let agendaAllDates = false;
+function shiftDay(isoDay, days) {
+ const utc = new Date(isoDay + 'T00:00:00Z');
+ utc.setUTCDate(utc.getUTCDate() + days);
+ return utc.toISOString().slice(0,10);
+}
+function weekStart(isoDay) {
+ const weekday = new Date(isoDay + 'T00:00:00Z').getUTCDay();
+ return shiftDay(isoDay, -((weekday + 6) % 7));
+}
+function renderWeek(appointments) {
+ const today = localInput(fixedNow).slice(0,10);
+ const dayField = $('#agenda-day');
+ agendaWeekStart = weekStart(dayField.value || agendaWeekStart || today);
+ $('#agenda-week-title').textContent = agendaWeekStart + ' 至 ' + shiftDay(agendaWeekStart,6);
+ const strip = $('#agenda-week');
+ strip.replaceChildren();
+ for (let index=0; index<7; index++) {
+   const day = shiftDay(agendaWeekStart,index);
+   const count = appointments.filter(a => localInput(a.planned_start).startsWith(day) && a.status === '已预约').length;
+   const button = document.createElement('button');
+   button.type = 'button';
+   button.setAttribute('aria-label', day + '，已预约 ' + count + ' 人次');
+   button.setAttribute('aria-pressed',String(day === dayField.value));
+   const label = document.createElement('small');
+   label.textContent = day === today ? '今天' : '周' + '一二三四五六日'[index];
+   const dateLabel = document.createElement('strong');
+   dateLabel.textContent = day.slice(5).replace('-','/');
+   const countLabel = document.createElement('small');
+   countLabel.textContent = count ? count + ' 个预约' : '无待诊预约';
+   button.append(label,dateLabel,countLabel);
+   button.onclick = () => { dayField.value=day; agendaAllDates=false; updateAgendaSelection(); };
+   strip.append(button);
+ }
+}
+function renderAgenda(data) {
+ const list = $('#appointments');
+ const status = $('#agenda-status');
+ const lastStatus = status.value;
+ status.replaceChildren();
+ option(status, '', '全部状态');
+ for (const value of new Set(data.appointments.map(a => a.status))) option(status, value, value);
+ if ([...status.options].some(o => o.value === lastStatus)) status.value = lastStatus;
+ renderWeek(data.appointments);
+ $('#agenda-all').setAttribute('aria-pressed',String(agendaAllDates));
+ const day = $('#agenda-day').value;
+ const rows = data.appointments.filter(a =>
+   (day ? localInput(a.planned_start).slice(0,10) === day : agendaAllDates || weekStart(localInput(a.planned_start).slice(0,10)) === agendaWeekStart) &&
+   (!status.value || status.value === a.status)
+ ).sort((a,b) => Date.parse(a.planned_start) - Date.parse(b.planned_start));
+ list.replaceChildren();
+ if (!rows.length) {
+   list.textContent = data.appointments.length ? '当前日期范围和状态下没有预约，可切换日期或查看全部日期。' : '本店暂无预约，可选择「新建预约」。';
+   return;
+ }
+ for (const a of rows) {
+   const patient = data.patients.find(p => p.id === a.patient_id);
+   const schedule = data.schedules.find(s => s.id === a.schedule_id);
+   const line = document.createElement('article');
+   line.className = 'agenda-row';
+   const slot = document.createElement('div');
+   const time = document.createElement('strong');
+   time.textContent = localInput(a.planned_start).slice(11,16) + ' – ' + localInput(a.planned_end).slice(11,16);
+   const dayLabel = document.createElement('small');
+   dayLabel.textContent = localInput(a.planned_start).slice(0,10);
+   slot.append(time,dayLabel);
+   const person = document.createElement('div');
+   const name = document.createElement('strong');
+   name.textContent = patient?.name || ('患者 ' + a.patient_id);
+   const identity = document.createElement('small');
+   identity.textContent = patient ? (patient.birth_date || '出生日期未记录') + ' · ' + patient.record_no : '';
+   person.append(name,identity);
+   const resource = document.createElement('div');
+   resource.textContent = schedule ? schedule.dentist_name + ' / ' + schedule.chair_name : '排班资料待核对';
+   const badge = document.createElement('span');
+   badge.className = 'agenda-badge';
+   badge.dataset.booked = String(a.status === '已预约');
+   badge.textContent = a.status;
+   line.append(slot,person,resource,badge);
   if(a.status==='已预约'){for(const [mode,label] of [['reschedule','改约'],['transfer','转店']]){const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=()=>act(b,()=>beginAppointmentChange(a,mode));line.append(b);}if(a.planned_end<fixedNow){const missed=document.createElement('button');missed.type='button';missed.textContent='登记未到';missed.onclick=()=>act(missed,async()=>{const reason=await askReason('请填写核实未到的依据');if(!reason)return;await api('/api/reception',command({action:'noShow',appointmentId:a.id,expectedRevision:a.revision,reason}));message('已登记未到。');await Promise.all([reception(),followups()]);});line.append(missed);}const button=document.createElement('button');button.type='button';button.textContent='取消预约';button.onclick=()=>act(button,async()=>{const reason=await askReason('请输入取消原因');if(!reason)return;await api('/api/reception',command({action:'cancel',appointmentId:a.id,expectedRevision:a.revision,reason}));message('预约已取消。');await Promise.all([reception(),followups()]);});line.append(button);
    if(localInput(a.planned_start).slice(0,10)===localInput(fixedNow).slice(0,10)&&a.schedule_id&&a.occupancy_revision){const arrive=document.createElement('button');arrive.type='button';arrive.textContent='登记到诊';arrive.onclick=()=>act(arrive,async()=>{await api('/api/reception',command({action:'arrive',appointmentId:a.id,expectedRevision:a.revision,patientId:a.patient_id,dentistId:a.dentist_id,scheduleRevision:a.schedule_revision,occupancyRevision:a.occupancy_revision,arrivedAt:fixedNow}));message('已登记到诊。');await reception();});line.append(arrive);}}
-  list.append(line);}
+  const actions = document.createElement('div');
+  actions.className = 'agenda-actions';
+  actions.append(...line.querySelectorAll('button'));
+  line.append(actions);
+  list.append(line);
+ }
 }
 async function finance(){
  const patient=Number($('#finance-query').elements.patient.value);if(!Number.isInteger(patient)||patient<1)return;
@@ -297,7 +406,7 @@ $('#prepay-offset-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()
 $('#adjustment-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,account=prepayState?.accounts.find(x=>x.patient_id===state.patient),bill=account?.bills.find(b=>b.id===Number(f.elements.bill.value)),item=bill?.items.find(i=>i.id===Number(f.elements.namedItem('item').value)),use=bill?.uses.find(u=>u.kind+':'+u.id===f.elements.use.value);if(!account||!bill||!item||!use)throw new Error('请重新查询并核对账单来源。');await api('/api/prepayments',command({action:'requestAdjustment',patientId:state.patient,expectedFundsRevision:account.revision,paymentId:use.patient_payment_id,expectedPaymentRevision:use.payment_revision,billId:bill.id,expectedBillRevision:bill.revision,billItemId:item.id,expectedItemRevision:item.revision,kind:use.kind,allocationId:use.id,expectedAllocationRevision:use.revision,amountCents:Number(f.elements.amount.value),reason:f.elements.reason.value,evidence:f.elements.evidence.value}));f.reset();message('费用调整及退款申请已提交负责人审核。');await finance();});};
 $('#prepay-request-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget;await api('/api/prepayments',command({action:'request',patientId:state.patient,paymentId:Number(f.dataset.paymentId),expectedFundsRevision:Number(f.dataset.fundsRevision),amountCents:Number(f.elements.amount.value),reason:f.elements.reason.value,evidence:f.elements.evidence.value}));f.hidden=true;message('退款申请已提交负责人审核。');await finance();});};
 $('#prepay-refund-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,r=prepayState?.requests.find(x=>x.id===Number(f.dataset.requestId));if(!r)throw new Error('请重新查询退款申请。');await api('/api/prepayments',command({action:'refund',patientId:state.patient,requestId:r.id,expectedRevision:Number(f.dataset.revision),expectedFundsRevision:Number(f.dataset.fundsRevision),confirmed:f.elements.confirmed.checked,recipientVerification:f.elements.recipient.value,evidence:f.elements.evidence.value,...(r.channel==='现金'?{}:{externalReference:f.elements.reference.value})}));f.hidden=true;message('已记录系统外退款结果。');await finance();});};
-$('#login-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,data=await api('/api/login',{username:f.elements.username.value,password:f.elements.password.value});state.csrf=data.csrf;const roles=$('#role');roles.replaceChildren();for(const role of data.user.roles)if(['frontdesk','cashier','dentist','manager','assistant'].includes(role.code))option(roles,role.code,role.name);if(data.user.username==='manager'&&data.user.roles.some(r=>r.code==='manager'))roles.value='manager';if(data.user.username==='assistant'&&data.user.roles.some(r=>r.code==='assistant'))roles.value='assistant';$('#user-info').textContent='登录人员：'+data.user.name;$('#login').hidden=true;$('#work').hidden=false;f.elements.password.value='';liveDefaults();await branches();message('登录成功，请确认当前岗位与门店。');});};
+$('#login-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,data=await api('/api/login',{username:f.elements.username.value,password:f.elements.password.value});state.csrf=data.csrf;const roles=$('#role');roles.replaceChildren();for(const role of data.user.roles)if(['frontdesk','cashier','dentist','manager','assistant'].includes(role.code))option(roles,role.code,role.name);if(data.user.username==='manager'&&data.user.roles.some(r=>r.code==='manager'))roles.value='manager';if(data.user.username==='assistant'&&data.user.roles.some(r=>r.code==='assistant'))roles.value='assistant';$('#user-info').textContent='登录人员：'+data.user.name;$('#login').hidden=true;$('#work').hidden=false;f.elements.password.value='';liveDefaults();await branches();$('#notice').hidden=true;});};
 $('#role').onchange=e=>act(e.currentTarget,branches);
 $('#branch').onchange=e=>act(e.currentTarget,async()=>{state.branch=Number(e.currentTarget.value);await refresh();});
 $('#switch-account').onclick=e=>act(e.currentTarget,async()=>{await api('/api/logout',{});location.reload();});
@@ -305,9 +414,69 @@ $('#patient-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{con
 $('#patient-edit-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget;await api('/api/setup',command({action:'patient-update',patientId:Number(f.elements.patient.value),expectedRevision:Number(f.dataset.revision),fields:{name:f.elements.patientName.value,birth_date:f.elements.birthDate.value,phone:f.elements.phone.value,phone_owner:f.elements.owner.value,contact_unavailable_reason:f.elements.unavailable.value},reason:f.elements.reason.value}));message('患者资料已更新。');f.elements.reason.value='';await Promise.all([reception(),patients()]);});};
 $('#schedule-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget;const editing=Boolean(f.dataset.id);await api('/api/setup',command({action:editing?'change':'publish',...(editing?{scheduleId:Number(f.dataset.id),expectedRevision:Number(f.dataset.revision)}:{}),dentistId:Number(f.elements.dentist.value),chairId:Number(f.elements.chair.value),businessDate:f.elements.businessDate.value,startsAt:isoLocal(f.elements.start.value),endsAt:isoLocal(f.elements.end.value),reason:f.elements.reason.value}));clearScheduleEdit();message(editing?'排班已调整。':'排班已发布。');await schedules();});};
 $('#walkin-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,s=state.options?.schedules.find(x=>x.id===Number(f.elements.schedule.value));if(!s)throw new Error('请重新选择排班。');await api('/api/reception',command({action:'walkIn',patientId:Number(f.elements.patient.value),scheduleId:s.id,scheduleRevision:s.revision,arrivedAt:fixedNow,startsAt:isoLocal(f.elements.start.value),endsAt:isoLocal(f.elements.end.value)}));message('现场到诊已登记，请通知牙医接诊。');await reception();});};
-$('#appointment-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,s=state.options.schedules.find(x=>x.id===Number(f.elements.schedule.value)),patientId=Number(f.elements.patient.value),booking=state.followupBooking,view=state.viewVersion,branch=state.branch;if(!s)throw Error('请先选择有效排班。');const receipt=await api('/api/reception',command({action:'create',patientId,scheduleId:s.id,scheduleRevision:s.revision,startsAt:isoLocal(f.elements.start.value),endsAt:isoLocal(f.elements.end.value),reason:f.elements.reason.value}));if(state.branch!==branch||state.role!=='frontdesk'||state.viewVersion!==view)return;f.elements.reason.value='';state.followupBooking=null;await Promise.all([reception(),followups()]);if(state.branch!==branch||state.role!=='frontdesk'||state.viewVersion!==view)return;if(booking&&booking.branch===branch&&booking.patientId===patientId){const contact=$('#followup-contact-form');contact.elements.followup.value=String(booking.id);contact.elements.followup.onchange?.();const appointment=contact.elements.appointment;if([...appointment.options].some(o=>o.value===String(receipt.id))){appointment.value=String(receipt.id);contact.elements.nextStep.value='arrange';message('预约已创建；请填写实际联系结果并保存关联。');contact.scrollIntoView({behavior:'smooth',block:'center'});return;}}message('预约已创建。');});};
-$('#finance-patient-search').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const branch=state.branch,term=e.currentTarget.elements.query.value.trim(),data=await api('/api/finance/patients?branchId='+branch+'&q='+encodeURIComponent(term));if(state.branch!==branch||state.role!=='cashier')return;const list=$('#finance-patient-results');list.replaceChildren();if(!data.items.length)list.textContent='未找到匹配患者。';for(const patient of data.items){const p=document.createElement('p');p.textContent=patient.name+' / '+patient.record_no+' / '+patient.phone_hint+'　';const b=document.createElement('button');b.type='button';b.textContent='查看本店账单';b.onclick=()=>act(b,async()=>{$('#finance-query').elements.patient.value=patient.id;await finance();});p.append(b);list.append(p);}});};
-$('#finance-query').onsubmit=e=>{e.preventDefault();act(e.submitter,finance);};
+$('#appointment-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,s=state.options.schedules.find(x=>x.id===Number(f.elements.schedule.value)),patientId=Number(f.elements.patient.value),booking=state.followupBooking,view=state.viewVersion,branch=state.branch;if(!s)throw Error('请先选择有效排班。');const receipt=await api('/api/reception',command({action:'create',patientId,scheduleId:s.id,scheduleRevision:s.revision,startsAt:isoLocal(f.elements.start.value),endsAt:isoLocal(f.elements.end.value),reason:f.elements.reason.value}));if(state.branch!==branch||state.role!=='frontdesk'||state.viewVersion!==view)return;f.elements.reason.value='';state.followupBooking=null;await Promise.all([reception(),followups()]);if(state.branch!==branch||state.role!=='frontdesk'||state.viewVersion!==view)return;if(booking&&booking.branch===branch&&booking.patientId===patientId){const contact=$('#followup-contact-form');contact.elements.followup.value=String(booking.id);contact.elements.followup.onchange?.();const appointment=contact.elements.appointment;if([...appointment.options].some(o=>o.value===String(receipt.id))){appointment.value=String(receipt.id);contact.elements.nextStep.value='arrange';message('预约已创建；请填写实际联系结果并保存关联。');revealTask(contact);return;}}message('预约已创建。');});};
+let patientSearchVersion = 0;
+function resetCashPatient() {
+ state.cashSelection=(state.cashSelection||0)+1;
+ patientSearchVersion++;
+ state.financeVersion++;
+ state.patient=null;
+ state.bills=[];
+ prepayState=null;
+ $('#finance').dataset.patientReady='false';
+ $('#finance-query').elements.patient.value='';
+ $('#finance-patient-results').replaceChildren();
+ $('#finance-patient-search').reset();
+ $('#cash-by-number').reset();
+ $('#cash-by-number').closest('details').open=false;
+ $('#bill-patient-context').textContent='请先查找并选择患者。';
+ for (const id of ['payment','prepay-receive','prepay-offset','prepay-request','prepay-refund','adjustment']) {
+   const form=$('#'+id+'-form');
+   form.reset();
+   if(id!=='prepay-receive') form.hidden=true;
+ }
+}
+async function selectCashPatient(patient) {
+ const view=state.viewVersion;
+ resetCashPatient();
+ const version=state.cashSelection;
+ $('#finance-query').elements.patient.value=patient.id;
+ $('#bill-patient-context').textContent='正在查询 '+patient.name+' 的本店账单…';
+ try {
+   await finance();
+   if(view!==state.viewVersion || version!==state.cashSelection)return;
+   $('#bill-patient-context').textContent=patient.record_no ? patient.name+' · '+patient.record_no : patient.name;
+   $('#finance').dataset.patientReady='true';
+ } catch(error) {
+   if(view===state.viewVersion && version===state.cashSelection)resetCashPatient();
+   throw error;
+ }
+}
+$('#cash-by-number').onsubmit=e=>{
+ e.preventDefault();
+ const id=Number(e.currentTarget.elements.id.value);
+ if(Number.isSafeInteger(id)&&id>0)act(e.submitter,()=>selectCashPatient({id,name:'患者编号 '+id}));
+};
+$('#finance-patient-search').onsubmit=e=>{
+ e.preventDefault();
+ const term=e.currentTarget.elements.query.value.trim();
+ const version=++patientSearchVersion,view=state.viewVersion,branch=state.branch;
+ const list=$('#finance-patient-results');
+ list.replaceChildren();
+ act(e.submitter,async()=>{
+   const data=await api('/api/finance/patients?branchId='+branch+'&q='+encodeURIComponent(term));
+   if(version!==patientSearchVersion||view!==state.viewVersion||state.role!=='cashier')return;
+   if(!data.items.length)list.textContent='未找到匹配患者。';
+   for(const patient of data.items){
+     const row=document.createElement('p');
+     row.textContent=patient.name+' / '+patient.record_no+' / '+patient.phone_hint+'　';
+     const button=document.createElement('button');
+     button.type='button'; button.textContent='选择患者';
+     button.onclick=()=>act(button,()=>selectCashPatient(patient));
+     row.append(button);list.append(row);
+   }
+ });
+};
 $('#payment-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,b=state.bills.find(x=>x.id===Number(f.elements.bill.value)),channel=f.elements.channel.value;const value=command({patientId:state.patient,billId:b.id,expectedBillRevision:b.revision,expectedFundsRevision:b.fundsRevision,amountCents:Number(f.elements.amount.value),verified:f.elements.verified.checked,receivedAt:fixedNow,evidence:f.elements.evidence.value,channel,...(channel==='现金'?{}:{externalReference:f.elements.reference.value})});await api('/api/finance/payment',value);f.reset();message('已登记系统外收款。');await finance();});};
 $('#execution-correct-cancel').onclick=()=>{$('#execution-correct-form').hidden=true;};
 $('#execution-correct-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget;if(Number(f.dataset.branch)!==state.branch||state.role!=='dentist'||Number(f.dataset.visitId)!==Number($('#record-form').elements.visit.value))throw new Error('门店或就诊已变更，请重新选择记录。');await api('/api/treatment/correct',command({visitId:Number(f.dataset.visitId),originalExecutionId:Number(f.dataset.executionId),procedureNote:f.elements.note.value,reason:f.elements.reason.value}));f.hidden=true;message('已追加诊疗经过更正；原记录和费用保留。');await loadRecord();});};
@@ -342,3 +511,173 @@ $('#inspect-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{con
 $('#pending-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,item=state.pending.find(x=>x.id===Number(f.elements.namedItem('item').value));await api('/api/prices/pending',command({billItemId:item.id,priceId:Number(f.elements.price.value),expectedRevision:item.revision,expectedBillRevision:item.bill_revision,...(f.elements.quoteItem.value?{quoteItemId:Number(f.elements.quoteItem.value)}:{}),reviewNote:f.elements.note.value}));f.reset();message('核价已确认。');await manager();});};
 $('#price-draft-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget;await api('/api/prices',command({action:'draft',serviceId:Number(f.elements.service.value),unitPriceCents:Number(f.elements.amount.value),validFrom:isoLocal(f.elements.validFrom.value),reason:f.elements.reason.value}));f.elements.amount.value='';f.elements.reason.value='';message('价目草稿已保存，请提交负责人确认。');await cashierPrices();});};
 $('#approval-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,v=state.approvalOptions.visits.find(x=>x.id===Number(f.elements.visit.value));await api('/api/approvals',command({action:'propose',sourceBranchId:state.branch,targetBranchId:Number(f.elements.target.value),dentistId:Number(f.elements.dentist.value),patientId:v.patient_id,visitId:v.id,scope:f.elements.scope.value,validUntil:isoLocal(f.elements.validUntil.value),reason:'已核实患者同意：'+f.elements.reason.value}));f.reset();message('跨店查阅申请已提交。');await manager();});};
+
+
+function updateAgendaSelection() {
+ clearAppointmentChange();
+ if (state.role === 'frontdesk' && state.options) renderAgenda(state.options);
+}
+$('#agenda-day').onchange = () => { agendaAllDates=false; updateAgendaSelection(); };
+for (const [selector,offset] of [['#agenda-prev',-7],['#agenda-next',7]]) {
+ $(selector).onclick = () => {
+   $('#agenda-day').value='';
+   agendaWeekStart=shiftDay(agendaWeekStart || weekStart(localInput(fixedNow).slice(0,10)),offset);
+   agendaAllDates=false;
+   updateAgendaSelection();
+ };
+}
+$('#agenda-status').onchange = updateAgendaSelection;
+$('#agenda-today').onclick = () => {
+ agendaAllDates=false;
+ $('#agenda-day').value = localInput(fixedNow).slice(0,10);
+ updateAgendaSelection();
+};
+$('#agenda-all').onclick = () => {
+ agendaAllDates=true;
+ $('#agenda-day').value = '';
+ updateAgendaSelection();
+};
+
+const areas = [
+ ['reception','前台接诊','接诊'], ['dentist','牙医接诊','接诊'],
+ ['documents-area','影像与文书','接诊'], ['finance','收费与报价','收费'],
+ ['insurance-area','医保办理','收费'], ['manager','门店管理','运营'],
+ ['inventory','采购与库存','运营'], ['assistant-resources-area','诊椅与设备','运营'],
+ ['catalog-area','基础目录','设置'], ['branch-staff-area','门店与人员','设置']
+];
+const defaultArea = {frontdesk:'reception', dentist:'dentist', cashier:'finance', assistant:'inventory', manager:'manager'};
+const panelSelection = new Map();
+let currentArea;
+let previousContext;
+const work = $('#work');
+const sidebar = document.createElement('aside');
+sidebar.className = 'workspace-sidebar';
+sidebar.innerHTML = '<div class="workspace-brand"><span class="workspace-logo">青</span><div><strong>青禾牙科</strong><small>连锁诊所工作台</small></div></div><nav aria-label="工作区域"></nav>';
+work.prepend(sidebar);
+const pageHeader = document.createElement('header');
+pageHeader.className = 'workspace-heading';
+pageHeader.innerHTML = '<div><span></span><h2></h2></div>';
+const contextBar = work.querySelector('.filters');
+contextBar.append($('#user-info'));
+contextBar.after(pageHeader);
+const pageTabs = document.createElement('nav');
+pageTabs.className = 'workspace-shortcuts';
+pageTabs.setAttribute('aria-label','业务分页');
+pageHeader.after(pageTabs);
+
+function choosePanel(area, requested) {
+ const panels = [...area.querySelectorAll(':scope > .task-panel')];
+ const selected = panels.find(p => p.dataset.panel === requested) || panels[0];
+ if (area.id==='finance') $('#finance-selector').hidden = !['账单与收款','退费','预付款'].includes(selected?.dataset.panel);
+ if (area.id==='dentist') $('#visit-selector').hidden = ['本店报价','跨店查阅'].includes(selected?.dataset.panel);
+ pageTabs.replaceChildren();
+ pageTabs.hidden = !selected;
+ if (!selected) return;
+ panelSelection.set(area.id, selected.dataset.panel);
+ if (area.id === 'reception') {
+   const filter = $('#patient-filter').parentElement;
+   const drawer = selected.querySelector('details');
+   if (selected.dataset.panel === '患者档案') selected.prepend(filter);
+   else if (drawer) drawer.querySelector('summary').after(filter);
+   filter.hidden = selected.dataset.panel === '复诊联系';
+ }
+ for (const panel of panels) {
+   const active = panel === selected;
+   panel.hidden = !active;
+   const button = document.createElement('button');
+   button.type = 'button';
+   button.textContent = panel.dataset.panel;
+   button.setAttribute('aria-current', active ? 'page' : 'false');
+   button.onclick = () => {
+     choosePanel(area,panel.dataset.panel);
+     [...pageTabs.children].find(b => b.textContent === panel.dataset.panel)?.focus();
+   };
+   pageTabs.append(button);
+ }
+}
+
+function chooseArea(id) {
+ const selected = document.getElementById(id);
+ if (!selected || selected.hidden) return;
+ currentArea = id;
+ for (const [key] of areas)
+   document.getElementById(key).classList.toggle('workspace-inactive',key !== id);
+ for (const button of sidebar.querySelectorAll('button[data-area]')) {
+   const active = button.dataset.area === id;
+   button.classList.toggle('active',active);
+   button.setAttribute('aria-current',active ? 'page' : 'false');
+ }
+ const [,label,group] = areas.find(item => item[0] === id);
+ pageHeader.querySelector('span').textContent = group;
+ pageHeader.querySelector('h2').textContent = label;
+ choosePanel(selected,panelSelection.get(id));
+}
+
+// An existing workflow can open a form on a different page (e.g. booking a recall).
+function revealTask(form) {
+ const panel = form.closest('.task-panel');
+ if (panel) choosePanel(panel.parentElement,panel.dataset.panel);
+ const details = form.closest('details');
+ if (details) details.open = true;
+ form.scrollIntoView({block:'center'});
+}
+
+function renderWorkspace() {
+ if (work.hidden) return;
+ const role = $('#role').value;
+ const context = role + '/' + $('#branch').value;
+ const available = areas.filter(([id]) => !document.getElementById(id).hidden);
+ const nav = sidebar.querySelector('nav');
+ nav.replaceChildren();
+ let group;
+ for (const [id,label,category] of available) {
+   if (category !== group) {
+     group = category;
+     const caption = document.createElement('p');
+     caption.className = 'workspace-nav-group';
+     caption.textContent = category;
+     nav.append(caption);
+   }
+   const button = document.createElement('button');
+   button.type = 'button';
+   button.dataset.area = id;
+   button.textContent = label;
+   button.onclick = () => chooseArea(id);
+   nav.append(button);
+ }
+ if (context !== previousContext) {
+   previousContext = context;
+   panelSelection.clear();
+   currentArea = defaultArea[role];
+   $('#agenda-day').value = '';
+   agendaWeekStart = '';
+   agendaAllDates = false;
+ }
+ const target = available.some(([id]) => id === currentArea) ? currentArea : available[0]?.[0];
+ if (target) chooseArea(target);
+}
+
+const workspaceObserver = new MutationObserver(renderWorkspace);
+for (const [id] of areas)
+ workspaceObserver.observe(document.getElementById(id),{attributes:true,attributeFilter:['hidden']});
+workspaceObserver.observe(work,{attributes:true,attributeFilter:['hidden']});
+
+function resetClinicalDrafts() {
+ state.record=null;
+ state.health=null;
+ clearPrescription();
+ for(const form of $('#dentist').querySelectorAll('form'))form.reset();
+ for(const row of [...$('#prescription-items').querySelectorAll('[data-prescription-item]')].slice(1))row.remove();
+ $('#plan-edit-cancel').click();
+ $('#execution-correct-form').hidden=true;
+}
+function clearVisitContext() {
+ state.visitRequest=(state.visitRequest || 0)+1;
+ $('#clinic-visit').replaceChildren();
+ $('#clinic-visit').dataset.visit='reset';
+ $('#dentist').dataset.caseReady='false';
+}
+$('#clinic-visit').onchange=e=>{
+ $('#dentist').dataset.caseReady='false';
+ act(e.currentTarget,()=>treatment(Number(e.target.value)));
+};

@@ -4,3 +4,84 @@
 #reason-dialog{width:min(90vw,500px);border:1px solid #dce5e9;border-radius:6px;padding:24px;color:#233d4d}
 #reason-dialog::backdrop{background:#233d4d88}
 #reason-dialog footer{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+/* Role-based workbench */
+body{background:#f5f7fa;color:#263747;font-family:'Microsoft YaHei UI','PingFang SC',sans-serif}
+.chain-main{max-width:none;margin:0;padding:0 38px 50px 270px}
+.chain-main>.home-welcome{padding:24px 0 12px;background:none;border:0;margin:0}
+.chain-main>.home-welcome h1{font-size:20px;letter-spacing:0;margin:0 0 5px}
+.chain-main>.home-welcome p{font-size:12px}
+#work>.filters{display:flex;align-items:end;gap:12px;padding:14px 18px;background:#fff;border:1px solid #e5eaf0;border-radius:8px;margin:12px 0}
+#work>.filters label{font-size:12px;color:#70808f;min-width:145px}
+#work>.filters select{margin-top:5px;padding:8px}
+#user-info{font-size:13px;color:#718191;margin:8px 0 22px}
+.workspace-sidebar{position:fixed;inset:0 auto 0 0;width:230px;background:#fff;border-right:1px solid #e4eaf0;display:flex;flex-direction:column;z-index:10;padding:25px 16px 18px;overflow-y:auto}
+.workspace-brand{display:flex;gap:11px;align-items:center;padding:0 7px 27px;border-bottom:1px solid #edf0f3}.workspace-logo{display:grid;place-items:center;width:39px;height:39px;border-radius:10px;background:#147b80;color:white;font-size:21px;font-weight:700}.workspace-brand strong,.workspace-brand small{display:block}.workspace-brand strong{font-size:16px}.workspace-brand small{font-size:11px;color:#8a99a7;margin-top:4px}
+.workspace-nav-label,.workspace-nav-group{font-size:11px;color:#9aa8b4;margin:21px 10px 8px}.workspace-nav-group{margin:17px 10px 6px}.workspace-sidebar nav button{width:100%;border:0;text-align:left;min-height:39px;margin:2px 0;padding:8px 12px;color:#536777;background:transparent;border-radius:6px}.workspace-sidebar nav button:hover{background:#f1f7f7;color:#147b80}.workspace-sidebar nav button.active{background:#e5f4f3;color:#08777b;font-weight:600}.workspace-sidebar-foot{margin-top:auto;padding:20px 10px 0;color:#a1adb7;font-size:11px}
+.workspace-heading{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:20px 0 14px}.workspace-heading span{font-size:12px;color:#8a9aa7}.workspace-heading h2{margin:5px 0 0;font-size:24px}.workspace-heading p{color:#91a0ad;font-size:12px;margin:0}.workspace-shortcuts{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 14px}.workspace-shortcuts button{border:0;background:transparent;color:#59717d;font-size:12px;min-height:32px;padding:6px 10px}.workspace-shortcuts button:hover{background:#e7f3f2}
+#work>section.clinical-summary{background:#fff;border:1px solid #e4eaf0;box-shadow:0 2px 10px #233d4d08;border-radius:8px;padding:24px;margin-bottom:20px}.workspace-inactive{display:none!important}#work h2{scroll-margin-top:20px}#work>section h2:not(:first-child){border-top:1px solid #edf1f3;padding-top:24px;margin-top:28px}.chain-main .form-grid{gap:15px}.chain-main button:focus-visible,.chain-main input:focus-visible,.chain-main select:focus-visible,.chain-main textarea:focus-visible{outline:3px solid #93d5d1;outline-offset:2px}
+@media(max-width:800px){.chain-main{padding:12px 16px 35px}.workspace-sidebar{position:static;width:auto;margin:0 0 18px;padding:14px}.workspace-brand{padding-bottom:12px}.workspace-sidebar nav{display:flex;gap:5px;overflow-x:auto}.workspace-sidebar nav button{white-space:nowrap;width:auto}.workspace-nav-label,.workspace-nav-group,.workspace-sidebar-foot{display:none}#work>.filters{flex-wrap:wrap}.workspace-heading p{display:none}}
+.chain-main:has(#work[hidden]) {
+  max-width: 490px;
+  margin: clamp(40px, 12vh, 120px) auto;
+  padding: 0 20px;
+}
+.chain-main:has(#work[hidden]) .home-welcome { padding: 0 0 18px; }
+#login { padding: 26px; background: white; border: 1px solid var(--line); border-radius: 10px; }
+#login .form-grid { grid-template-columns: 1fr; }
+#login .primary { width: 100%; }
+.login-help { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; font-size: 13px; }
+.login-help summary, .entry-drawer summary { cursor: pointer; }
+.workspace-shortcuts { border-bottom: 1px solid #cfdde2; gap: 0; }
+.workspace-shortcuts button { border-radius: 0; border-bottom: 3px solid transparent; font-size: 14px; padding: 10px 13px; }
+.workspace-shortcuts button[aria-current="page"] { border-color: #187d81; color: #10696e; font-weight: 650; }
+#work .task-panel > h2:first-child { margin-top: 0; }
+.entry-drawer { border: 1px solid #cddfe1; border-radius: 6px; margin: 0 0 16px; padding: 0 14px; }
+.entry-drawer summary { color: #126a6e; font-weight: 600; padding: 11px 0; }
+.entry-drawer[open] { border-left: 3px solid #26878b; }
+.entry-drawer[open] summary { margin-bottom: 10px; }
+.agenda-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; padding: 8px 0 16px; }
+.agenda-filters label { min-width: 120px; margin: 0; }
+.agenda-filters button { min-height: 36px; padding: 6px 12px; }
+.agenda-row { display: grid; grid-template-columns: 9em minmax(10em,1fr) minmax(8em,.7fr) auto; align-items: baseline; gap: 6px 18px; padding: 15px 2px; border-top: 1px solid #dde5e8; }
+.agenda-row strong, .agenda-row small { display: block; }
+.agenda-row strong { font-weight: 600; }
+.agenda-row small { font-size: 12px; color: #576c78; overflow-wrap: anywhere; }
+.agenda-badge { border-radius: 4px; background: #f1f3f4; color: #536570; font-size: 12px; padding: 3px 7px; }
+.agenda-badge[data-booked="true"] { color: #0c6264; background: #dcf1ed; }
+.agenda-actions { grid-column: 2/-1; display: flex; flex-wrap: wrap; gap: 7px; }
+.agenda-actions:empty { display:none; }
+.agenda-actions button { min-height: 30px; padding: 4px 9px; font-size: 13px; }
+.patient-context { font-weight: 600; color: #175e64; }
+.patient-context:empty { display:none; }
+@media(max-width:900px){ .agenda-row { grid-template-columns: 1fr 1.3fr; }.agenda-actions{grid-column:1/-1} .agenda-badge{justify-self:start} }
+@media(prefers-reduced-motion:reduce){ *{scroll-behavior:auto!important} }
+.chain-main:has(#login[hidden]) > .home-welcome { padding: 12px 0 2px; }
+.chain-main:has(#login[hidden]) > .home-welcome h1 { font-size: 16px; margin-bottom: 1px; }
+#work > .filters { padding: 8px 14px; align-items: center; }
+#work > .filters label { display:flex; gap:8px; align-items:center; min-width:0; }
+#work > .filters select { width:auto; margin:0; }
+#work > .filters #user-info { margin:0 0 0 auto; }
+.workspace-heading { margin:14px 0 8px; }
+.workspace-heading > div { display:flex; align-items:baseline; gap:12px; }
+.week-toolbar { display:flex; gap:14px; align-items:center; margin:0 0 10px; }
+.week-toolbar button { min-height:32px; padding:3px 12px; font-size:20px; }
+#agenda-week { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); border:1px solid #d8e4e5; border-radius:6px; overflow:hidden; margin-bottom:8px; }
+#agenda-week button { border:0; border-radius:0; border-right:1px solid #e3ebed; padding:7px 2px; display:grid; gap:2px; text-align:center; }
+#agenda-week button:last-child { border:0; }
+#agenda-week small { font-size:11px; color:#586d76; }
+#agenda-week button[aria-pressed="true"], #agenda-all[aria-pressed="true"] { color:#075c60; background:#e0f1ef; }
+#agenda-week button:focus-visible { outline-offset:-3px; }
+@media(max-width:650px){#agenda-week small:last-child { display:none; }#work>.filters #user-info{margin:0}.week-toolbar{font-size:13px}}
+.case-context { border-left:3px solid #177b80; background:#f1f8f7; padding:12px 16px; margin-bottom:18px; }
+.case-context h3 { margin:0 0 8px; font-size:15px; }
+.case-context label { display:block; color:#385861; font-weight:600; }
+.case-context select { margin:5px 0 0; max-width:100%; }
+.case-context p { margin:8px 0 0; overflow-wrap:anywhere; }
+.case-context p:empty { display:none; }
+#finance-patient-search,#cash-by-number { display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+#finance-patient-search .form-grid { flex:1; min-width:min(280px,100%); }
+#finance-patient-search p { margin:0; }
+.numeric-search { margin:8px 0; }
+.numeric-search summary { cursor:pointer; color:#406773; font-size:13px; }
+#dentist[data-case-ready="false"] > .task-panel:is([data-panel="方案与报价"],[data-panel="诊疗记录"],[data-panel="病历与签署"],[data-panel="院外处方"]),
+#finance:not([data-patient-ready="true"]) > .task-panel:is([data-panel="账单与收款"],[data-panel="预付款"],[data-panel="退费"]) { display:none; }
