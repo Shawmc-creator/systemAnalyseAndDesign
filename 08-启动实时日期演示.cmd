@@ -11,7 +11,8 @@ if errorlevel 1 (
 )
 set "CLINIC_NODE=node"
 :launch
-echo 正在启动实时日期虚构演示，请访问 http://127.0.0.1:3019/
-"%CLINIC_NODE%" "%~dp002-系统实现\app\scripts\serve-chain-live-demo.js"
-echo 服务已停止。
-pause
+"%CLINIC_NODE%" "%~dp002-系统实现\app\scripts\start-chain-demo.js" --live %*
+set "CLINIC_EXIT=%errorlevel%"
+if "%CLINIC_EXIT%"=="0" exit /b 0
+if /i not "%~1"=="--check" pause
+exit /b %CLINIC_EXIT%
