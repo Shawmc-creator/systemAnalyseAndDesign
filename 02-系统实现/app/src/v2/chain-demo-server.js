@@ -38,8 +38,9 @@ const {ChainDocumentsTrial}=require('./chain-documents-trial');
 const {MAX_FILE_BYTES}=require('./document-store');
 const {ChainDemoSnapshot}=require('./chain-demo-snapshot');
 const {insert,fact,day,fail,hash}=require('./common');
+const {encodePassword,checkPassword}=require('./auth');
 
-const CHAIN_DEMO_BUILD='20261105-08';
+const CHAIN_DEMO_BUILD='20261109-01';
 function createChainDemo({snapshotPath=null,runtimeClock=null}={}){
  if(runtimeClock!==null&&typeof runtimeClock!=='function')throw new Error('运行时钟必须是函数');
  const demoNow='2026-10-19T01:35:00Z';
@@ -151,7 +152,19 @@ function createChainDemo({snapshotPath=null,runtimeClock=null}={}){
   business_date:date,starts_at:new Date(date+'T09:00:00+08:00').toISOString().replace('.000Z','Z'),ends_at:new Date(date+'T18:00:00+08:00').toISOString().replace('.000Z','Z'),
   confirmed_at:now,closure_reason:null,created_by:staff.manager,confirmed_by:staff.manager,status:'已确认'}));
  schedule(2,staff.manager,2,tomorrow);schedule(3,staff.dentist,chair,following);
- let store=null;try{if(snapshotPath){store=new ChainDemoSnapshot(snapshotPath);store.initialize(db);}}catch(error){if(store)store.close();db.close();throw error;}
+ let store=null;try{if(snapshotPath){store=new ChainDemoSnapshot(snapshotPath);store.initialize(db);}
+  // Only migrate the original demo password; preserve independently changed credentials.
+  const demoNames=['frontdesk','dentist','cashier','assistant','assistant2','manager'];
+  const findAccount=db.prepare('SELECT id,password_hash FROM user_account WHERE login_name=?');
+  const updateAccount=db.prepare('UPDATE user_account SET password_hash=?,auth_version=auth_version+1 WHERE id=?');
+  db.exec('BEGIN');
+  try{
+   let changed=false;
+   for(const name of demoNames){const account=findAccount.get(name);if(account&&checkPassword('Clinic123!',account.password_hash)){updateAccount.run(encodePassword('Clinic123'),account.id);changed=true;}}
+   db.exec('COMMIT');
+   if(changed&&store)store.save(db);
+  }catch(error){if(db.isTransaction)db.exec('ROLLBACK');throw error;}
+ }catch(error){if(store)store.close();db.close();throw error;}
  initialized=true;
  const reception=new ChainReceptionTrial(app),approval=new ChainApprovalTrial(app),grants=new ChainGrantsTrial(app),clinical=new ChainClinicalQuery(app.auth,app.documentStore),finance=new ChainFinanceQuery(app),cash=new ChainCashTrial(app),prices=new ChainPriceTrial(app),treatment=new ChainTreatmentTrial(app),pendingPrices=new ChainPendingPriceTrial(app),crossOptions=new ChainCrossBranchOptions(app),startVisit=new ChainStartVisitTrial(app),recordTrial=new ChainRecordTrial(app),resourcesTrial=new ChainResourcesTrial(app),healthSign=new ChainHealthSignTrial(app,recordTrial),addendumTrial=new ChainAddendumTrial(app,recordTrial),followupTrial=new ChainFollowupTrial(app),inventoryTrial=new ChainInventoryTrial(app),purchaseTrial=new ChainPurchaseTrial(app),dashboard=new ChainDashboardTrial(app),setup=new ChainSetupTrial(app),planTrial=new ChainPlanTrial(app),quoteTrial=new ChainQuoteTrial(app),prepayTrial=new ChainPrepayTrial(app),prescriptionTrial=new ChainPrescriptionTrial(app),access=new ChainAuth(app.auth);
  const documentsTrial=new ChainDocumentsTrial(app);

@@ -2,7 +2,7 @@
 const test=require('node:test');const assert=require('node:assert/strict');const {createChainDemo}=require('../src/v2/chain-demo-server');
 test('连锁前台建档与本店排班互相衔接，跨店冲突和有效占用不可绕过',async t=>{
  const demo=createChainDemo();await new Promise(resolve=>demo.server.listen(0,'127.0.0.1',resolve));t.after(async()=>{await new Promise(resolve=>demo.server.close(resolve));demo.db.close();});const base=`http://127.0.0.1:${demo.server.address().port}`;
- async function login(name,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:name,password:'Clinic123!'})});assert.equal(r.status,200);const p=await r.json();return {cookie:r.headers.get('set-cookie').split(';')[0],'content-type':'application/json','x-clinic-role':role,'x-csrf-token':p.csrf};}
+ async function login(name,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:name,password:'Clinic123'})});assert.equal(r.status,200);const p=await r.json();return {cookie:r.headers.get('set-cookie').split(';')[0],'content-type':'application/json','x-clinic-role':role,'x-csrf-token':p.csrf};}
  const front=await login('frontdesk','frontdesk'),manager=await login('manager','manager'),other=await login('assistant','manager');
  const get=(url,h)=>fetch(base+url,{headers:h}),post=(url,value,h)=>fetch(base+url,{method:'POST',headers:h,body:JSON.stringify(value)});
  assert.equal((await get('/api/schedules?branchId=1',front)).status,403);assert.equal((await get('/api/schedules?branchId=1',other)).status,403);

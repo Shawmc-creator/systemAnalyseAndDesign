@@ -3,7 +3,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {createChainDemo}=require('../src/v2/chain-demo-server');
 test('未用材料按原领用退回本店库存，拒绝超量、越权及跨店',async t=>{
  const demo=createChainDemo();await new Promise(r=>demo.server.listen(0,'127.0.0.1',r));t.after(async()=>{await new Promise(r=>demo.server.close(r));demo.db.close();});const base='http://127.0.0.1:'+demo.server.address().port;
- async function login(username,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username,password:'Clinic123!'})});const data=await r.json();return {'content-type':'application/json',cookie:r.headers.get('set-cookie').split(';')[0],'x-clinic-role':role,'x-csrf-token':data.csrf};}
+ async function login(username,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username,password:'Clinic123'})});const data=await r.json();return {'content-type':'application/json',cookie:r.headers.get('set-cookie').split(';')[0],'x-clinic-role':role,'x-csrf-token':data.csrf};}
  const assistant=await login('assistant','assistant'),dentist=await login('dentist','dentist');
  const list=async branch=>await (await fetch(base+'/api/inventory?branchId='+branch,{headers:assistant})).json(),post=(body,headers=assistant)=>fetch(base+'/api/inventory/issue',{method:'POST',headers,body:JSON.stringify(body)});
  let a=await list(1),b=await list(2);const stock=a.items[0],other=b.items[0];

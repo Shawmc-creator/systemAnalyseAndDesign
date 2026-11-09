@@ -7,7 +7,7 @@ test('本店文书上传、牙医确认及重启后下载，阻止越权与跨�
  async function start(){demo=createChainDemo({snapshotPath});await new Promise(r=>demo.server.listen(0,'127.0.0.1',r));return 'http://127.0.0.1:'+demo.server.address().port;}
  async function stop(){await new Promise(r=>demo.server.close(r));demo.db.close();}
  t.after(async()=>{if(demo?.server.listening)await stop();fs.rmSync(dir,{recursive:true,force:true});});let base=await start();
- async function login(username,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username,password:'Clinic123!'})});const data=await r.json();return {'content-type':'application/json',cookie:r.headers.get('set-cookie').split(';')[0],'x-clinic-role':role,'x-csrf-token':data.csrf};}
+ async function login(username,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username,password:'Clinic123'})});const data=await r.json();return {'content-type':'application/json',cookie:r.headers.get('set-cookie').split(';')[0],'x-clinic-role':role,'x-csrf-token':data.csrf};}
  let assistant=await login('assistant','assistant'),dentist=await login('dentist','dentist'),front=await login('frontdesk','frontdesk');
  const get=(url,h)=>fetch(base+url,{headers:h}),post=(url,value,h)=>fetch(base+url,{method:'POST',headers:h,body:JSON.stringify(value)});
  const options=await (await get('/api/documents/options?branchId=1',assistant)).json(),v=options.visits[0];assert.ok(v);assert.equal((await get('/api/documents/options?branchId=1',front)).status,403);

@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict');const {createChainDemo}=require('../src/v2/chain-demo-server');
 test('连锁院外处方接口按本店本人接诊核验，开立不发药或收费',async t=>{
  const demo=createChainDemo();await new Promise(r=>demo.server.listen(0,'127.0.0.1',r));t.after(async()=>{await new Promise(r=>demo.server.close(r));demo.db.close();});const base='http://127.0.0.1:'+demo.server.address().port;
- async function login(name,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:name,password:'Clinic123!'})});const data=await r.json();return {cookie:r.headers.get('set-cookie').split(';')[0],'content-type':'application/json','x-clinic-role':role,'x-csrf-token':data.csrf};}
+ async function login(name,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:name,password:'Clinic123'})});const data=await r.json();return {cookie:r.headers.get('set-cookie').split(';')[0],'content-type':'application/json','x-clinic-role':role,'x-csrf-token':data.csrf};}
  const d=await login('dentist','dentist'),f=await login('frontdesk','frontdesk'),get=(url,h=d)=>fetch(base+url,{headers:h}),post=(url,x,h=d)=>fetch(base+url,{method:'POST',headers:h,body:JSON.stringify(x)});
  const visits=(await (await get('/api/treatment/options?branchId=1')).json()).visits,visit=visits.find(v=>v.status==='接诊中'),query='/api/prescriptions?branchId=1&visitId='+visit.id+'&patientId='+visit.patient_id;
  assert.equal((await get(query,f)).status,403);assert.equal((await get(query.replace('branchId=1','branchId=2'))).status,403);

@@ -121,3 +121,7 @@ body{background:#f5f7fa;color:#263747;font-family:'Microsoft YaHei UI','PingFang
 #front-followups > p,#dentist-followups > p { line-height:1.8; padding:12px 0; border-bottom:1px solid #e5ecef; overflow-wrap:anywhere; }
 @media(max-width:950px){.home-columns{grid-template-columns:1fr}.work-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:800px){.workspace-sidebar nav{padding:0;display:flex;flex-wrap:wrap;overflow:visible}.workspace-sidebar{overflow:visible}.workspace-sidebar nav button{font-size:12px}#workspace-home{padding:16px}.home-heading{align-items:center}}
+.demo-credentials > div { display:grid; grid-template-columns:70px 1fr auto; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid #edf1f3; }
+.demo-credentials code { color:#1c5260; font-size:13px; }
+.demo-credentials button { min-height:30px; padding:4px 8px; font-size:12px; }
+#copy-feedback { min-height:1.3em; margin:8px 0 0; color:#146d70; }

@@ -11,7 +11,7 @@ test('隔离连锁API按会话、岗位、门店和提交号提供预约演示',
  assert.match(page.headers.get('content-security-policy'),/default-src 'self'/);
  assert.equal((await fetch(base+'/chain-demo.js')).status,200);assert.equal((await fetch(base+'/chain-demo.css')).status,200);
  assert.equal((await fetch(base+'/src/v2/server.js')).status,404);
- const login=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:'frontdesk',password:'Clinic123!'})});
+ const login=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:'frontdesk',password:'Clinic123'})});
  assert.equal(login.status,200);const profile=await login.json(),cookie=login.headers.get('set-cookie').split(';')[0];
  const headers={cookie,'x-clinic-role':'frontdesk','x-csrf-token':profile.csrf,'content-type':'application/json'};
  const branches=await fetch(base+'/api/branches',{headers});assert.deepEqual((await branches.json()).items.map(x=>x.id),[1,2,3]);
@@ -32,7 +32,7 @@ test('隔离连锁API按会话、岗位、门店和提交号提供预约演示',
  demo.db.prepare("UPDATE branch_staff_role SET revoked_at=NULL,revoked_by=NULL WHERE staff_id=? AND branch_id=2 AND role_code='frontdesk'").run(frontId);
  const frontClinical=await fetch(base+'/api/clinical',{method:'POST',headers,body:JSON.stringify({scope:'record',sourceBranchId:1,targetBranchId:2,patientId:1,visitId:1})});assert.equal(frontClinical.status,403);
  const noCsrf=await fetch(base+'/api/clinical',{method:'POST',headers:{cookie,'x-clinic-role':'frontdesk','content-type':'application/json'},body:JSON.stringify({})});assert.equal(noCsrf.status,403);
- async function loginAs(username,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username,password:'Clinic123!'})});const data=await r.json();return {cookie:r.headers.get('set-cookie').split(';')[0],'content-type':'application/json','x-csrf-token':data.csrf,'x-clinic-role':role};}
+ async function loginAs(username,role){const r=await fetch(base+'/api/login',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username,password:'Clinic123'})});const data=await r.json();return {cookie:r.headers.get('set-cookie').split(';')[0],'content-type':'application/json','x-csrf-token':data.csrf,'x-clinic-role':role};}
  const cashier=await loginAs('cashier','cashier');
  const finance=await fetch(base+'/api/finance?branchId=1&patientId=1',{headers:cashier});assert.equal(finance.status,200);
  const account=await finance.json();assert.equal(account.items.length,1);assert.equal(account.items[0].summary.receivableCents,20000);assert.equal(account.items[0].summary.unpaidCents,10000);

@@ -76,4 +76,4 @@ class Auth {
     this.authenticationEvent(s.account_id, s.id, '注销', s.login_name, 'local', 'LOGOUT');
   }
 }
-module.exports = { Auth, encodePassword };
+module.exports = { Auth, encodePassword, checkPassword };

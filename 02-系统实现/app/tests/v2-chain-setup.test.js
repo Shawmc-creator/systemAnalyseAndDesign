@@ -2,7 +2,7 @@
 const test=require('node:test');const assert=require('node:assert/strict');const {createChainDemo}=require('../src/v2/chain-demo-server');const {ChainSetupTrial}=require('../src/v2/chain-setup-trial');const {ChainReceptionTrial}=require('../src/v2/chain-reception-trial');
 test('患者资料和排班调整保留历史，版本冲突及无门店权限拒绝',t=>{
  const demo=createChainDemo();t.after(()=>demo.db.close());const setup=new ChainSetupTrial(demo.app);
- function login(username,role){const p=demo.app.auth.login({username,password:'Clinic123!'});return {token:p.token,csrf:p.csrf,role};}
+ function login(username,role){const p=demo.app.auth.login({username,password:'Clinic123'});return {token:p.token,csrf:p.csrf,role};}
  const front=login('frontdesk','frontdesk'),manager=login('manager','manager'),other=login('assistant','manager');
  const opts=setup.options(manager,2),dentist=opts.dentists[0].id,chair=opts.chairs[0].id;
  const fields={name:'虚构新患者',phone:'13800004444',phone_owner:'本人'};

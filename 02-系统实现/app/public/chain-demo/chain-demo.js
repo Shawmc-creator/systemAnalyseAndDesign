@@ -860,3 +860,15 @@ for(const [id,label] of [
  const summary=document.createElement('summary');summary.textContent=label;
  form.before(drawer);drawer.append(summary,form);
 }
+document.querySelector('.demo-credentials').addEventListener('click', async event => {
+ const button=event.target.closest('button[data-copy]');
+ if(!button)return;
+ const feedback=$('#copy-feedback');
+ try {
+   if(!navigator.clipboard?.writeText)throw new Error('clipboard unavailable');
+   await navigator.clipboard.writeText(button.dataset.copy);
+   feedback.textContent=button.dataset.copy==='Clinic123'?'密码已复制。':'账号已复制。';
+ } catch {
+   feedback.textContent='无法自动复制，请手动选择旁边的文字复制。';
+ }
+});
