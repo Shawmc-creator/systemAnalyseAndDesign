@@ -1,0 +1,25 @@
+<view class="content">
+  <view class="header">
+    <text class="page-title">我的预约</text>
+    <text class="help-text">{{storageLabel}}</text>
+  </view>
+  <view wx:if="{{loading && !records.length}}" class="empty">正在读取预约记录…</view>
+  <view wx:if="{{error}}" class="empty notice">
+    <text class="error">{{error}}</text>
+    <button class="secondary" bindtap="refreshBookings">重新读取</button>
+  </view>
+
+  <view wx:for="{{records}}" wx:key="id" class="record">
+    <view class="record-head">
+      <text class="record-title">{{item.branchName}}</text>
+      <text class="record-status {{item.status === '已预约' ? 'record-status-active' : ''}}">{{item.status}}</text>
+    </view>
+    <text class="record-time">{{item.date}} {{item.time}}</text>
+    <text class="help-text">{{item.reason ? item.reason + ' · ' : ''}}{{item.reference || item.id}}</text>
+    <button wx:if="{{item.status === '已预约'}}" class="secondary cancel"
+      disabled="{{!!cancellingId}}" data-id="{{item.id}}" bindtap="confirmCancellation">取消预约</button>
+  </view>
+
+  <view wx:if="{{!records.length && !loading && !error}}" class="empty">暂无预约，可以选择门店和时段体验预约。</view>
+  <button class="action next" bindtap="openAppointment">预约其他时段</button>
+</view>

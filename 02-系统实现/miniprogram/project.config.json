@@ -1,0 +1,15 @@
+{
+  "appid": "touristappid",
+  "projectname": "青禾牙科预约演示",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "./",
+  "setting": {
+    "es6": true,
+    "urlCheck": true
+  },
+  "packOptions": {
+    "ignore": [
+      { "type": "file", "value": "README.md" }
+    ]
+  }
+}

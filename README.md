@@ -38,3 +38,4 @@ certutil -user -addstore Root "%USERPROFILE%\Downloads\dental-preview-root.crt"
 - [主业务演示指引](04-测试与验收/第一版主业务操作指引.md)提供各岗位演示顺序及虚构案例。
 - [网页验收记录](04-测试与验收/连锁演示网页验收记录.md)记录实际核对过的业务与剩余事项。
 - [系统源码与开发说明](02-系统实现/app/README.md)包含代码位置及开发命令。
+- [微信小程序](02-系统实现/miniprogram/README.md)包含预约演示、本机联调及真机接入说明。

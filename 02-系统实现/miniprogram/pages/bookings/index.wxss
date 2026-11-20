@@ -1,0 +1,18 @@
+.header { margin: 8rpx 0 28rpx; }
+.header .help-text { margin-top: 10rpx; }
+.record {
+  margin-bottom: 18rpx;
+  padding: 24rpx 26rpx;
+  border: 1rpx solid #dbe8e1;
+  border-radius: 20rpx;
+  background: #fff;
+}
+.record-head { display: flex; justify-content: space-between; align-items: center; gap: 12rpx; }
+.record-title { font-size: 31rpx; font-weight: 650; }
+.record-status { padding: 3rpx 14rpx; border-radius: 10rpx; background: #eef2ef; color: #486359; font-size: 23rpx; }
+.record-status-active { background: #e4f3eb; color: #155b49; }
+.record-time { display: block; margin: 12rpx 0 4rpx; font-size: 34rpx; font-weight: 650; }
+.cancel { margin-top: 18rpx; }
+.next { margin-top: 24rpx; }
+.error { display: block; margin-bottom: 12rpx; color: #9b302f; }
+.notice { margin-bottom: 18rpx; }

@@ -10,6 +10,7 @@ const {installTrialSchema}=require('./chain-schema-trial');
 const {ChainReceptionTrial}=require('./chain-reception-trial');
 const {ChainTransferProposal}=require('./chain-transfer-proposal');
 const {PatientDemoBooking}=require('./patient-demo-booking');
+const {MiniProgramDemoLogin,validateWechatDemoConfig}=require('./mini-program-demo-login');
 const {ensurePatientIdentityTrial}=require('./patient-identity-schema-trial');
 const {PatientVerifiedIdentity}=require('./patient-verified-identity');
 const {PatientIdentitySessionTrial}=require('./patient-identity-session-trial');
@@ -49,10 +50,13 @@ const {ChainDemoSnapshot}=require('./chain-demo-snapshot');
 const {insert,fact,day,fail,hash}=require('./common');
 const {encodePassword,checkPassword}=require('./auth');
 
-const CHAIN_DEMO_BUILD='20261118-02';
-function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,identityTrialConfig=null,publicOrigin=null}={}){
+const CHAIN_DEMO_BUILD='20261120-02';
+function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,identityTrialConfig=null,publicOrigin=null,miniProgramTrial=false,wechatDemoConfig=null}={}){
  if(runtimeClock!==null&&typeof runtimeClock!=='function')throw new Error('运行时钟必须是函数');
  if(identityTrialConfig&&(snapshotPath||runtimeClock))throw new Error('身份试验只允许独立内存演示');
+ if(miniProgramTrial&&(snapshotPath||runtimeClock||publicOrigin||identityTrialConfig))throw new Error('小程序联调只允许本机隔离内存演示');
+ if(wechatDemoConfig&&(miniProgramTrial||runtimeClock||identityTrialConfig))throw new Error('微信体验入口只允许固定日期虚构演示');
+ const wechatConfig=wechatDemoConfig?validateWechatDemoConfig(wechatDemoConfig):null;
  if(publicOrigin!==null){let u;try{u=new URL(publicOrigin);}catch{throw Error('公开演示来源无效');}if(u.protocol!=='https:'||u.origin!==publicOrigin||u.username||u.password||u.hostname==='localhost')throw Error('公开演示来源须是明确的 HTTPS 来源');}
  if(fixedClock!==null&&(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(fixedClock)||!Number.isFinite(Date.parse(fixedClock))))throw new Error('固定演示时间无效');
  const demoNow='2026-10-19T01:35:00Z';
@@ -186,7 +190,12 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
  const patientBooking=new PatientDemoBooking(app,reception);
  // Prepare the candidate relation on the isolated demonstration snapshot.
  // It does not configure an identity provider or enable identity endpoints.
- try{if(ensurePatientIdentityTrial(db)&&store)store.save(db);}
+ let wechatDemo;
+ try{
+  const identityChanged=ensurePatientIdentityTrial(db);
+  wechatDemo=wechatConfig?new MiniProgramDemoLogin(app,wechatConfig,patientBooking):null;
+  if((identityChanged||wechatDemo)&&store)store.save(db);
+ }
  catch(error){if(store)store.close();db.close();throw error;}
  let identitySessions=null;
  const identity=identityTrialConfig?new PatientVerifiedIdentity({db,...identityTrialConfig}):null;
@@ -195,13 +204,25 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
  // This entrance is restricted to one explicitly fictitious patient in the local demo.
  const patientDemoSessions=new Map();
  let persistenceFailed=false;
- const json=(res,status,value,extra={})=>{if(store&&!persistenceFailed){try{store.save(db);}catch(error){persistenceFailed=true;status=503;value={code:'SNAPSHOT_WRITE_FAILED',message:'演示数据保存失败，服务已停止；请检查磁盘后重新启动并核对操作结果。'};extra={};setImmediate(()=>server.close());}}res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...extra});res.end(JSON.stringify(value));};
+ const readOnlyJson=(res,status,value,extra={})=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...extra});res.end(JSON.stringify(value));};
+ const json=(res,status,value,extra={})=>{if(store&&!persistenceFailed){try{store.save(db);}catch(error){persistenceFailed=true;status=503;value={code:'SNAPSHOT_WRITE_FAILED',message:'演示数据保存失败，服务已停止；请检查磁盘后重新启动并核对操作结果。'};extra={};setImmediate(()=>server.close());}}return readOnlyJson(res,status,value,extra);};
  const body=async(req,limit=65536)=>{let n=0,chunks=[];for await(const c of req){n+=c.length;if(n>limit)fail(413,'TOO_LARGE','请求过大');chunks.push(c);}let value;try{value=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{fail(400,'INVALID_JSON','请输入有效JSON');}if(!value||typeof value!=='object'||Array.isArray(value))fail(400,'INVALID_JSON','请求应为对象');return value;};
  const server=http.createServer(async(req,res)=>{
+  let isWechat=false;
   try{
-   if(persistenceFailed)fail(503,'SNAPSHOT_WRITE_FAILED','演示数据保存失败，请重新启动并核对操作结果');
    const url=new URL(req.url,'http://127.0.0.1'),origin=req.headers.origin,expected=`http://127.0.0.1:${server.address().port}`;
-   if(origin&&origin!==expected&&origin!==publicOrigin)fail(403,'ORIGIN_INVALID','来源不允许');
+   isWechat=url.pathname.startsWith('/api/miniprogram/');
+   if(persistenceFailed)fail(503,'SNAPSHOT_WRITE_FAILED','演示数据保存失败，请重新启动并核对操作结果');
+   if(isWechat&&(!wechatDemo||req.socket.remoteAddress!=='127.0.0.1'||req.headers.host!==wechatConfig.host||
+    req.headers['x-forwarded-proto']!=='https'))fail(404,'NOT_FOUND','微信演示入口未启用');
+   if(origin&&origin!==expected&&origin!==(isWechat?wechatConfig.origin:publicOrigin))fail(403,'ORIGIN_INVALID','来源不允许');
+   if(isWechat&&req.method==='GET'&&url.pathname==='/api/miniprogram/status'){
+    return readOnlyJson(res,200,{application:'qinghe-miniprogram-demo',status:'ready'});
+   }
+   const isMiniProgram=url.pathname.startsWith('/api/miniprogram-trial/');
+   if(isMiniProgram&&(!miniProgramTrial||req.socket.remoteAddress!=='127.0.0.1'||req.headers.host!==new URL(expected).host||
+    req.headers.forwarded||req.headers['x-forwarded-for']||req.headers['x-forwarded-host']||req.headers['x-forwarded-proto']))
+    fail(404,'NOT_FOUND','本机联调入口未启用');
    const identityFiles={'/identity-trial':['identity-trial.html','text/html; charset=utf-8'],'/identity-trial.js':['identity-trial.js','text/javascript; charset=utf-8']};
    if(req.method==='GET'&&identityFiles[url.pathname]){
     if(!identitySessions)fail(503,'PATIENT_IDENTITY_UNAVAILABLE','患者身份核验尚未配置');
@@ -214,12 +235,17 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
    }
    if(req.method==='GET'&&url.pathname==='/api/status')return json(res,200,{application:'qinghe-chain-demo',buildVersion:CHAIN_DEMO_BUILD,mode:store?'persistent-snapshot':'memory',clockMode:runtimeClock?'live':'fixed',businessTime:app.auth.now(),publicOrigin});
    if(req.method==='POST'&&!String(req.headers['content-type']||'').toLowerCase().startsWith('application/json'))fail(415,'CONTENT_TYPE','请求需使用JSON');
-   if(req.method==='POST'&&url.pathname==='/api/patient-demo/session'){
+   if(req.method==='POST'&&url.pathname==='/api/miniprogram/session'){
+    const {code}=await body(req,4096);
+    return json(res,200,await wechatDemo.login(code));
+   }
+   if(req.method==='POST'&&(url.pathname==='/api/patient-demo/session'||url.pathname==='/api/miniprogram-trial/session')){
     await body(req);
     const token=crypto.randomBytes(32).toString('hex'),csrf=crypto.randomBytes(32).toString('hex');
     for(const [key,entry] of patientDemoSessions)if(entry.expires<Date.now())patientDemoSessions.delete(key);
     if(patientDemoSessions.size>=100)fail(429,'DEMO_BUSY','演示会话过多，请稍后再试');
-    patientDemoSessions.set(token,{csrf,patientId:2,expires:Date.now()+3600000});
+    patientDemoSessions.set(token,{csrf,patientId:2,expires:Date.now()+3600000,isMiniProgram});
+    if(isMiniProgram)return json(res,200,{token,expiresInSeconds:3600});
     return json(res,200,{csrf},{'Set-Cookie':`chain_patient_demo=${token}; HttpOnly; SameSite=Strict; Path=/`});
    }
    if(url.pathname.startsWith('/api/patient-identity/')){
@@ -227,13 +253,15 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
     if(req.method==='POST'&&url.pathname==='/api/patient-identity/challenge'){await body(req);return json(res,200,identitySessions.challenge());}
     if(req.method==='POST'&&url.pathname==='/api/patient-identity/login'){const login=await identitySessions.login(await body(req));return json(res,200,{csrf:login.csrf,expiresInSeconds:login.expiresInSeconds},{'Set-Cookie':`chain_patient_identity_trial=${login.token}; HttpOnly; SameSite=Strict; Path=/`});}
    }
-   if(url.pathname.startsWith('/api/patient-demo/')||url.pathname.startsWith('/api/patient-identity/')){
+   if(isWechat||isMiniProgram||url.pathname.startsWith('/api/patient-demo/')||url.pathname.startsWith('/api/patient-identity/')){
     const isIdentity=url.pathname.startsWith('/api/patient-identity/'),cookieName=isIdentity?'chain_patient_identity_trial':'chain_patient_demo';
-    const token=String(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName+'='))?.slice(cookieName.length+1);
+    const token=isWechat||isMiniProgram?(/^Bearer ([0-9a-f]{64})$/.exec(req.headers.authorization||'')?.[1]):
+     String(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName+'='))?.slice(cookieName.length+1);
     let session;
-    if(isIdentity){if(req.method==='POST'&&!req.headers['x-patient-csrf'])fail(403,'CSRF_INVALID','缺少安全令牌');session=identitySessions.authorize(token,req.method==='POST'?req.headers['x-patient-csrf']:undefined);
+    if(isWechat){session=wechatDemo.authorize(token);}
+    else if(isIdentity){if(req.method==='POST'&&!req.headers['x-patient-csrf'])fail(403,'CSRF_INVALID','缺少安全令牌');session=identitySessions.authorize(token,req.method==='POST'?req.headers['x-patient-csrf']:undefined);
      if(req.method==='POST'&&url.pathname==='/api/patient-identity/logout'){await body(req);identitySessions.logout(token,req.headers['x-patient-csrf']);return json(res,200,{ok:true},{'Set-Cookie':'chain_patient_identity_trial=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'});}
-    }else{session=patientDemoSessions.get(token);if(!session||session.expires<Date.now())fail(401,'DEMO_SESSION','请重新进入患者演示');if(req.method==='POST'&&req.headers['x-patient-csrf']!==session.csrf)fail(403,'CSRF_INVALID','会话已失效，请重新进入');}
+    }else{session=patientDemoSessions.get(token);if(!session||session.expires<Date.now()||session.isMiniProgram!==isMiniProgram)fail(401,'DEMO_SESSION','请重新进入患者演示');if(!isMiniProgram&&req.method==='POST'&&req.headers['x-patient-csrf']!==session.csrf)fail(403,'CSRF_INVALID','会话已失效，请重新进入');}
     if(req.method==='GET'&&url.pathname.endsWith('/options')){
      const branches=db.prepare("SELECT id,name FROM clinic_branch WHERE status='active' ORDER BY id").all();
      const schedules=db.prepare(`SELECT s.id,s.revision,s.branch_id,s.dentist_id,s.starts_at,s.ends_at,d.name dentist_name,c.name chair_name
@@ -242,7 +270,7 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
      db.exec('BEGIN');try{const now=Date.parse(app.auth.now());for(const s of schedules){s.slots=[];const end=Math.min(Date.parse(s.ends_at),now+14*86400000);for(let t=Math.ceil(Math.max(Date.parse(s.starts_at),now+1000)/1800000)*1800000;t+1800000<=end&&s.slots.length<48;t+=1800000){const start=new Date(t).toISOString().replace('.000Z','Z'),finish=new Date(t+1800000).toISOString().replace('.000Z','Z');try{app.reception.checkSchedule(s.id,s.revision,start,finish);assertCandidateReservation(db,{branchId:s.branch_id,patientId:session.patientId,scheduleId:s.id,startsAt:start,endsAt:finish});reception.ensureDentist(s,s.branch_id,start,finish);s.slots.push({startsAt:start,endsAt:finish});}catch(e){if(!e.status||e.status>=500)throw e;}}}db.exec('COMMIT');}catch(e){if(db.isTransaction)db.exec('ROLLBACK');throw e;}
      const bookings=db.prepare(`SELECT a.id,a.record_no,a.branch_id,a.planned_start,a.planned_end,a.status,a.revision,b.name branch_name
       FROM appointment a JOIN clinic_branch b ON b.id=a.branch_id WHERE a.patient_id=? ORDER BY a.planned_start DESC`).all(session.patientId);
-     return json(res,200,{branches,schedules:schedules.filter(s=>s.slots.length),bookings,now:app.auth.now()});
+     return (isWechat?readOnlyJson:json)(res,200,{branches,schedules:schedules.filter(s=>s.slots.length),bookings,now:app.auth.now()});
     }
     if(req.method==='POST'&&url.pathname.endsWith('/appointment')){
      const input=await body(req);
@@ -262,7 +290,7 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
      }
      return json(res,200,patientBooking.command(session.patientId,{requestKey:String(input.requestKey||''),branchId,action:input.action,...fields}));
     }
-    return json(res,404,{code:'NOT_FOUND',message:'演示接口不存在'});
+    return (isWechat?readOnlyJson:json)(res,404,{code:'NOT_FOUND',message:'演示接口不存在'});
    }
    if(req.method==='POST'&&url.pathname==='/api/login'){
     const login=app.auth.login(await body(req));return json(res,200,{user:login.user,csrf:login.csrf},{'Set-Cookie':`chain_demo_session=${login.token}; HttpOnly; SameSite=Strict; Path=/`});
@@ -439,7 +467,11 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
    }
    if(req.method==='GET'&&url.pathname==='/api/clinical/grants')return json(res,200,crossOptions.forDentist(credentials,Number(url.searchParams.get('branchId'))));
    return json(res,404,{code:'NOT_FOUND',message:'演示接口不存在'});
-  }catch(e){return json(res,e.code==='PATIENT_IDENTITY_UNAVAILABLE'?503:e.status&&e.status<500?e.status:500,{code:e.code||'INTERNAL_ERROR',message:e.status?e.message:'演示请求未完成'});}
+  }catch(e){
+   const status=e.code==='PATIENT_IDENTITY_UNAVAILABLE'?503:
+    e.status&&(e.status<500||isWechat&&e.status===503)?e.status:500;
+   return (isWechat?readOnlyJson:json)(res,status,{code:e.code||'INTERNAL_ERROR',message:e.status?e.message:'演示请求未完成'});
+  }
  });
  if(store){server.on('close',()=>store.close());server.on('error',()=>store.close());}
  return {server,db,app};

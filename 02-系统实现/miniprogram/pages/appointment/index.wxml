@@ -1,0 +1,65 @@
+<view class="content">
+  <view class="masthead">
+    <image class="brand-mark" src="/assets/qinghe.png" mode="aspectFit" />
+    <view>
+      <text class="page-title">青禾牙科预约</text>
+      <text class="help-text">{{modeLabel}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="section empty">正在读取预约安排…</view>
+  <view wx:elif="{{!branches.length}}" class="section empty">
+    <text>{{error || '目前暂无可选门店。'}}</text>
+    <button class="secondary retry" bindtap="refreshOptions">重新读取</button>
+  </view>
+  <block wx:else>
+  <view class="section">
+    <text class="section-title">选择门店</text>
+    <view class="branches">
+      <button wx:for="{{branches}}" wx:key="id"
+        class="branch {{branchId === item.id ? 'branch-active' : ''}}"
+        data-id="{{item.id}}" bindtap="chooseBranch">
+        <view class="branch-copy">
+          <text class="branch-name">{{item.name}}</text>
+          <text wx:if="{{item.detail}}" class="help-text">{{item.detail}}</text>
+        </view>
+        <text class="choice">{{branchId === item.id ? '已选' : '选择'}}</text>
+      </button>
+    </view>
+  </view>
+
+  <view class="section">
+    <text class="section-title">选择日期和时段</text>
+    <view class="dates">
+      <button wx:for="{{dates}}" wx:key="value"
+        class="date {{date === item.value ? 'pill-active' : ''}}"
+        data-date="{{item.value}}" bindtap="chooseDate">
+        <text>{{item.label}}</text>
+        <text class="weekday">{{item.weekday}}</text>
+      </button>
+    </view>
+    <view wx:if="{{slots.length}}" class="slots">
+      <button wx:for="{{slots}}" wx:key="id"
+        class="slot {{selectedSlotId === item.id ? 'pill-active' : ''}}"
+        data-id="{{item.id}}" bindtap="chooseTime">
+        <text>{{item.time}}</text><text wx:if="{{item.dentist}}" class="weekday">{{item.dentist}}</text>
+      </button>
+    </view>
+    <view wx:else class="empty">这天暂无空位，请选择其他日期或门店。</view>
+  </view>
+
+  <view class="section booking-action">
+    <picker range="{{reasons}}" value="{{reasonIndex}}" bindchange="chooseReason">
+      <view class="purpose">
+        <text>预约用途</text>
+        <text class="purpose-value">{{reasons[reasonIndex]}} ›</text>
+      </view>
+    </picker>
+    <text wx:if="{{time}}" class="summary">{{branchName}} · {{date}} {{time}}</text>
+    <text wx:if="{{error}}" class="error">{{error}}</text>
+    <button class="action" disabled="{{!time || saving}}" loading="{{saving}}" bindtap="submitBooking">
+      {{time ? '确认预约' : '请选择时段'}}
+    </button>
+  </view>
+  </block>
+</view>

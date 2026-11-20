@@ -1,0 +1,48 @@
+.masthead {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+  padding: 8rpx 0 28rpx;
+  border-bottom: 1rpx solid #dbe8e1;
+}
+.brand-mark { flex: 0 0 82rpx; width: 82rpx; height: 82rpx; border-radius: 22rpx; }
+.masthead .help-text { margin-top: 8rpx; }
+.section { margin-top: 32rpx; }
+.retry { margin-top: 14rpx; }
+.branches { overflow: hidden; border: 1rpx solid #dbe8e1; border-radius: 20rpx; background: #fff; }
+.branch {
+  display: flex;
+  width: 100%;
+  min-height: 96rpx;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 22rpx;
+  border-bottom: 1rpx solid #e2ece6;
+  border-radius: 0;
+  background: #fff;
+  text-align: left;
+  color: #193a30;
+}
+.branch:last-child { border-bottom: 0; }
+.branch-active { background: #e8f5ee; }
+.branch-name { display: block; font-size: 29rpx; font-weight: 600; }
+.choice { color: #246554; font-size: 24rpx; }
+.branch-active .choice { font-weight: 700; }
+.dates, .slots { display: flex; flex-wrap: wrap; margin-right: -12rpx; }
+.date, .slot {
+  min-height: 74rpx;
+  margin: 0 12rpx 12rpx 0;
+  border: 1rpx solid #c9ded2;
+  background: #fff;
+  color: #23453b;
+}
+.date { flex: 1; padding: 12rpx 8rpx; }
+.weekday { display: block; font-size: 23rpx; color: inherit; }
+.slot { width: 148rpx; padding: 15rpx 4rpx; }
+.pill-active { border-color: #086652; background: #086652; color: #fff; }
+.booking-action { padding-top: 18rpx; border-top: 1rpx solid #dbe8e1; }
+.purpose { display: flex; justify-content: space-between; align-items: center; min-height: 84rpx; padding: 0 20rpx; border-radius: 16rpx; background: #fff; }
+.purpose-value { color: #486359; }
+.summary, .error { display: block; margin-top: 12rpx; font-size: 26rpx; }
+.error { color: #9b302f; }
+.booking-action .action { margin-top: 18rpx; }

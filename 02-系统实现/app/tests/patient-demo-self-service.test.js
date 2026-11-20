@@ -34,3 +34,47 @@ test('门店岗位隔离，牙医只可选择已授权门店',()=>{
   assert.throws(()=>auth.authorizeBranch(dentist,'uc09.query',2),e=>e.code==='BRANCH_FORBIDDEN');
  }finally{demo.db.close();}
 });
+
+test('小程序门店预约联调仅限本机，且前台可查询新增和取消状态',async t=>{
+ assert.throws(()=>createChainDemo({miniProgramTrial:true,publicOrigin:'https://example.test'}));
+ async function start(miniProgramTrial){
+  const demo=createChainDemo({miniProgramTrial,fixedClock:'2026-10-19T03:00:00Z'});
+  await new Promise((resolve,reject)=>demo.server.once('error',reject).listen(0,'127.0.0.1',resolve));
+  t.after(()=>new Promise(resolve=>demo.server.close(()=>{demo.db.close();resolve();})));
+  return 'http://127.0.0.1:'+demo.server.address().port;
+ }
+ const send=(base,path,data,headers={})=>fetch(base+path,{
+  method:'POST',headers:{'content-type':'application/json',...headers},body:JSON.stringify(data)
+ });
+ const prefix='/api/miniprogram-trial';
+ const normal=await start(false);
+ assert.equal((await send(normal,prefix+'/session',{})).status,404);
+ const base=await start(true);
+ assert.equal((await send(base,prefix+'/session',{}, {forwarded:'for=203.0.113.5'})).status,404);
+ const session=await send(base,prefix+'/session',{});
+ assert.equal(session.status,200);
+ const {token}=await session.json();
+ const headers={authorization:'Bearer '+token};
+ assert.equal((await fetch(base+'/api/patient-demo/options',{headers:{cookie:'chain_patient_demo='+token}})).status,401);
+ const options=async()=>(await (await fetch(base+prefix+'/options',{headers})).json()).schedules;
+ const schedule=(await options()).find(entry=>entry.branch_id===2&&entry.slots.length);
+ const slot=schedule.slots[0];
+ const created=await send(base,prefix+'/appointment',{
+  action:'create',requestKey:'wx-create',branchId:2,scheduleId:schedule.id,scheduleRevision:schedule.revision,
+  ...slot,reason:'虚构小程序预约'
+ },headers);
+ assert.equal(created.status,200,await created.clone().text());
+ const booking=await created.json();
+ const login=await send(base,'/api/login',{username:'frontdesk',password:'Clinic123'});
+ assert.equal(login.status,200);
+ const staffHeaders={cookie:login.headers.get('set-cookie').split(';')[0],'x-clinic-role':'frontdesk'};
+ const front=async()=>(await (await fetch(base+'/api/reception/options?branchId=2',{headers:staffHeaders})).json()).appointments.find(entry=>entry.id===booking.id);
+ assert.equal((await front()).status,'已预约');
+ assert.ok(!(await options()).find(entry=>entry.id===schedule.id)?.slots.some(entry=>entry.startsAt===slot.startsAt));
+ const cancelled=await send(base,prefix+'/appointment',{
+  action:'cancel',requestKey:'wx-cancel',branchId:2,appointmentId:booking.id,expectedRevision:booking.revision
+ },headers);
+ assert.equal(cancelled.status,200,await cancelled.clone().text());
+ assert.equal((await front()).status,'已取消');
+ assert.ok((await options()).find(entry=>entry.id===schedule.id)?.slots.some(entry=>entry.startsAt===slot.startsAt));
+});

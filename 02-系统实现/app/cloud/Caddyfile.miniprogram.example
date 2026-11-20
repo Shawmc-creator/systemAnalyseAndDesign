@@ -1,0 +1,12 @@
+# Add this site block to the existing Caddyfile after the API domain is ready.
+# CHAIN_MINIPROGRAM_API_ORIGIN: https://api.your-domain.example
+{$CHAIN_MINIPROGRAM_API_ORIGIN} {
+    @miniProgram path /api/miniprogram/status /api/miniprogram/session /api/miniprogram/options /api/miniprogram/appointment
+    handle @miniProgram {
+        reverse_proxy 127.0.0.1:3011
+    }
+
+    handle {
+        respond 404
+    }
+}

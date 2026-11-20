@@ -19,10 +19,12 @@ function main(){
   copyFile(path.join(assignment,'01-需求文档','数据层设计','SQLite-独立报价设计补充.sql'),path.join(dest,'01-需求文档','数据层设计','SQLite-独立报价设计补充.sql'));
   for(const name of ['连锁基础表候选结构.sql','连锁业务表归属候选映射.json'])copyFile(path.join(assignment,'01-需求文档','设计交付',name),path.join(dest,'01-需求文档','设计交付',name));
   copyFile(path.join(app,'package.json'),path.join(target,'package.json'));
-  copyFile(path.join(app,'cloud','Caddyfile.example'),path.join(target,'cloud','Caddyfile.example'));
+  for(const name of ['Caddyfile.example','Caddyfile.miniprogram.example']){
+   copyFile(path.join(app,'cloud',name),path.join(target,'cloud',name));
+  }
   copyFile(path.join(assignment,'07-启动连锁演示.cmd'),path.join(dest,'07-启动连锁演示.cmd'));
   copyFile(path.join(assignment,'08-启动实时日期演示.cmd'),path.join(dest,'08-启动实时日期演示.cmd'));
-  const instructions='青禾牙科连锁演示（仅供虚构数据教学）\r\n\r\n安装 Node.js 24 或以上版本后，双击 07-启动连锁演示.cmd。\r\n初次启动将生成新的虚构数据；访问 http://127.0.0.1:3011/ 。\r\n08-启动实时日期演示.cmd 对应 http://127.0.0.1:3019/。\r\n演示账号为 frontdesk、dentist、cashier、assistant、manager，密码 Clinic123。\r\n本包不包含来源电脑的数据库和患者文书，不可用于真实诊疗。\r\n服务仅监听本机；仅可在配置 HTTPS 和访问密码后通过反向代理开放虚构演示。\r\n请勿直接开放 3011、3019 端口。参考 cloud/Caddyfile.example 和云服务器衔接说明。\r\n生成后的 data 目录保存演示数据，更新程序前请另行备份；不要把数据提交到 GitHub。\r\n';
+  const instructions='青禾牙科连锁演示（仅供虚构数据教学）\r\n\r\n安装已核验的 Node.js 24.19.0 LTS 后，双击 07-启动连锁演示.cmd。\r\n初次启动将生成新的虚构数据；访问 http://127.0.0.1:3011/ 。\r\n08-启动实时日期演示.cmd 对应 http://127.0.0.1:3019/。\r\n演示账号为 frontdesk、dentist、cashier、assistant、manager，密码 Clinic123。\r\n本包不包含来源电脑的数据库和患者文书，不可用于真实诊疗。\r\n服务仅监听本机；仅可在配置 HTTPS 和访问密码后通过反向代理开放虚构演示。\r\n请勿直接开放 3011、3019 端口。参考 cloud/Caddyfile.example 和云服务器衔接说明。\r\n微信小程序的独立 API 代理见 app/cloud/Caddyfile.miniprogram.example。\r\n生成后的 data 目录保存演示数据，更新程序前请另行备份；不要把数据提交到 GitHub。\r\n';
   fs.writeFileSync(path.join(dest,'使用说明.txt'),instructions,{encoding:'utf8',flag:'wx'});
   const manifest={format:'windows-chain-demo-package-1',createdAt:new Date().toISOString(),packageId:crypto.randomUUID(),contents:'仅演示程序，无数据库、文书和运行环境',publicAccess:'需另行配置HTTPS反向代理和访问密码'};
   fs.writeFileSync(path.join(dest,'package-manifest.json'),JSON.stringify(manifest,null,2),{flag:'wx'});

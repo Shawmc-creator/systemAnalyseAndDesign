@@ -1,0 +1,22 @@
+{
+  "pages": [
+    "pages/appointment/index",
+    "pages/bookings/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "青禾牙科预约演示",
+    "navigationBarBackgroundColor": "#f6faf8",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f6faf8"
+  },
+  "tabBar": {
+    "color": "#425b53",
+    "selectedColor": "#087158",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      { "pagePath": "pages/appointment/index", "text": "预约" },
+      { "pagePath": "pages/bookings/index", "text": "我的预约" }
+    ]
+  }
+}
