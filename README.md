@@ -6,7 +6,7 @@
 
 **访问网址**　[https://106.55.178.237/](https://106.55.178.237/)
 
-首次访问前，请向项目提交人领取 `dental-preview-root.crt` 和浏览器试用密码。
+首次访问前，请向项目提交人领取 `dental-preview-root.crt`。
 
 1. 在自己的 Windows 电脑上将证书保存到“下载”文件夹，打开命令提示符（CMD）并执行以下命令。若证书保存在其他位置，请替换文件路径。
 
@@ -14,7 +14,7 @@
    certutil -user -addstore Root "%USERPROFILE%\Downloads\dental-preview-root.crt"
    ```
 
-2. 用 Edge 或 Chrome 打开演示链接。浏览器弹出的登录框使用用户名 `preview` 和项目提交人提供的试用密码。
+2. 用 Edge 或 Chrome 打开演示链接。浏览器弹出的登录框使用用户名 **`preview`**，密码 **`3578td1116iu`**。
 3. 进入牙科系统后，使用演示密码 **`Clinic123`** 登录。演示账号为前台 `frontdesk`、牙医 `dentist`、收费 `cashier`、助理 `assistant`、负责人 `manager`。患者可以点击“患者自助预约”。
 
 若试用设备无法导入私有根证书，可在 Windows 上使用下述本地入口。
