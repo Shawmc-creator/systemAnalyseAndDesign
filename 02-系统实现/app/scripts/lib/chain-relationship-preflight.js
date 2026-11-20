@@ -7,6 +7,8 @@ const checks=[
  {name:'就诊与预约',left:'visit',right:'appointment',sql:'SELECT v.id item_id,v.appointment_id right_id FROM visit v WHERE v.appointment_id IS NOT NULL'},
  {name:'就诊与排班占用',left:'visit',right:'dated_schedule',sql:'SELECT o.visit_id item_id,o.dated_schedule_id right_id FROM resource_occupancy o WHERE o.visit_id IS NOT NULL'},
  {name:'账单与患者资金',left:'bill',right:'patient_funds',sql:'SELECT b.id item_id,b.patient_funds_id right_id FROM bill b'},
+ {name:'账单项目与门店价目',left:'bill',right:'service_price',sql:'SELECT i.bill_id item_id,i.service_price_id right_id FROM bill_item i WHERE i.service_price_id IS NOT NULL'},
+ {name:'诊疗执行与门店价目',left:'treatment_execution',right:'service_price',sql:'SELECT i.treatment_execution_id item_id,i.service_price_id right_id FROM bill_item i WHERE i.treatment_execution_id IS NOT NULL AND i.service_price_id IS NOT NULL'},
  {name:'付款与患者资金',left:'patient_payment',right:'patient_funds',sql:'SELECT p.id item_id,p.patient_funds_id right_id FROM patient_payment p'},
  {name:'治疗执行与就诊',left:'treatment_execution',right:'visit',sql:'SELECT e.id item_id,e.visit_id right_id FROM treatment_execution e'},
  {name:'临床文书与就诊',left:'clinical_document',right:'visit',sql:'SELECT d.id item_id,d.visit_id right_id FROM clinical_document d WHERE d.visit_id IS NOT NULL'},

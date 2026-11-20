@@ -31,6 +31,11 @@ async function api(url,body){if(body){const previous=fixedNow,role=state.role,br
 function command(fields){return {commandVersion:1,requestKey:crypto.randomUUID(),branchId:state.branch,...fields};}
 function askReason(title){return new Promise(resolve=>{const dialog=$('#reason-dialog'),form=$('#reason-form');$('#reason-title').textContent=title;form.reset();dialog.onclose=()=>resolve(dialog.returnValue==='confirm'?form.elements.reason.value.trim():null);dialog.showModal();});}
 $('#refresh-dashboard').onclick=e=>act(e.currentTarget,dashboard);
+let dayClosePreview=null;
+function invalidateDayClose(){dayClosePreview=null;$('#day-close-submit').disabled=true;$('#day-close-summary').textContent='请先选择渠道并查询。';$('#day-close-history').replaceChildren();}
+$('#day-close-form').elements.channel.onchange=invalidateDayClose;
+$('#day-close-preview').onclick=e=>act(e.currentTarget,async()=>{const branch=state.branch,view=state.viewVersion,channel=$('#day-close-form').elements.channel.value;invalidateDayClose();const d=await api('/api/day-close?branchId='+branch+'&channel='+encodeURIComponent(channel));if(state.role!=='manager'||state.branch!==branch||state.viewVersion!==view||$('#day-close-form').elements.channel.value!==channel)return;dayClosePreview={...d,branch,view};$('#day-close-summary').textContent=d.businessDate+' / '+channel+'：已确认收款 '+(d.receiptCents/100).toFixed(2)+' 元（'+d.receiptCount+' 笔），退款 '+(d.refundCents/100).toFixed(2)+' 元（'+d.refundCount+' 笔），系统净额 '+(d.expectedCents/100).toFixed(2)+' 元。';$('#day-close-submit').disabled=false;const history=$('#day-close-history');history.replaceChildren();if(d.items.length)history.append(dataTable(['日期','渠道','系统净额','实际净额','差额','核对依据'],d.items.map(x=>[x.business_date,x.channel,(x.expected_cents/100).toFixed(2),(x.actual_cents/100).toFixed(2),(x.difference_cents/100).toFixed(2),x.evidence])));});
+$('#day-close-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,p=dayClosePreview;if(!p||p.branch!==state.branch||p.view!==state.viewVersion||p.channel!==f.elements.channel.value)throw Error('请先重新查询本店渠道汇总。');const n=Number(f.elements.actual.value);if(!Number.isSafeInteger(n))throw Error('实际净额须填写整数分。');const r=await api('/api/day-close',command({channel:p.channel,businessDate:p.businessDate,sourceDigest:p.sourceDigest,actualCents:n,evidence:f.elements.evidence.value,confirmed:f.elements.confirmed.checked}));f.elements.actual.value='';f.elements.evidence.value='';f.elements.confirmed.checked=false;invalidateDayClose();message('核对结果已保存，差额 '+(r.differenceCents/100).toFixed(2)+' 元。');}).finally(()=>{$('#day-close-submit').disabled=!dayClosePreview;});};
 $('#refresh-branch-summary').onclick=e=>act(e.currentTarget,branchSummary);
 $('#reason-cancel').onclick=()=>$('#reason-dialog').close('cancel');
 $('#reason-form').onsubmit=e=>{e.preventDefault();if(e.currentTarget.elements.reason.value.trim())$('#reason-dialog').close('confirm');};
@@ -41,8 +46,12 @@ async function branches(){state.role=$('#role').value;const data=await api('/api
 async function refresh(){
  state.viewVersion++;
  state.summaryVersion++;
+ invalidateDayClose();
  state.clinicalVersion++;
  state.financeVersion++;
+ transferState=null;transferQueryId++;$('#transfer-accept-form').hidden=true;$('#transfer-list').replaceChildren();
+ managerFollowupState=null;managerFollowupQueryId++;$('#manager-followup-form').hidden=true;$('#manager-followup-empty').textContent='';
+ $('#identity-binding-list').replaceChildren();
  $('#branch-summary').replaceChildren();
  resetCashPatient();
  clearVisitContext();
@@ -264,7 +273,8 @@ async function followups(){const branch=state.branch,role=state.role,viewVersion
  const active=data.items.filter(x=>['待联系','待到诊或评估'].includes(x.status));
  if(role==='dentist'){const f=$('#followup-create-form'),front=f.elements.frontdesk;front.replaceChildren();for(const person of data.frontdesks)option(front,person.id,person.name);updateFollowupCreate();const assess=$('#followup-assess-form'),select=assess.elements.followup;select.replaceChildren();for(const item of active)option(select,item.id,visitPatientLabel(item)+' / '+item.purpose+' / '+item.status);const updateVisits=()=>{const item=active.find(x=>x.id===Number(select.value)),visits=assess.elements.visit;const remote=Array.from(assess.elements.method.options||[]).find(x=>x.value==='远程沟通');if(remote)remote.disabled=!!item&&item.source_branch_id!==branch;if(remote?.disabled&&assess.elements.method.value==='远程沟通')assess.elements.method.value='到诊检查';visits.replaceChildren();for(const v of eligibleFollowupVisits(data.visits,item,fixedNow))option(visits,v.id,v.record_no+' / '+date(v.started_at));const inPerson=assess.elements.method.value==='到诊检查';$('#followup-visit-label').hidden=!inPerson;$('#followup-visit-empty').hidden=!inPerson||visits.options.length>0;visits.required=inPerson;};const updateOwner=()=>{const item=active.find(x=>x.id===Number(select.value)),owner=assess.elements.responsibleFrontdesk;owner.replaceChildren();option(owner,'','请选择');for(const person of data.frontdesks)option(owner,person.id,person.name);owner.value=data.frontdesks.some(p=>p.id===item?.responsible_frontdesk_id)?String(item.responsible_frontdesk_id):'';};select.onchange=()=>{updateVisits();updateOwner();};assess.elements.method.onchange=updateVisits;const updateAdvice=()=>{const continuing=assess.elements.advice.value==='继续跟进';$('#followup-next-label').hidden=!continuing;$('#followup-owner-label').hidden=!continuing;assess.elements.nextDate.required=continuing;assess.elements.responsibleFrontdesk.required=continuing;};assess.elements.advice.onchange=updateAdvice;updateAdvice();updateOwner();updateVisits();assess.hidden=!active.length;}
  else{const f=$('#followup-contact-form'),select=f.elements.followup,appointment=f.elements.appointment;select.replaceChildren();for(const item of active)option(select,item.id,visitPatientLabel(item)+' / '+item.purpose+' / '+item.status);f.hidden=!active.length;
-  const updateAppointments=()=>{const item=active.find(x=>x.id===Number(select.value));appointment.replaceChildren();option(appointment,'','不关联');for(const a of data.appointments.filter(a=>item&&a.patient_id===item.patient_id&&localInput(a.planned_start).slice(0,10)>=item.target_start&&localInput(a.planned_start).slice(0,10)<=item.target_end))option(appointment,a.id,date(a.planned_start)+' / '+a.status);};select.onchange=updateAppointments;updateAppointments();}
+  const updateAppointments=()=>{const item=active.find(x=>x.id===Number(select.value));appointment.replaceChildren();option(appointment,'','不关联');for(const a of data.appointments.filter(a=>item&&a.patient_id===item.patient_id&&localInput(a.planned_start).slice(0,10)>=item.target_start&&localInput(a.planned_start).slice(0,10)<=item.target_end))option(appointment,a.id,date(a.planned_start)+' / '+a.status);};select.onchange=updateAppointments;updateAppointments();
+  const handoff=$('#followup-handoff-form'),hs=handoff.elements.followup,recipient=handoff.elements.recipient;hs.replaceChildren();for(const item of active)option(hs,item.id,visitPatientLabel(item)+' / '+item.purpose);const updateRecipients=()=>{const item=active.find(x=>x.id===Number(hs.value));recipient.replaceChildren();for(const p of data.frontdesks.filter(x=>x.id!==item?.responsible_frontdesk_id))option(recipient,p.id,p.name);handoff.hidden=!item||!recipient.options.length;};hs.onchange=updateRecipients;updateRecipients();}
 }
 function recordDirty(){const loaded=state.record,f=$('#record-form');if(!loaded)return false;return f.elements.chiefComplaint.value!==(loaded.record.chief_complaint||'')||f.elements.diagnosis.value!==(loaded.record.diagnosis||'')||f.elements.advice.value!==(loaded.record.treatment_advice||'')||!!f.elements.newFinding.value.trim()||!!f.elements.newTooth.value.trim()||!!f.elements.newSurface.value.trim()||loaded.findings.some(item=>$('#record-findings').querySelector('[data-finding-id="'+item.id+'"]').value!==item.finding_text||$('#record-findings').querySelector('[data-finding-position=tooth][data-position-id="'+item.id+'"]').value!==(item.tooth_code||'')||$('#record-findings').querySelector('[data-finding-position=surface][data-position-id="'+item.id+'"]').value!==(item.surface_code||''));}
 function healthDirty(){const loaded=state.health,f=$('#health-form'),fields=$('#health-fields');if(!loaded)return false;return !!(f.elements.source.value.trim()||f.elements.reason.value.trim()||f.elements.conclusion.value.trim())||['病史','过敏','用药'].some(category=>{const old=loaded.items.find(i=>i.category===category);return fields.querySelector('select[data-category="'+category+'"]').value!==(old?.certainty||'')||fields.querySelector('textarea[data-category="'+category+'"]').value!==(old?.content||'');});}
@@ -585,6 +595,7 @@ const pages = [
  {key:'arrival',label:'到诊与候诊',group:'患者服务',roles:F,area:'reception',panel:'到诊与候诊'},
  {key:'patients',label:'患者档案',group:'患者服务',roles:F,area:'reception',panel:'患者档案'},
  {key:'contact',label:'复诊联系',group:'患者服务',roles:F,area:'reception',panel:'复诊联系'},
+ {key:'transfer-handoff',label:'跨店预约交接',group:'患者服务',roles:F,area:'reception',panel:'跨店交接'},
  {key:'queue',label:'接诊队列',group:'临床诊疗',roles:D,area:'dentist',panel:'接诊队列'},
  {key:'record',label:'病历与签署',group:'临床诊疗',roles:D,area:'dentist',panel:'病历与签署'},
  {key:'plan',label:'治疗方案',group:'临床诊疗',roles:D,area:'dentist',panel:'方案与报价'},
@@ -604,6 +615,7 @@ const pages = [
  {key:'review',label:'费用审核与核价',group:'门店运营',roles:M,area:'manager',panel:'费用审核'},
  {key:'price-review',label:'价目审核',group:'门店运营',roles:M,area:'manager',panel:'价目审核'},
  {key:'authorization',label:'跨店查阅授权',group:'门店运营',roles:M,area:'manager',panel:'跨店授权'},
+ {key:'followup-management',label:'复诊事项交接',group:'门店运营',roles:M,area:'manager',panel:'复诊交接'},
  {key:'stock',label:'库存与领用',group:'物资管理',roles:[...A,...M],area:'inventory',panel:'库存与领用'},
  {key:'purchase',label:'采购与验收',group:'物资管理',roles:[...A,...M],area:'inventory',panel:'采购与收货'},
  {key:'count',label:'库存盘点',group:'物资管理',roles:[...A,...M],area:'inventory',panel:'盘点'},
@@ -666,6 +678,8 @@ function openPage(key,focus=false) {
    button.setAttribute('aria-current',active?'page':'false');
  }
  if(key==='home')renderHome();
+ if(key==='transfer-handoff')loadTransfers().catch(e=>message(e.message||'无法查询交接申请。',true));
+ if(key==='followup-management')managerFollowups().catch(e=>message(e.message||'无法查询本店复诊事项。',true));
  if(focus)pageHeader.querySelector('h2').focus({preventScroll:true});
  window.scrollTo({top:0,behavior:'auto'});
 }
@@ -845,6 +859,19 @@ function renderPatientDirectory(){
  list.append(dataTable(['患者姓名','档案号','出生日期','联系方式','办理'],rows));
 }
 $('#patient-directory-search').oninput=renderPatientDirectory;
+$('#patient-edit-form').elements.patient.addEventListener('change',()=>$('#identity-binding-list').replaceChildren());
+async function showIdentityBindings(){
+ const branch=state.branch,view=state.viewVersion,patient=Number($('#patient-edit-form').elements.patient.value),box=$('#identity-binding-list');
+ if(!patient||state.role!=='frontdesk')throw Error('请先选择患者档案。');
+ box.replaceChildren();const data=await api('/api/patient-identity-binding/list?branchId='+branch+'&patientId='+patient);
+ if(state.branch!==branch||state.viewVersion!==view||state.role!=='frontdesk'||Number($('#patient-edit-form').elements.patient.value)!==patient)return;
+ if(!data.items.length){box.textContent='该患者暂无身份关联。';return;}
+ for(const item of data.items){const line=document.createElement('p');line.textContent='关联 #'+item.id+' / '+item.issuer+' / 核实时间 '+item.verified_at+' / '+(item.revoked_at?'已撤销':'有效')+'　';
+  if(!item.revoked_at){const button=document.createElement('button');button.type='button';button.textContent='撤销关联';button.onclick=()=>act(button,async()=>{const reason=await askReason('核对患者档案后填写撤销原因');if(!reason)return;if(state.branch!==branch||state.viewVersion!==view||state.role!=='frontdesk'||Number($('#patient-edit-form').elements.patient.value)!==patient)throw Error('门店或患者已变化，请重新查询。');await api('/api/patient-identity-binding/revoke',command({bindingId:item.id,reason,confirmed:true}));message('身份关联已撤销，原关联及操作记录保留。');await showIdentityBindings();});line.append(button);}
+  box.append(line);
+ }
+}
+$('#identity-binding-query').onclick=e=>act(e.currentTarget,showIdentityBindings);
 
 
 for(const [id,label] of [
@@ -860,15 +887,27 @@ for(const [id,label] of [
  const summary=document.createElement('summary');summary.textContent=label;
  form.before(drawer);drawer.append(summary,form);
 }
-document.querySelector('.demo-credentials').addEventListener('click', async event => {
+document.addEventListener('click', async event => {
  const button=event.target.closest('button[data-copy]');
  if(!button)return;
- const feedback=$('#copy-feedback');
+ const feedback=button.closest('#branch-demo-accounts')?$('#branch-copy-feedback'):$('#copy-feedback');
  try {
    if(!navigator.clipboard?.writeText)throw new Error('clipboard unavailable');
    await navigator.clipboard.writeText(button.dataset.copy);
-   feedback.textContent=button.dataset.copy==='Clinic123'?'密码已复制。':'账号已复制。';
+   feedback.textContent=button.textContent.includes('密码')?'密码已复制。':'账号已复制。';
  } catch {
    feedback.textContent='无法自动复制，请手动选择旁边的文字复制。';
  }
 });
+$('#followup-handoff-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,data=state.followups,item=data?.items.find(x=>x.id===Number(f.elements.followup.value));if(!item||state.role!=='frontdesk')throw Error('请重新查询复诊事项。');await api('/api/followups',command({action:'handoff',followupId:item.id,expectedRevision:item.revision,responsibleFrontdeskId:Number(f.elements.recipient.value),reason:f.elements.reason.value}));f.elements.reason.value='';message('复诊事项已转交本店前台。');await followups();});};
+let managerFollowupState=null,managerFollowupQueryId=0;
+async function managerFollowups(){const branch=state.branch,view=state.viewVersion;if(state.role!=='manager'||!branch)return;const query=++managerFollowupQueryId,data=await api('/api/followups?branchId='+branch);if(query!==managerFollowupQueryId||state.role!=='manager'||state.branch!==branch||state.viewVersion!==view)return;managerFollowupState={...data,branch,view};const form=$('#manager-followup-form'),select=form.elements.followup,recipient=form.elements.recipient;select.replaceChildren();for(const f of data.items)option(select,f.id,visitPatientLabel(f)+' / '+f.followup_type+' / '+f.status+' / 当前负责：'+(f.responsible_frontdesk_name||'待核对'));const update=()=>{const f=data.items.find(x=>x.id===Number(select.value));recipient.replaceChildren();for(const p of data.frontdesks.filter(x=>x.id!==f?.responsible_frontdesk_id))option(recipient,p.id,p.name);form.hidden=!f||!recipient.options.length;$('#manager-followup-empty').textContent=!data.items.length?'本店暂无待交接的复诊事项。':!recipient.options.length?'请先安排具备本店岗位资格的其他前台。':'';};select.onchange=update;update();}
+$('#manager-followup-refresh').onclick=e=>act(e.currentTarget,managerFollowups);
+$('#manager-followup-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,data=managerFollowupState,item=data?.items.find(x=>x.id===Number(f.elements.followup.value));if(!item||state.role!=='manager'||data.branch!==state.branch||data.view!==state.viewVersion)throw Error('请重新查询本店复诊事项。');await api('/api/followups',command({action:'handoff',followupId:item.id,expectedRevision:item.revision,responsibleFrontdeskId:Number(f.elements.recipient.value),reason:f.elements.reason.value}));f.elements.reason.value='';message('复诊事项已分配给本店前台。');await managerFollowups();});};
+let transferState=null,transferQueryId=0;
+async function loadTransfers(){const branch=state.branch,view=state.viewVersion;if(state.role!=='frontdesk'||!branch)return;const query=++transferQueryId,[data,options]=await Promise.all([api('/api/transfer-proposals?branchId='+branch),api('/api/reception/options?branchId='+branch)]);if(query!==transferQueryId||state.role!=='frontdesk'||state.branch!==branch||state.viewVersion!==view)return;transferState={...data,options,branch,view};const form=$('#transfer-propose-form'),appointments=form.elements.appointment,targets=form.elements.target;appointments.replaceChildren();targets.replaceChildren();for(const a of options.appointments.filter(x=>x.status==='已预约')){const p=options.patients.find(x=>x.id===a.patient_id);option(appointments,a.id,(p?patientLabel(p):'患者 '+a.patient_id)+' / '+date(a.planned_start));}for(const b of data.branches)option(targets,b.id,b.name);form.hidden=!appointments.options.length||!targets.options.length;const box=$('#transfer-list');box.replaceChildren();if(!data.items.length)box.textContent='本店暂无跨店交接申请。';for(const p of data.items){const line=document.createElement('p');const otherId=p.sourceBranchId===branch?p.targetBranchId:p.sourceBranchId,other=data.branches.find(x=>x.id===otherId);line.textContent=p.patientName+' / '+p.patientNo+' / '+(p.sourceBranchId===branch?'目标门店：':'来源门店：')+(other?.name||('门店 '+otherId))+' / '+p.status+' / 申请依据：'+p.reason+' / 患者联系：'+p.method+' '+p.contactNote+'　';if(p.status==='待目标店确认'||(p.status==='原预约已变化'&&p.sourceBranchId===branch)){const actions=p.sourceBranchId===branch?[['withdraw','撤回申请']]:[['accept','确认预约'],['reject','拒绝申请']];for(const [action,label] of actions){const button=document.createElement('button');button.type='button';button.textContent=label;button.onclick=()=>act(button,async()=>{if(state.branch!==branch||state.viewVersion!==view)throw Error('门店已变化，请重新查询。');if(action==='accept'){prepareTransferAcceptance(p);return;}const reason=await askReason(action==='withdraw'?'填写撤回原因':'填写拒绝原因');if(!reason)return;if(state.branch!==branch||state.viewVersion!==view)throw Error('门店已变化，请重新查询。');await api('/api/transfer-proposals',command({action,proposalId:p.id,reason}));message(action==='withdraw'?'交接申请已撤回。':'交接申请已拒绝。');await loadTransfers();});line.append(button);}}box.append(line);}}
+function prepareTransferAcceptance(p){const data=transferState;if(!data||p.targetBranchId!==data.branch)throw Error('请重新查询交接申请。');const f=$('#transfer-accept-form');f.reset();f.dataset.proposal=String(p.id);const select=f.elements.schedule;select.replaceChildren();for(const s of data.options.schedules.filter(x=>x.ends_at>fixedNow))option(select,s.id,date(s.starts_at)+' / '+s.dentist_name+' / '+s.chair_name);if(!select.options.length)throw Error('本店暂无可用排班，请先安排接诊时段。');const update=()=>{const s=data.options.schedules.find(x=>x.id===Number(select.value));if(!s)return;const start=Math.ceil(Math.max(Date.parse(s.starts_at),Date.parse(fixedNow)+60000)/60000)*60000;f.elements.start.value=localInput(new Date(start).toISOString());f.elements.end.value=localInput(new Date(start+1800000).toISOString());};select.onchange=update;update();f.hidden=false;f.scrollIntoView({block:'center'});}
+$('#transfer-refresh').onclick=e=>act(e.currentTarget,loadTransfers);
+$('#transfer-accept-cancel').onclick=()=>{$('#transfer-accept-form').hidden=true;};
+$('#transfer-propose-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,d=transferState,a=d?.options.appointments.find(x=>x.id===Number(f.elements.appointment.value));if(!a||d.branch!==state.branch||d.view!==state.viewVersion)throw Error('请重新查询本店预约。');await api('/api/transfer-proposals',command({action:'propose',targetBranchId:Number(f.elements.target.value),appointmentId:a.id,expectedRevision:a.revision,patientConfirmed:f.elements.confirmed.checked,contactedAt:fixedNow,method:f.elements.method.value,contactNote:f.elements.contact.value,reason:f.elements.reason.value}));f.elements.contact.value='';f.elements.reason.value='';f.elements.confirmed.checked=false;message('交接申请已发出，原预约继续有效。');await loadTransfers();});};
+$('#transfer-accept-form').onsubmit=e=>{e.preventDefault();act(e.submitter,async()=>{const f=e.currentTarget,d=transferState,p=d?.items.find(x=>x.id===Number(f.dataset.proposal)),s=d?.options.schedules.find(x=>x.id===Number(f.elements.schedule.value));if(!p||!s||d.branch!==state.branch||d.view!==state.viewVersion||p.targetBranchId!==state.branch||p.status!=='待目标店确认')throw Error('请重新查询交接申请。');await api('/api/reception',command({action:'transfer',branchId:p.sourceBranchId,targetBranchId:p.targetBranchId,transferProposalId:p.id,appointmentId:p.appointmentId,expectedRevision:p.appointmentRevision,patientConfirmed:f.elements.confirmed.checked,scheduleId:s.id,scheduleRevision:s.revision,startsAt:isoLocal(f.elements.start.value),endsAt:isoLocal(f.elements.end.value),reason:f.elements.reason.value,transferContact:{method:f.elements.method.value,note:f.elements.contact.value,contactedAt:fixedNow},equipmentIds:[]}));f.hidden=true;message('目标店预约已确认，原预约已取消。');await Promise.all([loadTransfers(),reception(),followups()]);});};

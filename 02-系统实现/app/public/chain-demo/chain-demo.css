@@ -28,6 +28,10 @@ body{background:#f5f7fa;color:#263747;font-family:'Microsoft YaHei UI','PingFang
 .chain-main:has(#work[hidden]) .home-welcome { padding: 0 0 18px; }
 #login { padding: 26px; background: white; border: 1px solid var(--line); border-radius: 10px; }
 #login .form-grid { grid-template-columns: 1fr; }
+#login-form .form-grid { display: flex; flex-direction: column; gap: 18px; }
+#login-form .form-grid label { display: flex; flex-direction: column; align-items: stretch; gap: 6px; line-height: 1.5; }
+#login-form .form-grid input { position: static; margin: 0; flex: none; }
+#login-form > p { margin: 22px 0 0; }
 #login .primary { width: 100%; }
 .login-help { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; font-size: 13px; }
 .login-help summary, .entry-drawer summary { cursor: pointer; }
@@ -125,3 +129,8 @@ body{background:#f5f7fa;color:#263747;font-family:'Microsoft YaHei UI','PingFang
 .demo-credentials code { color:#1c5260; font-size:13px; }
 .demo-credentials button { min-height:30px; padding:4px 8px; font-size:12px; }
 #copy-feedback { min-height:1.3em; margin:8px 0 0; color:#146d70; }
+.patient-entrance-link { display:inline-block; padding:10px 16px; border-radius:5px; background:#166e72; color:white; text-decoration:none; }
+body:has(#work:not([hidden])) #patient-entrance, body:has(#work:not([hidden])) #branch-demo-accounts { display:none; }
+.form-grid > *, .home-columns > *, .workspace-heading > * { min-width:0; }
+.clinical-summary, .workspace-content { min-width:0; overflow-wrap:anywhere; }
+@media(max-width:480px){.demo-credentials > div{grid-template-columns:minmax(0,65px) minmax(0,1fr) auto;gap:5px}.demo-credentials code{overflow-wrap:anywhere}.demo-credentials button{padding:4px 5px}}

@@ -15,10 +15,12 @@ skinparam classAttributeIconSize 0
 skinparam nodesep 24
 skinparam ranksep 34
 left to right direction
+actor "患者" as PAT
 actor "前台" as A0
 rectangle "牙科连锁诊所管理系统" {
 usecase "UC-02\n维护预约安排" as U
 }
+PAT -- U
 A0 -- U
 
 @enduml

@@ -3,9 +3,8 @@ const {id,fail,row}=require('./common');
 const {ChainAuth}=require('./chain-auth');
 
 // Isolated outpatient trial. Existing prescribing rules remain authoritative.
-class ChainPrescriptionTrial {
- constructor(app){this.db=app.db;this.prescriptions=app.prescriptions;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('连锁处方试验仅允许内存数据库');}
+class ChainPrescription {
+ constructor(app){this.db=app.db;this.prescriptions=app.prescriptions;this.access=new ChainAuth(app.auth);}
  scope(credentials,input,permission){
   const branch=id(input.branchId,'门店'),visitId=id(input.visitId,'就诊'),patientId=id(input.patientId,'患者');
   if(credentials.role!=='dentist')fail(403,'FORBIDDEN','需要牙医岗位');
@@ -27,4 +26,5 @@ class ChainPrescriptionTrial {
   }});
  }
 }
-module.exports={ChainPrescriptionTrial};
+class ChainPrescriptionTrial extends ChainPrescription{constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('连锁处方试验仅允许内存数据库');}}
+module.exports={ChainPrescription,ChainPrescriptionTrial};

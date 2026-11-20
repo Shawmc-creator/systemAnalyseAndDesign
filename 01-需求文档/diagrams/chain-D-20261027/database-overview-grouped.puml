@@ -36,6 +36,11 @@ entity "患者\npatient" as patient {
 * id <<PK>>
   created_branch_id <<FK>>
 }
+entity "患者身份关联\npatient_verified_identity" as patient_verified_identity {
+* id <<PK>>
+* patient_id, verified_by <<FK>>
+  revoked_by <<FK>>
+}
 entity "职员\nstaff" as staff {
 * id <<PK>>
 }
@@ -453,6 +458,8 @@ entity "报价确认\nquote_decision" as quote_decision {
 * id <<PK>>
 }
 }
+patient ||--o{ patient_verified_identity
+staff ||--o{ patient_verified_identity : 核实及撤销
 patient ||--o{ patient_change
 staff ||--o| user_account
 staff ||--o{ dated_schedule

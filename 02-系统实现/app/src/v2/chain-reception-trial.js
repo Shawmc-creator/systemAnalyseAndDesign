@@ -3,17 +3,16 @@ const crypto=require('node:crypto');
 const {fail,id,instant,text,insert,fact,recordNo,hash,canonical,row,revision,day}=require('./common');
 const {assertCandidateReservation}=require('./chain-reception-rules');
 const {ChainAuth}=require('./chain-auth');
+const {hasBranchRole}=require('./chain-access');
 const {equipmentIds,reserveEquipment,releaseReservations}=require('./resource-rules');
 const {followupSnapshot,validateFollowups}=require('./followup-rules');
 
 // Experimental in-memory service only; not exposed by the running server.
 // Candidate implementation, all changes and receipts
 // are committed together under one SQLite write lock.
-class ChainReceptionTrial {
+class ChainReception {
  constructor(app) {
   this.db=app.db; this.auth=app.auth; this.unit=app.unit; this.reception=app.reception;
-  const databases=this.db.prepare('PRAGMA database_list').all();
-  if(databases.some(d=>!['main','temp'].includes(d.name)||d.file!=='')) throw new Error('连锁接诊试验仅允许内存数据库');
   this.access=new ChainAuth(this.auth);
  }
  ensureDentist(schedule,branch,start,end) {
@@ -28,7 +27,7 @@ class ChainReceptionTrial {
    if(equipment.branch_id!==branch) fail(409,'EQUIPMENT_BRANCH','设备不属于当前门店');
   }
  }
- command(credentials,input) {
+ command(credentials,input,patientDemo=null) {
   if(!credentials.csrf) fail(403,'CSRF_INVALID','缺少安全令牌');
   if(!input || !['create','cancel','reschedule','arrive','walkIn','noShow','transfer'].includes(input.action)) fail(422,'INVALID_ACTION','不支持该隔离试验操作');
   if(input.equipmentIds!==undefined && !['create','reschedule','transfer','walkIn'].includes(input.action)) fail(422,'INVALID_EQUIPMENT','此操作不能修改设备选择');
@@ -40,14 +39,21 @@ class ChainReceptionTrial {
   const digest=hash(canonical({permission,input}));
   this.db.exec('BEGIN IMMEDIATE');
   try {
-   const ctx=this.access.authorizeBranch(credentials,permission,branch);
-   if(targetBranch) this.access.authorizeBranch(credentials,permission,targetBranch);
-   ctx.authority={...ctx.authority,branchId:branch};
+   let proposal=null,proposalId=null;
+   if(input.action==='transfer'&&input.transferProposalId!=null){
+    proposalId=id(input.transferProposalId,'交接申请');const original=this.db.prepare("SELECT * FROM operation_audit WHERE id=? AND object_kind='appointment_transfer_proposal' AND outcome_code='TRANSFER_PROPOSED'").get(proposalId);
+    if(!original)fail(404,'NOT_FOUND','交接申请不存在');try{proposal=JSON.parse(original.authority_snapshot).proposal;}catch{fail(409,'TRANSFER_INVALID','交接申请内容待核对');}
+    if(!proposal||proposal.sourceBranchId!==branch||proposal.targetBranchId!==targetBranch||proposal.appointmentId!==input.appointmentId||proposal.appointmentRevision!==input.expectedRevision||proposal.patientConfirmed!==true)fail(409,'TRANSFER_INVALID','交接申请与原预约不一致');
+   }
+   const ctx=this.access.authorizeBranch(credentials,permission,proposal?targetBranch:branch);
+   if(targetBranch&&!proposal) this.access.authorizeBranch(credentials,permission,targetBranch);
+   ctx.authority={...ctx.authority,branchId:branch,...(patientDemo?{channel:'patient_demo',patientId:patientDemo.patientId}: {})};
    const previous=this.db.prepare('SELECT * FROM request_submission WHERE account_id=? AND request_key=?').get(ctx.session.account_id,key);
    if(previous) {
     if(previous.permission_id!==ctx.permission.id || previous.payload_digest!==digest) fail(409,'REQUEST_KEY_REUSED','提交号已用于其他内容或门店');
     this.db.exec('COMMIT'); return {...this.unit.result(previous),replayed:true};
    }
+   if(proposal&&this.db.prepare("SELECT 1 FROM operation_audit WHERE object_kind='appointment_transfer_decision' AND json_extract(authority_snapshot,'$.proposalId')=?").get(proposalId))fail(409,'TRANSFER_PROCESSED','交接申请已处理');
    const now=this.auth.now(); let result,related=[];
    if(input.action==='create') {
     row(this.db,'patient',input.patientId);
@@ -91,10 +97,12 @@ class ChainReceptionTrial {
     const reserved=this.db.prepare("SELECT equipment_id FROM equipment_occupancy WHERE appointment_id=? AND status='已预留'").all(old.id).map(e=>e.equipment_id);
     this.ensureEquipment(reserved,branch);
     if(input.action==='transfer') {
+     const proposer=proposal?this.db.prepare("SELECT id FROM user_account WHERE staff_id=? AND status='启用'").get(proposal.sourceStaffId):null;
+     if(proposal&&(old.patient_id!==proposal.patientId||!Array.isArray(proposal.followups)||linked.length!==proposal.followups.length||linked.some(f=>!proposal.followups.some(x=>x.id===f.id&&x.revision===f.revision))||!proposer||!this.auth.roles(proposer.id,now).some(r=>r.code==='frontdesk')||!hasBranchRole(this.db,{staffId:proposal.sourceStaffId,branchId:branch,role:'frontdesk',at:now})))fail(409,'TRANSFER_SOURCE_CHANGED','原店岗位、预约或复诊责任已变化，请重新交接');
      if(input.patientConfirmed!==true) fail(422,'CONFIRM_REQUIRED','须确认患者同意转店');
      if(this.db.prepare('SELECT 1 FROM contact_history WHERE appointment_id=? LIMIT 1').get(old.id) && !linked.length)
       fail(409,'FOLLOWUP_SOURCE','原复诊联系已被后续记录替代，请先核对');
-     if(linked.some(f=>f.status!=='待到诊或评估' || f.responsible_frontdesk_id!==ctx.session.staff_id))
+     if(linked.some(f=>f.status!=='待到诊或评估' || f.responsible_frontdesk_id!==(proposal?proposal.sourceStaffId:ctx.session.staff_id)))
       fail(409,'FOLLOWUP_FRONTDESK_SCOPE','须由复诊当前责任前台办理，并核对待到诊状态');
      if(reserved.length && input.equipmentIds===undefined)
       fail(422,'EQUIPMENT_CONFIRM','请确认目标门店所需设备，或明确选择无需设备');
@@ -145,7 +153,8 @@ class ChainReceptionTrial {
        code:'FOLLOWUP_TRANSFERRED',reason:'实际联系并确认转店预约',changes:[{field:'responsible_branch_id',before:branch,after:targetBranch}]});
      }
      if(linked.length){validateFollowups(this.db,followupBefore);this.unit.workflowHistory.validate(historyBefore,permission);}
-     ctx.authority.transfer={originalAppointmentId:old.id,newAppointmentId:newId,sourceBranchId:branch,targetBranchId:targetBranch,patientConfirmed:true};
+     ctx.authority.transfer={originalAppointmentId:old.id,newAppointmentId:newId,sourceBranchId:branch,targetBranchId:targetBranch,patientConfirmed:true,...(proposal?{proposalId,sourceStaffId:proposal.sourceStaffId}: {})};
+     if(proposal){const decisionCtx={...ctx,authority:{...ctx.authority,proposalId,sourceBranchId:branch,targetBranchId:targetBranch}};this.unit.audit(decisionCtx,'变更','TRANSFER_ACCEPTED',{kind:'appointment_transfer_decision',key:proposalId,revision:1},null,reason);}
      related=[{kind:'appointment',key:old.id,beforeRevision:old.revision,revision:old.revision+1,code:'TRANSFER_SOURCE_CANCELLED',reason,changes:[]},...followupChanges];
      result={kind:'appointment',key:newId,revision:1,reason};
     } else if(input.action==='arrive') {
@@ -211,4 +220,7 @@ class ChainReceptionTrial {
   } catch(error) {if(this.db.isTransaction)this.db.exec('ROLLBACK');throw error;}
  }
 }
-module.exports={ChainReceptionTrial};
+class ChainReceptionTrial extends ChainReception{
+ constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('连锁接诊试验仅允许内存数据库');}
+}
+module.exports={ChainReception,ChainReceptionTrial};

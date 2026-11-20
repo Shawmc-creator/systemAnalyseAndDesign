@@ -1,7 +1,9 @@
 const fs=require('node:fs'),path=require('node:path');
 const {chromium}=require('C:/Users/ROG STRIX/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
 (async()=>{
- const root=fs.existsSync(path.join(__dirname,'图源'))?path.join(__dirname,'图源'):__dirname,jobs=JSON.parse(fs.readFileSync(path.join(__dirname,'图表任务.json'),'utf8'));
+ const root=fs.existsSync(path.join(__dirname,'图源'))?path.join(__dirname,'图源'):__dirname,allJobs=JSON.parse(fs.readFileSync(path.join(__dirname,'图表任务.json'),'utf8'));
+ const jobs=process.argv.length>2?process.argv.slice(2):allJobs;
+ if(jobs.some(stem=>!allJobs.includes(stem)))throw Error('未登记的图表任务');
  const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
  try{const page=await browser.newPage();for(const stem of jobs){
   const svg=fs.readFileSync(path.join(root,stem+'.svg'),'utf8');

@@ -1,0 +1,34 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam EntityBackgroundColor white
+skinparam EntityBorderColor black
+skinparam linetype polyline
+skinparam nodesep 55
+skinparam ranksep 80
+hide circle
+left to right direction
+entity "患者\npatient" as patient {
+ * id : INTEGER <<PK>>
+}
+entity "患者身份关联\npatient_verified_identity" as binding {
+ * id : INTEGER <<PK>>
+ * patient_id : INTEGER <<FK>>
+ * issuer : TEXT
+ * subject_hash : TEXT
+ * verified_by : INTEGER <<FK>>
+ * verification_basis : TEXT
+ * verified_at : TEXT
+   revoked_at : TEXT
+   revoked_by : INTEGER <<FK>>
+   revocation_reason : TEXT
+}
+entity "职员\nstaff" as staff {
+ * id : INTEGER <<PK>>
+}
+patient ||--o{ binding : 患者档案
+staff ||--o{ binding : 核实及撤销
+@enduml

@@ -5,6 +5,8 @@ const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 const { installTrialSchema } = require('../../src/v2/chain-schema-trial');
 const { rebuildTrialUniqueConstraints } = require('../../src/v2/chain-unique-trial');
+const {VERSION}=require('../../src/v2/database');
+const {VERSION:IDENTITY_VERSION}=require('../../src/v2/patient-identity-migration');
 const quote = s => '"'+s.replaceAll('"','""')+'"';
 const digest = v => crypto.createHash('sha256').update(v).digest('hex');
 function snapshot(db) {
@@ -56,7 +58,8 @@ function verifySerialized(bytes) {
  }
  const original=cloneInMemory(bytes); let before;
  try {
-  if(original.prepare("SELECT count(*) n FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get().n!==112) throw new Error('仅支持112表单店基线');
+  const count=original.prepare("SELECT count(*) n FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get().n,version=original.prepare('PRAGMA user_version').get().user_version;
+  if(!((count===112&&version===VERSION)||(count===113&&version===IDENTITY_VERSION)))throw new Error('仅支持112表或113表单店基线');
   before=snapshot(original);
  }
  finally { original.close(); }

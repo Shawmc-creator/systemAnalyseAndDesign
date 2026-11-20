@@ -16,6 +16,7 @@ const {VERSION:PAYMENT_VERSION,upgradePaymentPrescription}=require('./payment-pr
 const {VERSION:INSURANCE_VERSION,upgradeInsuranceAlignment}=require('./insurance-alignment-schema');
 const {VERSION:CLINIC_VERSION,upgradeClinic}=require('./clinic-schema');
 const {VERSION,upgradeQuotes}=require('./quote-schema');
+const {VERSION:IDENTITY_VERSION}=require('./patient-identity-migration');
 const APPLICATION = 0x51484432;
 function openDatabase(filename = ':memory:') {
   // Never pass an existing legacy database through an initialization/migration path.
@@ -29,13 +30,18 @@ function openDatabase(filename = ':memory:') {
       db.exec(sql.toString('utf8'));
       db.exec(`PRAGMA application_id=${APPLICATION}`);
     } else if (db.prepare('PRAGMA application_id').get().application_id !== APPLICATION ||
-      ![[20261018,85],[RESOURCE_VERSION,88],[PRESCRIPTION_VERSION,90],[PHARMACY_VERSION,91],[SETTLEMENT_VERSION,100],[CLINICAL_VERSION,100],[FINANCIAL_VERSION,102],[WORKFLOW_VERSION,108],[PAYMENT_VERSION,108],[INSURANCE_VERSION,108],[CLINIC_VERSION,108],[VERSION,112]].some(([v,n]) => db.prepare('PRAGMA user_version').get().user_version===v && tables.length===n)) {
+      ![[20261018,85],[RESOURCE_VERSION,88],[PRESCRIPTION_VERSION,90],[PHARMACY_VERSION,91],[SETTLEMENT_VERSION,100],[CLINICAL_VERSION,100],[FINANCIAL_VERSION,102],[WORKFLOW_VERSION,108],[PAYMENT_VERSION,108],[INSURANCE_VERSION,108],[CLINIC_VERSION,108],[VERSION,112],[IDENTITY_VERSION,113]].some(([v,n]) => db.prepare('PRAGMA user_version').get().user_version===v && tables.length===n)) {
       throw new Error('此文件不是已识别的新版数据库，拒绝打开或自动迁移；请指定独立的新版文件');
     }
     db.exec('PRAGMA foreign_keys=ON; PRAGMA recursive_triggers=ON; PRAGMA busy_timeout=3000;');
     if (filename !== ':memory:') db.exec('PRAGMA journal_mode=WAL');
     if (db.prepare('PRAGMA foreign_key_check').all().length) throw new Error('数据库外键检查失败');
     const initialVersion=db.prepare('PRAGMA user_version').get().user_version;
+    if(initialVersion===IDENTITY_VERSION){
+      const table=db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='patient_verified_identity'").get();
+      const active=db.prepare('PRAGMA index_list(patient_verified_identity)').all().find(x=>x.name==='patient_identity_active_subject');
+      if(!table||!active||active.unique!==1||active.partial!==1)throw new Error('患者身份关联结构不完整，拒绝打开数据库');
+    }
     if(initialVersion===20261018)upgradeResources(db, filename);
     if(initialVersion<=PRESCRIPTION_VERSION)upgradePrescriptions(db,filename,initialVersion===RESOURCE_VERSION);
     if(initialVersion<=PHARMACY_VERSION)upgradePharmacy(db,filename,initialVersion===PRESCRIPTION_VERSION);
@@ -46,7 +52,7 @@ function openDatabase(filename = ':memory:') {
     if(initialVersion<=PAYMENT_VERSION)upgradePaymentPrescription(db,filename,initialVersion===WORKFLOW_VERSION);
     if(initialVersion<=INSURANCE_VERSION)upgradeInsuranceAlignment(db,filename,initialVersion===PAYMENT_VERSION);
     if(initialVersion<=CLINIC_VERSION)upgradeClinic(db,filename,initialVersion===INSURANCE_VERSION);
-    upgradeQuotes(db,filename,initialVersion===CLINIC_VERSION);
+    if(initialVersion!==IDENTITY_VERSION)upgradeQuotes(db,filename,initialVersion===CLINIC_VERSION);
     if (db.prepare('PRAGMA foreign_key_check').all().length) throw new Error('资源升级后外键检查失败');
     return db;
   } catch (error) { db.close(); throw error; }

@@ -4,9 +4,17 @@
 const http=require('node:http');
 const fs=require('node:fs');
 const path=require('node:path');
+const crypto=require('node:crypto');
 const {createApplication}=require('./server');
 const {installTrialSchema}=require('./chain-schema-trial');
 const {ChainReceptionTrial}=require('./chain-reception-trial');
+const {ChainTransferProposal}=require('./chain-transfer-proposal');
+const {PatientDemoBooking}=require('./patient-demo-booking');
+const {ensurePatientIdentityTrial}=require('./patient-identity-schema-trial');
+const {PatientVerifiedIdentity}=require('./patient-verified-identity');
+const {PatientIdentitySessionTrial}=require('./patient-identity-session-trial');
+const {PatientIdentityBindingTrial}=require('./patient-identity-binding-trial');
+const {assertCandidateReservation}=require('./chain-reception-rules');
 const {ChainApprovalTrial}=require('./chain-approval-trial');
 const {ChainGrantsTrial}=require('./chain-grants-trial');
 const {ChainClinicalQuery}=require('./chain-clinical-query');
@@ -29,6 +37,7 @@ const {ChainFollowupTrial}=require('./chain-followup-trial');
 const {ChainInventoryTrial}=require('./chain-inventory-trial');
 const {ChainPurchaseTrial}=require('./chain-purchase-trial');
 const {ChainDashboardTrial}=require('./chain-dashboard-trial');
+const {ChainDayCloseTrial}=require('./chain-day-close-trial');
 const {ChainSetupTrial}=require('./chain-setup-trial');
 const {ChainPlanTrial}=require('./chain-plan-trial');
 const {ChainQuoteTrial}=require('./chain-quote-trial');
@@ -40,9 +49,12 @@ const {ChainDemoSnapshot}=require('./chain-demo-snapshot');
 const {insert,fact,day,fail,hash}=require('./common');
 const {encodePassword,checkPassword}=require('./auth');
 
-const CHAIN_DEMO_BUILD='20261109-01';
-function createChainDemo({snapshotPath=null,runtimeClock=null}={}){
+const CHAIN_DEMO_BUILD='20261118-02';
+function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,identityTrialConfig=null,publicOrigin=null}={}){
  if(runtimeClock!==null&&typeof runtimeClock!=='function')throw new Error('运行时钟必须是函数');
+ if(identityTrialConfig&&(snapshotPath||runtimeClock))throw new Error('身份试验只允许独立内存演示');
+ if(publicOrigin!==null){let u;try{u=new URL(publicOrigin);}catch{throw Error('公开演示来源无效');}if(u.protocol!=='https:'||u.origin!==publicOrigin||u.username||u.password||u.hostname==='localhost')throw Error('公开演示来源须是明确的 HTTPS 来源');}
+ if(fixedClock!==null&&(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(fixedClock)||!Number.isFinite(Date.parse(fixedClock))))throw new Error('固定演示时间无效');
  const demoNow='2026-10-19T01:35:00Z';
  let demoClock='2026-10-19T01:00:00Z';
  let initialized=false;
@@ -165,9 +177,23 @@ function createChainDemo({snapshotPath=null,runtimeClock=null}={}){
    if(changed&&store)store.save(db);
   }catch(error){if(db.isTransaction)db.exec('ROLLBACK');throw error;}
  }catch(error){if(store)store.close();db.close();throw error;}
+ if(fixedClock)demoClock=fixedClock;
  initialized=true;
  const reception=new ChainReceptionTrial(app),approval=new ChainApprovalTrial(app),grants=new ChainGrantsTrial(app),clinical=new ChainClinicalQuery(app.auth,app.documentStore),finance=new ChainFinanceQuery(app),cash=new ChainCashTrial(app),prices=new ChainPriceTrial(app),treatment=new ChainTreatmentTrial(app),pendingPrices=new ChainPendingPriceTrial(app),crossOptions=new ChainCrossBranchOptions(app),startVisit=new ChainStartVisitTrial(app),recordTrial=new ChainRecordTrial(app),resourcesTrial=new ChainResourcesTrial(app),healthSign=new ChainHealthSignTrial(app,recordTrial),addendumTrial=new ChainAddendumTrial(app,recordTrial),followupTrial=new ChainFollowupTrial(app),inventoryTrial=new ChainInventoryTrial(app),purchaseTrial=new ChainPurchaseTrial(app),dashboard=new ChainDashboardTrial(app),setup=new ChainSetupTrial(app),planTrial=new ChainPlanTrial(app),quoteTrial=new ChainQuoteTrial(app),prepayTrial=new ChainPrepayTrial(app),prescriptionTrial=new ChainPrescriptionTrial(app),access=new ChainAuth(app.auth);
  const documentsTrial=new ChainDocumentsTrial(app);
+ const transferProposal=new ChainTransferProposal(app);
+ const dayClose=new ChainDayCloseTrial(app);
+ const patientBooking=new PatientDemoBooking(app,reception);
+ // Prepare the candidate relation on the isolated demonstration snapshot.
+ // It does not configure an identity provider or enable identity endpoints.
+ try{if(ensurePatientIdentityTrial(db)&&store)store.save(db);}
+ catch(error){if(store)store.close();db.close();throw error;}
+ let identitySessions=null;
+ const identity=identityTrialConfig?new PatientVerifiedIdentity({db,...identityTrialConfig}):null;
+ const identityBinding=new PatientIdentityBindingTrial({app,identity});
+ if(identity)identitySessions=new PatientIdentitySessionTrial({db,identity});
+ // This entrance is restricted to one explicitly fictitious patient in the local demo.
+ const patientDemoSessions=new Map();
  let persistenceFailed=false;
  const json=(res,status,value,extra={})=>{if(store&&!persistenceFailed){try{store.save(db);}catch(error){persistenceFailed=true;status=503;value={code:'SNAPSHOT_WRITE_FAILED',message:'演示数据保存失败，服务已停止；请检查磁盘后重新启动并核对操作结果。'};extra={};setImmediate(()=>server.close());}}res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...extra});res.end(JSON.stringify(value));};
  const body=async(req,limit=65536)=>{let n=0,chunks=[];for await(const c of req){n+=c.length;if(n>limit)fail(413,'TOO_LARGE','请求过大');chunks.push(c);}let value;try{value=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{fail(400,'INVALID_JSON','请输入有效JSON');}if(!value||typeof value!=='object'||Array.isArray(value))fail(400,'INVALID_JSON','请求应为对象');return value;};
@@ -175,20 +201,84 @@ function createChainDemo({snapshotPath=null,runtimeClock=null}={}){
   try{
    if(persistenceFailed)fail(503,'SNAPSHOT_WRITE_FAILED','演示数据保存失败，请重新启动并核对操作结果');
    const url=new URL(req.url,'http://127.0.0.1'),origin=req.headers.origin,expected=`http://127.0.0.1:${server.address().port}`;
-   if(origin&&origin!==expected)fail(403,'ORIGIN_INVALID','来源不允许');
-   const staticFiles={'/':['chain-demo.html','text/html; charset=utf-8'],'/chain-demo.js':['chain-demo.js','text/javascript; charset=utf-8'],'/chain-demo.css':['chain-demo.css','text/css; charset=utf-8'],'/styles.css':['styles.css','text/css; charset=utf-8']};
+   if(origin&&origin!==expected&&origin!==publicOrigin)fail(403,'ORIGIN_INVALID','来源不允许');
+   const identityFiles={'/identity-trial':['identity-trial.html','text/html; charset=utf-8'],'/identity-trial.js':['identity-trial.js','text/javascript; charset=utf-8']};
+   if(req.method==='GET'&&identityFiles[url.pathname]){
+    if(!identitySessions)fail(503,'PATIENT_IDENTITY_UNAVAILABLE','患者身份核验尚未配置');
+    const [name,type]=identityFiles[url.pathname];res.writeHead(200,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"});return res.end(fs.readFileSync(path.join(__dirname,'../../public/chain-demo',name)));
+   }
+   const staticFiles={'/':['chain-demo.html','text/html; charset=utf-8'],'/chain-demo.js':['chain-demo.js','text/javascript; charset=utf-8'],'/chain-demo.css':['chain-demo.css','text/css; charset=utf-8'],'/patient-demo':['patient-demo.html','text/html; charset=utf-8'],'/patient-demo.js':['patient-demo.js','text/javascript; charset=utf-8'],'/patient-demo.css':['patient-demo.css','text/css; charset=utf-8'],'/styles.css':['styles.css','text/css; charset=utf-8']};
    if(req.method==='GET'&&staticFiles[url.pathname]){
     const [name,type]=staticFiles[url.pathname];const root=name==='styles.css'?path.join(__dirname,'../../public/v2'):path.join(__dirname,'../../public/chain-demo');
-    res.writeHead(200,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"});return res.end(name==='chain-demo.html'?fs.readFileSync(path.join(root,name),'utf8').replace('数据保存方式取决于启动方式',store?'重新启动后演示数据保留':'关闭服务后数据清除').replace('演示时间：2026 年 10 月 19 日 09:35。',runtimeClock?'演示使用当前系统时间。':'演示时间：2026 年 10 月 19 日 09:35。'):fs.readFileSync(path.join(root,name)));
+    res.writeHead(200,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"});return res.end(name==='chain-demo.html'?fs.readFileSync(path.join(root,name),'utf8').replace('数据保存方式取决于启动方式',store?'重新启动后演示数据保留':'关闭服务后数据清除').replace('演示时间：2026 年 10 月 19 日 09:35。',runtimeClock?'演示使用当前系统时间。':fixedClock?'演示时间：2026 年 10 月 19 日 11:00。':'演示时间：2026 年 10 月 19 日 09:35。'):fs.readFileSync(path.join(root,name)));
    }
-   if(req.method==='GET'&&url.pathname==='/api/status')return json(res,200,{application:'qinghe-chain-demo',buildVersion:CHAIN_DEMO_BUILD,mode:store?'persistent-snapshot':'memory',clockMode:runtimeClock?'live':'fixed',businessTime:app.auth.now()});
+   if(req.method==='GET'&&url.pathname==='/api/status')return json(res,200,{application:'qinghe-chain-demo',buildVersion:CHAIN_DEMO_BUILD,mode:store?'persistent-snapshot':'memory',clockMode:runtimeClock?'live':'fixed',businessTime:app.auth.now(),publicOrigin});
    if(req.method==='POST'&&!String(req.headers['content-type']||'').toLowerCase().startsWith('application/json'))fail(415,'CONTENT_TYPE','请求需使用JSON');
+   if(req.method==='POST'&&url.pathname==='/api/patient-demo/session'){
+    await body(req);
+    const token=crypto.randomBytes(32).toString('hex'),csrf=crypto.randomBytes(32).toString('hex');
+    for(const [key,entry] of patientDemoSessions)if(entry.expires<Date.now())patientDemoSessions.delete(key);
+    if(patientDemoSessions.size>=100)fail(429,'DEMO_BUSY','演示会话过多，请稍后再试');
+    patientDemoSessions.set(token,{csrf,patientId:2,expires:Date.now()+3600000});
+    return json(res,200,{csrf},{'Set-Cookie':`chain_patient_demo=${token}; HttpOnly; SameSite=Strict; Path=/`});
+   }
+   if(url.pathname.startsWith('/api/patient-identity/')){
+    if(!identitySessions)fail(503,'PATIENT_IDENTITY_UNAVAILABLE','患者身份核验尚未配置');
+    if(req.method==='POST'&&url.pathname==='/api/patient-identity/challenge'){await body(req);return json(res,200,identitySessions.challenge());}
+    if(req.method==='POST'&&url.pathname==='/api/patient-identity/login'){const login=await identitySessions.login(await body(req));return json(res,200,{csrf:login.csrf,expiresInSeconds:login.expiresInSeconds},{'Set-Cookie':`chain_patient_identity_trial=${login.token}; HttpOnly; SameSite=Strict; Path=/`});}
+   }
+   if(url.pathname.startsWith('/api/patient-demo/')||url.pathname.startsWith('/api/patient-identity/')){
+    const isIdentity=url.pathname.startsWith('/api/patient-identity/'),cookieName=isIdentity?'chain_patient_identity_trial':'chain_patient_demo';
+    const token=String(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName+'='))?.slice(cookieName.length+1);
+    let session;
+    if(isIdentity){if(req.method==='POST'&&!req.headers['x-patient-csrf'])fail(403,'CSRF_INVALID','缺少安全令牌');session=identitySessions.authorize(token,req.method==='POST'?req.headers['x-patient-csrf']:undefined);
+     if(req.method==='POST'&&url.pathname==='/api/patient-identity/logout'){await body(req);identitySessions.logout(token,req.headers['x-patient-csrf']);return json(res,200,{ok:true},{'Set-Cookie':'chain_patient_identity_trial=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'});}
+    }else{session=patientDemoSessions.get(token);if(!session||session.expires<Date.now())fail(401,'DEMO_SESSION','请重新进入患者演示');if(req.method==='POST'&&req.headers['x-patient-csrf']!==session.csrf)fail(403,'CSRF_INVALID','会话已失效，请重新进入');}
+    if(req.method==='GET'&&url.pathname.endsWith('/options')){
+     const branches=db.prepare("SELECT id,name FROM clinic_branch WHERE status='active' ORDER BY id").all();
+     const schedules=db.prepare(`SELECT s.id,s.revision,s.branch_id,s.dentist_id,s.starts_at,s.ends_at,d.name dentist_name,c.name chair_name
+      FROM dated_schedule s JOIN clinic_branch b ON b.id=s.branch_id JOIN staff d ON d.id=s.dentist_id JOIN dental_chair c ON c.id=s.dental_chair_id
+      WHERE b.status='active' AND s.status='已确认' AND s.ends_at>? ORDER BY s.starts_at LIMIT 100`).all(app.auth.now());
+     db.exec('BEGIN');try{const now=Date.parse(app.auth.now());for(const s of schedules){s.slots=[];const end=Math.min(Date.parse(s.ends_at),now+14*86400000);for(let t=Math.ceil(Math.max(Date.parse(s.starts_at),now+1000)/1800000)*1800000;t+1800000<=end&&s.slots.length<48;t+=1800000){const start=new Date(t).toISOString().replace('.000Z','Z'),finish=new Date(t+1800000).toISOString().replace('.000Z','Z');try{app.reception.checkSchedule(s.id,s.revision,start,finish);assertCandidateReservation(db,{branchId:s.branch_id,patientId:session.patientId,scheduleId:s.id,startsAt:start,endsAt:finish});reception.ensureDentist(s,s.branch_id,start,finish);s.slots.push({startsAt:start,endsAt:finish});}catch(e){if(!e.status||e.status>=500)throw e;}}}db.exec('COMMIT');}catch(e){if(db.isTransaction)db.exec('ROLLBACK');throw e;}
+     const bookings=db.prepare(`SELECT a.id,a.record_no,a.branch_id,a.planned_start,a.planned_end,a.status,a.revision,b.name branch_name
+      FROM appointment a JOIN clinic_branch b ON b.id=a.branch_id WHERE a.patient_id=? ORDER BY a.planned_start DESC`).all(session.patientId);
+     return json(res,200,{branches,schedules:schedules.filter(s=>s.slots.length),bookings,now:app.auth.now()});
+    }
+    if(req.method==='POST'&&url.pathname.endsWith('/appointment')){
+     const input=await body(req);
+     if(!['create','cancel'].includes(input.action))fail(422,'INVALID_ACTION','请选择预约或取消');
+     const branchId=Number(input.branchId);
+     if(!Number.isSafeInteger(branchId)||branchId<1)fail(422,'INVALID_INPUT','请选择门店');
+     let fields;
+     if(input.action==='create'){
+      const schedule=db.prepare('SELECT id,branch_id,revision FROM dated_schedule WHERE id=?').get(Number(input.scheduleId));
+      if(!schedule||schedule.branch_id!==branchId)fail(409,'SCHEDULE_CHANGED','请选择当前门店排班');
+      fields={patientId:session.patientId,scheduleId:schedule.id,scheduleRevision:input.scheduleRevision,startsAt:input.startsAt,endsAt:input.endsAt,reason:String(input.reason||'').trim()};
+      if(!String(input.reason||'').trim())fail(422,'INVALID_INPUT','请填写就诊目的');
+     }else{
+      const appointment=db.prepare('SELECT id,branch_id,patient_id,revision FROM appointment WHERE id=?').get(Number(input.appointmentId));
+      if(!appointment||appointment.patient_id!==session.patientId||appointment.branch_id!==branchId)fail(403,'PATIENT_SCOPE','预约不属于当前演示患者');
+      fields={appointmentId:appointment.id,expectedRevision:input.expectedRevision,reason:'患者自助演示：患者取消预约'};
+     }
+     return json(res,200,patientBooking.command(session.patientId,{requestKey:String(input.requestKey||''),branchId,action:input.action,...fields}));
+    }
+    return json(res,404,{code:'NOT_FOUND',message:'演示接口不存在'});
+   }
    if(req.method==='POST'&&url.pathname==='/api/login'){
     const login=app.auth.login(await body(req));return json(res,200,{user:login.user,csrf:login.csrf},{'Set-Cookie':`chain_demo_session=${login.token}; HttpOnly; SameSite=Strict; Path=/`});
    }
    const token=String(req.headers.cookie||'').split(';').map(x=>x.trim()).find(x=>x.startsWith('chain_demo_session='))?.slice('chain_demo_session='.length);
    const credentials={token,role:req.headers['x-clinic-role'],csrf:req.headers['x-csrf-token']};
+   if(req.method==='GET'&&url.pathname==='/api/patient-identity-binding/list'){
+    return json(res,200,identityBinding.list(credentials,{branchId:Number(url.searchParams.get('branchId')),patientId:Number(url.searchParams.get('patientId'))}));
+   }
    if(req.method==='POST'&&!credentials.csrf)fail(403,'CSRF_INVALID','缺少安全令牌');
+   if(req.method==='POST'&&url.pathname.startsWith('/api/patient-identity-binding/')){
+    const value=await body(req);
+    if(url.pathname.endsWith('/challenge')){if(!identity)fail(503,'PATIENT_IDENTITY_UNAVAILABLE','患者身份核验尚未配置');return json(res,200,identityBinding.challenge(credentials,value.branchId));}
+    if(url.pathname.endsWith('/bind')){if(!identity)fail(503,'PATIENT_IDENTITY_UNAVAILABLE','患者身份核验尚未配置');return json(res,200,await identityBinding.bind(credentials,value));}
+    if(url.pathname.endsWith('/revoke'))return json(res,200,identityBinding.revoke(credentials,value));
+   }
    if(req.method==='POST'&&url.pathname==='/api/logout'){
     const session=app.auth.session(token);if(hash(String(credentials.csrf))!==session.csrf_hash)fail(403,'CSRF_INVALID','安全令牌无效');
     app.auth.logout(token);return json(res,200,{ok:true},{'Set-Cookie':'chain_demo_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'});
@@ -321,6 +411,8 @@ function createChainDemo({snapshotPath=null,runtimeClock=null}={}){
    if(req.method==='GET'&&url.pathname==='/api/record/health')return json(res,200,healthSign.detail(credentials,Number(url.searchParams.get('branchId')),Number(url.searchParams.get('visitId'))));
    if(req.method==='POST'&&url.pathname==='/api/record/health')return json(res,200,healthSign.command(credentials,await body(req)));
    if(req.method==='POST'&&url.pathname==='/api/record/addendum')return json(res,200,addendumTrial.append(credentials,await body(req)));
+   if(req.method==='GET'&&url.pathname==='/api/transfer-proposals')return json(res,200,transferProposal.list(credentials,Number(url.searchParams.get('branchId'))));
+   if(req.method==='POST'&&url.pathname==='/api/transfer-proposals')return json(res,200,transferProposal.command(credentials,await body(req)));
    if(req.method==='GET'&&url.pathname==='/api/followups')return json(res,200,followupTrial.list(credentials,Number(url.searchParams.get('branchId'))));
    if(req.method==='POST'&&url.pathname==='/api/followups')return json(res,200,followupTrial.command(credentials,await body(req)));
    if(req.method==='GET'&&url.pathname==='/api/inventory')return json(res,200,inventoryTrial.list(credentials,Number(url.searchParams.get('branchId'))));
@@ -328,6 +420,8 @@ function createChainDemo({snapshotPath=null,runtimeClock=null}={}){
    if(req.method==='POST'&&url.pathname==='/api/inventory/batch')return json(res,200,inventoryTrial.batch(credentials,await body(req)));
    if(req.method==='POST'&&url.pathname==='/api/inventory/count')return json(res,200,inventoryTrial.count(credentials,await body(req)));
    if(req.method==='GET'&&url.pathname==='/api/dashboard')return json(res,200,dashboard.query(credentials,Number(url.searchParams.get('branchId'))));
+   if(req.method==='GET'&&url.pathname==='/api/day-close')return json(res,200,dayClose.preview(credentials,Number(url.searchParams.get('branchId')),url.searchParams.get('channel')));
+   if(req.method==='POST'&&url.pathname==='/api/day-close')return json(res,200,dayClose.record(credentials,await body(req)));
    if(req.method==='GET'&&url.pathname==='/api/purchases')return json(res,200,purchaseTrial.list(credentials,Number(url.searchParams.get('branchId'))));
    if(req.method==='POST'&&url.pathname==='/api/purchases')return json(res,200,purchaseTrial.command(credentials,await body(req)));
    if(req.method==='GET'&&url.pathname==='/api/resources')return json(res,200,resourcesTrial.list(credentials,Number(url.searchParams.get('branchId'))));
@@ -345,7 +439,7 @@ function createChainDemo({snapshotPath=null,runtimeClock=null}={}){
    }
    if(req.method==='GET'&&url.pathname==='/api/clinical/grants')return json(res,200,crossOptions.forDentist(credentials,Number(url.searchParams.get('branchId'))));
    return json(res,404,{code:'NOT_FOUND',message:'演示接口不存在'});
-  }catch(e){return json(res,e.status&&e.status<500?e.status:500,{code:e.code||'INTERNAL_ERROR',message:e.status?e.message:'演示请求未完成'});}
+  }catch(e){return json(res,e.code==='PATIENT_IDENTITY_UNAVAILABLE'?503:e.status&&e.status<500?e.status:500,{code:e.code||'INTERNAL_ERROR',message:e.status?e.message:'演示请求未完成'});}
  });
  if(store){server.on('close',()=>store.close());server.on('error',()=>store.close());}
  return {server,db,app};

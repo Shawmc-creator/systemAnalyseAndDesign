@@ -6,9 +6,8 @@ const {startResources}=require('./resource-rules');
 const {clinicalSnapshot,validateClinical}=require('./clinical-gates');
 const {mapError}=require('./unit-of-work');
 
-class ChainStartVisitTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('接诊试验仅允许内存数据库');}
+class ChainStartVisit{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.access=new ChainAuth(app.auth);}
  start(credentials,input){
   if(!credentials.csrf)fail(403,'CSRF_INVALID','缺少安全令牌');
   if(!input||input.commandVersion!==1)fail(422,'COMMAND_VERSION','提交版本无效');
@@ -38,4 +37,5 @@ class ChainStartVisitTrial{
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}
  }
 }
-module.exports={ChainStartVisitTrial};
+class ChainStartVisitTrial extends ChainStartVisit {constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('接诊试验仅允许内存数据库');}}
+module.exports={ChainStartVisit,ChainStartVisitTrial};

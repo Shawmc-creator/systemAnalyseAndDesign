@@ -4,8 +4,8 @@ const {toothFields}=require('./treatment');
 const {id,text,fail,row,revision,insert,fact,recordNo,hash,canonical}=require('./common');
 const {ChainAuth}=require('./chain-auth');const {treatmentSnapshot,validateTreatment,consentFor,leafQuantity}=require('./treatment-gates');const {mapError}=require('./unit-of-work');
 // Same-store visit plans; service identity is frozen in each item description.
-class ChainPlanTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.treatment=app.treatment;this.access=new ChainAuth(app.auth);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('方案试验仅允许内存数据库');}
+class ChainPlan{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.treatment=app.treatment;this.access=new ChainAuth(app.auth);}
  scope(credentials,permission,branch,visitId){const ctx=this.access.authorizeBranch(credentials,permission,branch),visit=row(this.db,'visit',visitId);if(credentials.role!=='dentist'||visit.branch_id!==branch||visit.dentist_id!==ctx.session.staff_id)fail(403,'VISIT_SCOPE','仅可办理本店本人负责的就诊');ctx.authority={...ctx.authority,branchId:branch,visitId,patientId:visit.patient_id};return {ctx,visit};}
  list(credentials,branchId,visitId){const branch=id(branchId,'门店'),v=id(visitId,'就诊');this.db.exec('BEGIN');try{const {ctx}=this.scope(credentials,'uc09.query',branch,v),now=this.auth.now();
   const plans=this.db.prepare(`SELECT p.id plan_id,p.goal,p.status plan_status,v.id version_id,v.version_no,(v.id=(SELECT z.id FROM plan_version z WHERE z.treatment_plan_id=p.id ORDER BY z.version_no DESC LIMIT 1)) is_latest,v.revision,v.status,v.diagnostic_basis,v.planned_schedule FROM treatment_plan p JOIN plan_version v ON v.treatment_plan_id=p.id WHERE p.branch_id=? AND v.source_visit_id=? ORDER BY v.id DESC`).all(branch,v).map(x=>({...x,items:this.db.prepare('SELECT id,item_description,planned_quantity,tooth_code,surface_code FROM plan_item WHERE plan_version_id=? ORDER BY sequence_no').all(x.version_id).map(i=>{const allowed=consentFor(this.db,i.id,now),done=leafQuantity(this.db,i.id);return {...i,completed:Number(done),consented:Number(allowed.limit),remaining:Number(allowed.limit>done?allowed.limit-done:0n),latestDecision:allowed.latest?.decision||null};})}));
@@ -34,4 +34,5 @@ class ChainPlanTrial{
    this.unit.audit(ctx,'变更','COMMITTED',result,sid,result.reason||'本店方案与患者决定');this.db.exec('COMMIT');return {...this.unit.result(this.db.prepare('SELECT * FROM request_submission WHERE id=?').get(sid)),replayed:false};
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}}
 }
-module.exports={ChainPlanTrial};
+class ChainPlanTrial extends ChainPlan{constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('方案试验仅允许内存数据库');}}
+module.exports={ChainPlan,ChainPlanTrial};

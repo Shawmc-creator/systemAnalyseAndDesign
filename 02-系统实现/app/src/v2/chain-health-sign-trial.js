@@ -6,9 +6,8 @@ const {clinicalSnapshot,validateClinical,signaturePayload}=require('./clinical-g
 const {mapError}=require('./unit-of-work');
 const categories=['病史','过敏','用药'];
 
-class ChainHealthSignTrial{
- constructor(app,recordTrial){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.records=recordTrial;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('健康与签署试验仅允许内存数据库');}
+class ChainHealthSign{
+ constructor(app,recordTrial){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.records=recordTrial;this.access=new ChainAuth(app.auth);}
  latest(credentials,branch,visit){
   const latest=this.db.prepare('SELECT * FROM health_version WHERE patient_id=? ORDER BY version_no DESC LIMIT 1').get(visit.patient_id);if(!latest)return null;
   if(!latest.source_visit_id)fail(409,'HEALTH_SOURCE_UNKNOWN','健康资料来源就诊不明，须先核对');
@@ -60,4 +59,5 @@ class ChainHealthSignTrial{
    this.unit.audit(ctx,'变更','COMMITTED',{kind:expectedKind,key:resultId,beforeRevision,revision:resultRevision},sid,reason);this.db.exec('COMMIT');return {...this.unit.result(this.db.prepare('SELECT * FROM request_submission WHERE id=?').get(sid)),replayed:false};
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}}
 }
-module.exports={ChainHealthSignTrial};
+class ChainHealthSignTrial extends ChainHealthSign{constructor(app,records){super(app,records);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('健康与签署试验仅允许内存数据库');}}
+module.exports={ChainHealthSign,ChainHealthSignTrial};

@@ -751,7 +751,7 @@ UC-01至UC-27共用第\ref{sec:common-quality}节的Q-01至Q-08和C-01至C-03，
 \toprule
 编号 & 用例 & 主要执行者 \\ \midrule
 UC-01 & 维护患者资料 & 前台 \\
-UC-02 & 维护预约安排 & 前台 \\
+UC-02 & 维护预约安排 & 前台、患者 \\
 UC-03 & 登记到诊 & 前台 \\
 UC-04 & 维护排班与接诊安排 & 门店负责人 \\
 UC-05 & 查阅患者诊疗资料 & 牙医 \\
@@ -867,9 +867,9 @@ R01-3（2a、6） & 更正仅限患者基本资料，原因必填；不改临床
 \toprule
 项目 & 内容 \\ \midrule
 用例编号与名称 & UC-02 维护预约安排 \\
-执行者 & 前台（主）。患者确认意向；牙医及负责人协调接诊条件。 \\
+执行者 & 前台、患者（按办理方式分别作为主执行者）。牙医及负责人协调接诊条件。 \\
 涉众利益 & 患者：获得明确安排及变更通知；前台：避免重复安排；牙医、助理：人员、诊椅及必要设备有可行时段；负责人：资源冲突可回查。 \\
-前置条件 & 前台已登录，并具有所选门店的预约维护权限；患者编号有效。改约、取消或核实未到时，原预约可查询。 \\
+前置条件 & 前台办理时已登录并具有所选门店权限；患者自助办理时已完成本人身份验证。患者编号有效，原预约按本人权限查询。 \\
 成功后置条件 & 新建得到状态为“已预约”的预约及所需资源预留；改约保留原安排并整体更新预留；取消或核实未到后保留依据并释放对应预约预留。 \\
 最低保证 & 冲突或资料不符时不生成有效新安排；改约失败仍保留原预约和原预留；结果未知先查原办理。 \\
 \bottomrule
@@ -895,6 +895,7 @@ R01-3（2a、6） & 更正仅限患者基本资料，原因必填；不改临床
 \noindent\textbf{UC-02 维护预约安排（扩展、字段与规则）}\par\smallskip
 \noindent\textbf{扩展路径}\par\smallskip
 \begin{description}\setlength{\itemsep}{2pt}\setlength{\parsep}{0pt}
+\item[1d] 患者自助：患者登录后选择门店、已发布排班和可预约时段，填写就诊目的并提交；系统按步骤4及步骤7重查并保存。患者可查看本人预约并取消未到诊预约；涉及复诊交接或特殊设备的预约转由门店协调。
 \item[1a] 改约：1a1 前台选定仍为已预约的原记录并填写原因；1a2 返回步骤3选择新安排；步骤7同时保留变更、释放原预留和建立新预留，任一失败均保留原安排。
 \item[1b] 取消：1b1 前台核实患者要求及原记录仍可取消，记录原因；1b2 系统保存已取消状态和变更依据，仅释放该预约预留；返回取消结果，本分支结束。已到诊记录不按预约取消处理。
 \item[1c] 核实未到：1c1 到达原预约未到核实截止后，前台核实患者尚未到店且无对应就诊；1c2 系统保存未到及核实依据，释放对应预留；本分支结束，不补造到诊或直接删除预约。
@@ -2675,7 +2676,7 @@ UC-05、12、21的查阅与汇总由相应用例控制组织读取，不因一�
 \toprule
 用例 & 主要协作实体 \\ \midrule
 UC-01 维护患者资料 & 患者、患者资料变更 \\
-UC-02 维护预约安排 & 患者、预约、预约变更、日期安排、接诊占用、诊疗设备、资源停用时段、设备占用 \\
+UC-02 维护预约安排 & 患者、患者身份关联、预约、预约变更、日期安排、接诊占用、诊疗设备、资源停用时段、设备占用 \\
 UC-03 登记到诊 & 患者、预约、就诊、接诊占用、病历 \\
 UC-04 维护排班与接诊安排 & 职员、诊椅、日期安排、安排变更、接诊占用 \\
 UC-05 查阅患者诊疗资料 & 患者、就诊、病历、检查所见、治疗方案、诊疗文件、处方 \\
@@ -2805,6 +2806,13 @@ UC-26复用职员、账号及诊椅，以门店岗位授权限定管理范围，
 \setlength{\hsize}{\textwidth}\setlength{\linewidth}{\textwidth}\setlength{\vsize}{\textheight}
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=210mm,297mm}
+\clearpage
+\subsubsection{UC-02：患者自助预约分析序列图}
+患者通过患者预约界面办理；身份核验接口对接可信身份服务，核验及患者档案关联通过后，预约安排控制查询门店排班与接诊占用，并在确认时重新核对并保存预约和预留。取消时只处理本人仍可取消的预约。\par
+\begin{center}
+\includegraphics[width=16cm,height=19.5cm,keepaspectratio]{diagrams/chain-C-20261027/patient-self-service.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:analysis-seq-patient-self}\small 图\thefigure：患者自助预约分析序列图
+\end{center}
 \clearpage
 \newgeometry{margin=19mm}
 \setlength{\paperwidth}{420mm}\setlength{\paperheight}{594mm}
@@ -3469,6 +3477,14 @@ UC-26复用职员、账号及诊椅，以门店岗位授权限定管理范围，
 授权须核验目标门店牙医岗位、患者、就诊、资料范围和有效期；撤销后不得读取。门店医保及院内发药按实际条件启用，不能因隶属同一连锁自动继承。复合外键核对原就诊、患者及来源门店；岗位资格、权限及时间区间由服务端核验。\par
 现有81表已按统一身份、直接门店归属、原业务继承和待核定分类。候选规则中，患者资金按“门店、患者”唯一，材料批次按“门店、材料、批号”唯一；账单与原款、批次与库存位置须核对同一门店。收费项目、材料和供应商使用统一基础目录，价目和库存按门店管理。健康资料历史来源仍待核实。后续连锁总图为候选设计，旧表字段和历史数据迁移尚待落实。\par
 \clearpage
+\subsubsection{患者身份关联数据结构}
+患者自助预约须先核实可信身份与患者档案的关联。患者身份关联类映射为\texttt{patient\_\allowbreak{}verified\_\allowbreak{}identity}；一名患者可对应多条历史关联，一条关联指向一名患者，并记录核实职员、依据、时间及撤销信息。同一服务签发方下，同一身份摘要最多存在一条未撤销关联。\par
+\begin{center}
+\includegraphics[width=16cm,height=8cm,keepaspectratio]{diagrams/chain-D-20261027/patient-identity-binding.pdf}
+\par\smallskip\refstepcounter{figure}\label{fig:patient-identity-binding}\small 图\thefigure：患者身份关联数据库关系图
+\end{center}
+身份签发方及其主体标识经密钥散列后用于定位关联，原始核验凭据不写入关联表；核实及撤销职员引用职员表。一次性挑战和登录会话独立于患者档案，撤销关联后不再允许该关联访问。该关联结构在隔离内存中验证，正式数据库迁移、可信身份服务及操作页面仍需接入；不将手机号输入或固定演示身份视为真实身份核验。\par
+\clearpage
 \subsubsection{分析类与核心表对应（一）}
 核心实体及关联类映射为对应表；主外键与关系见后续结构图，主要字段集中列出。来源列采用现行系统用例编号。\par
 \begingroup\small\linespread{0.98}\selectfont
@@ -3579,7 +3595,7 @@ UC-26复用职员、账号及诊椅，以门店岗位授权限定管理范围，
 \makeatletter\global\@colht\textheight\global\@colroom\textheight\makeatother
 \special{papersize=841mm,1189mm}
 \subsubsection{数据库关系总图}
-本图按业务分区列出81张原业务及历史表与4张连锁候选表，共85张。组内关系用连线表示，跨区关联在相应字段以“字段→目标表”表示；分区图门店字段均引用门店表，继承来源的记录按原业务核对。原表门店归属和约束仍为候选，健康资料历史来源待核实；现有数据库尚未迁移。\par
+本图按业务分区列出81张原业务及历史表、4张连锁候选表及患者身份关联表，共86张。组内关系用连线表示，跨区关联在相应字段以“字段→目标表”表示；分区图门店字段均引用门店表，继承来源的记录按原业务核对。身份关联及原表门店归属和约束仍为候选，健康资料历史来源待核实；现有正式数据库尚未迁移。\par
 \begin{center}
 \includegraphics[width=80.3cm,height=109.9cm,keepaspectratio]{diagrams/chain-D-20261027/database-overview-grouped.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:database-overall}\small 图\thefigure：连锁业务数据库关系总览图（候选）
@@ -4271,7 +4287,7 @@ UC-27报价应用服务核验当前门店及岗位权限，协调本店报价编
 \clearpage
 \subsubsection{岗位页面1}
 \noindent\textbf{患者与预约页面}\par
-对应UC-01、UC-02、UC-03；前台。\par
+对应UC-01、UC-02、UC-03；前台。患者自助预约另提供本人身份核验、选择门店时段、查看及取消本人预约的页面，预约安排和资源核对复用同一业务规则。\par
 \begin{center}
 \includegraphics[width=16.2cm,height=7.4cm,keepaspectratio]{diagrams/chain-D-20261027/screen-1.pdf}
 \par\smallskip\refstepcounter{figure}\label{fig:screen-1}\small 图\thefigure：患者与预约页面结构

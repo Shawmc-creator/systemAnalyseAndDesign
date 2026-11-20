@@ -15,6 +15,7 @@ skinparam classAttributeIconSize 0
 skinparam nodesep 24
 skinparam ranksep 34
 left to right direction
+actor "患者" as PAT
 actor "前台" as A0
 actor "牙医" as A1
 actor "诊疗助理" as A2
@@ -53,6 +54,7 @@ usecase "UC-26\n维护诊所基础资料与账号" as U26
 usecase "UC-27\n编制报价并记录患者确认" as U27
 }
 A0 -- U1
+PAT -- U2
 A0 -- U2
 A0 -- U3
 A0 -- U16

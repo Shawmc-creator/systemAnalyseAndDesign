@@ -1,0 +1,11 @@
+# 虚构数据演示专用。替换为实际域名和 Caddy 生成的密码哈希。
+# 前置条件：域名解析到服务器，80/443 可达，后端仅监听 127.0.0.1:3011。
+demo.example.com {
+    basic_auth {
+        preview REPLACE_WITH_CADDY_HASHED_PASSWORD
+    }
+    reverse_proxy 127.0.0.1:3011 {
+        header_up -Authorization
+        header_down Set-Cookie ^(.*)$ "$1; Secure"
+    }
+}

@@ -5,9 +5,8 @@ const {integer,inventorySnapshot,validateInventory}=require('./inventory-gates')
 const {ChainAuth}=require('./chain-auth');
 const {mapError}=require('./unit-of-work');
 
-class ChainInventoryTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.inventory=app.inventory;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('库存试验仅允许内存数据库');}
+class ChainInventory{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.inventory=app.inventory;this.access=new ChainAuth(app.auth);}
  scope(stockId,branch){const stock=row(this.db,'batch_stock',stockId),batch=row(this.db,'material_batch',stock.material_batch_id),location=row(this.db,'stock_location',stock.stock_location_id);
   if(location.branch_id!==branch||batch.branch_id!==branch)fail(409,'INVENTORY_BRANCH_UNKNOWN','库存位置与批次门店不一致，请先核对');
   const bad=this.db.prepare(`SELECT 1 FROM inventory_movement m LEFT JOIN purchase_receipt_item ri ON ri.id=m.purchase_receipt_item_id LEFT JOIN purchase_receipt r ON r.id=ri.purchase_receipt_id
@@ -89,4 +88,5 @@ class ChainInventoryTrial{
    this.unit.audit(ctx,'变更',code,{kind:'stock_count',key:countId,beforeRevision:previous,revision:rev},sid,reason);this.db.exec('COMMIT');return {...this.unit.result(this.db.prepare('SELECT * FROM request_submission WHERE id=?').get(sid)),replayed:false};
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}}
 }
-module.exports={ChainInventoryTrial};
+class ChainInventoryTrial extends ChainInventory{constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('库存试验仅允许内存数据库');}}
+module.exports={ChainInventory,ChainInventoryTrial};

@@ -2,6 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {DatabaseSync,backup}=require('node:sqlite');
 const {VERSION}=require('../../src/v2/database');
+const {VERSION:IDENTITY_VERSION}=require('../../src/v2/patient-identity-migration');
 const sha=bytes=>crypto.createHash('sha256').update(bytes).digest('hex');
 const allowed=name=>name==='clinic-v2.db'||/^(insurance|pharmacy)-config\.json$/.test(name)||/^clinical-files\/[a-f0-9-]{36}\.blob$/.test(name);
 function localFile(folder,name){
@@ -11,7 +12,9 @@ function localFile(folder,name){
  let p=base;for(const part of name.split('/')){p=path.join(p,part);if(fs.existsSync(p)&&fs.lstatSync(p).isSymbolicLink())throw new Error('备份文件不能使用符号链接');}return dest;
 }
 function inspect(db){
- if(db.prepare('PRAGMA application_id').get().application_id!==0x51484432||db.prepare('PRAGMA user_version').get().user_version!==VERSION)throw new Error('仅支持当前新版数据库；请先使用正常启动入口完成版本核对');
+ const version=db.prepare('PRAGMA user_version').get().user_version,count=db.prepare("SELECT count(*) n FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get().n;
+ if(db.prepare('PRAGMA application_id').get().application_id!==0x51484432||!((version===VERSION&&count===112)||(version===IDENTITY_VERSION&&count===113)))throw new Error('仅支持当前新版数据库；请先使用正常启动入口完成版本核对');
+ if(version===IDENTITY_VERSION){const table=db.prepare("SELECT 1 FROM sqlite_master WHERE type='table' AND name='patient_verified_identity'").get(),triggers=db.prepare("SELECT count(*) n FROM sqlite_master WHERE type='trigger' AND tbl_name='patient_verified_identity' AND name IN ('patient_identity_immutable','patient_identity_no_delete')").get().n,active=db.prepare('PRAGMA index_list(patient_verified_identity)').all().find(x=>x.name==='patient_identity_active_subject');if(!table||triggers!==2||!active||active.unique!==1||active.partial!==1)throw new Error('患者身份结构不完整，拒绝备份');}
  if(db.prepare('PRAGMA integrity_check').get().integrity_check!=='ok'||db.prepare('PRAGMA foreign_key_check').all().length)throw new Error('备份数据库完整性检查未通过');
  return Object.fromEntries(db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name").all().map(({name})=>[name,db.prepare('SELECT count(*) n FROM "'+name+'"').get().n]));
 }
@@ -19,16 +22,16 @@ function verifyBundle(directory){
  const folder=path.resolve(directory);if(fs.lstatSync(folder).isSymbolicLink())throw new Error('备份目录不能使用符号链接');
  const manifestFile=path.join(folder,'manifest.json');if(fs.lstatSync(manifestFile).isSymbolicLink())throw new Error('备份清单不能使用符号链接');
  const manifest=JSON.parse(fs.readFileSync(manifestFile,'utf8'));
- if(manifest.format!=='qinghe-clinic-v2-bundle-1'||manifest.status!=='complete'||manifest.schemaVersion!==VERSION||!Array.isArray(manifest.files))throw new Error('此目录不是已完成的新版备份包');
+ if(manifest.format!=='qinghe-clinic-v2-bundle-1'||manifest.status!=='complete'||![VERSION,IDENTITY_VERSION].includes(manifest.schemaVersion)||!Array.isArray(manifest.files))throw new Error('此目录不是已完成的新版备份包');
  const files=new Map();for(const item of manifest.files){if(files.has(item.path))throw new Error('备份清单存在重复文件');const file=localFile(folder,item.path),bytes=fs.readFileSync(file);if(bytes.length!==item.bytes||sha(bytes)!==item.sha256)throw new Error('备份文件摘要不匹配：'+item.path);files.set(item.path,item);}
  if(!files.has('clinic-v2.db'))throw new Error('备份缺少当前数据库');
  const db=new DatabaseSync(localFile(folder,'clinic-v2.db'),{readOnly:true});let counts;
- try{counts=inspect(db);if(JSON.stringify(counts)!==JSON.stringify(manifest.tableCounts))throw new Error('备份表行数与清单不一致');
+ try{counts=inspect(db);if(db.prepare('PRAGMA user_version').get().user_version!==manifest.schemaVersion)throw new Error('备份版本与清单不一致');if(JSON.stringify(counts)!==JSON.stringify(manifest.tableCounts))throw new Error('备份表行数与清单不一致');
   for(const v of db.prepare('SELECT storage_key,size_bytes,sha256 FROM document_version').all()){
    const item=files.get('clinical-files/'+v.storage_key);if(!item||item.bytes!==v.size_bytes||item.sha256!==v.sha256)throw new Error('备份缺少与数据库版本一致的影像文书原件');
   }
  }finally{db.close();}
- return {passed:true,directory:folder,schemaVersion:VERSION,tables:Object.keys(counts).length,files:files.size,clinicalFiles:[...files.keys()].filter(p=>p.startsWith('clinical-files/')).length};
+ return {passed:true,directory:folder,schemaVersion:manifest.schemaVersion,tables:Object.keys(counts).length,files:files.size,clinicalFiles:[...files.keys()].filter(p=>p.startsWith('clinical-files/')).length};
 }
 async function createBundle({source,outputDir}={}){
  source=path.resolve(source);if(!fs.existsSync(source))throw new Error('当前数据库不存在：'+source);
@@ -37,9 +40,9 @@ async function createBundle({source,outputDir}={}){
  const writeManifest=()=>fs.writeFileSync(path.join(folder,'manifest.json'),JSON.stringify(manifest,null,2),{mode:0o600});writeManifest();
  function copy(bytes,rel,expected){if(expected&&(bytes.length!==expected.bytes||sha(bytes)!==expected.sha256))throw new Error('源影像文书缺失、损坏或并发变化：'+rel);const dest=localFile(folder,rel);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,bytes,{flag:'wx',mode:0o600});manifest.files.push({path:rel,bytes:bytes.length,sha256:sha(bytes)});}
  try{
-  const db=new DatabaseSync(source,{readOnly:true});try{inspect(db);await backup(db,path.join(folder,'clinic-v2.db'));}finally{db.close();}
+  const db=new DatabaseSync(source,{readOnly:true});try{inspect(db);manifest.schemaVersion=db.prepare('PRAGMA user_version').get().user_version;await backup(db,path.join(folder,'clinic-v2.db'));}finally{db.close();}
   const saved=new DatabaseSync(path.join(folder,'clinic-v2.db'),{readOnly:true});let versions;
-  try{manifest.tableCounts=inspect(saved);versions=saved.prepare('SELECT storage_key,size_bytes,sha256 FROM document_version ORDER BY id').all();}finally{saved.close();}
+  try{manifest.tableCounts=inspect(saved);if(saved.prepare('PRAGMA user_version').get().user_version!==manifest.schemaVersion)throw new Error('备份期间数据库版本发生变化');versions=saved.prepare('SELECT storage_key,size_bytes,sha256 FROM document_version ORDER BY id').all();}finally{saved.close();}
   const dbBytes=fs.readFileSync(path.join(folder,'clinic-v2.db'));manifest.files.push({path:'clinic-v2.db',bytes:dbBytes.length,sha256:sha(dbBytes)});
   const copied=new Set();for(const v of versions){const rel='clinical-files/'+v.storage_key;if(copied.has(rel))continue;const bytes=fs.readFileSync(localFile(path.dirname(source),rel));copy(bytes,rel,{bytes:v.size_bytes,sha256:v.sha256});copied.add(rel);}
   for(const config of ['insurance-config.json','pharmacy-config.json']){const file=path.join(path.dirname(source),config);if(fs.existsSync(file)){if(fs.lstatSync(file).isSymbolicLink())throw new Error('机构配置不能为符号链接');const bytes=fs.readFileSync(file);JSON.parse(bytes.toString('utf8').replace(/^\uFEFF/,''));copy(bytes,config);}}

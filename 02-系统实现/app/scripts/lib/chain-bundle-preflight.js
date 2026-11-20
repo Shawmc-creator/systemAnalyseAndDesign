@@ -12,6 +12,7 @@ function inspectBundle(directory,assignment){
  const verified=verifyBundle(directory),folder=verified.directory,manifest=JSON.parse(fs.readFileSync(path.join(folder,'manifest.json'),'utf8'));
  const item=manifest.files.find(x=>x.path==='clinic-v2.db'),bytes=fs.readFileSync(path.join(folder,'clinic-v2.db'));
  if(!item||bytes.length!==item.bytes||digest(bytes)!==item.sha256)throw new Error('备份数据库在核验期间变化，请重新核对');
+ if(assignment?.sourceSha256!==undefined&&assignment.sourceSha256!==item.sha256)throw new Error('门店映射与当前备份数据库不匹配，请重新生成模板并核实归属');
  const schema=verifySerialized(bytes),candidate=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../../../../01-需求文档/设计交付/连锁业务表归属候选映射.json'),'utf8'));
  const image=Buffer.from(bytes);if(image[18]===2&&image[19]===2){image[18]=1;image[19]=1;}
  const db=new DatabaseSync(':memory:');try{db.deserialize(image);db.exec('PRAGMA foreign_keys=ON; PRAGMA query_only=ON; BEGIN');

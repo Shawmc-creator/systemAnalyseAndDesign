@@ -1,8 +1,8 @@
 'use strict';
 const crypto=require('node:crypto');const {id,text,dateOnly,day,fail,row,revision,insert,fact,recordNo,hash,canonical}=require('./common');
 const {ChainAuth}=require('./chain-auth');const {money,decisionAt,ACTIVE}=require('./quote-rules');const {mapError}=require('./unit-of-work');
-class ChainQuoteTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.quotes=app.quotes;this.access=new ChainAuth(app.auth);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('报价试验仅允许内存数据库');}
+class ChainQuote{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.quotes=app.quotes;this.access=new ChainAuth(app.auth);}
  scope(credentials,permission,branch,visitId){const ctx=this.access.authorizeBranch(credentials,permission,branch),visit=row(this.db,'visit',visitId);if(visit.branch_id!==branch||(credentials.role==='dentist'&&visit.dentist_id!==ctx.session.staff_id))fail(403,'QUOTE_SCOPE','就诊不属于当前门店或牙医');ctx.authority={...ctx.authority,branchId:branch,patientId:visit.patient_id,visitId};return {ctx,visit};}
  list(credentials,branchId){const branch=id(branchId,'门店');if(!['dentist','cashier'].includes(credentials.role))fail(403,'FORBIDDEN','需要牙医或收费岗位');this.db.exec('BEGIN');try{
   const ctx=this.access.authorizeBranch(credentials,'quote.read',branch);ctx.authority={...ctx.authority,branchId:branch};const now=this.auth.now();
@@ -48,4 +48,5 @@ class ChainQuoteTrial{
    const sid=insert(this.db,'request_submission',{account_id:ctx.session.account_id,permission_id:ctx.permission.id,request_key:key,payload_digest:digest,command_version:1,status:'已提交',created_at:now,committed_at:now,result_kind:result.kind,result_key:String(result.key),result_revision:result.revision,result_code:'COMMITTED',correlation_id:crypto.randomUUID()});this.unit.audit(ctx,'变更','COMMITTED',result,sid,reason);this.db.exec('COMMIT');return {...this.unit.result(this.db.prepare('SELECT * FROM request_submission WHERE id=?').get(sid)),replayed:false};
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}}
 }
-module.exports={ChainQuoteTrial};
+class ChainQuoteTrial extends ChainQuote{constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('报价试验仅允许内存数据库');}}
+module.exports={ChainQuote,ChainQuoteTrial};

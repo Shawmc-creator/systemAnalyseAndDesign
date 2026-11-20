@@ -7,9 +7,8 @@ const {clinicalSnapshot,validateClinical}=require('./clinical-gates');
 const {mapError}=require('./unit-of-work');
 
 // Only the isolated candidate database; no live resource migration.
-class ChainResourcesTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('资源试验仅允许内存数据库');}
+class ChainResources{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.access=new ChainAuth(app.auth);}
  list(credentials,branchId){const branch=id(branchId,'门店');this.db.exec('BEGIN');try{
   const ctx=this.access.authorizeBranch(credentials,'resources.query',branch);ctx.authority={...ctx.authority,branchId:branch};
   const chairs=this.db.prepare(`SELECT c.id,c.name,EXISTS(SELECT 1 FROM resource_occupancy o JOIN dated_schedule s ON s.id=o.dated_schedule_id JOIN visit v ON v.id=o.visit_id
@@ -70,4 +69,5 @@ class ChainResourcesTrial{
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}
  }
 }
-module.exports={ChainResourcesTrial};
+class ChainResourcesTrial extends ChainResources{constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('资源试验仅允许内存数据库');}}
+module.exports={ChainResources,ChainResourcesTrial};

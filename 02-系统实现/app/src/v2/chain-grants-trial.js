@@ -6,10 +6,9 @@ const {hasBranchRole}=require('./chain-access');
 
 // Isolated prototype. It is intentionally absent from the live server and
 // only supports a manager holding authority in both participating branches.
-class ChainGrantsTrial {
+class ChainGrants {
  constructor(app) {
   this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!=='')) throw new Error('授权试验仅允许内存数据库');
  }
  command(credentials,input) {
   if(!credentials.csrf) fail(403,'CSRF_INVALID','缺少安全令牌');
@@ -61,4 +60,7 @@ class ChainGrantsTrial {
   } catch(error) {if(this.db.isTransaction)this.db.exec('ROLLBACK');throw error;}
  }
 }
-module.exports={ChainGrantsTrial};
+class ChainGrantsTrial extends ChainGrants {
+ constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('授权试验仅允许内存数据库');}
+}
+module.exports={ChainGrants,ChainGrantsTrial};

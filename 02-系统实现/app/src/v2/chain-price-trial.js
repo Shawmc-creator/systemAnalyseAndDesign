@@ -7,9 +7,8 @@ const {mapError}=require('./unit-of-work');
 
 // Demonstration service only. Catalog is shared; prices and approvals are per
 // branch. This class is not connected to the live single-store server.
-class ChainPriceTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.billing=app.billing;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('价目试验仅允许内存数据库');}
+class ChainPrice{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.billing=app.billing;this.access=new ChainAuth(app.auth);}
  list(credentials,branchId){
   branchId=id(branchId,'门店');const permission=credentials.role==='manager'?'uc05.approve':'uc05.draft';
   this.db.exec('BEGIN');try{
@@ -66,4 +65,5 @@ class ChainPriceTrial{
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}
  }
 }
-module.exports={ChainPriceTrial};
+class ChainPriceTrial extends ChainPrice{constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('价目试验仅允许内存数据库');}}
+module.exports={ChainPrice,ChainPriceTrial};

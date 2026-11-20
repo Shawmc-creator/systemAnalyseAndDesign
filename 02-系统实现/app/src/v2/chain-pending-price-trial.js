@@ -9,9 +9,8 @@ const {mapError}=require('./unit-of-work');
 const {decisionAt}=require('./quote-rules');
 
 // Candidate pending pricing for independent checks and same-visit plans; no quoted or corrected work.
-class ChainPendingPriceTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.billing=app.billing;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('核价试验仅允许内存数据库');}
+class ChainPendingPrice{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.billing=app.billing;this.access=new ChainAuth(app.auth);}
  list(credentials,branchId){
   const branch=id(branchId,'门店');this.db.exec('BEGIN');try{
    const ctx=this.access.authorizeBranch(credentials,'uc05.approve',branch);ctx.authority={...ctx.authority,branchId:branch};
@@ -59,4 +58,5 @@ class ChainPendingPriceTrial{
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}
  }
 }
-module.exports={ChainPendingPriceTrial};
+class ChainPendingPriceTrial extends ChainPendingPrice{constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('核价试验仅允许内存数据库');}}
+module.exports={ChainPendingPrice,ChainPendingPriceTrial};

@@ -1,0 +1,59 @@
+@startuml
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultFontName SimSun
+skinparam defaultFontSize 18
+skinparam ArrowColor black
+skinparam ParticipantBackgroundColor white
+skinparam ActorBackgroundColor white
+skinparam BoundaryBackgroundColor white
+skinparam ControlBackgroundColor white
+skinparam EntityBackgroundColor white
+skinparam sequenceGroupBackgroundColor white
+hide footbox
+autonumber
+actor "患者" as A
+boundary "患者预约界面" as B
+control "预约安排控制" as C
+boundary "身份核验接口" as I
+actor "可信身份服务" as S
+entity "患者" as P
+entity "日期安排" as D
+entity "接诊占用" as O
+entity "预约" as R
+A -> B : 请求进入本人预约
+B -> I : 提交身份核验材料
+I -> S : 请求核验
+S --> I : 核验结果
+I -> C : 核验结果及可信身份
+C -> P : 核对身份与档案关联()
+alt 核验失败或档案关联不确定
+ C --> B : 提示核验失败或联系门店
+else 核验及关联通过
+ A -> B : 选择门店与预约需求
+ B -> C : 请求本人可预约安排
+ C -> D : 查询有效排班()
+ C -> O : 核对患者与接诊资源占用()
+ C --> B : 返回可预约时段
+ A -> B : 确认预约
+ B -> C : 提交时段及办理编号
+ critical 重查并保存
+  C -> D : 重核排班版本()
+  C -> O : 重核患者和资源冲突()
+  alt 仍可预约
+   C -> R : 建立本人预约()
+   C -> O : 预留时段()
+   C --> B : 返回预约结果
+  else 条件变化
+   C --> B : 提示改选时段
+  end
+ end
+ opt 取消本人未到诊预约
+  A -> B : 取消预约
+  B -> C : 预约编号及版本
+  C -> R : 核对本人归属及状态()
+  C -> O : 释放该预约预留()
+  C --> B : 返回取消结果
+ end
+end
+@enduml

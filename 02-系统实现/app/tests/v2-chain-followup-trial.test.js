@@ -4,6 +4,8 @@ const assert=require('node:assert/strict');
 const {setupFollowups}=require('./helpers/v2-followups');
 const {installTrialSchema}=require('../src/v2/chain-schema-trial');
 const {ChainReceptionTrial}=require('../src/v2/chain-reception-trial');
+const {ChainFollowupTrial}=require('../src/v2/chain-followup-trial');
+const {ChainTransferProposal}=require('../src/v2/chain-transfer-proposal');
 
 function fixture(t) {
  const a=setupFollowups(t), f=a.createFollowup();a.signSource();a.advance('2026-10-20T01:00:00Z');
@@ -22,6 +24,48 @@ function fixture(t) {
  db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(1,?,'frontdesk','2026-10-01T00:00:00Z',?,?,'隔离授权')").run(staff,manager,now);
  return {a,f,booking,service:new ChainReceptionTrial(a)};
 }
+test('两店前台可发起并拒绝交接申请，确认前原预约不变',t=>{
+ const {a,f,booking}=fixture(t),db=a.db;a.enableSecondFrontdesk();
+ const receiver=a.auth.session(a.frontdesk2.token).staff_id,manager=a.auth.session(a.m.token).staff_id,now=a.auth.now();
+ db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(2,?,'frontdesk',?,?,?,'虚构资格')").run(receiver,now,manager,now);
+ const service=new ChainTransferProposal(a),req={action:'propose',branchId:1,targetBranchId:2,appointmentId:booking.id,expectedRevision:1,patientConfirmed:true,contactedAt:now,method:'电话',contactNote:'虚构患者同意交接',reason:'患者选择转店',requestKey:'proposal-create',commandVersion:1};
+ assert.throws(()=>service.command(a.f,{...req,patientConfirmed:false,requestKey:'no-consent'}),/患者同意/);
+ const p=service.command(a.f,req);assert.equal(service.command(a.f,req).replayed,true);assert.equal(db.prepare('SELECT status FROM appointment WHERE id=?').get(booking.id).status,'已预约');
+ assert.equal(service.list(a.frontdesk2,2).items.find(x=>x.id===p.id).status,'待目标店确认');
+ assert.throws(()=>service.command(a.f,{...req,requestKey:'duplicate-proposal'}),/待处理/);
+ assert.throws(()=>service.command(a.f,{action:'reject',branchId:1,proposalId:p.id,reason:'不属于目标店',requestKey:'bad-reject',commandVersion:1}),/无权办理/);
+ const reject={action:'reject',branchId:2,proposalId:p.id,reason:'目标时段不合适',requestKey:'proposal-reject',commandVersion:1};
+ service.command(a.frontdesk2,reject);assert.equal(service.command(a.frontdesk2,reject).replayed,true);assert.equal(service.list(a.f,1).items.find(x=>x.id===p.id).status,'已拒绝');assert.equal(db.prepare('SELECT status FROM appointment WHERE id=?').get(booking.id).status,'已预约');
+ assert.equal(a.followup(f.id).responsible_branch_id,1);
+ const next=service.command(a.f,{...req,requestKey:'proposal-again'});
+ db.exec('UPDATE dental_chair SET branch_id=2 WHERE id=2');
+ db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(2,?,'dentist',?,?,?,'虚构资格')").run(manager,now,manager,now);
+ db.prepare(`INSERT INTO dated_schedule(dentist_id,dental_chair_id,business_date,starts_at,ends_at,confirmed_at,created_by,confirmed_by,status,created_at,updated_at,revision,branch_id) VALUES(?,2,'2026-10-20','2026-10-20T01:00:00Z','2026-10-20T10:00:00Z',?,?,?,'已确认',?,?,1,2)`).run(manager,now,manager,manager,now,now);
+ const schedule=db.prepare('SELECT id FROM dated_schedule WHERE branch_id=2').get().id;
+ const accept={action:'transfer',branchId:1,targetBranchId:2,transferProposalId:next.id,appointmentId:booking.id,expectedRevision:1,patientConfirmed:true,scheduleId:schedule,scheduleRevision:1,startsAt:'2026-10-20T04:00:00Z',endsAt:'2026-10-20T04:30:00Z',reason:'目标店确认预约',transferContact:{method:'电话',note:'虚构患者确认新时段',contactedAt:now},equipmentIds:[],requestKey:'proposal-accept',commandVersion:1};
+ const reception=new ChainReceptionTrial(a);assert.throws(()=>reception.command(a.f,accept),/无权办理/);
+ db.exec("CREATE TEMP TRIGGER fail_transfer_decision BEFORE INSERT ON operation_audit WHEN NEW.outcome_code='TRANSFER_ACCEPTED' BEGIN SELECT RAISE(ABORT,'transfer audit failure'); END");
+ assert.throws(()=>reception.command(a.frontdesk2,accept),/transfer audit failure/);assert.equal(db.prepare('SELECT status FROM appointment WHERE id=?').get(booking.id).status,'已预约');assert.equal(a.followup(f.id).responsible_branch_id,1);db.exec('DROP TRIGGER fail_transfer_decision');
+ const result=reception.command(a.frontdesk2,accept);assert.equal(reception.command(a.frontdesk2,accept).replayed,true);
+ assert.equal(db.prepare('SELECT status FROM appointment WHERE id=?').get(booking.id).status,'已取消');assert.equal(db.prepare('SELECT branch_id FROM appointment WHERE id=?').get(result.id).branch_id,2);
+ assert.equal(a.followup(f.id).responsible_frontdesk_id,receiver);assert.equal(a.followup(f.id).responsible_branch_id,2);assert.equal(service.list(a.frontdesk2,2).items.find(x=>x.id===next.id).status,'已确认');
+});
+test('责任前台将未完成复诊交给本店同事，保留历史且重复提交不重复转交',t=>{
+ const {a,f}=fixture(t),db=a.db; a.enableSecondFrontdesk();db.exec('ALTER TABLE followup_requirement ADD COLUMN source_branch_id INTEGER REFERENCES clinic_branch(id)');db.prepare('UPDATE followup_requirement SET source_branch_id=1 WHERE id=?').run(f.id);
+ const second=a.auth.session(a.frontdesk2.token).staff_id,manager=a.auth.session(a.m.token).staff_id,now=a.auth.now();
+ db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(1,?,'frontdesk',?,?,?,'虚构岗位')").run(second,now,manager,now);
+ const service=new ChainFollowupTrial(a),current=a.followup(f.id),input={action:'handoff',branchId:1,followupId:f.id,expectedRevision:current.revision,responsibleFrontdeskId:second,reason:'前台换班交接',requestKey:'followup-owner-handoff',commandVersion:1};
+ assert.throws(()=>service.command(a.frontdesk2,{...input,requestKey:'wrong-owner'}),/仅当前责任前台/);
+ const result=service.command(a.f,input);assert.equal(a.followup(f.id).responsible_frontdesk_id,second);assert.equal(result.revision,current.revision+1);
+ assert.equal(service.command(a.f,input).replayed,true);
+ assert.ok(db.prepare("SELECT 1 FROM followup_history WHERE followup_requirement_id=? AND event_type='转交' AND responsible_frontdesk_id=?").get(f.id,second));
+ assert.ok(service.list(a.frontdesk2,1).items.some(x=>x.id===f.id));assert.ok(!service.list(a.f,1).items.some(x=>x.id===f.id));
+ db.prepare("INSERT INTO branch_staff_role(branch_id,staff_id,role_code,valid_from,granted_by,granted_at,evidence) VALUES(1,?,'branch_manager',?,?,?,'虚构岗位')").run(manager,now,manager,now);
+ const list=service.list(a.m,1),visible=list.items.find(x=>x.id===f.id);assert.ok(visible);assert.equal(visible.contacts,undefined);
+ const restore={...input,expectedRevision:a.followup(f.id).revision,responsibleFrontdeskId:a.auth.session(a.f.token).staff_id,reason:'负责人调整接班人',requestKey:'manager-followup-handoff'};
+ assert.throws(()=>service.command(a.m,{...restore,branchId:2,requestKey:'manager-wrong-branch'}),/无权办理/);
+ service.command(a.m,restore);assert.equal(a.followup(f.id).responsible_frontdesk_id,restore.responsibleFrontdeskId);assert.equal(service.command(a.m,restore).replayed,true);
+});
 test('取消关联复诊时原联系保留、待联系恢复并写入历史及审计，失败整体回滚',t=>{
  const {a,f,booking,service}=fixture(t),db=a.db;
  const req={action:'cancel',branchId:1,appointmentId:booking.id,expectedRevision:1,reason:'患者取消',requestKey:'chain-followup-cancel',commandVersion:1};

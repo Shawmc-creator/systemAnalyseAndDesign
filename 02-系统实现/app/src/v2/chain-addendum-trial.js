@@ -5,9 +5,8 @@ const {ChainAuth}=require('./chain-auth');
 const {clinicalSnapshot,validateClinical,signedIntegrity}=require('./clinical-gates');
 const {mapError}=require('./unit-of-work');
 
-class ChainAddendumTrial{
- constructor(app,records){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.records=records;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('补充试验仅允许内存数据库');}
+class ChainAddendum{
+ constructor(app,records){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.records=records;this.access=new ChainAuth(app.auth);}
  append(credentials,input){if(!credentials.csrf)fail(403,'CSRF_INVALID','缺少安全令牌');if(!input||input.commandVersion!==1)fail(422,'COMMAND_VERSION','提交版本无效');
   const branch=id(input.branchId,'门店'),visitId=id(input.visitId,'就诊'),key=text(input.requestKey,'提交号',100),permission='uc11.sign',digest=hash(canonical({permission,input}));
   this.db.exec('BEGIN IMMEDIATE');try{
@@ -31,4 +30,5 @@ class ChainAddendumTrial{
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}
  }
 }
-module.exports={ChainAddendumTrial};
+class ChainAddendumTrial extends ChainAddendum{constructor(app,records){super(app,records);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('补充试验仅允许内存数据库');}}
+module.exports={ChainAddendum,ChainAddendumTrial};

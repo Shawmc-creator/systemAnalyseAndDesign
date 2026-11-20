@@ -6,10 +6,9 @@ const {hasBranchRole}=require('./chain-access');
 
 // Candidate two-manager flow: immutable existing audit entries carry the
 // proposal and its decision; the live server never calls this prototype.
-class ChainApprovalTrial {
+class ChainApproval {
  constructor(app){
   this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!=='')) throw new Error('协同授权试验仅允许内存数据库');
  }
  list(credentials,branchId){
   branchId=id(branchId,'门店');
@@ -95,4 +94,7 @@ class ChainApprovalTrial {
   }catch(error){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw error;}
  }
 }
-module.exports={ChainApprovalTrial};
+class ChainApprovalTrial extends ChainApproval {
+ constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('协同授权试验仅允许内存数据库');}
+}
+module.exports={ChainApproval,ChainApprovalTrial};

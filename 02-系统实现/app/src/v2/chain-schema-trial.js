@@ -3,6 +3,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { VERSION } = require('./database');
+const { VERSION:IDENTITY_VERSION } = require('./patient-identity-migration');
+const { ensurePatientIdentityTrial } = require('./patient-identity-schema-trial');
 
 // Experimental schema bootstrap for isolated in-memory tests only. It neither
 // assigns legacy records nor upgrades an application database.
@@ -14,9 +16,11 @@ function installTrialSchema(db, { testFailAfterDdl = false, includeBusinessField
   if (db.isTransaction || db.prepare('PRAGMA foreign_keys').get().foreign_keys !== 1)
     throw new Error('试验要求启用外键且没有活动事务');
   const tables = db.prepare("SELECT count(*) n FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").get().n;
+  const version=db.prepare('PRAGMA user_version').get().user_version;
   if (db.prepare('PRAGMA application_id').get().application_id !== 0x51484432 ||
-      db.prepare('PRAGMA user_version').get().user_version !== VERSION || tables !== 112)
+      !((version===VERSION&&tables===112)||(version===IDENTITY_VERSION&&tables===113)))
     throw new Error('试验仅支持当前单店基线');
+  if(version===IDENTITY_VERSION){const count=db.prepare("SELECT count(*) n FROM sqlite_master WHERE type='trigger' AND tbl_name='patient_verified_identity' AND name IN ('patient_identity_immutable','patient_identity_no_delete')").get().n;if(count!==2||ensurePatientIdentityTrial(db)!==false)throw new Error('患者身份保护不完整，拒绝连锁结构试验');}
   const source = fs.readFileSync(path.resolve(__dirname, '../../../../01-需求文档/设计交付/连锁基础表候选结构.sql'));
   if (crypto.createHash('sha256').update(source).digest('hex') !== 'e69de6066e9892d0aa24822f8f6b17f24d315bc27e243345aafd83e9c6f98e47')
     throw new Error('连锁候选结构摘要不匹配');

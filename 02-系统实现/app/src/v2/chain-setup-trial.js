@@ -3,10 +3,10 @@ const crypto=require('node:crypto');
 const {id,text,instant,dateOnly,day,fail,row,revision,insert,fact,recordNo,hash,canonical}=require('./common');
 const {assertCandidateSchedule}=require('./chain-reception-rules');
 const {ChainAuth}=require('./chain-auth');
-const {ChainReceptionTrial}=require('./chain-reception-trial');
+const {ChainReception}=require('./chain-reception-trial');
 const {mapError}=require('./unit-of-work');
-class ChainSetupTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.reception=app.reception;this.access=new ChainAuth(app.auth);this.chainReception=new ChainReceptionTrial(app);}
+class ChainSetup{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.reception=app.reception;this.access=new ChainAuth(app.auth);this.chainReception=new ChainReception(app);}
  options(credentials,branchId){if(credentials.role!=='manager')fail(403,'FORBIDDEN','需要负责人岗位');const branch=id(branchId,'门店');this.db.exec('BEGIN');try{
   const ctx=this.access.authorizeBranch(credentials,'uc15.schedule',branch);ctx.authority={...ctx.authority,branchId:branch};const now=this.auth.now();
   const dentists=this.db.prepare(`SELECT DISTINCT s.id,s.name FROM staff s JOIN branch_staff_role r ON r.staff_id=s.id WHERE r.branch_id=? AND r.role_code='dentist' AND r.valid_from<=? AND (r.valid_until IS NULL OR r.valid_until>?) AND (r.revoked_at IS NULL OR r.revoked_at>?) ORDER BY s.id`).all(branch,now,now,now);
@@ -59,4 +59,5 @@ class ChainSetupTrial{
    this.unit.audit(ctx,'变更','COMMITTED',result,sid,reason);this.db.exec('COMMIT');return {...this.unit.result(this.db.prepare('SELECT * FROM request_submission WHERE id=?').get(sid)),replayed:false};
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}}
 }
-module.exports={ChainSetupTrial};
+class ChainSetupTrial extends ChainSetup{constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('基础资料试验仅允许内存数据库');}}
+module.exports={ChainSetup,ChainSetupTrial};

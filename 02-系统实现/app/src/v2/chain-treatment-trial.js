@@ -10,9 +10,8 @@ const {assessExecution}=require('./quote-rules');
 const {toothFields}=require('./treatment');
 
 // Isolated demonstration; correction appends a new clinical note without changing charges.
-class ChainTreatmentTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.billing=app.billing;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('诊疗试验仅允许内存数据库');}
+class ChainTreatment{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.billing=app.billing;this.access=new ChainAuth(app.auth);}
  correct(credentials,input){
   if(!credentials.csrf)fail(403,'CSRF_INVALID','缺少安全令牌');if(!input||input.commandVersion!==1)fail(422,'COMMAND_VERSION','提交版本无效');
   const branch=id(input.branchId,'门店'),visitId=id(input.visitId,'就诊'),originalId=id(input.originalExecutionId,'原诊疗记录'),key=text(input.requestKey,'提交号',100),permission='uc04.execute',digest=hash(canonical({permission,input}));
@@ -90,4 +89,5 @@ class ChainTreatmentTrial{
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw e;}
  }
 }
-module.exports={ChainTreatmentTrial};
+class ChainTreatmentTrial extends ChainTreatment {constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('诊疗试验仅允许内存数据库');}}
+module.exports={ChainTreatment,ChainTreatmentTrial};

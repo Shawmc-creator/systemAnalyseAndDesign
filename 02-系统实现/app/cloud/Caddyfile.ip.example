@@ -1,0 +1,23 @@
+# Replace 203.0.113.10 with the server's public IPv4 address.
+# Replace REPLACE_WITH_CADDY_HASHED_PASSWORD with the output of caddy hash-password.
+{
+    auto_https disable_redirects
+}
+
+https://203.0.113.10 {
+    tls {
+        issuer acme https://acme-v02.api.letsencrypt.org/directory {
+            profile shortlived
+            disable_http_challenge
+        }
+    }
+
+    basic_auth bcrypt {
+        preview REPLACE_WITH_CADDY_HASHED_PASSWORD
+    }
+
+    reverse_proxy 127.0.0.1:3011 {
+        header_up -Authorization
+        header_down Set-Cookie ^(.*)$ "$1; Secure"
+    }
+}

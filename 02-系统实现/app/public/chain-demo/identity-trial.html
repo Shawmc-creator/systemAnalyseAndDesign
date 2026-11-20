@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>身份关联 · 隔离演示</title><link rel="stylesheet" href="/patient-demo.css"><script defer src="/identity-trial.js"></script></head>
+<body><header><div class="header-inner"><a href="/identity-trial">青禾牙科 <span>身份关联演示</span></a><span class="badge">独立内存 · 虚构数据</span></div></header>
+<main><div class="intro"><div><h1>患者身份与预约</h1><p>先由前台核对并关联虚构身份，再以患者身份体验预约。</p></div></div>
+<div class="warning">本页面使用固定的虚构身份模拟核验，不接入真实身份服务。请勿输入真实患者资料；关闭服务后数据清除。</div>
+<div id="notice" role="status" aria-live="polite" hidden></div>
+<div class="layout"><section class="card"><h2>1 · 前台关联身份</h2><p class="hint">模拟现场核对后，关联患者与虚构身份。</p>
+<form id="staff-login"><label>演示前台账号<input name="username" value="frontdesk" required autocomplete="username"></label><label>演示密码<input name="password" value="Clinic123" type="password" required autocomplete="current-password"></label><button>登录前台</button></form>
+<div id="staff-area" hidden><p id="staff-status" class="hint"></p><label>演示患者<select id="patient-select"><option value="1">虚构患者 1</option><option value="2">虚构患者 2</option></select></label><p class="hint">虚构患者编号与相同编号的演示身份配对。</p><button id="bind" type="button">模拟核验并关联</button> <button id="list" type="button" class="secondary">查看关联</button><div id="bindings"></div></div></section>
+<section class="card"><h2>2 · 患者自助预约</h2><p class="hint">选择已关联的虚构身份，登录后查看自己的预约。</p>
+<form id="patient-login"><label>虚构演示身份<select name="identity"><option value="1">演示身份 1</option><option value="2">演示身份 2</option></select></label><button>模拟核验并登录</button></form>
+<div id="patient-area" hidden><div class="section-title"><h2>预约就诊</h2><button type="button" id="logout" class="secondary">退出患者登录</button></div><form id="booking"><label>门店<select name="branch" required></select></label><label>接诊排班<select name="schedule" required></select></label><label>可预约时间<select name="slot" required></select></label><label>就诊目的<input name="reason" value="口腔检查（虚构示例）" maxlength="100" required></label><button>确认预约</button></form><h2>我的预约</h2><div id="bookings"></div></div></section></div></main></body></html>

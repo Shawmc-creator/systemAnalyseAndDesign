@@ -1,0 +1,4 @@
+'use strict';
+const path=require('node:path'),{openWorkspace}=require('../src/v2/chain-query-workspace'),{createWorkspaceServer}=require('../src/v2/chain-workspace-server');
+const folder=process.argv[2],port=Number(process.argv[3]||3021);if(process.argv.length>4||!folder||!path.isAbsolute(folder)||!Number.isInteger(port)||port<1024||port>65535)throw Error('用法：node scripts/serve-chain-workspace.js <工作副本绝对目录> [本机端口]');
+const workspace=openWorkspace(folder),server=createWorkspaceServer(workspace);server.on('error',error=>{workspace.close();console.error('工作副本启动失败：'+error.message);process.exitCode=1;});server.listen(port,'127.0.0.1',()=>console.log(`本地开发 API：http://127.0.0.1:${port}；仅用于迁移工作副本，不可用于正式业务。`));for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>server.close(()=>{workspace.close();process.exit(0);}));

@@ -8,9 +8,8 @@ const {paymentGate,validateSettlements}=require('./settlement-rules');
 
 // In-memory demonstration only. Records an already verified offline receipt
 // allocated to one existing bill; never initiates payment or refund.
-class ChainCashTrial {
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.billing=app.billing;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('现金登记试验仅允许内存数据库');}
+class ChainCash {
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.billing=app.billing;this.access=new ChainAuth(app.auth);}
  receive(credentials,input){
   if(!credentials.csrf)fail(403,'CSRF_INVALID','缺少安全令牌');
   if(!input||input.commandVersion!==1)fail(422,'INVALID_INPUT','提交版本无效');
@@ -56,4 +55,5 @@ class ChainCashTrial {
   }catch(error){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw error;}
  }
 }
-module.exports={ChainCashTrial};
+class ChainCashTrial extends ChainCash {constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('现金登记试验仅允许内存数据库');}}
+module.exports={ChainCash,ChainCashTrial};

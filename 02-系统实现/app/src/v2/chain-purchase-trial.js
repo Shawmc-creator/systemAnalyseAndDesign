@@ -6,9 +6,8 @@ const {ChainAuth}=require('./chain-auth');
 const {mapError}=require('./unit-of-work');
 
 // Purchase lines use existing same-store batches and locations; no payment.
-class ChainPurchaseTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.purchases=app.purchases;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('采购试验仅允许内存数据库');}
+class ChainPurchase{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.purchases=app.purchases;this.access=new ChainAuth(app.auth);}
  list(credentials,branchId){const branch=id(branchId,'门店');this.db.exec('BEGIN');try{
   const ctx=this.access.authorizeBranch(credentials,credentials.role==='manager'?'uc27.approve':'uc27.draft',branch);ctx.authority={...ctx.authority,branchId:branch};
   const orders=this.db.prepare('SELECT id,branch_id,supplier_id,record_no,status,cancellation_reason,revision FROM purchase_order WHERE branch_id=? ORDER BY id DESC').all(branch).map(p=>({...p,items:this.db.prepare('SELECT id,material_id,ordered_quantity_scaled,unit_price_cents,status,revision FROM purchase_order_item WHERE purchase_order_id=? ORDER BY id').all(p.id),receipts:this.db.prepare('SELECT id,record_no,status,arrived_at,delivery_evidence,revision FROM purchase_receipt WHERE purchase_order_id=? ORDER BY id').all(p.id).map(r=>({...r,items:this.db.prepare('SELECT id,purchase_order_item_id,material_batch_id,stock_location_id,arrived_quantity_scaled,accepted_quantity_scaled,rejected_quantity_scaled,pending_quantity_scaled,inspection_note,revision FROM purchase_receipt_item WHERE purchase_receipt_id=? ORDER BY id').all(r.id)}))}));
@@ -70,4 +69,5 @@ class ChainPurchaseTrial{
    this.unit.audit(ctx,'变更','COMMITTED',result,sid,reason);this.db.exec('COMMIT');return {...this.unit.result(this.db.prepare('SELECT * FROM request_submission WHERE id=?').get(sid)),replayed:false};
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}}
 }
-module.exports={ChainPurchaseTrial};
+class ChainPurchaseTrial extends ChainPurchase{constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw Error('采购试验仅允许内存数据库');}}
+module.exports={ChainPurchase,ChainPurchaseTrial};

@@ -6,9 +6,8 @@ const {clinicalSnapshot,validateClinical,signedIntegrity}=require('./clinical-ga
 const {mapError}=require('./unit-of-work');
 
 // Draft only: no signing, health review, handover or cross-store writing.
-class ChainRecordTrial{
- constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.access=new ChainAuth(app.auth);
-  if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('病历试验仅允许内存数据库');}
+class ChainRecord{
+ constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.access=new ChainAuth(app.auth);}
  scope(ctx,branch,visitId){const visit=row(this.db,'visit',visitId);
   if(visit.branch_id!==branch||visit.dentist_id!==ctx.session.staff_id)fail(403,'VISIT_SCOPE','仅可办理本店本人负责的就诊');
   if(!['接诊中','诊疗结束'].includes(visit.status)||!visit.started_at)fail(409,'VISIT_NOT_ACTIVE','须先开始接诊');
@@ -50,4 +49,5 @@ class ChainRecordTrial{
    this.db.exec('COMMIT');return {...this.unit.result(this.db.prepare('SELECT * FROM request_submission WHERE id=?').get(sid)),replayed:false};
   }catch(e){if(this.db.isTransaction)this.db.exec('ROLLBACK');throw mapError(e);}}
 }
-module.exports={ChainRecordTrial};
+class ChainRecordTrial extends ChainRecord {constructor(app){super(app);if(this.db.prepare('PRAGMA database_list').all().some(d=>!['main','temp'].includes(d.name)||d.file!==''))throw new Error('病历试验仅允许内存数据库');}}
+module.exports={ChainRecord,ChainRecordTrial};
