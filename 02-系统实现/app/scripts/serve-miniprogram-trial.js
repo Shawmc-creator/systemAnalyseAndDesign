@@ -1,7 +1,7 @@
 'use strict';
 
 const {createChainDemo}=require('../src/v2/chain-demo-server');
-const trial=createChainDemo({miniProgramTrial:true,fixedClock:'2026-10-19T03:00:00Z'});
+const trial=createChainDemo({miniProgramTrial:true,fixedClock:'2026-10-19T03:00:00Z',patientClock:()=>new Date()});
 trial.server.on('error',error=>{
   trial.db.close();
   console.error('小程序联调服务启动失败：'+error.message);

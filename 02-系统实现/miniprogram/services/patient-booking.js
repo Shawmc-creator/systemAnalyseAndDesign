@@ -84,11 +84,12 @@ function chinaTime(value) {
 async function getOptions() {
   if (!signedIn) throw new Error('请先登录。');
   if (!connected) {
-    const slots = demo.branches.flatMap(branch => demo.dates.flatMap(date =>
-      demo.availableSlots(branch.id, date.value).map(time => ({
-        id: branch.id + '|' + date.value + '|' + time, branchId: branch.id, date: date.value, time, dentist: branch.dentist
+    const now = Date.now(), dates = demo.bookableDates(now);
+    const slots = demo.branches.flatMap(branch => dates.flatMap(date =>
+      demo.availableSlots(branch.id, date, now).map(time => ({
+        id: branch.id + '|' + date + '|' + time, branchId: branch.id, date, time, dentist: branch.dentist
       }))));
-    return { branches: demo.branches, slots, patientName: demo.patientName, reasons: demo.reasons, now: demo.dates[0].value };
+    return { branches: demo.branches, slots, patientName: demo.patientName, reasons: demo.reasons, now: dates[0] };
   }
   const result = await call('/options');
   const slots = result.schedules.flatMap(schedule => schedule.slots.map(slot => {

@@ -100,3 +100,45 @@ test('小程序门店预约联调仅限本机，且前台可查询新增和取�
  assert.equal((await front()).status,'已取消');
  assert.ok((await options()).find(entry=>entry.id===schedule.id)?.slots.some(entry=>entry.startsAt===slot.startsAt));
 });
+
+test('患者预约跨北京时间月末滚动，保留既有预约并拒绝过去时段',async t=>{
+ let clock=new Date('2026-11-30T15:30:00Z');
+ const demo=createChainDemo({fixedClock:'2026-10-19T03:00:00Z',patientClock:()=>clock});
+ await new Promise((resolve,reject)=>demo.server.once('error',reject).listen(0,'127.0.0.1',resolve));
+ t.after(()=>new Promise(resolve=>demo.server.close(()=>{demo.db.close();resolve();})));
+ const base='http://127.0.0.1:'+demo.server.address().port+'/api/patient-demo';
+ const post=(suffix,data,headers)=>fetch(base+suffix,{method:'POST',
+  headers:{'content-type':'application/json',...headers},body:JSON.stringify(data)});
+ const login=await post('/session',{username:'patient',password:'Patient123'});
+ const {csrf}=await login.json(),headers={cookie:login.headers.get('set-cookie').split(';')[0],'x-patient-csrf':csrf};
+ const options=async()=>{
+  const response=await fetch(base+'/options',{headers});
+  assert.equal(response.status,200);
+  return response.json();
+ };
+ const first=await options();
+ assert.equal(first.now,'2026-11-30T15:30:00Z');
+ assert.ok(first.bookings.some(row=>row.planned_start.startsWith('2026-10')));
+ assert.deepEqual([...new Set(first.schedules.map(row=>row.branch_id))].sort(),[1,2,3]);
+ assert.ok(first.schedules.every(row=>row.slots.every(slot=>slot.startsAt>first.now)));
+ const schedule=first.schedules.find(row=>row.branch_id===1);
+ const made=await post('/appointment',{action:'create',branchId:1,scheduleId:schedule.id,
+  scheduleRevision:schedule.revision,...schedule.slots[0],requestKey:'rolling-create',reason:'口腔检查'},headers);
+ assert.equal(made.status,200,await made.clone().text());
+ const booking=await made.json();
+ assert.match(booking.recordNo,/^A-1201-\d{3}$/);
+ clock=new Date('2026-12-01T16:01:00Z');
+ const next=await options();
+ assert.equal(next.now,'2026-12-01T16:01:00Z');
+ assert.ok(next.schedules.every(row=>row.slots.every(slot=>slot.startsAt>next.now)));
+ assert.ok(next.bookings.some(row=>row.id===booking.id));
+ assert.ok(next.schedules.some(row=>row.starts_at.startsWith('2026-12-08')));
+ const size=()=>demo.db.prepare("SELECT count(*) n FROM patient_demo_calendar_seed").get().n;
+ const count=size();
+ await options();
+ assert.equal(size(),count);
+ const stale=await post('/appointment',{action:'create',branchId:1,scheduleId:schedule.id,
+  scheduleRevision:schedule.revision,...schedule.slots[0],requestKey:'rolling-stale',reason:'口腔检查'},headers);
+ assert.equal(stale.status,422);
+ assert.equal((await stale.json()).code,'PAST_APPOINTMENT');
+});

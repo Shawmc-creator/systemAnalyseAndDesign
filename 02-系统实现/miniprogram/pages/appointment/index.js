@@ -47,7 +47,7 @@ Page({
     this.branchSlots = this.options.slots.filter(slot => slot.branchId === branch.id);
     this.availableDates = [...new Set(this.branchSlots.map(slot => slot.date))].sort();
     const months = [...new Set([this.options.now.slice(0, 7), ...this.availableDates.map(day => day.slice(0, 7))])].sort();
-    const month = (this.availableDates[0] || this.options.now).slice(0, 7);
+    const month = this.options.now.slice(0, 7);
     this.setData({ branchId: branch.id, branchName: branch.name, months, hasAvailability: this.availableDates.length > 0, error: '' });
     this.selectMonth(month);
   },

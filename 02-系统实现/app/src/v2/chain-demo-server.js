@@ -10,7 +10,7 @@ const {installTrialSchema}=require('./chain-schema-trial');
 const {ChainReceptionTrial}=require('./chain-reception-trial');
 const {ChainTransferProposal}=require('./chain-transfer-proposal');
 const {PatientDemoBooking}=require('./patient-demo-booking');
-const {PATIENT_DEMO_ACCOUNT,PATIENT_BOOKING_REASONS,installPatientDemoCalendar}=require('./patient-demo-calendar');
+const {PATIENT_DEMO_ACCOUNT,PATIENT_BOOKING_REASONS,installPatientDemoCalendar,createRollingPatientCalendar,bookingHorizonMilliseconds,slotMilliseconds}=require('./patient-demo-calendar');
 const {MiniProgramDemoLogin,validateWechatDemoConfig}=require('./mini-program-demo-login');
 const {ensurePatientIdentityTrial}=require('./patient-identity-schema-trial');
 const {PatientVerifiedIdentity}=require('./patient-verified-identity');
@@ -48,12 +48,13 @@ const {ChainPrescriptionTrial}=require('./chain-prescription-trial');
 const {ChainDocumentsTrial}=require('./chain-documents-trial');
 const {MAX_FILE_BYTES}=require('./document-store');
 const {ChainDemoSnapshot}=require('./chain-demo-snapshot');
-const {insert,fact,day,fail,hash}=require('./common');
+const {insert,fact,day,fail,hash,utc}=require('./common');
 const {encodePassword,checkPassword}=require('./auth');
 
-const CHAIN_DEMO_BUILD='20261124-02';
-function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,identityTrialConfig=null,publicOrigin=null,miniProgramTrial=false,wechatDemoConfig=null}={}){
+const CHAIN_DEMO_BUILD='20261124-03';
+function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,patientClock=null,identityTrialConfig=null,publicOrigin=null,miniProgramTrial=false,wechatDemoConfig=null}={}){
  if(runtimeClock!==null&&typeof runtimeClock!=='function')throw new Error('运行时钟必须是函数');
+ if(patientClock!==null&&typeof patientClock!=='function')throw new Error('患者预约时钟必须是函数');
  if(identityTrialConfig&&(snapshotPath||runtimeClock))throw new Error('身份试验只允许独立内存演示');
  if(miniProgramTrial&&(snapshotPath||runtimeClock||publicOrigin||identityTrialConfig))throw new Error('小程序联调只允许本机隔离内存演示');
  if(wechatDemoConfig&&(miniProgramTrial||runtimeClock||identityTrialConfig))throw new Error('微信体验入口只允许固定日期虚构演示');
@@ -188,15 +189,18 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
  const documentsTrial=new ChainDocumentsTrial(app);
  const transferProposal=new ChainTransferProposal(app);
  const dayClose=new ChainDayCloseTrial(app);
- const patientBooking=new PatientDemoBooking(app,reception);
+ const patientNow=()=>patientClock?utc(patientClock()):app.auth.now();
+ const patientBooking=new PatientDemoBooking(app,reception,patientNow);
+ const rollPatientCalendar=patientClock||runtimeClock?createRollingPatientCalendar(db,patientBooking):null;
  // Prepare the candidate relation on the isolated demonstration snapshot.
  // It does not configure an identity provider or enable identity endpoints.
  let wechatDemo;
  try{
   const calendarChanged=installPatientDemoCalendar(db,demoNow,patientBooking);
+  const rollingChanged=rollPatientCalendar?.(patientNow());
   const identityChanged=ensurePatientIdentityTrial(db);
   wechatDemo=wechatConfig?new MiniProgramDemoLogin(app,wechatConfig,patientBooking):null;
-  if((calendarChanged||identityChanged||wechatDemo)&&store)store.save(db);
+  if((calendarChanged||rollingChanged||identityChanged||wechatDemo)&&store)store.save(db);
  }
  catch(error){if(store)store.close();db.close();throw error;}
  let identitySessions=null;
@@ -282,11 +286,13 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
      return readOnlyJson(res,200,{ok:true},{'Set-Cookie':'chain_patient_demo=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'+(publicOrigin?'; Secure':'')});
     }
     if(req.method==='GET'&&url.pathname.endsWith('/options')){
+     const current=patientNow(),calendarChanged=rollPatientCalendar?.(current);
+     const windowEnd=Date.parse(current)+bookingHorizonMilliseconds;
      const branches=db.prepare("SELECT id,name FROM clinic_branch WHERE status='active' ORDER BY id").all();
      const schedules=db.prepare(`SELECT s.id,s.revision,s.branch_id,s.dentist_id,s.starts_at,s.ends_at,d.name dentist_name,c.name chair_name
       FROM dated_schedule s JOIN clinic_branch b ON b.id=s.branch_id JOIN staff d ON d.id=s.dentist_id JOIN dental_chair c ON c.id=s.dental_chair_id
-      WHERE b.status='active' AND s.status='已确认' AND s.ends_at>? ORDER BY s.starts_at LIMIT 100`).all(app.auth.now());
-     db.exec('BEGIN');try{const now=Date.parse(app.auth.now());for(const s of schedules){s.slots=[];const end=Math.min(Date.parse(s.ends_at),now+14*86400000);for(let t=Math.ceil(Math.max(Date.parse(s.starts_at),now+1000)/1800000)*1800000;t+1800000<=end&&s.slots.length<48;t+=1800000){const start=new Date(t).toISOString().replace('.000Z','Z'),finish=new Date(t+1800000).toISOString().replace('.000Z','Z');try{app.reception.checkSchedule(s.id,s.revision,start,finish);assertCandidateReservation(db,{branchId:s.branch_id,patientId:session.patientId,scheduleId:s.id,startsAt:start,endsAt:finish});reception.ensureDentist(s,s.branch_id,start,finish);s.slots.push({startsAt:start,endsAt:finish});}catch(e){if(!e.status||e.status>=500)throw e;}}}db.exec('COMMIT');}catch(e){if(db.isTransaction)db.exec('ROLLBACK');throw e;}
+      WHERE b.status='active' AND s.status='已确认' AND s.ends_at>? AND s.starts_at<? ORDER BY s.starts_at LIMIT 100`).all(current,utc(windowEnd));
+     db.exec('BEGIN');try{const now=Date.parse(current);for(const s of schedules){s.slots=[];const end=Math.min(Date.parse(s.ends_at),windowEnd);for(let t=Math.ceil(Math.max(Date.parse(s.starts_at),now+1000)/slotMilliseconds)*slotMilliseconds;t+slotMilliseconds<=end&&s.slots.length<48;t+=slotMilliseconds){const start=utc(t),finish=utc(t+slotMilliseconds);try{app.reception.checkSchedule(s.id,s.revision,start,finish);assertCandidateReservation(db,{branchId:s.branch_id,patientId:session.patientId,scheduleId:s.id,startsAt:start,endsAt:finish});reception.ensureDentist(s,s.branch_id,start,finish);s.slots.push({startsAt:start,endsAt:finish});}catch(e){if(!e.status||e.status>=500)throw e;}}}db.exec('COMMIT');}catch(e){if(db.isTransaction)db.exec('ROLLBACK');throw e;}
      const patient=db.prepare('SELECT name FROM patient WHERE id=?').get(session.patientId);
      const bookings=db.prepare(`SELECT a.id,a.record_no,a.branch_id,a.planned_start,a.planned_end,a.status,a.revision,a.reason,
       b.name branch_name,p.name patient_name,d.name dentist_name
@@ -294,8 +300,8 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
       LEFT JOIN resource_occupancy o ON o.id=(SELECT id FROM resource_occupancy WHERE appointment_id=a.id ORDER BY id DESC LIMIT 1)
       LEFT JOIN dated_schedule s ON s.id=o.dated_schedule_id LEFT JOIN staff d ON d.id=s.dentist_id
       WHERE a.patient_id=? ORDER BY a.planned_start DESC`).all(session.patientId);
-     return readOnlyJson(res,200,{patientName:patient.name,reasons:PATIENT_BOOKING_REASONS,branches,
-      schedules:schedules.filter(s=>s.slots.length),bookings,now:app.auth.now(),...(browserPatient?{csrf:session.csrf}:{})});
+     return (calendarChanged&&store?json:readOnlyJson)(res,200,{patientName:patient.name,reasons:PATIENT_BOOKING_REASONS,branches,
+      schedules:schedules.filter(s=>s.slots.length),bookings,now:current,...(browserPatient?{csrf:session.csrf}:{})});
     }
     if(req.method==='POST'&&url.pathname.endsWith('/appointment')){
      const input=await body(req);

@@ -5,20 +5,22 @@ const booked = '已预约';
 const cancelled = '已取消';
 const branches = [
   { id: 'a', name: '一店（演示）', detail: '上午可约', dentist: '许医生（演示）' },
-  { id: 'b', name: '二店（演示）', detail: '上午、下午可约', dentist: '林医生' },
+  { id: 'b', name: '二店（演示）', detail: '上午、下午可约', dentist: '高医生（演示）' },
   { id: 'c', name: '三店（演示）', detail: '下午可约', dentist: '许医生（演示）' }
-];
-const dates = [
-  { value: '2026-10-20', label: '10月20日', weekday: '周二' },
-  { value: '2026-10-21', label: '10月21日', weekday: '周三' },
-  { value: '2026-10-22', label: '10月22日', weekday: '周四' }
 ];
 const reasons = ['口腔检查', '洁牙咨询', '复诊咨询', '牙痛检查', '正畸咨询', '修复咨询'];
 const times = {
-  a: [['09:00', '09:30', '10:00', '10:30'], ['10:00', '11:00'], []],
-  b: [['10:00', '10:30', '14:00', '14:30'], ['09:30', '11:00', '14:30'], ['10:30', '14:00']],
-  c: [['14:30', '15:00', '15:30'], [], ['14:00', '15:00', '16:00']]
+  a: ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30'],
+  b: ['09:30', '10:00', '10:30', '11:00', '14:00', '14:30', '15:00', '16:00'],
+  c: ['14:00', '14:30', '15:00', '15:30', '16:00', '16:30']
 };
+const dayMilliseconds = 86400000;
+
+function bookableDates(now = Date.now()) {
+  const shanghai = now + 8 * 3600000;
+  return Array.from({ length: 7 }, (_, index) =>
+    new Date(shanghai + index * dayMilliseconds).toISOString().slice(0, 10));
+}
 
 function initialBookings() {
   return [
@@ -38,12 +40,11 @@ function readBookings() {
   });
 }
 
-function availableSlots(branchId, date) {
-  const index = dates.findIndex(entry => entry.value === date);
-  if (index < 0 || !branches.some(branch => branch.id === branchId)) return [];
-  const scheduled = times[branchId][index];
+function availableSlots(branchId, date, now = Date.now()) {
+  if (!branches.some(branch => branch.id === branchId) || !bookableDates(now).includes(date)) return [];
   const occupied = readBookings().filter(record => record.status === booked && record.date === date);
-  return scheduled.filter(time => !occupied.some(record => record.time === time));
+  return times[branchId].filter(time =>
+    Date.parse(date + 'T' + time + ':00+08:00') > now && !occupied.some(record => record.time === time));
 }
 
 function listBookings() {
@@ -80,4 +81,4 @@ function cancelBooking(id) {
   wx.setStorageSync(storageKey, records);
 }
 
-module.exports = { patientName, branches, dates, reasons, availableSlots, listBookings, createBooking, cancelBooking };
+module.exports = { patientName, branches, bookableDates, reasons, availableSlots, listBookings, createBooking, cancelBooking };

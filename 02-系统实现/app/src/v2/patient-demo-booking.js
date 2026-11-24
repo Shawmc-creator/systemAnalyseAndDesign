@@ -4,11 +4,11 @@
 const {fail,id,instant,text,insert,fact,hash,canonical,revision,day}=require('./common');
 const {assertCandidateReservation}=require('./chain-reception-rules');
 const {chainAppointmentNumber}=require('./chain-appointment-number');
-const {PATIENT_BOOKING_REASONS,slotMilliseconds}=require('./patient-demo-calendar');
+const {PATIENT_BOOKING_REASONS,slotMilliseconds,bookingHorizonMilliseconds}=require('./patient-demo-calendar');
 class PatientDemoBooking {
- constructor(app,reception){this.app=app;this.db=app.db;this.reception=reception;this.db.exec(`CREATE TABLE IF NOT EXISTS patient_demo_receipt(patient_id INTEGER NOT NULL,request_key TEXT NOT NULL,digest TEXT NOT NULL,result TEXT NOT NULL,PRIMARY KEY(patient_id,request_key)) STRICT`);}
+ constructor(app,reception,now=()=>app.auth.now()){this.app=app;this.now=now;this.db=app.db;this.reception=reception;this.db.exec(`CREATE TABLE IF NOT EXISTS patient_demo_receipt(patient_id INTEGER NOT NULL,request_key TEXT NOT NULL,digest TEXT NOT NULL,result TEXT NOT NULL,PRIMARY KEY(patient_id,request_key)) STRICT`);}
  actor(now){let actor=this.db.prepare("SELECT id FROM staff WHERE record_no='PATIENT-DEMO-SYSTEM-ACTOR'").get();if(!actor){const key=insert(this.db,'staff',fact(now,{name:'患者自助演示系统',employed_from:day(now),employed_until:null,created_by:null,record_no:'PATIENT-DEMO-SYSTEM-ACTOR'}));actor={id:key};}return actor.id;}
- command(patientId,input){const db=this.db,branch=id(input.branchId,'门店'),key=text(input.requestKey,'提交号',100),digest=hash(canonical(input)),now=this.app.auth.now();db.exec('BEGIN IMMEDIATE');try{
+ command(patientId,input){const db=this.db,branch=id(input.branchId,'门店'),key=text(input.requestKey,'提交号',100),digest=hash(canonical(input)),now=this.now();db.exec('BEGIN IMMEDIATE');try{
  const previous=db.prepare('SELECT digest,result FROM patient_demo_receipt WHERE patient_id=? AND request_key=?').get(patientId,key);
  if(previous){if(previous.digest!==digest)fail(409,'REQUEST_KEY_REUSED','提交号已用于其他操作');db.exec('COMMIT');return {...JSON.parse(previous.result),replayed:true};}
  const actor=this.actor(now),ctx={session:{staff_id:actor}},patient=db.prepare('SELECT id FROM patient WHERE id=?').get(patientId);if(!patient)fail(404,'PATIENT_MISSING','演示患者不存在');
@@ -17,7 +17,7 @@ class PatientDemoBooking {
   const reason=input.reason;
   if(!PATIENT_BOOKING_REASONS.includes(reason))fail(422,'INVALID_BOOKING_REASON','请选择就诊目的');
   const start=instant(input.startsAt,'预约开始'),end=instant(input.endsAt,'预约结束');if(start<=now)fail(422,'PAST_APPOINTMENT','预约开始必须晚于当前时间');
-  if(Date.parse(start)%slotMilliseconds||Date.parse(end)-Date.parse(start)!==slotMilliseconds||Date.parse(end)>Date.parse(now)+14*86400000)
+  if(Date.parse(start)%slotMilliseconds||Date.parse(end)-Date.parse(start)!==slotMilliseconds||Date.parse(end)>Date.parse(now)+bookingHorizonMilliseconds)
    fail(422,'INVALID_BOOKING_SLOT','请选择日历中提供的 30 分钟时段');
   const schedule=this.app.reception.checkSchedule(input.scheduleId,input.scheduleRevision,start,end);
   assertCandidateReservation(db,{branchId:branch,patientId,scheduleId:schedule.id,startsAt:start,endsAt:end});this.reception.ensureDentist(schedule,branch,start,end);

@@ -42,7 +42,7 @@ function choice(label,active,disabled,handler){
 function renderCalendar(){
   const available=[...new Set(slots.map(slot=>slot.date))].sort();
   const months=[...new Set([china(data.now).slice(0,7),...available.map(day=>day.slice(0,7))])].sort();
-  if(!months.includes(month)) month=(available[0]||china(data.now)).slice(0,7);
+  if(!months.includes(month)) month=china(data.now).slice(0,7);
   const index=months.indexOf(month), calendar=bookingDays(month,available);
   previous.disabled=index===0;
   next.disabled=index===months.length-1;
