@@ -51,7 +51,7 @@ const {ChainDemoSnapshot}=require('./chain-demo-snapshot');
 const {insert,fact,day,fail,hash,utc}=require('./common');
 const {encodePassword,checkPassword}=require('./auth');
 
-const CHAIN_DEMO_BUILD='20261124-03';
+const CHAIN_DEMO_BUILD='20261124-04';
 function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,patientClock=null,identityTrialConfig=null,publicOrigin=null,miniProgramTrial=false,wechatDemoConfig=null}={}){
  if(runtimeClock!==null&&typeof runtimeClock!=='function')throw new Error('运行时钟必须是函数');
  if(patientClock!==null&&typeof patientClock!=='function')throw new Error('患者预约时钟必须是函数');

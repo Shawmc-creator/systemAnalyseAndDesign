@@ -21,9 +21,9 @@ body{background:#f5f7fa;color:#263747;font-family:'Microsoft YaHei UI','PingFang
 #work>section.clinical-summary{background:#fff;border:1px solid #e4eaf0;box-shadow:0 2px 10px #233d4d08;border-radius:8px;padding:24px;margin-bottom:20px}.workspace-inactive{display:none!important}#work h2{scroll-margin-top:20px}#work>section h2:not(:first-child){border-top:1px solid #edf1f3;padding-top:24px;margin-top:28px}.chain-main .form-grid{gap:15px}.chain-main button:focus-visible,.chain-main input:focus-visible,.chain-main select:focus-visible,.chain-main textarea:focus-visible{outline:3px solid #93d5d1;outline-offset:2px}
 @media(max-width:800px){.chain-main{padding:12px 16px 35px}.workspace-sidebar{position:static;width:auto;margin:0 0 18px;padding:14px}.workspace-brand{padding-bottom:12px}.workspace-sidebar nav{display:flex;gap:5px;overflow-x:auto}.workspace-sidebar nav button{white-space:nowrap;width:auto}.workspace-nav-label,.workspace-nav-group,.workspace-sidebar-foot{display:none}#work>.filters{flex-wrap:wrap}.workspace-heading p{display:none}}
 .chain-main:has(#work[hidden]) {
-  max-width: 490px;
-  margin: clamp(40px, 12vh, 120px) auto;
-  padding: 0 20px;
+  max-width: 1088px;
+  margin: clamp(28px, 7vh, 72px) auto;
+  padding: 0 clamp(16px, 4vw, 36px);
 }
 .chain-main:has(#work[hidden]) .home-welcome { padding: 0 0 18px; }
 #login { padding: 26px; background: white; border: 1px solid var(--line); border-radius: 10px; }
@@ -33,7 +33,7 @@ body{background:#f5f7fa;color:#263747;font-family:'Microsoft YaHei UI','PingFang
 #login-form .form-grid input { position: static; margin: 0; flex: none; }
 #login-form > p { margin: 22px 0 0; }
 #login .primary { width: 100%; }
-.login-help { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 12px; font-size: 13px; }
+.login-help { font-size: 14px; }
 .login-help summary, .entry-drawer summary { cursor: pointer; }
 .workspace-shortcuts { border-bottom: 1px solid #cfdde2; gap: 0; }
 .workspace-shortcuts button { border-radius: 0; border-bottom: 3px solid transparent; font-size: 14px; padding: 10px 13px; }
@@ -130,7 +130,40 @@ body{background:#f5f7fa;color:#263747;font-family:'Microsoft YaHei UI','PingFang
 .demo-credentials button { min-height:30px; padding:4px 8px; font-size:12px; }
 #copy-feedback { min-height:1.3em; margin:8px 0 0; color:#146d70; }
 .patient-entrance-link { display:inline-block; padding:10px 16px; border-radius:5px; background:#166e72; color:white; text-decoration:none; }
-body:has(#work:not([hidden])) #patient-entrance, body:has(#work:not([hidden])) #branch-demo-accounts { display:none; }
+.chain-main:has(#work:not([hidden])) > .login-portal { display:none; }
 .form-grid > *, .home-columns > *, .workspace-heading > * { min-width:0; }
 .clinical-summary, .workspace-content { min-width:0; overflow-wrap:anywhere; }
 @media(max-width:480px){.demo-credentials > div{grid-template-columns:minmax(0,65px) minmax(0,1fr) auto;gap:5px}.demo-credentials code{overflow-wrap:anywhere}.demo-credentials button{padding:4px 5px}}
+
+.login-portal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.22fr);
+  grid-template-areas: "staff demo" "patient demo" "branches branches";
+  gap: 16px;
+  align-items: start;
+}
+.login-portal > .clinical-summary { margin: 0; padding: clamp(18px, 3vw, 30px); }
+.login-portal #login { grid-area: staff; }
+.login-portal .login-help { grid-area: demo; }
+.login-portal #branch-demo-accounts { grid-area: branches; }
+.login-portal #patient-entrance {
+  grid-area: patient;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  background: #e7f2ee;
+  border-color: #d6e5e0;
+}
+.login-portal h2 { margin: 0 0 6px; }
+.login-portal #patient-entrance p { margin: 0; color: #345851; }
+.login-portal .login-help summary { margin-bottom: 8px; font-size: 17px; font-weight: 650; }
+.login-portal #login-form input { width: 100%; min-height: 44px; font-size: 16px; }
+.login-portal #login-form .primary { min-height: 44px; }
+.login-portal .patient-entrance-link { min-height: 44px; }
+.login-portal .patient-entrance-link:focus-visible { outline: 3px solid #187d81; outline-offset: 2px; }
+.login-portal .demo-credentials button { min-height: 36px; }
+.login-portal #branch-copy-feedback:empty, .login-portal #copy-feedback:empty { display: none; }
+@media (max-width: 800px) {
+  .chain-main:has(#work[hidden]) { max-width: 540px; }
+  .login-portal { grid-template-columns: minmax(0, 1fr); grid-template-areas: "staff" "patient" "demo" "branches"; }
+}

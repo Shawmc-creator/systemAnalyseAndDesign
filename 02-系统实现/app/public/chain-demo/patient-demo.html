@@ -4,14 +4,34 @@
 <script src="/booking-calendar.js" defer></script><script src="/patient-demo.js" defer></script></head>
 <body><header><div class="header-inner"><a href="/">青禾牙科 <span>连锁演示</span></a><a href="/">工作人员入口</a></div></header>
 <main>
-<div class="intro"><div><h1>预约就诊</h1><p>选择空闲日期、时间和医生，在线管理您的预约。</p></div><span class="badge">课程演示</span></div>
-<p class="warning">请使用演示账号体验虚构预约，请勿输入真实患者信息。</p>
 <div id="notice" role="status" aria-live="polite" hidden></div>
-<section class="card login-card" id="login-panel"><h2>患者登录</h2><p class="hint">演示账号 <strong>patient</strong>　密码 <strong>Patient123</strong></p>
-<form id="login" method="post"><label>账号<input name="username" required autocomplete="username"></label>
-<label>密码<input name="password" required type="password" autocomplete="current-password"></label>
-<button type="submit">登录</button> <button id="demo-login" class="secondary" type="button">使用演示账号</button></form></section>
+<section class="patient-login" id="login-panel" aria-labelledby="patient-login-title">
+  <div class="patient-login-overview">
+    <span class="badge">课程演示</span>
+    <h1>预约就诊</h1>
+    <p>预订三家演示门店的就诊时段，也可以查询和取消自己的预约。</p>
+    <ol class="booking-steps">
+      <li>选择门店和日期</li>
+      <li>选择时间和医生</li>
+      <li>确认就诊目的</li>
+    </ol>
+    <p class="patient-login-note">请使用虚构信息体验预约。</p>
+  </div>
+  <div class="card login-card">
+    <h2 id="patient-login-title">患者登录</h2>
+    <p class="login-demo-account">演示账号 <code>patient</code><span>密码 <code>Patient123</code></span></p>
+    <form id="login" method="post">
+      <label>账号<input name="username" required autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+      <label>密码<input name="password" required type="password" autocomplete="current-password"></label>
+      <div class="login-actions">
+        <button type="submit">登录</button>
+        <button id="demo-login" class="secondary" type="button">使用演示账号</button>
+      </div>
+    </form>
+  </div>
+</section>
 <div id="workspace" hidden>
+  <div class="intro"><div><h1>预约就诊</h1><p>选择门店、日期、时间和医生，在线管理您的预约。</p></div><span class="badge">课程演示</span></div>
 <div class="account"><div class="account-name"><span>当前患者</span><strong id="patient-name"></strong></div><button class="secondary" id="logout" type="button">退出登录</button></div>
 <div class="layout"><section class="card"><h2>新建预约</h2>
 <form id="booking">

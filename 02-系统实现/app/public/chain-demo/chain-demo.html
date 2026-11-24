@@ -3,9 +3,24 @@
 <body><main class="chain-main">
 <header class="home-welcome"><div><h1>青禾牙科 · 连锁演示</h1><p>虚构数据，仅用于演示；数据保存方式取决于启动方式。演示时间：2026 年 10 月 19 日 09:35。</p></div></header>
 <div id="notice" class="notice" role="status" hidden></div>
-<section id="login" class="clinical-summary"><h2>工作人员登录</h2><form id="login-form"><div class="form-grid"><label>账号<input name="username" required autocomplete="username"></label><label>密码<input name="password" type="password" required autocomplete="current-password"></label></div><p><button class="primary">登录</button></p></form><details class="login-help" open><summary>演示账号</summary><div class="demo-credentials"><div><span>前台</span><code>frontdesk</code><button type="button" data-copy="frontdesk">复制账号</button></div><div><span>牙医</span><code>dentist</code><button type="button" data-copy="dentist">复制账号</button></div><div><span>收费人员</span><code>cashier</code><button type="button" data-copy="cashier">复制账号</button></div><div><span>诊所助理</span><code>assistant</code><button type="button" data-copy="assistant">复制账号</button></div><div><span>负责人</span><code>manager</code><button type="button" data-copy="manager">复制账号</button></div><div><span>演示密码</span><code>Clinic123</code><button type="button" data-copy="Clinic123">复制密码</button></div></div><p id="copy-feedback" role="status" aria-live="polite"></p></details></section>
-<section id="branch-demo-accounts" class="clinical-summary"><h2>门店权限示例</h2><p>固定时间演示（3011）可使用以下独立账号，分别仅能操作对应门店。</p><div class="demo-credentials"><div><span>一店前台</span><code>frontdesk1</code><button type="button" data-copy="frontdesk1">复制账号</button></div><div><span>二店前台</span><code>frontdesk2</code><button type="button" data-copy="frontdesk2">复制账号</button></div><div><span>示例密码</span><code>Clinic1234</code><button type="button" data-copy="Clinic1234">复制密码</button></div></div><p id="branch-copy-feedback" role="status" aria-live="polite"></p></section>
-<section id="patient-entrance" class="clinical-summary"><h2>患者自助预约</h2><p>使用虚构患者体验选择门店、预约和取消预约。</p><p><a class="patient-entrance-link" href="/patient-demo">进入患者演示 →</a></p><p class="muted">演示入口无需真实身份验证，请勿填写真实患者信息。</p></section>
+<div class="login-portal">
+  <section id="login" class="clinical-summary">
+    <h2>工作人员登录</h2>
+    <form id="login-form" method="post">
+      <div class="form-grid">
+        <label>账号<input name="username" required autocomplete="username" autocapitalize="none" spellcheck="false"></label>
+        <label>密码<input name="password" type="password" required autocomplete="current-password"></label>
+      </div>
+      <p><button class="primary" type="submit">登录</button></p>
+    </form>
+  </section>
+  <section id="patient-entrance" class="clinical-summary">
+    <div><h2>患者自助预约</h2><p>查看门店余号、提交或取消预约。</p></div>
+    <a class="patient-entrance-link" href="/patient-demo">进入患者预约</a>
+  </section>
+  <details class="clinical-summary login-help" open><summary>演示账号</summary><div class="demo-credentials"><div><span>前台</span><code>frontdesk</code><button type="button" data-copy="frontdesk">复制账号</button></div><div><span>牙医</span><code>dentist</code><button type="button" data-copy="dentist">复制账号</button></div><div><span>收费人员</span><code>cashier</code><button type="button" data-copy="cashier">复制账号</button></div><div><span>诊所助理</span><code>assistant</code><button type="button" data-copy="assistant">复制账号</button></div><div><span>负责人</span><code>manager</code><button type="button" data-copy="manager">复制账号</button></div><div><span>演示密码</span><code>Clinic123</code><button type="button" data-copy="Clinic123">复制密码</button></div></div><p id="copy-feedback" role="status" aria-live="polite"></p></details>
+  <section id="branch-demo-accounts" class="clinical-summary"><h2>门店权限示例</h2><p>固定时间演示（3011）可使用以下独立账号，分别仅能操作对应门店。</p><div class="demo-credentials"><div><span>一店前台</span><code>frontdesk1</code><button type="button" data-copy="frontdesk1">复制账号</button></div><div><span>二店前台</span><code>frontdesk2</code><button type="button" data-copy="frontdesk2">复制账号</button></div><div><span>示例密码</span><code>Clinic1234</code><button type="button" data-copy="Clinic1234">复制密码</button></div></div><p id="branch-copy-feedback" role="status" aria-live="polite"></p></section>
+</div>
 <section id="work" hidden>
  <div class="filters"><label>当前岗位<select id="role"></select></label><label>当前门店<select id="branch"></select></label><button id="switch-account" type="button">切换账号</button></div>
  <p id="user-info" class="muted"></p>
