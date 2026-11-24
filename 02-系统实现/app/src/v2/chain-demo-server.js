@@ -51,7 +51,7 @@ const {ChainDemoSnapshot}=require('./chain-demo-snapshot');
 const {insert,fact,day,fail,hash}=require('./common');
 const {encodePassword,checkPassword}=require('./auth');
 
-const CHAIN_DEMO_BUILD='20261124-01';
+const CHAIN_DEMO_BUILD='20261124-02';
 function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,identityTrialConfig=null,publicOrigin=null,miniProgramTrial=false,wechatDemoConfig=null}={}){
  if(runtimeClock!==null&&typeof runtimeClock!=='function')throw new Error('运行时钟必须是函数');
  if(identityTrialConfig&&(snapshotPath||runtimeClock))throw new Error('身份试验只允许独立内存演示');
@@ -210,10 +210,11 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
  const json=(res,status,value,extra={})=>{if(store&&!persistenceFailed){try{store.save(db);}catch(error){persistenceFailed=true;status=503;value={code:'SNAPSHOT_WRITE_FAILED',message:'演示数据保存失败，服务已停止；请检查磁盘后重新启动并核对操作结果。'};extra={};setImmediate(()=>server.close());}}return readOnlyJson(res,status,value,extra);};
  const body=async(req,limit=65536)=>{let n=0,chunks=[];for await(const c of req){n+=c.length;if(n>limit)fail(413,'TOO_LARGE','请求过大');chunks.push(c);}let value;try{value=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{fail(400,'INVALID_JSON','请输入有效JSON');}if(!value||typeof value!=='object'||Array.isArray(value))fail(400,'INVALID_JSON','请求应为对象');return value;};
  const server=http.createServer(async(req,res)=>{
-  let isWechat=false;
+  let isWechat=false,browserPatient=false;
   try{
    const url=new URL(req.url,'http://127.0.0.1'),origin=req.headers.origin,expected=`http://127.0.0.1:${server.address().port}`;
    isWechat=url.pathname.startsWith('/api/miniprogram/');
+   browserPatient=url.pathname.startsWith('/api/patient-demo/');
    if(persistenceFailed)fail(503,'SNAPSHOT_WRITE_FAILED','演示数据保存失败，请重新启动并核对操作结果');
    if(isWechat&&(!wechatDemo||req.socket.remoteAddress!=='127.0.0.1'||req.headers.host!==wechatConfig.host||
     req.headers['x-forwarded-proto']!=='https'))fail(404,'NOT_FOUND','微信演示入口未启用');
@@ -244,7 +245,7 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
    if(req.method==='POST'&&(url.pathname==='/api/patient-demo/session'||url.pathname==='/api/miniprogram-trial/session')){
     const {username,password}=await body(req);
     if(!isMiniProgram&&(username!==PATIENT_DEMO_ACCOUNT.username||password!==PATIENT_DEMO_ACCOUNT.password))
-     fail(401,'INVALID_CREDENTIALS','患者账号或密码不正确');
+     fail(403,'INVALID_CREDENTIALS','患者账号或密码不正确');
     const token=crypto.randomBytes(32).toString('hex'),csrf=crypto.randomBytes(32).toString('hex');
     for(const [key,entry] of patientDemoSessions)if(entry.expires<Date.now())patientDemoSessions.delete(key);
     if(patientDemoSessions.size>=100)fail(429,'DEMO_BUSY','演示会话过多，请稍后再试');
@@ -257,7 +258,7 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
     if(req.method==='POST'&&url.pathname==='/api/patient-identity/challenge'){await body(req);return json(res,200,identitySessions.challenge());}
     if(req.method==='POST'&&url.pathname==='/api/patient-identity/login'){const login=await identitySessions.login(await body(req));return json(res,200,{csrf:login.csrf,expiresInSeconds:login.expiresInSeconds},{'Set-Cookie':`chain_patient_identity_trial=${login.token}; HttpOnly; SameSite=Strict; Path=/`});}
    }
-   if(isWechat||isMiniProgram||url.pathname.startsWith('/api/patient-demo/')||url.pathname.startsWith('/api/patient-identity/')){
+   if(isWechat||isMiniProgram||browserPatient||url.pathname.startsWith('/api/patient-identity/')){
     const isIdentity=url.pathname.startsWith('/api/patient-identity/'),cookieName=isIdentity?'chain_patient_identity_trial':'chain_patient_demo';
     const token=isWechat||isMiniProgram?(/^Bearer ([0-9a-f]{64})$/.exec(req.headers.authorization||'')?.[1]):
      String(req.headers.cookie||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(cookieName+'='))?.slice(cookieName.length+1);
@@ -265,8 +266,17 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
     if(isWechat){session=wechatDemo.authorize(token);}
     else if(isIdentity){if(req.method==='POST'&&!req.headers['x-patient-csrf'])fail(403,'CSRF_INVALID','缺少安全令牌');session=identitySessions.authorize(token,req.method==='POST'?req.headers['x-patient-csrf']:undefined);
      if(req.method==='POST'&&url.pathname==='/api/patient-identity/logout'){await body(req);identitySessions.logout(token,req.headers['x-patient-csrf']);return json(res,200,{ok:true},{'Set-Cookie':'chain_patient_identity_trial=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'});}
-    }else{session=patientDemoSessions.get(token);if(!session||session.expires<Date.now()||session.isMiniProgram!==isMiniProgram)fail(401,'DEMO_SESSION','请重新进入患者演示');if(!isMiniProgram&&req.method==='POST'&&req.headers['x-patient-csrf']!==session.csrf)fail(403,'CSRF_INVALID','会话已失效，请重新进入');}
-    const browserPatient=url.pathname.startsWith('/api/patient-demo/');
+    }else{
+     session=patientDemoSessions.get(token);
+     const active=Boolean(session&&session.expires>Date.now()&&session.isMiniProgram===isMiniProgram);
+     // Caddy owns the browser's HTTP authentication challenge. A missing app
+     // cookie is an ordinary logged-out state, and must not look like that challenge.
+     if(browserPatient&&req.method==='GET'&&url.pathname==='/api/patient-demo/session'){
+      return readOnlyJson(res,200,{signedIn:active});
+     }
+     if(!active)fail(browserPatient?403:401,'DEMO_SESSION','请登录患者演示账号');
+     if(browserPatient&&req.method==='POST'&&req.headers['x-patient-csrf']!==session.csrf)fail(403,'CSRF_INVALID','会话已失效，请重新进入');
+    }
     if(browserPatient&&req.method==='POST'&&url.pathname==='/api/patient-demo/logout'){
      patientDemoSessions.delete(token);
      return readOnlyJson(res,200,{ok:true},{'Set-Cookie':'chain_patient_demo=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'+(publicOrigin?'; Secure':'')});
@@ -484,7 +494,7 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
   }catch(e){
    const status=e.code==='PATIENT_IDENTITY_UNAVAILABLE'?503:
     e.status&&(e.status<500||isWechat&&e.status===503)?e.status:500;
-   return (isWechat?readOnlyJson:json)(res,status,{code:e.code||'INTERNAL_ERROR',message:e.status?e.message:'演示请求未完成'});
+   return (isWechat||browserPatient?readOnlyJson:json)(res,status,{code:e.code||'INTERNAL_ERROR',message:e.status?e.message:'演示请求未完成'});
   }
  });
  if(store){server.on('close',()=>store.close());server.on('error',()=>store.close());}

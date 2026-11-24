@@ -11,10 +11,18 @@ function show(message,error=false){
   notice.hidden=!message;
 }
 async function api(path,payload){
-  const options=payload?{method:'POST',headers:{'Content-Type':'application/json','X-Patient-CSRF':csrf},body:JSON.stringify(payload)}:{};
-  const response=await fetch('/api/patient-demo/'+path,options), result=await response.json();
+  const options={credentials:'same-origin',headers:{Accept:'application/json'}};
+  if(payload){
+    options.method='POST';
+    Object.assign(options.headers,{'Content-Type':'application/json','X-Patient-CSRF':csrf});
+    options.body=JSON.stringify(payload);
+  }
+  const response=await fetch('/api/patient-demo/'+path,options);
+  if(response.status===401)throw Error('网站访问验证已失效。请刷新页面，用试用访问账号验证后，再登录患者账号。');
+  if(!response.headers.get('content-type')?.includes('application/json'))throw Error('暂时无法连接患者服务，请刷新页面后重试。');
+  const result=await response.json();
   if(!response.ok){
-    if(response.status===401) showLogin();
+    if(result.code==='DEMO_SESSION')showLogin();
     throw Error(result.message||'操作未完成');
   }
   return result;
@@ -184,4 +192,4 @@ form.onsubmit=async event=>{
   }finally{busy=false;updateSubmit();}
 };
 document.querySelector('#refresh').onclick=()=>refresh().catch(error=>show(error.message,true));
-refresh().catch(error=>{if(!/重新进入/.test(error.message))show(error.message,true);});
+api('session').then(({signedIn})=>signedIn?refresh():null).catch(error=>show(error.message,true));
