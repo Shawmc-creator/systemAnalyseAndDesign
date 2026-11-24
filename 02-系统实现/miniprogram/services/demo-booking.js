@@ -1,6 +1,7 @@
 // Fictional, device-local appointments for the course preview.
 const storageKey = 'qinghe-course-appointments-v1';
 const patientName = '陈晨（演示）';
+const patientRecordNo = 'P-0002';
 const booked = '已预约';
 const cancelled = '已取消';
 const branches = [
@@ -81,4 +82,4 @@ function cancelBooking(id) {
   wx.setStorageSync(storageKey, records);
 }
 
-module.exports = { patientName, branches, bookableDates, reasons, availableSlots, listBookings, createBooking, cancelBooking };
+module.exports = { patientName, patientRecordNo, branches, bookableDates, reasons, availableSlots, listBookings, createBooking, cancelBooking };

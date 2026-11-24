@@ -3,7 +3,7 @@ const { bookingDays } = require('../../services/booking-calendar');
 
 Page({
   data: {
-    modeLabel: bookings.modeLabel, online: bookings.online, signedIn: false, patientName: '',
+    modeLabel: bookings.modeLabel, online: bookings.online, signedIn: false, patientName: '', patientRecordNo: '',
     branches: [], slots: [], reasons: [], days: [], months: [], weekdays: '一二三四五六日'.split(''),
     branchId: '', branchName: '', month: '', date: '', time: '', doctors: [], chosenDoctor: '',
     reasonIndex: -1, loading: false, saving: false, error: ''
@@ -32,9 +32,9 @@ Page({
     this.setData({ loading: true, error: '' });
     try {
       this.options = await bookings.getOptions();
-      const { branches, reasons, patientName } = this.options;
+      const { branches, reasons, patientName, patientRecordNo } = this.options;
       const branch = branches.find(item => item.id === this.data.branchId) || branches[0];
-      this.setData({ signedIn: true, branches, reasons, patientName });
+      this.setData({ signedIn: true, branches, reasons, patientName, patientRecordNo });
       if (branch) this.selectBranch(branch);
     } catch (error) {
       this.setData({ branches: [], error: error.message });

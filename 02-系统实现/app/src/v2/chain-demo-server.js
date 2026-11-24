@@ -52,7 +52,7 @@ const {ChainDemoSnapshot}=require('./chain-demo-snapshot');
 const {insert,fact,day,fail,hash,utc}=require('./common');
 const {encodePassword,checkPassword}=require('./auth');
 
-const CHAIN_DEMO_BUILD='20261124-05';
+const CHAIN_DEMO_BUILD='20261124-06';
 function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,patientClock=null,identityTrialConfig=null,publicOrigin=null,miniProgramTrial=false,wechatDemoConfig=null}={}){
  if(runtimeClock!==null&&typeof runtimeClock!=='function')throw new Error('运行时钟必须是函数');
  if(patientClock!==null&&typeof patientClock!=='function')throw new Error('患者预约时钟必须是函数');
@@ -295,14 +295,14 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,pa
       FROM dated_schedule s JOIN clinic_branch b ON b.id=s.branch_id JOIN staff d ON d.id=s.dentist_id JOIN dental_chair c ON c.id=s.dental_chair_id
       WHERE b.status='active' AND s.status='已确认' AND s.ends_at>? AND s.starts_at<? ORDER BY s.starts_at LIMIT 100`).all(current,utc(windowEnd));
      db.exec('BEGIN');try{const now=Date.parse(current);for(const s of schedules){s.slots=[];const end=Math.min(Date.parse(s.ends_at),windowEnd);for(let t=Math.ceil(Math.max(Date.parse(s.starts_at),now+1000)/slotMilliseconds)*slotMilliseconds;t+slotMilliseconds<=end&&s.slots.length<48;t+=slotMilliseconds){const start=utc(t),finish=utc(t+slotMilliseconds);try{app.reception.checkSchedule(s.id,s.revision,start,finish);assertCandidateReservation(db,{branchId:s.branch_id,patientId:session.patientId,scheduleId:s.id,startsAt:start,endsAt:finish});reception.ensureDentist(s,s.branch_id,start,finish);s.slots.push({startsAt:start,endsAt:finish});}catch(e){if(!e.status||e.status>=500)throw e;}}}db.exec('COMMIT');}catch(e){if(db.isTransaction)db.exec('ROLLBACK');throw e;}
-     const patient=db.prepare('SELECT name FROM patient WHERE id=?').get(session.patientId);
+     const patient=db.prepare('SELECT name,record_no FROM patient WHERE id=?').get(session.patientId);
      const bookings=db.prepare(`SELECT a.id,a.record_no,a.branch_id,a.planned_start,a.planned_end,a.status,a.revision,a.reason,
       b.name branch_name,p.name patient_name,d.name dentist_name
       FROM appointment a JOIN clinic_branch b ON b.id=a.branch_id JOIN patient p ON p.id=a.patient_id
       LEFT JOIN resource_occupancy o ON o.id=(SELECT id FROM resource_occupancy WHERE appointment_id=a.id ORDER BY id DESC LIMIT 1)
       LEFT JOIN dated_schedule s ON s.id=o.dated_schedule_id LEFT JOIN staff d ON d.id=s.dentist_id
       WHERE a.patient_id=? ORDER BY a.planned_start DESC`).all(session.patientId);
-     return (calendarChanged&&store?json:readOnlyJson)(res,200,{patientName:patient.name,reasons:PATIENT_BOOKING_REASONS,branches,
+     return (calendarChanged&&store?json:readOnlyJson)(res,200,{patientName:patient.name,patientRecordNo:patient.record_no,reasons:PATIENT_BOOKING_REASONS,branches,
       schedules:schedules.filter(s=>s.slots.length),bookings,now:current,...(browserPatient?{csrf:session.csrf}:{})});
     }
     if(req.method==='POST'&&url.pathname.endsWith('/appointment')){

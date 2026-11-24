@@ -5,6 +5,7 @@
       <text class="page-title">青禾牙科预约</text>
       <text class="help-text">{{modeLabel}}</text>
       <text wx:if="{{patientName}}" class="patient-name">当前患者 · {{patientName}}</text>
+      <text wx:if="{{patientRecordNo}}" class="help-text">患者档案号 {{patientRecordNo}}</text>
     </view>
   </view>
 

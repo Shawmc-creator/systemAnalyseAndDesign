@@ -89,7 +89,8 @@ async function getOptions() {
       demo.availableSlots(branch.id, date, now).map(time => ({
         id: branch.id + '|' + date + '|' + time, branchId: branch.id, date, time, dentist: branch.dentist
       }))));
-    return { branches: demo.branches, slots, patientName: demo.patientName, reasons: demo.reasons, now: dates[0] };
+    return { branches: demo.branches, slots, patientName: demo.patientName, patientRecordNo: demo.patientRecordNo,
+      reasons: demo.reasons, now: dates[0] };
   }
   const result = await call('/options');
   const slots = result.schedules.flatMap(schedule => schedule.slots.map(slot => {
@@ -101,7 +102,8 @@ async function getOptions() {
   }));
   return {
     branches: result.branches.map(branch => ({ ...branch, id: String(branch.id) })),
-    now: chinaTime(result.now).slice(0, 10), patientName: result.patientName, reasons: result.reasons || demo.reasons, slots
+    now: chinaTime(result.now).slice(0, 10), patientName: result.patientName, patientRecordNo: result.patientRecordNo || '',
+    reasons: result.reasons || demo.reasons, slots
   };
 }
 
