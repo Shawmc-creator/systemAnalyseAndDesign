@@ -7,6 +7,7 @@ const base = local ? 'http://127.0.0.1:3027/api/miniprogram-trial' : config.apiO
 const modeLabel = local ? '本机联调 · 预约同步到前台网页' :
   online ? '联网体验 · 预约同步到演示前台' : '课程演示 · 使用虚构门店和预约时段';
 let token = '';
+let signedIn = false;
 let pendingLogin;
 let sequence = 0;
 
@@ -60,6 +61,11 @@ async function getToken() {
   return pendingLogin;
 }
 
+async function signIn() {
+  if (connected) await getToken();
+  signedIn = true;
+}
+
 async function call(path, method = 'GET', data) {
   const current = await getToken();
   try {
@@ -75,19 +81,14 @@ function chinaTime(value) {
   return new Date(Date.parse(value) + 8 * 3600000).toISOString().slice(0, 16);
 }
 
-function dateLabel(value) {
-  const [year, month, day] = value.split('-').map(Number);
-  const weekday = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
-  return { value, label: month + '月' + day + '日', weekday: '周' + '日一二三四五六'[weekday] };
-}
-
 async function getOptions() {
+  if (!signedIn) throw new Error('请先登录。');
   if (!connected) {
     const slots = demo.branches.flatMap(branch => demo.dates.flatMap(date =>
       demo.availableSlots(branch.id, date.value).map(time => ({
-        id: branch.id + '|' + date.value + '|' + time, branchId: branch.id, date: date.value, time
+        id: branch.id + '|' + date.value + '|' + time, branchId: branch.id, date: date.value, time, dentist: branch.dentist
       }))));
-    return { branches: demo.branches, dates: demo.dates, slots };
+    return { branches: demo.branches, slots, patientName: demo.patientName, reasons: demo.reasons, now: demo.dates[0].value };
   }
   const result = await call('/options');
   const slots = result.schedules.flatMap(schedule => schedule.slots.map(slot => {
@@ -97,22 +98,22 @@ async function getOptions() {
       dentist: schedule.dentist_name, scheduleId: schedule.id, scheduleRevision: schedule.revision
     };
   }));
-  const dates = [...new Set(slots.map(slot => slot.date))].sort();
   return {
     branches: result.branches.map(branch => ({ ...branch, id: String(branch.id) })),
-    dates: (dates.length ? dates : [chinaTime(result.now).slice(0, 10)]).map(dateLabel),
-    slots
+    now: chinaTime(result.now).slice(0, 10), patientName: result.patientName, reasons: result.reasons || demo.reasons, slots
   };
 }
 
 async function listBookings() {
+  if (!signedIn) return [];
   if (!connected) return demo.listBookings();
   const { bookings } = await call('/options');
   return bookings.map(item => {
     const [date, time] = chinaTime(item.planned_start).split('T');
     return {
       id: String(item.id), reference: item.record_no, branchId: item.branch_id,
-      branchName: item.branch_name, date, time, status: item.status, revision: item.revision
+      branchName: item.branch_name, patientName: item.patient_name, dentist: item.dentist_name,
+      date, time, status: item.status, revision: item.revision
     };
   });
 }
@@ -122,6 +123,7 @@ function requestKey() {
 }
 
 async function createBooking(slot, reason) {
+  if (!signedIn) throw new Error('请先登录。');
   if (!connected) return demo.createBooking({ ...slot, reason });
   return call('/appointment', 'POST', {
     action: 'create', branchId: slot.branchId, scheduleId: slot.scheduleId,
@@ -130,6 +132,7 @@ async function createBooking(slot, reason) {
 }
 
 async function cancelBooking(record) {
+  if (!signedIn) throw new Error('请先登录。');
   if (!connected) return demo.cancelBooking(record.id);
   return call('/appointment', 'POST', {
     action: 'cancel', branchId: record.branchId, appointmentId: record.id,
@@ -137,4 +140,5 @@ async function cancelBooking(record) {
   });
 }
 
-module.exports = { getOptions, listBookings, createBooking, cancelBooking, modeLabel, reasons: demo.reasons, connected, local };
+module.exports = { getOptions, listBookings, createBooking, cancelBooking, signIn,
+  signedIn: () => signedIn, modeLabel, online, local, connected };

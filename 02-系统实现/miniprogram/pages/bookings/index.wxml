@@ -11,11 +11,11 @@
 
   <view wx:for="{{records}}" wx:key="id" class="record">
     <view class="record-head">
-      <text class="record-title">{{item.branchName}}</text>
+      <text class="record-title">{{item.patientName}} · {{item.branchName}}</text>
       <text class="record-status {{item.status === '已预约' ? 'record-status-active' : ''}}">{{item.status}}</text>
     </view>
     <text class="record-time">{{item.date}} {{item.time}}</text>
-    <text class="help-text">{{item.reason ? item.reason + ' · ' : ''}}{{item.reference || item.id}}</text>
+    <text class="help-text">{{item.reference || item.id}}{{item.dentist ? ' · ' + item.dentist : ''}}</text>
     <button wx:if="{{item.status === '已预约'}}" class="secondary cancel"
       disabled="{{!!cancellingId}}" data-id="{{item.id}}" bindtap="confirmCancellation">取消预约</button>
   </view>

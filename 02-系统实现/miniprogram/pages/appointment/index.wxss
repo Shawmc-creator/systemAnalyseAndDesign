@@ -46,3 +46,13 @@
 .summary, .error { display: block; margin-top: 12rpx; font-size: 26rpx; }
 .error { color: #9b302f; }
 .booking-action .action { margin-top: 18rpx; }
+.patient-name { display: block; margin-top: 8rpx; color: #195a49; font-size: 25rpx; font-weight: 600; }
+.calendar { border: 1rpx solid #dbe8e1; border-radius: 18rpx; background: #fff; padding: 14rpx; }
+.calendar-nav { display: flex; justify-content: space-between; align-items: center; padding: 2rpx 0 12rpx; font-weight: 600; }
+.calendar-nav button { min-width: 68rpx; padding: 7rpx; font-size: 32rpx; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5rpx; text-align: center; }
+.weekdays { color: #415e53; margin-bottom: 8rpx; font-size: 23rpx; }
+.day { min-height: 58rpx; width: 100%; padding: 0; background: #e8f5ee; color: #195a49; line-height: 58rpx; }
+.day[disabled] { background: transparent; color: #72857b; opacity: 1; }
+.day.pill-active { background: #086652; color: #fff; }
+.calendar-note { margin-top: 10rpx; }

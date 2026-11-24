@@ -10,10 +10,12 @@ test('患者自助预约不依赖前台账号并限制本人和门店',()=>{
   const service=new PatientDemoBooking(app,new ChainReceptionTrial(app));
   app.db.prepare("UPDATE user_account SET password_hash='演示中不可登录' WHERE login_name='frontdesk'").run();
   const schedule=app.db.prepare("SELECT * FROM dated_schedule WHERE branch_id=2 AND business_date='2026-10-20'").get();
-  const input={action:'create',branchId:2,scheduleId:schedule.id,scheduleRevision:schedule.revision,startsAt:'2026-10-20T06:00:00Z',endsAt:'2026-10-20T06:30:00Z',reason:'演示检查',requestKey:'test-patient-create'};
+  const input={action:'create',branchId:2,scheduleId:schedule.id,scheduleRevision:schedule.revision,startsAt:'2026-10-20T06:00:00Z',endsAt:'2026-10-20T06:30:00Z',reason:'口腔检查',requestKey:'test-patient-create'};
   const created=service.command(2,input);
   assert.equal(app.db.prepare('SELECT branch_id FROM appointment WHERE id=?').get(created.id).branch_id,2);
+  assert.match(created.recordNo,/^B-1020-\d{3}$/);
   assert.equal(service.command(2,input).replayed,true);
+  assert.throws(()=>service.command(2,{...input,reason:'任意文字',requestKey:'invalid-purpose'}),e=>e.code==='INVALID_BOOKING_REASON');
   assert.throws(()=>service.command(1,{action:'cancel',branchId:2,appointmentId:created.id,expectedRevision:1,reason:'取消',requestKey:'other'}));
   assert.throws(()=>service.command(2,{action:'cancel',branchId:1,appointmentId:created.id,expectedRevision:1,reason:'取消',requestKey:'wrong-branch'}));
   const cancelled=service.command(2,{action:'cancel',branchId:2,appointmentId:created.id,expectedRevision:1,reason:'取消',requestKey:'cancel'});
@@ -49,6 +51,19 @@ test('小程序门店预约联调仅限本机，且前台可查询新增和取�
  const prefix='/api/miniprogram-trial';
  const normal=await start(false);
  assert.equal((await send(normal,prefix+'/session',{})).status,404);
+ const patientURL='/api/patient-demo';
+ assert.equal((await send(normal,patientURL+'/session',{})).status,401);
+ const patientLogin=await send(normal,patientURL+'/session',{username:'patient',password:'Patient123'});
+ assert.equal(patientLogin.status,200);
+ const patientHeaders={cookie:patientLogin.headers.get('set-cookie').split(';')[0]};
+ const calendar=await (await fetch(normal+patientURL+'/options',{headers:patientHeaders})).json();
+ assert.ok(calendar.patientName);
+ assert.deepEqual([...new Set(calendar.schedules.map(row=>row.branch_id))].sort(),[1,2,3]);
+ assert.ok(calendar.schedules.every(row=>row.dentist_name&&row.slots.length));
+ assert.ok(calendar.bookings.length>=3);
+ assert.ok(calendar.bookings.every(row=>row.patient_name===calendar.patientName&&/^[ABC]-\d{4}-\d{3}$/.test(row.record_no)));
+ assert.equal((await send(normal,patientURL+'/logout',{}, {...patientHeaders,'x-patient-csrf':calendar.csrf})).status,200);
+ assert.equal((await fetch(normal+patientURL+'/options',{headers:patientHeaders})).status,401);
  const base=await start(true);
  assert.equal((await send(base,prefix+'/session',{}, {forwarded:'for=203.0.113.5'})).status,404);
  const session=await send(base,prefix+'/session',{});
@@ -61,7 +76,7 @@ test('小程序门店预约联调仅限本机，且前台可查询新增和取�
  const slot=schedule.slots[0];
  const created=await send(base,prefix+'/appointment',{
   action:'create',requestKey:'wx-create',branchId:2,scheduleId:schedule.id,scheduleRevision:schedule.revision,
-  ...slot,reason:'虚构小程序预约'
+  ...slot,reason:'口腔检查'
  },headers);
  assert.equal(created.status,200,await created.clone().text());
  const booking=await created.json();

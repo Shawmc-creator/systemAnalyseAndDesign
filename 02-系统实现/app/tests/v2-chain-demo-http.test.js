@@ -15,7 +15,7 @@ test('隔离连锁API按会话、岗位、门店和提交号提供预约演示',
  assert.equal(login.status,200);const profile=await login.json(),cookie=login.headers.get('set-cookie').split(';')[0];
  const headers={cookie,'x-clinic-role':'frontdesk','x-csrf-token':profile.csrf,'content-type':'application/json'};
  const branches=await fetch(base+'/api/branches',{headers});assert.deepEqual((await branches.json()).items.map(x=>x.id),[1,2,3]);
- const opts=await fetch(base+'/api/reception/options?branchId=2',{headers});const data=await opts.json();assert.equal(data.schedules.length,2);
+ const opts=await fetch(base+'/api/reception/options?branchId=2',{headers});const data=await opts.json();assert.ok(data.schedules.length>=2);
  const s=data.schedules.find(x=>x.business_date==='2026-10-20'),start=new Date(Date.parse(s.starts_at)+2*3600000).toISOString().replace('.000Z','Z'),end=new Date(Date.parse(start)+1800000).toISOString().replace('.000Z','Z');
  const input={action:'create',branchId:2,patientId:data.patients[1].id,scheduleId:s.id,scheduleRevision:s.revision,startsAt:start,endsAt:end,reason:'演示预约',requestKey:'http-demo-1',commandVersion:1};
  const send=(value,h=headers)=>fetch(base+'/api/reception',{method:'POST',headers:h,body:JSON.stringify(value)});

@@ -49,11 +49,11 @@ test('各岗位样例重启后保留，重复导入不会新增重复单据',asy
   const page=await fetch(base+'/');
   assert.equal(page.status,200);
   assert.match(await page.text(),/chain-demo\.js/);
-  const session=await fetch(base+'/api/patient-demo/session',{method:'POST',headers:{'content-type':'application/json'},body:'{}'});
+  const session=await fetch(base+'/api/patient-demo/session',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({username:'patient',password:'Patient123'})});
   const cookie=session.headers.get('set-cookie').split(';')[0],data=await session.json();
   const options=await (await fetch(base+'/api/patient-demo/options',{headers:{cookie}})).json();
   const schedule=options.schedules.find(s=>s.branch_id===2&&s.slots.length);assert.ok(schedule,'二店应该有患者可选择的时段');
-  const slot=schedule.slots[0],req={action:'create',branchId:2,scheduleId:schedule.id,scheduleRevision:schedule.revision,...slot,reason:'虚构预约',requestKey:'fixture-patient-book'};
+  const slot=schedule.slots[0],req={action:'create',branchId:2,scheduleId:schedule.id,scheduleRevision:schedule.revision,...slot,reason:'口腔检查',requestKey:'fixture-patient-book'};
   const createdResponse=await fetch(base+'/api/patient-demo/appointment',{method:'POST',headers:{cookie,'content-type':'application/json','x-patient-csrf':data.csrf},body:JSON.stringify(req)});assert.equal(createdResponse.status,200,await createdResponse.clone().text());const created=await createdResponse.json();
   const occupied=await (await fetch(base+'/api/patient-demo/options',{headers:{cookie}})).json();
   assert.ok(!occupied.schedules.find(s=>s.id===schedule.id)?.slots.some(s=>s.startsAt===slot.startsAt));

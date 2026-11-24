@@ -1,4 +1,5 @@
 'use strict';
+const {chainAppointmentNumber}=require('./chain-appointment-number');
 const crypto=require('node:crypto');
 const {fail,id,instant,text,insert,fact,recordNo,hash,canonical,row,revision,day}=require('./common');
 const {assertCandidateReservation}=require('./chain-reception-rules');
@@ -65,7 +66,7 @@ class ChainReception {
     const ids=equipmentIds(input.equipmentIds);this.ensureEquipment(ids,branch);
     const keyId=insert(this.db,'appointment',fact(now,{branch_id:branch,patient_id:input.patientId,planned_start:start,planned_end:end,
      reason:text(input.reason,'就诊目的'),due_at:end,arrangement_revision:1,status_reason:null,notified_at:null,
-     created_by:ctx.session.staff_id,notified_by:null,status:'已预约',record_no:recordNo('A')}));
+     created_by:ctx.session.staff_id,notified_by:null,status:'已预约',record_no:chainAppointmentNumber(this.db,branch,start)}));
     this.reception.occupy(schedule,{start,end},ctx,now,keyId);
     reserveEquipment(this.db,schedule.dental_chair_id,ids,start,end,now,keyId);
     result={kind:'appointment',key:keyId,revision:1};
@@ -140,7 +141,7 @@ class ChainReception {
       change_kind:'取消',operator_id:ctx.session.staff_id,old_schedule_id:occupancy.dated_schedule_id,new_schedule_id:null}));
      const newId=insert(this.db,'appointment',fact(now,{branch_id:targetBranch,patient_id:old.patient_id,planned_start:start,planned_end:end,
       reason:old.reason,due_at:end,arrangement_revision:1,status_reason:null,notified_at:null,created_by:ctx.session.staff_id,
-      notified_by:null,status:'已预约',record_no:recordNo('A')}));
+      notified_by:null,status:'已预约',record_no:chainAppointmentNumber(this.db,targetBranch,start)}));
      this.reception.occupy(schedule,{start,end},ctx,now,newId);
      reserveEquipment(this.db,schedule.dental_chair_id,ids,start,end,now,newId);
      const followupChanges=[];

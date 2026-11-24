@@ -10,6 +10,7 @@ const {installTrialSchema}=require('./chain-schema-trial');
 const {ChainReceptionTrial}=require('./chain-reception-trial');
 const {ChainTransferProposal}=require('./chain-transfer-proposal');
 const {PatientDemoBooking}=require('./patient-demo-booking');
+const {PATIENT_DEMO_ACCOUNT,PATIENT_BOOKING_REASONS,installPatientDemoCalendar}=require('./patient-demo-calendar');
 const {MiniProgramDemoLogin,validateWechatDemoConfig}=require('./mini-program-demo-login');
 const {ensurePatientIdentityTrial}=require('./patient-identity-schema-trial');
 const {PatientVerifiedIdentity}=require('./patient-verified-identity');
@@ -50,7 +51,7 @@ const {ChainDemoSnapshot}=require('./chain-demo-snapshot');
 const {insert,fact,day,fail,hash}=require('./common');
 const {encodePassword,checkPassword}=require('./auth');
 
-const CHAIN_DEMO_BUILD='20261120-02';
+const CHAIN_DEMO_BUILD='20261124-01';
 function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,identityTrialConfig=null,publicOrigin=null,miniProgramTrial=false,wechatDemoConfig=null}={}){
  if(runtimeClock!==null&&typeof runtimeClock!=='function')throw new Error('运行时钟必须是函数');
  if(identityTrialConfig&&(snapshotPath||runtimeClock))throw new Error('身份试验只允许独立内存演示');
@@ -192,9 +193,10 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
  // It does not configure an identity provider or enable identity endpoints.
  let wechatDemo;
  try{
+  const calendarChanged=installPatientDemoCalendar(db,demoNow,patientBooking);
   const identityChanged=ensurePatientIdentityTrial(db);
   wechatDemo=wechatConfig?new MiniProgramDemoLogin(app,wechatConfig,patientBooking):null;
-  if((identityChanged||wechatDemo)&&store)store.save(db);
+  if((calendarChanged||identityChanged||wechatDemo)&&store)store.save(db);
  }
  catch(error){if(store)store.close();db.close();throw error;}
  let identitySessions=null;
@@ -228,7 +230,7 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
     if(!identitySessions)fail(503,'PATIENT_IDENTITY_UNAVAILABLE','患者身份核验尚未配置');
     const [name,type]=identityFiles[url.pathname];res.writeHead(200,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"});return res.end(fs.readFileSync(path.join(__dirname,'../../public/chain-demo',name)));
    }
-   const staticFiles={'/':['chain-demo.html','text/html; charset=utf-8'],'/chain-demo.js':['chain-demo.js','text/javascript; charset=utf-8'],'/chain-demo.css':['chain-demo.css','text/css; charset=utf-8'],'/patient-demo':['patient-demo.html','text/html; charset=utf-8'],'/patient-demo.js':['patient-demo.js','text/javascript; charset=utf-8'],'/patient-demo.css':['patient-demo.css','text/css; charset=utf-8'],'/styles.css':['styles.css','text/css; charset=utf-8']};
+   const staticFiles={'/':['chain-demo.html','text/html; charset=utf-8'],'/chain-demo.js':['chain-demo.js','text/javascript; charset=utf-8'],'/chain-demo.css':['chain-demo.css','text/css; charset=utf-8'],'/patient-demo':['patient-demo.html','text/html; charset=utf-8'],'/patient-demo.js':['patient-demo.js','text/javascript; charset=utf-8'],'/booking-calendar.js':['booking-calendar.js','text/javascript; charset=utf-8'],'/patient-demo.css':['patient-demo.css','text/css; charset=utf-8'],'/styles.css':['styles.css','text/css; charset=utf-8']};
    if(req.method==='GET'&&staticFiles[url.pathname]){
     const [name,type]=staticFiles[url.pathname];const root=name==='styles.css'?path.join(__dirname,'../../public/v2'):path.join(__dirname,'../../public/chain-demo');
     res.writeHead(200,{'Content-Type':type,'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"});return res.end(name==='chain-demo.html'?fs.readFileSync(path.join(root,name),'utf8').replace('数据保存方式取决于启动方式',store?'重新启动后演示数据保留':'关闭服务后数据清除').replace('演示时间：2026 年 10 月 19 日 09:35。',runtimeClock?'演示使用当前系统时间。':fixedClock?'演示时间：2026 年 10 月 19 日 11:00。':'演示时间：2026 年 10 月 19 日 09:35。'):fs.readFileSync(path.join(root,name)));
@@ -240,13 +242,15 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
     return json(res,200,await wechatDemo.login(code));
    }
    if(req.method==='POST'&&(url.pathname==='/api/patient-demo/session'||url.pathname==='/api/miniprogram-trial/session')){
-    await body(req);
+    const {username,password}=await body(req);
+    if(!isMiniProgram&&(username!==PATIENT_DEMO_ACCOUNT.username||password!==PATIENT_DEMO_ACCOUNT.password))
+     fail(401,'INVALID_CREDENTIALS','患者账号或密码不正确');
     const token=crypto.randomBytes(32).toString('hex'),csrf=crypto.randomBytes(32).toString('hex');
     for(const [key,entry] of patientDemoSessions)if(entry.expires<Date.now())patientDemoSessions.delete(key);
     if(patientDemoSessions.size>=100)fail(429,'DEMO_BUSY','演示会话过多，请稍后再试');
-    patientDemoSessions.set(token,{csrf,patientId:2,expires:Date.now()+3600000,isMiniProgram});
+    patientDemoSessions.set(token,{csrf,patientId:PATIENT_DEMO_ACCOUNT.patientId,expires:Date.now()+3600000,isMiniProgram});
     if(isMiniProgram)return json(res,200,{token,expiresInSeconds:3600});
-    return json(res,200,{csrf},{'Set-Cookie':`chain_patient_demo=${token}; HttpOnly; SameSite=Strict; Path=/`});
+    return readOnlyJson(res,200,{csrf},{'Set-Cookie':`chain_patient_demo=${token}; HttpOnly; SameSite=Strict; Path=/${publicOrigin?'; Secure':''}`});
    }
    if(url.pathname.startsWith('/api/patient-identity/')){
     if(!identitySessions)fail(503,'PATIENT_IDENTITY_UNAVAILABLE','患者身份核验尚未配置');
@@ -262,15 +266,26 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
     else if(isIdentity){if(req.method==='POST'&&!req.headers['x-patient-csrf'])fail(403,'CSRF_INVALID','缺少安全令牌');session=identitySessions.authorize(token,req.method==='POST'?req.headers['x-patient-csrf']:undefined);
      if(req.method==='POST'&&url.pathname==='/api/patient-identity/logout'){await body(req);identitySessions.logout(token,req.headers['x-patient-csrf']);return json(res,200,{ok:true},{'Set-Cookie':'chain_patient_identity_trial=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'});}
     }else{session=patientDemoSessions.get(token);if(!session||session.expires<Date.now()||session.isMiniProgram!==isMiniProgram)fail(401,'DEMO_SESSION','请重新进入患者演示');if(!isMiniProgram&&req.method==='POST'&&req.headers['x-patient-csrf']!==session.csrf)fail(403,'CSRF_INVALID','会话已失效，请重新进入');}
+    const browserPatient=url.pathname.startsWith('/api/patient-demo/');
+    if(browserPatient&&req.method==='POST'&&url.pathname==='/api/patient-demo/logout'){
+     patientDemoSessions.delete(token);
+     return readOnlyJson(res,200,{ok:true},{'Set-Cookie':'chain_patient_demo=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'+(publicOrigin?'; Secure':'')});
+    }
     if(req.method==='GET'&&url.pathname.endsWith('/options')){
      const branches=db.prepare("SELECT id,name FROM clinic_branch WHERE status='active' ORDER BY id").all();
      const schedules=db.prepare(`SELECT s.id,s.revision,s.branch_id,s.dentist_id,s.starts_at,s.ends_at,d.name dentist_name,c.name chair_name
       FROM dated_schedule s JOIN clinic_branch b ON b.id=s.branch_id JOIN staff d ON d.id=s.dentist_id JOIN dental_chair c ON c.id=s.dental_chair_id
       WHERE b.status='active' AND s.status='已确认' AND s.ends_at>? ORDER BY s.starts_at LIMIT 100`).all(app.auth.now());
      db.exec('BEGIN');try{const now=Date.parse(app.auth.now());for(const s of schedules){s.slots=[];const end=Math.min(Date.parse(s.ends_at),now+14*86400000);for(let t=Math.ceil(Math.max(Date.parse(s.starts_at),now+1000)/1800000)*1800000;t+1800000<=end&&s.slots.length<48;t+=1800000){const start=new Date(t).toISOString().replace('.000Z','Z'),finish=new Date(t+1800000).toISOString().replace('.000Z','Z');try{app.reception.checkSchedule(s.id,s.revision,start,finish);assertCandidateReservation(db,{branchId:s.branch_id,patientId:session.patientId,scheduleId:s.id,startsAt:start,endsAt:finish});reception.ensureDentist(s,s.branch_id,start,finish);s.slots.push({startsAt:start,endsAt:finish});}catch(e){if(!e.status||e.status>=500)throw e;}}}db.exec('COMMIT');}catch(e){if(db.isTransaction)db.exec('ROLLBACK');throw e;}
-     const bookings=db.prepare(`SELECT a.id,a.record_no,a.branch_id,a.planned_start,a.planned_end,a.status,a.revision,b.name branch_name
-      FROM appointment a JOIN clinic_branch b ON b.id=a.branch_id WHERE a.patient_id=? ORDER BY a.planned_start DESC`).all(session.patientId);
-     return (isWechat?readOnlyJson:json)(res,200,{branches,schedules:schedules.filter(s=>s.slots.length),bookings,now:app.auth.now()});
+     const patient=db.prepare('SELECT name FROM patient WHERE id=?').get(session.patientId);
+     const bookings=db.prepare(`SELECT a.id,a.record_no,a.branch_id,a.planned_start,a.planned_end,a.status,a.revision,a.reason,
+      b.name branch_name,p.name patient_name,d.name dentist_name
+      FROM appointment a JOIN clinic_branch b ON b.id=a.branch_id JOIN patient p ON p.id=a.patient_id
+      LEFT JOIN resource_occupancy o ON o.id=(SELECT id FROM resource_occupancy WHERE appointment_id=a.id ORDER BY id DESC LIMIT 1)
+      LEFT JOIN dated_schedule s ON s.id=o.dated_schedule_id LEFT JOIN staff d ON d.id=s.dentist_id
+      WHERE a.patient_id=? ORDER BY a.planned_start DESC`).all(session.patientId);
+     return readOnlyJson(res,200,{patientName:patient.name,reasons:PATIENT_BOOKING_REASONS,branches,
+      schedules:schedules.filter(s=>s.slots.length),bookings,now:app.auth.now(),...(browserPatient?{csrf:session.csrf}:{})});
     }
     if(req.method==='POST'&&url.pathname.endsWith('/appointment')){
      const input=await body(req);
@@ -282,7 +297,6 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,id
       const schedule=db.prepare('SELECT id,branch_id,revision FROM dated_schedule WHERE id=?').get(Number(input.scheduleId));
       if(!schedule||schedule.branch_id!==branchId)fail(409,'SCHEDULE_CHANGED','请选择当前门店排班');
       fields={patientId:session.patientId,scheduleId:schedule.id,scheduleRevision:input.scheduleRevision,startsAt:input.startsAt,endsAt:input.endsAt,reason:String(input.reason||'').trim()};
-      if(!String(input.reason||'').trim())fail(422,'INVALID_INPUT','请填写就诊目的');
      }else{
       const appointment=db.prepare('SELECT id,branch_id,patient_id,revision FROM appointment WHERE id=?').get(Number(input.appointmentId));
       if(!appointment||appointment.patient_id!==session.patientId||appointment.branch_id!==branchId)fail(403,'PATIENT_SCOPE','预约不属于当前演示患者');

@@ -1,18 +1,19 @@
 // Fictional, device-local appointments for the course preview.
 const storageKey = 'qinghe-course-appointments-v1';
+const patientName = '陈晨（演示）';
 const booked = '已预约';
 const cancelled = '已取消';
 const branches = [
-  { id: 'a', name: '一店（演示）', detail: '上午可约' },
-  { id: 'b', name: '二店（演示）', detail: '上午、下午可约' },
-  { id: 'c', name: '三店（演示）', detail: '下午可约' }
+  { id: 'a', name: '一店（演示）', detail: '上午可约', dentist: '许医生（演示）' },
+  { id: 'b', name: '二店（演示）', detail: '上午、下午可约', dentist: '林医生' },
+  { id: 'c', name: '三店（演示）', detail: '下午可约', dentist: '许医生（演示）' }
 ];
 const dates = [
   { value: '2026-10-20', label: '10月20日', weekday: '周二' },
   { value: '2026-10-21', label: '10月21日', weekday: '周三' },
   { value: '2026-10-22', label: '10月22日', weekday: '周四' }
 ];
-const reasons = ['口腔检查', '洁牙咨询', '复诊咨询'];
+const reasons = ['口腔检查', '洁牙咨询', '复诊咨询', '牙痛检查', '正畸咨询', '修复咨询'];
 const times = {
   a: [['09:00', '09:30', '10:00', '10:30'], ['10:00', '11:00'], []],
   b: [['10:00', '10:30', '14:00', '14:30'], ['09:30', '11:00', '14:30'], ['10:30', '14:00']],
@@ -28,7 +29,13 @@ function initialBookings() {
 
 function readBookings() {
   const saved = wx.getStorageSync(storageKey);
-  return Array.isArray(saved) ? saved : initialBookings();
+  const records = Array.isArray(saved) ? saved : initialBookings();
+  const counters = {};
+  return records.map(record => {
+    const prefix = record.branchId.toUpperCase() + '-' + record.date.slice(5).replace('-', '') + '-';
+    counters[prefix] = (counters[prefix] || 0) + 1;
+    return { ...record, reference: prefix + String(counters[prefix]).padStart(3, '0') };
+  });
 }
 
 function availableSlots(branchId, date) {
@@ -41,8 +48,9 @@ function availableSlots(branchId, date) {
 
 function listBookings() {
   return readBookings().map(record => ({
-    ...record,
-    branchName: branches.find(branch => branch.id === record.branchId).name
+    ...record, patientName,
+    branchName: branches.find(branch => branch.id === record.branchId).name,
+    dentist: branches.find(branch => branch.id === record.branchId).dentist
   })).sort((a, b) => {
     const statusOrder = Number(a.status === cancelled) - Number(b.status === cancelled);
     if (statusOrder) return statusOrder;
@@ -72,4 +80,4 @@ function cancelBooking(id) {
   wx.setStorageSync(storageKey, records);
 }
 
-module.exports = { branches, dates, reasons, availableSlots, listBookings, createBooking, cancelBooking };
+module.exports = { patientName, branches, dates, reasons, availableSlots, listBookings, createBooking, cancelBooking };

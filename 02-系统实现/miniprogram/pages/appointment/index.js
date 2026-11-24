@@ -1,63 +1,93 @@
 const bookings = require('../../services/patient-booking');
+const { bookingDays } = require('../../services/booking-calendar');
 
 Page({
   data: {
-    modeLabel: bookings.modeLabel,
-    branches: [], dates: [], slots: [],
-    reasons: bookings.reasons,
-    branchId: '', branchName: '', date: '', selectedSlotId: '', time: '',
-    reasonIndex: 0, loading: false, saving: false, error: ''
+    modeLabel: bookings.modeLabel, online: bookings.online, signedIn: false, patientName: '',
+    branches: [], slots: [], reasons: [], days: [], months: [], weekdays: '一二三四五六日'.split(''),
+    branchId: '', branchName: '', month: '', date: '', time: '', doctors: [], chosenDoctor: '',
+    reasonIndex: -1, loading: false, saving: false, error: ''
   },
 
   onShow() {
-    this.refreshOptions();
+    if (bookings.signedIn()) this.refreshOptions();
+  },
+
+  async login() {
+    if (this.data.loading) return;
+    this.setData({ loading: true, error: '' });
+    try {
+      await bookings.signIn();
+      this.setData({ signedIn: true });
+    } catch (error) {
+      this.setData({ error: error.message });
+    } finally {
+      this.setData({ loading: false });
+    }
+    if (this.data.signedIn) await this.refreshOptions();
   },
 
   async refreshOptions() {
     if (this.data.loading || this.data.saving) return;
-    this.setData({ loading: true, error: '', selectedSlotId: '', time: '' });
+    this.setData({ loading: true, error: '' });
     try {
-      const options = await bookings.getOptions();
-      this.options = options;
-      const preferred = bookings.connected ? '2' : 'b';
-      const branch = options.branches.find(item => item.id === (this.data.branchId || preferred)) || options.branches[0];
-      const date = options.dates.some(item => item.value === this.data.date) ? this.data.date : options.dates[0]?.value;
-      this.setData({ branches: options.branches, dates: options.dates, branchId: branch?.id || '', branchName: branch?.name || '', date: date || '' });
-      this.updateSlots();
+      this.options = await bookings.getOptions();
+      const { branches, reasons, patientName } = this.options;
+      const branch = branches.find(item => item.id === this.data.branchId) || branches[0];
+      this.setData({ signedIn: true, branches, reasons, patientName });
+      if (branch) this.selectBranch(branch);
     } catch (error) {
-      this.options = null;
-      this.setData({ branches: [], dates: [], slots: [], error: error.message });
+      this.setData({ branches: [], error: error.message });
     } finally {
       this.setData({ loading: false });
     }
   },
 
-  updateSlots() {
-    const { branchId, date } = this.data;
-    const slots = (this.options?.slots || []).filter(slot => slot.branchId === branchId && slot.date === date);
-    this.setData({ slots, selectedSlotId: '', time: '' });
+  selectBranch(branch) {
+    this.branchSlots = this.options.slots.filter(slot => slot.branchId === branch.id);
+    this.availableDates = [...new Set(this.branchSlots.map(slot => slot.date))].sort();
+    const months = [...new Set([this.options.now.slice(0, 7), ...this.availableDates.map(day => day.slice(0, 7))])].sort();
+    const month = (this.availableDates[0] || this.options.now).slice(0, 7);
+    this.setData({ branchId: branch.id, branchName: branch.name, months, hasAvailability: this.availableDates.length > 0, error: '' });
+    this.selectMonth(month);
+  },
+
+  selectMonth(month) {
+    const calendar = bookingDays(month, this.availableDates);
+    const index = this.data.months.indexOf(month);
+    this.setData({ month, monthTitle: calendar.title, days: calendar.days, previousMonth: index > 0,
+      nextMonth: index < this.data.months.length - 1, date: '', time: '', slots: [], doctors: [], chosenDoctor: '' });
   },
 
   chooseBranch(event) {
     if (this.data.loading || this.data.saving) return;
     const branch = this.data.branches.find(item => item.id === event.currentTarget.dataset.id);
-    if (!branch || branch.id === this.data.branchId) return;
-    this.setData({ branchId: branch.id, branchName: branch.name, error: '' });
-    this.updateSlots();
+    if (branch && branch.id !== this.data.branchId) this.selectBranch(branch);
+  },
+
+  changeMonth(event) {
+    if (this.data.saving) return;
+    const index = this.data.months.indexOf(this.data.month) + Number(event.currentTarget.dataset.delta);
+    if (this.data.months[index]) this.selectMonth(this.data.months[index]);
   },
 
   chooseDate(event) {
-    if (this.data.loading || this.data.saving) return;
+    if (this.data.saving) return;
     const date = event.currentTarget.dataset.date;
-    if (date === this.data.date) return;
-    this.setData({ date, error: '' });
-    this.updateSlots();
+    if (!this.availableDates.includes(date) || date === this.data.date) return;
+    const slots = [...new Set(this.branchSlots.filter(slot => slot.date === date).map(slot => slot.time))].sort();
+    this.setData({ date, slots, time: '', doctors: [], chosenDoctor: '', error: '' });
   },
 
   chooseTime(event) {
-    if (this.data.loading || this.data.saving) return;
-    const slot = this.data.slots.find(item => item.id === event.currentTarget.dataset.id);
-    if (slot) this.setData({ selectedSlotId: slot.id, time: slot.time, error: '' });
+    if (this.data.saving) return;
+    const time = event.currentTarget.dataset.time;
+    const doctors = this.branchSlots.filter(slot => slot.date === this.data.date && slot.time === time);
+    this.setData({ time, doctors, chosenDoctor: '', error: '' });
+  },
+
+  chooseDoctor(event) {
+    if (!this.data.saving) this.setData({ chosenDoctor: event.currentTarget.dataset.id });
   },
 
   chooseReason(event) {
@@ -66,12 +96,13 @@ Page({
 
   async submitBooking() {
     if (this.data.loading || this.data.saving) return;
-    const slot = this.data.slots.find(item => item.id === this.data.selectedSlotId);
-    if (!slot) return;
+    const slot = this.data.doctors.find(item => item.id === this.data.chosenDoctor);
+    const reason = this.data.reasons[this.data.reasonIndex];
+    if (!slot || !reason) return;
     this.setData({ saving: true, error: '' });
     try {
-      await bookings.createBooking(slot, bookings.reasons[this.data.reasonIndex]);
-      this.setData({ selectedSlotId: '', time: '' });
+      await bookings.createBooking(slot, reason);
+      this.setData({ chosenDoctor: '', time: '' });
       wx.showToast({ title: '预约成功', icon: 'success' });
       wx.switchTab({ url: '/pages/bookings/index' });
     } catch (error) {

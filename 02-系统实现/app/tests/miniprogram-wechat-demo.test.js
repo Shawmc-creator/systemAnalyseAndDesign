@@ -95,7 +95,7 @@ test('微信体验档案分别关联，预约可被前台查询，重启后保�
   const slot=schedule.slots[0];
   const response=await post(prefix+'/appointment',{
     action:'create',branchId:2,scheduleId:schedule.id,scheduleRevision:schedule.revision,
-    ...slot,reason:'虚构预约',requestKey:'wechat-test-book'
+    ...slot,reason:'口腔检查',requestKey:'wechat-test-book'
   },patientHeaders(tokenA));
   assert.equal(response.status,200,await response.clone().text());
   const booked=await response.json();

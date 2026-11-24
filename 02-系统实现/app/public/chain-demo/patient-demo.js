@@ -1,16 +1,187 @@
 'use strict';
-const form=document.querySelector('#booking'),notice=document.querySelector('#notice'),list=document.querySelector('#bookings');
-let csrf='',data={branches:[],schedules:[],bookings:[]};
-const show=(text,error=false)=>{notice.textContent=text;notice.className=error?'error':'';notice.hidden=false;};
-async function api(url,payload){const options=payload?{method:'POST',headers:{'Content-Type':'application/json','X-Patient-CSRF':csrf},body:JSON.stringify(payload)}:{};const response=await fetch(url,options),result=await response.json();if(!response.ok)throw Error(result.message||'操作未完成');return result;}
-function labelTime(value){return new Date(value).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}
-function local(value){return new Date(new Date(value).getTime()+8*3600000).toISOString().slice(0,16);}
-function option(select,value,label){const item=document.createElement('option');item.value=value;item.textContent=label;select.append(item);}
-function renderSchedules(){const select=form.elements.schedule,previous=select.value;select.replaceChildren();const schedules=data.schedules.filter(s=>s.branch_id===Number(form.elements.branch.value));if(!schedules.length)option(select,'','该门店暂无可预约排班');for(const s of schedules)option(select,s.id,labelTime(s.starts_at)+' — '+labelTime(s.ends_at)+' / '+s.dentist_name+' / '+s.chair_name);if(schedules.some(s=>String(s.id)===previous))select.value=previous;setTime();}
-function setTime(){const s=data.schedules.find(x=>x.id===Number(form.elements.schedule.value)),select=form.elements.slot;select.replaceChildren();if(!s){option(select,'','暂无可预约时间');return;}for(const slot of s.slots)option(select,slot.startsAt,labelTime(slot.startsAt)+' — '+labelTime(slot.endsAt));}
-function renderBookings(){list.replaceChildren();if(!data.bookings.length){list.textContent='暂无预约记录，可以从左侧选择排班体验预约。';return;}for(const item of data.bookings){const box=document.createElement('article');box.className='booking-item';const status=document.createElement('span');status.className='status';status.textContent=item.status;const title=document.createElement('strong');title.textContent=item.branch_name+' · '+labelTime(item.planned_start);const detail=document.createElement('small');detail.textContent='预约编号 '+item.record_no+'　结束 '+labelTime(item.planned_end);box.append(status,title,detail);if(item.status==='已预约'){const button=document.createElement('button');button.type='button';button.className='secondary';button.textContent='取消预约';button.onclick=async()=>{if(!confirm('确定取消这条虚构演示预约？'))return;button.disabled=true;try{await api('/api/patient-demo/appointment',{action:'cancel',branchId:item.branch_id,appointmentId:item.id,expectedRevision:item.revision,requestKey:crypto.randomUUID()});await refresh();show('预约已取消。');}catch(e){show(e.message,true);}finally{button.disabled=false;}};box.append(button);}list.append(box);}}
-async function refresh(){data=await api('/api/patient-demo/options');const branch=form.elements.branch,previous=branch.value;branch.replaceChildren();for(const b of data.branches)option(branch,b.id,b.name);if(data.branches.some(b=>String(b.id)===previous))branch.value=previous;else if(data.schedules.some(s=>s.branch_id===2))branch.value='2';renderSchedules();renderBookings();}
-form.elements.branch.onchange=renderSchedules;form.elements.schedule.onchange=setTime;
-form.onsubmit=async event=>{event.preventDefault();const button=event.submitter,s=data.schedules.find(x=>x.id===Number(form.elements.schedule.value)),slot=s?.slots.find(x=>x.startsAt===form.elements.slot.value);if(!slot){show('当前门店暂无可预约时间，请刷新。',true);return;}button.disabled=true;try{await api('/api/patient-demo/appointment',{action:'create',branchId:Number(form.elements.branch.value),scheduleId:s.id,scheduleRevision:s.revision,startsAt:slot.startsAt,endsAt:slot.endsAt,reason:form.elements.reason.value,requestKey:crypto.randomUUID()});await refresh();show('预约已登记，可在右侧查看或取消。');}catch(e){show(e.message,true);await refresh().catch(()=>{});}finally{button.disabled=false;}};
-document.querySelector('#refresh').onclick=()=>refresh().catch(e=>show(e.message,true));
-(async()=>{try{const session=await api('/api/patient-demo/session',{});csrf=session.csrf;await refresh();}catch(e){show(e.message,true);}})();
+const form=document.querySelector('#booking'), notice=document.querySelector('#notice');
+const login=document.querySelector('#login'), field=form.elements, list=document.querySelector('#bookings');
+const days=document.querySelector('#days'), times=document.querySelector('#times'), submit=document.querySelector('#book-submit');
+const previous=document.querySelector('#previous'), next=document.querySelector('#next');
+let csrf='',data,slots=[],month='',date='',time='',busy=false;
+
+function show(message,error=false){
+  notice.textContent=message;
+  notice.className=error?'error':'';
+  notice.hidden=!message;
+}
+async function api(path,payload){
+  const options=payload?{method:'POST',headers:{'Content-Type':'application/json','X-Patient-CSRF':csrf},body:JSON.stringify(payload)}:{};
+  const response=await fetch('/api/patient-demo/'+path,options), result=await response.json();
+  if(!response.ok){
+    if(response.status===401) showLogin();
+    throw Error(result.message||'操作未完成');
+  }
+  return result;
+}
+function china(value){return new Date(Date.parse(value)+8*3600000).toISOString().slice(0,16);}
+function option(select,value,label){select.add(new Option(label,value));}
+function choice(label,active,disabled,handler){
+  const button=document.createElement('button');
+  button.type='button';
+  button.textContent=label;
+  button.className='choice';
+  button.setAttribute('aria-pressed',String(active));
+  button.disabled=disabled;
+  button.onclick=handler;
+  return button;
+}
+function renderCalendar(){
+  const available=[...new Set(slots.map(slot=>slot.date))].sort();
+  const months=[...new Set([china(data.now).slice(0,7),...available.map(day=>day.slice(0,7))])].sort();
+  if(!months.includes(month)) month=(available[0]||china(data.now)).slice(0,7);
+  const index=months.indexOf(month), calendar=bookingDays(month,available);
+  previous.disabled=index===0;
+  next.disabled=index===months.length-1;
+  function changeMonth(delta){
+    month=months[index+delta];
+    date=time='';
+    renderCalendar();
+  }
+  previous.onclick=()=>changeMonth(-1);
+  next.onclick=()=>changeMonth(1);
+  document.querySelector('#month').textContent=calendar.title;
+  days.replaceChildren();
+  for(const item of calendar.days){
+    if(!item.day){ days.append(document.createElement('span')); continue; }
+    const button=choice(item.day,item.date===date,!item.available,()=>{
+      date=item.date;
+      time='';
+      renderCalendar();
+      days.querySelector('[aria-pressed="true"]')?.focus();
+    });
+    button.setAttribute('aria-label',item.date+(item.available?' 可预约':' 无号'));
+    days.append(button);
+  }
+  document.querySelector('#date-hint').textContent=available.length?'可选日期有剩余号源。':'该门店暂时没有可约日期，请选择其他门店。';
+  renderTimes();
+}
+function renderTimes(){
+  const choices=[...new Set(slots.filter(s=>s.date===date).map(s=>s.time))].sort();
+  times.replaceChildren();
+  if(!choices.length){times.textContent=date?'当天暂无可约时间。':'请先在日历上选择日期。';}
+  for(const value of choices){
+    const button=choice(value,value===time,false,()=>{
+      time=value;
+      renderTimes();
+      times.querySelector('[aria-pressed="true"]')?.focus();
+    });
+    times.append(button);
+  }
+  renderDoctors();
+}
+function renderDoctors(){
+  const doctors=slots.filter(s=>s.date===date&&s.time===time);
+  field.doctor.replaceChildren();
+  option(field.doctor,'',time?'请选择医生':'请先选择时间');
+  for(const slot of doctors) option(field.doctor,slot.schedule.id,slot.schedule.dentist_name);
+  field.doctor.disabled=!doctors.length;
+  updateSubmit();
+}
+function updateSubmit(){submit.disabled=busy||!field.doctor.value||!field.reason.value;}
+function selectBranch(){
+  slots=data.schedules.filter(s=>String(s.branch_id)===field.branch.value).flatMap(schedule=>schedule.slots.map(slot=>{
+    const [date,time]=china(slot.startsAt).split('T');
+    return {...slot,date,time,schedule};
+  }));
+  date=time=month='';
+  renderCalendar();
+}
+function renderBookings(){
+  list.replaceChildren();
+  if(!data.bookings.length){list.textContent='暂无预约记录。';return;}
+  for(const item of data.bookings){
+    const entry=document.createElement('article'), status=document.createElement('span');
+    const title=document.createElement('strong'), detail=document.createElement('small');
+    entry.className='booking-item';
+    status.className='status';
+    status.textContent=item.status;
+    title.textContent=item.patient_name+' · '+item.branch_name;
+    detail.textContent=[item.record_no,china(item.planned_start).replace('T',' '),item.dentist_name].filter(Boolean).join(' · ');
+    entry.append(status,title,detail);
+    if(item.status==='已预约'){
+      const button=document.createElement('button');
+      button.className='secondary';
+      button.textContent='取消预约';
+      button.onclick=async()=>{
+        if(!confirm('确定取消这条预约？'))return;
+        button.disabled=true;
+        try{
+          await api('appointment',{action:'cancel',branchId:item.branch_id,appointmentId:item.id,expectedRevision:item.revision,requestKey:crypto.randomUUID()});
+          await refresh();
+          show('预约已取消。');
+        }catch(error){show(error.message,true);}
+        finally{button.disabled=false;}
+      };
+      entry.append(button);
+    }
+    list.append(entry);
+  }
+}
+function showLogin(){
+  csrf='';
+  data=null;
+  document.querySelector('#workspace').hidden=true;
+  document.querySelector('#login-panel').hidden=false;
+}
+async function refresh(){
+  data=await api('options');
+  csrf=data.csrf;
+  document.querySelector('#patient-name').textContent=data.patientName;
+  const branch=field.branch.value, reason=field.reason.value;
+  field.branch.replaceChildren();
+  field.reason.replaceChildren();
+  for(const item of data.branches) option(field.branch,item.id,item.name);
+  option(field.reason,'','请选择就诊目的');
+  for(const item of data.reasons) option(field.reason,item,item);
+  if(data.branches.some(item=>String(item.id)===branch))field.branch.value=branch;
+  if(data.reasons.includes(reason))field.reason.value=reason;
+  selectBranch();
+  renderBookings();
+  document.querySelector('#login-panel').hidden=true;
+  document.querySelector('#workspace').hidden=false;
+}
+login.onsubmit=async event=>{
+  event.preventDefault();
+  for(const button of login.querySelectorAll('button'))button.disabled=true;
+  try{
+    await api('session',{username:login.elements.username.value.trim(),password:login.elements.password.value});
+    login.elements.password.value='';
+    await refresh();
+    show('');
+  }catch(error){show(error.message,true);}
+  finally{for(const button of login.querySelectorAll('button'))button.disabled=false;}
+};
+document.querySelector('#demo-login').onclick=()=>{
+  login.elements.username.value='patient';
+  login.elements.password.value='Patient123';
+  login.requestSubmit();
+};
+document.querySelector('#logout').onclick=async()=>{
+  try{await api('logout',{});showLogin();show('已退出患者账号。');}
+  catch(error){show(error.message,true);}
+};
+field.branch.onchange=selectBranch;
+field.doctor.onchange=field.reason.onchange=updateSubmit;
+form.onsubmit=async event=>{
+  event.preventDefault();
+  const slot=slots.find(s=>s.date===date&&s.time===time&&String(s.schedule.id)===field.doctor.value);
+  if(!slot||busy)return;
+  busy=true;
+  updateSubmit();
+  try{
+    const result=await api('appointment',{action:'create',branchId:Number(field.branch.value),scheduleId:slot.schedule.id,scheduleRevision:slot.schedule.revision,startsAt:slot.startsAt,endsAt:slot.endsAt,reason:field.reason.value,requestKey:crypto.randomUUID()});
+    await refresh();
+    show('预约成功'+(result.recordNo?'。预约编号 '+result.recordNo:'。'));
+  }catch(error){
+    await refresh().catch(()=>{});
+    show(error.message,true);
+  }finally{busy=false;updateSubmit();}
+};
+document.querySelector('#refresh').onclick=()=>refresh().catch(error=>show(error.message,true));
+refresh().catch(error=>{if(!/重新进入/.test(error.message))show(error.message,true);});
