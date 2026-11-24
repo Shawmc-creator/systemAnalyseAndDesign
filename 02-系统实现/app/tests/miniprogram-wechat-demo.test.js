@@ -91,6 +91,10 @@ test('微信体验档案分别关联，预约可被前台查询，重启后保�
   const tokenA=await login('codeA');
   assert.equal((await post(prefix+'/session',{code:'codeA'},proxyHeaders)).status,401);
   const tokenB=await login('codeB');
+  assert.match((await options(tokenA)).patientName,/^[\u4e00-\u9fa5]{3}（演示）$/);
+  const accounts=demo.db.prepare('SELECT p.record_no FROM patient p JOIN mini_program_demo_patient mp ON mp.patient_id=p.id').all();
+  assert.equal(new Set(accounts.map(row=>row.record_no)).size,2);
+  assert.ok(accounts.every(row=>/^P-\d{4,}$/.test(row.record_no)));
   const schedule=(await options(tokenA)).schedules.find(entry=>entry.branch_id===2&&entry.slots.length);
   const slot=schedule.slots[0];
   const response=await post(prefix+'/appointment',{

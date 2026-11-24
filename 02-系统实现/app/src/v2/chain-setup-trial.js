@@ -1,10 +1,11 @@
 'use strict';
 const crypto=require('node:crypto');
-const {id,text,instant,dateOnly,day,fail,row,revision,insert,fact,recordNo,hash,canonical}=require('./common');
+const {id,text,instant,dateOnly,day,fail,row,revision,insert,fact,hash,canonical}=require('./common');
 const {assertCandidateSchedule}=require('./chain-reception-rules');
 const {ChainAuth}=require('./chain-auth');
 const {ChainReception}=require('./chain-reception-trial');
 const {mapError}=require('./unit-of-work');
+const {nextChainPatientNumber}=require('./chain-patient-number');
 class ChainSetup{
  constructor(app){this.db=app.db;this.auth=app.auth;this.unit=app.unit;this.reception=app.reception;this.access=new ChainAuth(app.auth);this.chainReception=new ChainReception(app);}
  options(credentials,branchId){if(credentials.role!=='manager')fail(403,'FORBIDDEN','需要负责人岗位');const branch=id(branchId,'门店');this.db.exec('BEGIN');try{
@@ -31,7 +32,7 @@ class ChainSetup{
     if(patient)revision(patient,input.expectedRevision);const merged={...patient,...fields};text(merged.name,'患者姓名',80);
     if(merged.phone)text(merged.phone_owner,'联系电话归属');else text(merged.contact_unavailable_reason,'无法联系原因');
     if(merged.phone&&this.db.prepare('SELECT 1 FROM patient WHERE name=? AND phone=? AND id<>?').get(merged.name,merged.phone,patient?.id||0))fail(409,'PATIENT_POSSIBLE_DUPLICATE','已有姓名和电话相同的患者，请先核对既有档案');
-    if(!patient){const patientId=insert(this.db,'patient',fact(now,{name:merged.name,birth_date:merged.birth_date||null,phone:merged.phone||null,phone_owner:merged.phone_owner||null,address:merged.address||null,contact_preference:merged.contact_preference||null,contact_unavailable_reason:merged.contact_unavailable_reason||null,created_by:ctx.session.staff_id,record_no:recordNo('P')}));result={kind:'patient',key:patientId,revision:1};}
+    if(!patient){const patientId=insert(this.db,'patient',fact(now,{name:merged.name,birth_date:merged.birth_date||null,phone:merged.phone||null,phone_owner:merged.phone_owner||null,address:merged.address||null,contact_preference:merged.contact_preference||null,contact_unavailable_reason:merged.contact_unavailable_reason||null,created_by:ctx.session.staff_id,record_no:nextChainPatientNumber(this.db)}));result={kind:'patient',key:patientId,revision:1};}
     else{const changes=Object.entries(fields).filter(([field,value])=>patient[field]!==value);if(!changes.length)fail(422,'NO_CHANGES','资料没有变化');
      this.db.prepare('UPDATE patient SET '+changes.map(([field])=>'"'+field+'"=?').join(',')+',updated_at=?,revision=revision+1 WHERE id=?').run(...changes.map(([,value])=>value),now,patient.id);
      for(const [field,value] of changes)insert(this.db,'patient_change',fact(now,{patient_id:patient.id,old_value:patient[field],new_value:value,reason,occurred_at:now,field_name:field,operator_id:ctx.session.staff_id}));

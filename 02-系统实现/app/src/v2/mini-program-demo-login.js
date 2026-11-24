@@ -2,7 +2,10 @@
 
 const {createHmac,randomBytes}=require('node:crypto');
 const {isIP}=require('node:net');
-const {fail,fact,insert,recordNo}=require('./common');
+const {fail,fact,insert}=require('./common');
+
+const {nextChainPatientNumber}=require('./chain-patient-number');
+const {miniProgramPatientName}=require('./chain-patient-demo-fixtures');
 
 const sessionSeconds=3600;
 
@@ -74,10 +77,11 @@ class MiniProgramDemoLogin{
       const existing=db.prepare('SELECT patient_id FROM mini_program_demo_patient WHERE subject_digest=?').get(subjectDigest);
       if(existing){db.exec('COMMIT');return existing.patient_id;}
       const now=auth.now();
+      const recordNo=nextChainPatientNumber(db);
       const patientId=insert(db,'patient',fact(now,{
-        name:'小程序虚构患者 '+randomBytes(3).toString('hex'),
+        name:miniProgramPatientName(recordNo),
         contact_unavailable_reason:'课程演示档案，未登记联系方式',
-        record_no:recordNo('P'),created_by:this.booking.actor(now)
+        record_no:recordNo,created_by:this.booking.actor(now)
       }));
       db.prepare('INSERT INTO mini_program_demo_patient(subject_digest,patient_id,created_at) VALUES(?,?,?)').run(subjectDigest,patientId,now);
       db.exec('COMMIT');

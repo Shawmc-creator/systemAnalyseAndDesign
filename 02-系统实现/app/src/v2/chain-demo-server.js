@@ -10,6 +10,7 @@ const {installTrialSchema}=require('./chain-schema-trial');
 const {ChainReceptionTrial}=require('./chain-reception-trial');
 const {ChainTransferProposal}=require('./chain-transfer-proposal');
 const {PatientDemoBooking}=require('./patient-demo-booking');
+const {upgradeDemoPatients}=require('./chain-patient-demo-fixtures');
 const {PATIENT_DEMO_ACCOUNT,PATIENT_BOOKING_REASONS,installPatientDemoCalendar,createRollingPatientCalendar,bookingHorizonMilliseconds,slotMilliseconds}=require('./patient-demo-calendar');
 const {MiniProgramDemoLogin,validateWechatDemoConfig}=require('./mini-program-demo-login');
 const {ensurePatientIdentityTrial}=require('./patient-identity-schema-trial');
@@ -51,7 +52,7 @@ const {ChainDemoSnapshot}=require('./chain-demo-snapshot');
 const {insert,fact,day,fail,hash,utc}=require('./common');
 const {encodePassword,checkPassword}=require('./auth');
 
-const CHAIN_DEMO_BUILD='20261124-04';
+const CHAIN_DEMO_BUILD='20261124-05';
 function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,patientClock=null,identityTrialConfig=null,publicOrigin=null,miniProgramTrial=false,wechatDemoConfig=null}={}){
  if(runtimeClock!==null&&typeof runtimeClock!=='function')throw new Error('运行时钟必须是函数');
  if(patientClock!==null&&typeof patientClock!=='function')throw new Error('患者预约时钟必须是函数');
@@ -199,8 +200,9 @@ function createChainDemo({snapshotPath=null,runtimeClock=null,fixedClock=null,pa
   const calendarChanged=installPatientDemoCalendar(db,demoNow,patientBooking);
   const rollingChanged=rollPatientCalendar?.(patientNow());
   const identityChanged=ensurePatientIdentityTrial(db);
+  const patientsChanged=upgradeDemoPatients(db);
   wechatDemo=wechatConfig?new MiniProgramDemoLogin(app,wechatConfig,patientBooking):null;
-  if((calendarChanged||rollingChanged||identityChanged||wechatDemo)&&store)store.save(db);
+  if((calendarChanged||rollingChanged||identityChanged||patientsChanged||wechatDemo)&&store)store.save(db);
  }
  catch(error){if(store)store.close();db.close();throw error;}
  let identitySessions=null;

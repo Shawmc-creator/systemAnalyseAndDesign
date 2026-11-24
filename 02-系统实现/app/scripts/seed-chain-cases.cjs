@@ -1,6 +1,7 @@
 'use strict';
 // Explicitly fictitious local fixed-date demo. Uses normal authorization and
 // commands, preserves existing records and reuses stable idempotency keys.
+const {examples}=require('../src/v2/chain-patient-demo-fixtures');
 const port=Number(process.env.CHAIN_DEMO_SEED_PORT||3011);
 if(!Number.isInteger(port)||port<1024||port>65535)throw Error('演示端口无效');
 const base='http://127.0.0.1:'+port;
@@ -9,9 +10,10 @@ async function login(user,role,password='Clinic123'){const r=await fetch(base+'/
 async function get(url,h){const r=await fetch(base+url,{headers:h});let d=await r.json();if(!r.ok)throw Error(url+'：'+d.message);return d;}
 async function post(url,input,h){const r=await fetch(base+url,{method:'POST',headers:h,body:JSON.stringify(input)}),d=await r.json();if(!r.ok)throw Error(url+'：'+d.message);return d;}
 const command=(branch,key,fields)=>({branchId:branch,commandVersion:1,requestKey:'case-20261112-'+key,...fields});
-async function examplePatient(branch, name, phone, key, front) {
+async function examplePatient(branch, {name,phone}, key, front) {
  const reception=await get('/api/reception/options?branchId='+branch,front);
- const existing=reception.patients.find(p=>p.name===name);
+ const {patients}=await get('/api/patients?branchId='+branch,front);
+ const existing=patients.find(p=>p.phone===phone);
  const patient=existing || await post('/api/setup',command(branch,key,{
   action:'patient',fields:{name,phone,phone_owner:'本人'},reason:'仅供课程虚构演示'
  }),front);
@@ -44,7 +46,7 @@ async function finishVisit(visit, key, dentist, assistant) {
 }
 
 async function seedAppointment(front) {
- const {patient,reception}=await examplePatient(2,'虚构示例预约患者','13800007778','booking-patient',front);
+ const {patient,reception}=await examplePatient(2,examples.booking,'booking-patient',front);
  if(reception.appointments.some(entry=>entry.patient_id===patient.id))return;
  await post('/api/reception',command(2,'booking',{
   action:'create',patientId:patient.id,...demoSchedule(reception,'2026-10-20'),
@@ -53,7 +55,7 @@ async function seedAppointment(front) {
 }
 
 async function seedWaiting(front, dentist) {
- const {patient,reception}=await examplePatient(2,'虚构示例候诊患者','13800007779','waiting-patient',front);
+ const {patient,reception}=await examplePatient(2,examples.waiting,'waiting-patient',front);
  const {visits}=await get('/api/treatment/options?branchId=2',dentist);
  if(visits.some(entry=>entry.patient_id===patient.id))return;
  await post('/api/reception',command(2,'waiting',{
@@ -63,7 +65,7 @@ async function seedWaiting(front, dentist) {
 }
 
 async function seedBill(front, dentist, cashier, manager, assistant) {
- const {patient,reception}=await examplePatient(2,'虚构示例待收费患者','13800007780','billing-patient',front);
+ const {patient,reception}=await examplePatient(2,examples.billing,'billing-patient',front);
  const options=()=>get('/api/treatment/options?branchId=2',dentist);
  let {visits,services}=await options();
  let visit=visits.find(entry=>entry.patient_id===patient.id);
@@ -177,7 +179,7 @@ async function seedDocument(visit, patient, assistant) {
  if(documents.some(document=>document.source==='课程虚构案例附件'))return;
  await post('/api/documents/upload',command(2,'followup-document',{
   ...context,documentType:'诊疗附件',source:'课程虚构案例附件',
-  ownershipNote:'对应二店虚构示例复诊患者',reason:'课堂演示牙医确认附件',
+  ownershipNote:'对应二店演示患者 '+examples.followup.name,reason:'课堂演示牙医确认附件',
   originalName:'虚构复诊说明.pdf',contentBase64:exampleDocument()
  }),assistant);
 }
@@ -194,9 +196,7 @@ async function seedDocument(visit, patient, assistant) {
     console.log('已创建 '+username+'（仅限本店）');
    }
   }
-  const reception=await get('/api/reception/options?branchId=2',front);
-  let patient=reception.patients.find(p=>p.name==='虚构示例复诊患者');
-  if(!patient){const added=await post('/api/setup',command(2,'patient',{action:'patient',fields:{name:'虚构示例复诊患者',phone:'13800007777',phone_owner:'本人'},reason:'仅供课程虚构演示'}),front);patient={id:added.id};console.log('已建立虚构患者');}
+  const {patient,reception}=await examplePatient(2,examples.followup,'patient',front);
   let treatment=await get('/api/treatment/options?branchId=2',dentist),visit=treatment.visits.find(v=>v.patient_id===patient.id);
   if(!visit){
    const schedule=reception.schedules.find(s=>s.business_date==='2026-10-19');if(!schedule)throw Error('二店示例排班缺失');
