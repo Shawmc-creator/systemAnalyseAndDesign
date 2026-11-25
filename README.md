@@ -18,6 +18,12 @@ certutil -user -addstore Root "%USERPROFILE%\Downloads\dental-preview-root.crt"
 
 如果 Windows 询问是否安装证书，确认文件来自项目提交人后点击「是」，然后重新打开浏览器。如果设备限制安装证书，可使用下方的本地演示。
 
+### 微信小程序
+
+打开微信「扫一扫」，扫描下方小程序码进入课程演示。
+
+![青禾课程演示项目小程序码](assets/wechat-miniprogram-code.png)
+
 ## 本地启动
 
 1. 下载本仓库，安装已验证的 [Node.js 24.19.0 LTS](https://nodejs.org/en/blog/release/v24.19.0)。
